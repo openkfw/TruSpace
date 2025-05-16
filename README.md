@@ -1,2 +1,2 @@
-# SmartSpace
-Repository for SmartSpace
+# TruSpace
+Repository for TruSpace
