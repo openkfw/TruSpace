@@ -1,0 +1,23 @@
+{
+  "verbose": true,
+  "restartable": "rs",
+  "legacyWatch": true,
+  "ignore": [
+    "node_modules",
+    "dist"
+  ],
+  "watch": [
+    "index.ts",
+    "src/**/*.ts"
+  ],
+  "execMap": {
+    "ts": "node --inspect=0.0.0.0:9229 --nolazy -r ts-node/register"
+  },
+  "ext": "ts,js",
+  "exec": "ts-node index.ts",
+  "env": {
+    "LOG_LEVEL": "debug"
+  },
+  "delay": "1000",
+  "legacy-watch": false
+}

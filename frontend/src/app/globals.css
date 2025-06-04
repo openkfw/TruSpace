@@ -1,0 +1,171 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+   font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer base {
+   :root {
+      --toastify-color-light: #fff;
+      --toastify-color-dark: #121212;
+      --toastify-color-info: #3498db;
+      --toastify-color-success: #02a808;
+      --toastify-color-warning: #f1c40f;
+      --toastify-color-error: hsl(6, 78%, 57%);
+      --toastify-color-transparent: rgba(255, 255, 255, 0.7);
+
+      --toastify-icon-color-info: var(--toastify-color-info);
+      --toastify-icon-color-success: var(--toastify-color-success);
+      --toastify-icon-color-warning: var(--toastify-color-warning);
+      --toastify-icon-color-error: var(--toastify-color-error);
+
+      --toastify-container-width: fit-content;
+      --toastify-toast-width: 320px;
+      --toastify-toast-offset: 16px;
+      --toastify-toast-top: max(
+         var(--toastify-toast-offset),
+         env(safe-area-inset-top)
+      );
+      --toastify-toast-right: max(
+         var(--toastify-toast-offset),
+         env(safe-area-inset-right)
+      );
+      --toastify-toast-left: max(
+         var(--toastify-toast-offset),
+         env(safe-area-inset-left)
+      );
+      --toastify-toast-bottom: max(
+         var(--toastify-toast-offset),
+         env(safe-area-inset-bottom)
+      );
+      --toastify-toast-background: #fff;
+      --toastify-toast-padding: 14px;
+      --toastify-toast-min-height: 64px;
+      --toastify-toast-max-height: 800px;
+      --toastify-toast-bd-radius: 6px;
+      --toastify-toast-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+      --toastify-font-family: sans-serif;
+      --toastify-z-index: 9999;
+      --toastify-text-color-light: #757575;
+      --toastify-text-color-dark: #fff;
+
+      /* Used only for colored theme */
+      --toastify-text-color-info: #fff;
+      --toastify-text-color-success: #fff;
+      --toastify-text-color-warning: #fff;
+      --toastify-text-color-error: #fff;
+
+      --toastify-spinner-color: #616161;
+      --toastify-spinner-color-empty-area: #e0e0e0;
+      --toastify-color-progress-light: linear-gradient(
+         to right,
+         #4cd964,
+         #5ac8fa,
+         #007aff,
+         #34aadc,
+         #5856d6,
+         #ff2d55
+      );
+      --toastify-color-progress-dark: #bb86fc;
+      --toastify-color-progress-info: var(--toastify-color-info);
+      --toastify-color-progress-success: var(--toastify-color-success);
+      --toastify-color-progress-warning: var(--toastify-color-warning);
+      --toastify-color-progress-error: var(--toastify-color-error);
+      --toastify-color-progress-bgo: 0.2;
+
+      --background: 217.9 100% 95%;
+      --foreground: 217.9 5% 7.5%;
+      --card: 217.9 50% 95%;
+      --card-foreground: 217.9 5% 12.5%;
+      --popover: 217.9 100% 97.5%;
+      --popover-foreground: 217.9 100% 5%;
+      --primary: 217.9 84.9% 49.4%;
+      --primary-foreground: 0 0% 100%;
+      --secondary: 217.9 30% 80%;
+      --secondary-foreground: 0 0% 0%;
+      --muted: 255.9 30% 90%;
+      --muted-foreground: 217.9 5% 37.5%;
+      --accent: 255.9 30% 85%;
+      --accent-foreground: 217.9 5% 12.5%;
+      --destructive: 0 100% 40%;
+      --destructive-foreground: 217.9 5% 95%;
+      --border: 217.9 30% 66%;
+      --input: 217.9 30% 34%;
+      --ring: 217.9 88.7% 45.3%;
+      --radius: 0.5rem;
+      --chart-1: 196 90% 59%;
+      --chart-2: 268 90% 59%;
+      --chart-3: 340 90% 59%;
+      --chart-4: 52 90% 59%;
+      --chart-5: 124 90% 59%;
+      --sidebar-background: 218, 100%, 90%;
+      --sidebar-foreground: 218, 5%, 7%;
+      --sidebar-primary: 218, 85%, 44%;
+      --sidebar-primary-foreground: 0, 0%, 100%;
+      --sidebar-accent: 256, 30%, 81%;
+      --sidebar-accent-foreground: 0 0% 0%;
+      --sidebar-border: 218, 30%, 63%;
+      --sidebar-ring: 208, 98%, 45%;
+   }
+
+   .dark {
+      --background: 217.9 50% 7.5%;
+      --foreground: 217.9 5% 95%;
+      --card: 217.9 50% 5%;
+      --card-foreground: 217.9 5% 95%;
+      --popover: 217.9 50% 5%;
+      --popover-foreground: 217.9 5% 95%;
+      --primary: 217.9 84.9% 49.4%;
+      --primary-foreground: 0 0% 100%;
+      --secondary: 217.9 30% 15%;
+      --secondary-foreground: 0 0% 100%;
+      --muted: 255.9 30% 20%;
+      --muted-foreground: 217.9 5% 62.5%;
+      --accent: 255.9 30% 20%;
+      --accent-foreground: 217.9 5% 92.5%;
+      --destructive: 0 100% 40%;
+      --destructive-foreground: 217.9 5% 95%;
+      --border: 217.9 30% 34%;
+      --input: 217.9 30% 34%;
+      --ring: 217.9 88.7% 45.3%;
+      --radius: 0.5rem;
+      --chart-1: 196 90% 59%;
+      --chart-2: 268 90% 59%;
+      --chart-3: 340 90% 59%;
+      --chart-4: 52 90% 59%;
+      --chart-5: 124 90% 59%;
+      --sidebar-background: 218, 50%, 10%;
+      --sidebar-foreground: 218, 5%, 100%;
+      --sidebar-primary: 218, 85%, 40%;
+      --sidebar-primary-foreground: 0 0% 100%;
+      --sidebar-accent: 256, 30%, 17%;
+      --sidebar-accent-foreground: 0 0% 100%;
+      --sidebar-border: 218, 30%, 32%;
+      --sidebar-ring: 208, 98%, 45%;
+   }
+}
+
+@layer base {
+   * {
+      @apply border-border;
+   }
+   body {
+      @apply bg-background text-foreground;
+   }
+}
+
+@layer utilities {
+   .transform-style-preserve-3d {
+      transform-style: preserve-3d;
+   }
+
+   .backface-hidden {
+      backface-visibility: hidden;
+   }
+
+   .rotate-y-180 {
+      transform: rotateY(180deg);
+   }
+}
