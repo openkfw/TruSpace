@@ -75,7 +75,15 @@ export default function DocumentVersions({ documentVersions }) {
             return (
                <div>
                   <div className="text-lg font-bold mb-1 mt-3">
-                     {fileName}
+                     <TooltipProvider>
+                        <Tooltip>
+                           <TooltipTrigger>{fileName}</TooltipTrigger>
+
+                           <TooltipContent>
+                              CID: {row.original?.cid}
+                           </TooltipContent>
+                        </Tooltip>
+                     </TooltipProvider>
                      {row.index === 0 && (
                         <span className="ml-2 bg-blue-200 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-sm dark:bg-blue-900 dark:text-blue-300">
                            {translations("newest")}
@@ -126,21 +134,8 @@ export default function DocumentVersions({ documentVersions }) {
                   langToSet = normalizedMetaLang;
                }
             }
-            return (
-               <div className="break-words text-sm max-w-[100px] sm:max-w-52 md:max-w-xs lg:max-w-md xl:max-w-lg">
-                  {langToSet}
-               </div>
-            );
+            return <span>{langToSet}</span>;
          }
-      },
-      {
-         accessorKey: "cid",
-         header: translations("versionCid"),
-         cell: ({ row }) => (
-            <div className="break-words text-sm max-w-[100px] sm:max-w-52 md:max-w-xs lg:max-w-md xl:max-w-lg">
-               {row.original?.cid}
-            </div>
-         )
       },
       {
          accessorKey: "actions",
