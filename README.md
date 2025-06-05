@@ -133,7 +133,7 @@ For a complete reference and description of all variables, see
 
 - Document summaries are triggered automatically (for .pdf and .docx documents)
 - View multiple perspectives (e.g. management, legal, digitalisation)
-- Add your own user perspectives from configured prompts. Details in [LLM Prompts](./prompts.md)
+- Add your own user perspectives from configured prompts. Details in [LLM Prompts](./doc/prompts.md)
 
 ### 🔄 IPFS Sync
 
