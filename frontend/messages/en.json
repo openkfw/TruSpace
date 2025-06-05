@@ -137,7 +137,8 @@
       "documentSize": "Document size:",
       "documentLanguages": "Document languages:",
       "generatingAILanguageQueue": "In queue for analyzing language...",
-      "generatingAILanguage": "Analyzing language..."
+      "generatingAILanguage": "Analyzing language...",
+      "languageGenerationError": "Beim Generieren der Sprache ist ein Fehler aufgetreten"
    },
    "documentVersion": {
       "version": "Version",
