@@ -137,7 +137,8 @@
       "documentSize": "Dokumentgröße:",
       "documentLanguages": "Dokumentsprachen:",
       "generatingAILanguageQueue": "In Warteschlange für Sprachanalyse...",
-      "generatingAILanguage": "Sprachanalyse..."
+      "generatingAILanguage": "Sprachanalyse...",
+      "languageGenerationError": "Beim Generieren der Sprache ist ein Fehler aufgetreten"
    },
    "documentVersion": {
       "version": "Version",
