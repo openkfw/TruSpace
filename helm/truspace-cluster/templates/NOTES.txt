@@ -1,0 +1,8 @@
+Commit: {{ .Values.global.env.CI_PROJECT_URL }}/-/commit/{{ .Values.global.build }} 
+Message: {{ .Values.global.env.CI_COMMIT_MESSAGE }}
+
+Branch or Tag: {{ .Values.global.env.CI_COMMIT_REF_NAME }}
+k8s namespace: {{ .Values.global.env.NAMESPACE }}
+
+WebUI: https://{{ (index .Values.webui.ingress.hosts 0).host }}/
+ipfs:  https://{{ (index .Values.ipfs.ingress.hosts 0).host }}/webui/

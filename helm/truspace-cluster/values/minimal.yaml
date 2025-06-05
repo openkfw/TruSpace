@@ -1,0 +1,197 @@
+clusterSecret: unset
+bootstrapPeerId: unset
+bootstrapPeerPrivKey: unset
+
+ipfs:
+  nameOverride: ipfs
+  fullnameOverride: ipfs
+  image:
+    repository: ipfs/kubo
+    tag: release
+  env:
+    - name: IPFS_FD_MAX
+      value: "4096"
+  services:
+    - port: 4001
+      name: swarm
+      targetPort: 4001
+      type: LoadBalancer
+  service:
+    port: 5001
+  ingress:
+    enabled: true
+    className: nginx
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/proxy-body-size: 1000m
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    hosts:
+      - paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                port:
+                  number: 5001
+    tls:
+      - secretName: wildcard-test-sixmarkets-crt
+        hosts:
+          - truspace-ipfs-00.test.sixmarkets.net
+  livenessProbe:
+    httpGet:
+      path: /webui
+      port: http
+    initialDelaySeconds: 15
+    periodSeconds: 10
+  readinessProbe:
+    httpGet:
+      path: /webui
+      port: http
+    initialDelaySeconds: 15
+    periodSeconds: 10
+  strategy:
+    type: Recreate
+  volumeMounts:
+    - mountPath: /data/ipfs
+      name: ipfs
+  volumes:
+    - name: ipfs
+      persistentVolumeClaim:
+        claimName: ipfs
+  volumeSize: 1Gi
+
+cluster:
+  nameOverride: cluster
+  fullnameOverride: cluster
+  image:
+    repository: ipfs/ipfs-cluster
+    tag: latest
+    command: ["sh", "/custom/entrypoint.sh"]
+  strategy:
+    type: Recreate
+  envFrom:
+    - configMapRef:
+        name: env-config
+  env:
+    - name: BOOTSTRAP_PEER_ID
+      valueFrom:
+        configMapKeyRef:
+          name: env-config
+          key: bootstrap-peer-id
+    - name: BOOTSTRAP_PEER_PRIV_KEY
+      valueFrom:
+        secretKeyRef:
+          name: secret-config
+          key: bootstrap-peer-priv-key
+    - name: CLUSTER_SECRET
+      valueFrom:
+        secretKeyRef:
+          name: secret-config
+          key: cluster-secret
+    - name: CLUSTER_MONITOR_PING_INTERVAL
+      value: "3m"
+    - name: SVC_NAME
+      value: $(CLUSTER_SVC_NAME)
+    - name: CLUSTER_PEERNAME
+      value: cluster0
+    - name: CLUSTER_IPFSHTTP_NODEMULTIADDRESS
+      value: /dns4/ipfs/tcp/5001
+    - name: CLUSTER_CRDT_TRUSTEDPEERS_0
+      value: "*"
+  service:
+    type: LoadBalancer
+    port: 9096
+  ingress:
+    enabled: false
+    className: nginx
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/proxy-body-size: 1000m
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    hosts:
+      - paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls:
+      - secretName: wildcard-test-sixmarkets-crt
+        #hosts:
+        #  - truspace-00-deployment-cluster.test.sixmarkets.net
+  volumeMounts:
+    - name: ipfs-cluster
+      mountPath: /data/ipfs-cluster
+    - name: configure-script
+      mountPath: /custom
+  volumes:
+    - name: ipfs-cluster
+      persistentVolumeClaim:
+        claimName: ipfs-cluster
+    - name: configure-script
+      configMap:
+        name: ipfs-cluster-set-bootstrap-conf
+  volumeSize: 1Gi
+
+webui:
+  nameOverride: webui
+  fullnameOverride: webui
+  image:
+    repository: ghcr.io/open-webui/open-webui
+    tag: main
+  service:
+    port: 8080
+  ingress:
+    enabled: true
+    className: nginx
+    annotations:
+      kubernetes.io/tls-acme: "true"
+      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/proxy-body-size: 1000m
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    hosts:
+      - paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls:
+      - secretName: wildcard-test-sixmarkets-crt
+  livenessProbe:
+    httpGet:
+      path: /
+      port: http
+  readinessProbe:
+    httpGet:
+      path: /
+      port: http
+  volumeMounts:
+    - mountPath: /app/backend/data
+      name: data
+  volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: webui-data
+  volumeSize: 50Gi
+
+backend:
+  nameOverride: backend
+  fullnameOverride: backend
+  image:
+    # repository: acrmarketshared.azurecr.io/truspace/backend
+    repository: nginx
+    tag: latest
+  imagePullSecrets:
+    - name: regsecret
+  strategy:
+    type: Recreate
+  env:
+    - name: PORT
+      value: "3000"
+    - name: IPFS_CLUSTER_HOST
+      value: ipfs
+  service:
+    port: 3000
+  volumeMounts:
+    - mountPath: /app/src
+      name: src
+  volumes:
+    - name: src
+      persistentVolumeClaim:
+        claimName: backend-src
+  volumeSize: 1Gi

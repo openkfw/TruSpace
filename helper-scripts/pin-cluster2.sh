@@ -1,0 +1,13 @@
+#!/bin/bash
+
+CID=$1
+if [ -z "$CID" ]; then
+  echo "Usage: sh $0 <CID>"
+  exit 1
+fi
+
+RESPONSE=$(curl -X POST http://localhost:9194/pins/$CID)
+# RESPONSE=$(curl -X POST http://localhost:5101/api/v0/pin/add?arg=$CID)
+
+#saved file under a hash
+echo "Pinning response: $RESPONSE"

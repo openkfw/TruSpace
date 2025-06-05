@@ -1,0 +1,7 @@
+# Collaborate on documents
+
+TruSpace allows users to collaborate on documents in different ways in real-time. This allows users to gain insights on documents, share knowledge and update documents collaboratively. Here are some of the features that TruSpace provides for document collaboration:
+
+- **Tags**: Users can add tags to documents to categorize them and make them easier to find. Tags can be added by clicking on the *+* icon in the document view and entering the desired tags.
+- **Comments**: Users can add comments to documents to provide feedback or ask questions. To display the comments, press on the comment symbol on the bottom right of the document view. There, users can add new comments and export the entire comment history.
+- **Perspectives**: Besides AI-generated perspectives (more [here](../Smart%20features%20through%20AI/AI%20perspectives.md)), users can also create their own perspectives on documents. Perspectives are a way to give insights on the documents from a specific point of view (e.g. financial, legal). This allows users with perhaps different areas of expertise to contribute their knowledge. To add a perspective, add it in the perspectives section of the document view.

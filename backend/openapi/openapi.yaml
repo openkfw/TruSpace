@@ -1,0 +1,135 @@
+openapi: 3.0.3
+info:
+  title: IPFS Cluster API
+  description: API for managing files in an IPFS cluster.
+  version: 1.0.0
+servers:
+  - url: /api
+paths:
+  /files/detail/{cid}:
+    get:
+      summary: Get file details by CID.
+      description: Retrieve detailed information about a file stored in the IPFS cluster using its CID.
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The CID of the file.
+      responses:
+        200:
+          description: File details retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      size:
+                        type: number
+                      cid:
+                        type: string
+        404:
+          description: File not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+  /files/{cid}:
+    get:
+      summary: Download file by CID.
+      description: Stream a file from the IPFS cluster using its CID.
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The CID of the file.
+      responses:
+        200:
+          description: File streamed successfully.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+  /files:
+    get:
+      summary: List all files in the IPFS cluster.
+      description: Retrieve a list of all files stored in the IPFS cluster.
+      responses:
+        200:
+          description: Files listed successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+    post:
+      summary: Upload a file to the IPFS cluster.
+      description: Upload a file along with its metadata to the IPFS cluster.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        200:
+          description: File uploaded successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      size:
+                        type: number
+        400:
+          description: No file uploaded.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        500:
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
