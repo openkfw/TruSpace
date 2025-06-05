@@ -8,7 +8,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies only for the build stage
-RUN npm i
+RUN npm ci --include=dev
 
 # Copy the rest of the application source code
 COPY . .
@@ -28,15 +28,25 @@ ENV CONTAINER=true
 WORKDIR /app
 
 # Copy the built code and package.json from the build stage
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/entrypoint.sh ./
+COPY --from=builder --chown=node:node /app/dist ./dist
+COPY --from=builder --chown=node:node /app/src ./src
+COPY --from=builder --chown=node:node /app/package*.json ./
+COPY --from=builder --chown=node:node /app/entrypoint.sh ./
+COPY --from=builder --chown=node:node /app/knexfile.ts ./
+COPY --from=builder --chown=node:node /app/src/db/migrations ./migrations
 
 RUN chmod +x entrypoint.sh
 
 # # Install only production dependencies
 RUN npm ci --production
 
+# Install ts-node for migration support
+RUN npm install -g ts-node typescript
+
+# Set correct permissions
+RUN chmod +x entrypoint.sh
+
+# Set the user to 'node' for security
 USER node
 
 # Set the command to run the application

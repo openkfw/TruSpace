@@ -8,25 +8,29 @@ The purpose of TruSpace is to make collaboration on documents between several st
 
 ## 📌 Table of Contents
 
-1. [Introduction](#🧭-introduction)
-2. [Key Features](#✨-key-features)
-3. [Getting Started](#🚀-getting-started)
-   - [Prerequisites](#🔧-prerequisites)
-   - [Environment Variables](#⚙️-environment-variables)
-   - [Quick start](#📥-quick-start)
-4. [Usage](#🧑‍💻-usage)
-   - [Creating Workspaces](#🔧-creating-workspaces)
-   - [Uploading and Editing Documents](#📤-uploading-and-editing-documents)
-   - [LLM Summarization](#🤖-llm-summarization)
-   - [IPFS Sync](#🔄-ipfs-sync)
-5. [Architecture Overview](#🏗-architecture-overview)
-6. [Tech Stack](#🧰-tech-stack)
-7. [Security & Data Privacy](#🔐-security--data-privacy)
-8. [Decentralization with IPFS Cluster](#🌐-decentralization-with-ipfs-cluster)
-9. [Contribution Guide](#🤝-contribution-guide)
-10. [Roadmap](#🛣-roadmap)
-11. [License](#📜-license)
-12. [Community & Support](#💬-community--support)
+1. [Introduction](#-introduction)
+2. [Key Features](#-key-features)
+3. [Start TruSpace in production](#-start-truSpace-in-production)
+   - [Prerequisites](#-prerequisites)
+   - [Environment Variables](#-environment-variables)
+   - [Quick start](#-quick-start)
+4. [Getting local environment started](#-getting-local-environment-started)
+   - [Prerequisites](#-prerequisites)
+   - [Environment Variables](#-environment-variables)
+   - [Quick start](#-quick-start)
+5. [Usage](#-usage)
+   - [Creating Workspaces](#-creating-workspaces)
+   - [Uploading and Editing Documents](#-uploading-and-editing-documents)
+   - [LLM Summarization](#-llm-summarization)
+   - [IPFS Sync](#-ipfs-sync)
+6. [Architecture Overview](#-architecture-overview)
+7. [Tech Stack](#-tech-stack)
+8. [Security & Data Privacy](#-security--data-privacy)
+9. [Decentralization with IPFS Cluster](#-decentralization-with-ipfs-cluster)
+10. [Contribution Guide](#-contribution-guide)
+11. [Roadmap](#-roadmap)
+12. [License](#-license)
+13. [Community & Support](#-community--support)
 
 ---
 
@@ -48,7 +52,31 @@ The purpose of TruSpace is to make collaboration on documents between several st
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Start TruSpace in production
+
+### 🔧 Prerequisites
+
+- Docker
+- File storage for docker volumes
+
+### 📥 Quick start
+
+If you want to run in production mode, e.g. on your virtual machine, start:
+
+```bash
+git clone https://github.com/openkfw/TruSpace.git
+cd production
+sh start-prod.sh
+```
+
+> ⚠️ **Warning:**  
+> If you encounter an error such as  
+> `Error response from daemon: error while creating mount source path '/.../truspace/production/volumes/cluster0': chown /.../truspace/production/volumes/cluster0: permission denied`  
+> you may need to set the correct permissions for the `/production/volumes` folders using `chown` or `chmod` commands, depending on your system setup.
+
+This script is meant for production run. If you want to start application for local development or testing follow [Dev Installation](./DEV_INSTALLATION.md) manual.
+
+## 🖥️ Getting local environment started
 
 ### 🔧 Prerequisites
 
@@ -78,15 +106,6 @@ If something doesn't work, check that all containers are running with `docker ps
 | 7b496fe98e68 | truspace-backend | "sh ./entrypoint.sh" | 26 minutes ago | Up 26 minutes | 0.0.0.0:8000->8000/tcp | truspace-backend-1 |
 | 783ffd8816f3 | ollama/ollama | "/bin/ollama serve" | 26 minutes ago | Up 26 minutes (healthy) | 0.0.0.0:11434->11434/tcp | ollama |
 | 590a1055f8ae | ipfs/kubo:release | "/sbin/tini -- /usr/…" | 26 minutes ago | Up 26 minutes (healthy) | 0.0.0.0:4001->4001/tcp, 0.0.0.0:5001->5001/tcp, 4001/udp, 0.0.0.0:8080->8080/tcp, 8081/tcp | ipfs0 |
-
-If you want to run in production mode, start:
-
-```bash
-git clone git@github.com:openkfw/TruSpace.git
-bash scripts/production/start-prod.sh
-```
-
-This script is meant for production run. If you want to start application for local development or testing follow [Dev Installation](./DEV_INSTALLATION.md) manual.
 
 ### ⚙️ Environment Variables
 
