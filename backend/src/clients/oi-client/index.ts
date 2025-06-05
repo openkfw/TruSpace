@@ -201,7 +201,7 @@ export class OpenWebUIClient {
         const oiReady = await this.openWebUIReady();
         if (!oiReady) {
           throw new Error(
-            `Open WebUI doesn't have ${config.ollama.model}, and it couldn't be downloaded`
+            `Open WebUI doesn't have ${config.ollama.model} LLM, and it couldn't be downloaded`
           );
         }
         await this.#generatePerspectives({
