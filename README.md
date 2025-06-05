@@ -70,14 +70,24 @@ sh start.sh
 
 it spins up docker compose containing backend api and IPFS clusters and additionally NextJS frontend in dev mode. After startup, the frontend is available on `http://localhost:3000`. Register a user and start using it!
 
+To enable AI analysis, you need to download the LLM model of your choice, as an example here is `gemma3:1b` and you can see the full list at the [ollama DB](https://ollama.com/library?q=mistral&sort=popular).
+
+- Login to the Open Web UI on `http://localhost:3333`. For login, use the values from the `.env` file, by default `admin@admin.com/admin`. Type the model you specified in the `.env` file in the search bar and Open Web UI offers you to download it.
+
+  ![Screenshot of downloading AI model](./doc/screenshotDownloadAIModel.png)
+
+Add commentMore actions
+
+**You made it!**
+
 If something doesn't work, check that all containers are running with `docker ps`. They should show these containers:
 | CONTAINER ID | IMAGE | COMMAND | CREATED | STATUS | PORTS | NAMES |
 |--------------|--------------------------------------|--------------------------|------------------|--------------------------|--------------------------------------------------------------------------------------------------|---------------------|
-| 14f314bc8fed | ghcr.io/open-webui/open-webui:main | "bash start.sh" | 26 minutes ago | Up 26 minutes (healthy) | 0.0.0.0:3333->8080/tcp | truspace-webui-1 |
-| 41267c887817 | ipfs/ipfs-cluster:latest | "/usr/bin/tini -- /u…" | 26 minutes ago | Up 26 minutes | 0.0.0.0:9094->9094/tcp, 0.0.0.0:9096-9097->9096-9097/tcp, 9095/tcp | cluster0 |
-| 7b496fe98e68 | truspace-backend | "sh ./entrypoint.sh" | 26 minutes ago | Up 26 minutes | 0.0.0.0:8000->8000/tcp | truspace-backend-1 |
-| 783ffd8816f3 | ollama/ollama | "/bin/ollama serve" | 26 minutes ago | Up 26 minutes (healthy) | 0.0.0.0:11434->11434/tcp | ollama |
-| 590a1055f8ae | ipfs/kubo:release | "/sbin/tini -- /usr/…" | 26 minutes ago | Up 26 minutes (healthy) | 0.0.0.0:4001->4001/tcp, 0.0.0.0:5001->5001/tcp, 4001/udp, 0.0.0.0:8080->8080/tcp, 8081/tcp | ipfs0 |
+| 14f... | ghcr.io/open-webui/open-webui:main | "bash start.sh" | 26 minutes ago | Up 26 minutes (healthy) | 0.0.0.0:3333->8080/tcp | truspace-webui-1 |
+| 412... | ipfs/ipfs-cluster:latest | "/usr/bin/tini -- /u…" | 26 minutes ago | Up 26 minutes | 0.0.0.0:9094->9094/tcp, 0.0.0.0:9096-9097->9096-9097/tcp, 9095/tcp | cluster0 |
+| 7b4...| truspace-backend | "sh ./entrypoint.sh" | 26 minutes ago | Up 26 minutes | 0.0.0.0:8000->8000/tcp | truspace-backend-1 |
+| 783... |truspace-frontend | "sh startup.sh" | 26 minutes ago | Up 26 minutes (healthy) | 0.0.0.0:3000->3000/tcp, :::3000->3000/tcp | truspace-frontend-1|
+| 590... | ipfs/kubo:release | "/sbin/tini -- /usr/…" | 26 minutes ago | Up 26 minutes (healthy) | 0.0.0.0:4001->4001/tcp, 0.0.0.0:5001->5001/tcp, 4001/udp, 0.0.0.0:8080->8080/tcp, 8081/tcp | ipfs0 |
 
 If you want to run in production mode, start:
 
@@ -132,10 +142,6 @@ For a complete reference and description of all variables, see
 - Changes are synced automatically using the pinning strategy by IPFS Cluster
 
 ---
-
-## 🏗 Architecture Overview
-
-![Architecture](./doc/TruSpace Architecture.png "Architecture overview")
 
 ## Tech Architectural overview
 

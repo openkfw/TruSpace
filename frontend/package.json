@@ -48,6 +48,7 @@
       "clsx": "^2.1.1",
       "date-fns": "^4.1.0",
       "docx-preview": "^0.3.4",
+      "geist": "^1.4.2",
       "html-react-parser": "^5.2.2",
       "js-cookie": "^3.0.5",
       "lucide-react": "^0.469.0",
