@@ -138,7 +138,7 @@
       "documentLanguages": "Document languages:",
       "generatingAILanguageQueue": "In queue for analyzing language...",
       "generatingAILanguage": "Analyzing language...",
-      "languageGenerationError": "Beim Generieren der Sprache ist ein Fehler aufgetreten"
+      "languageGenerationError": "An error occurred while generating the language"
    },
    "documentVersion": {
       "version": "Version",
