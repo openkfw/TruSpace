@@ -2,6 +2,13 @@ node_modules
 volumes/*
 production/volumes/*
 .next
+copy.png
+TdRDrainageBamako.pdf
 .DS_Store
+output.png
+outputscribble.json
 .env
 .env-multicluster
+ipfs-cluster-ctl
+ipfs-cluster-service
+scripts/prompts/cookies.txt

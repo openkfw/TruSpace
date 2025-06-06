@@ -1,0 +1,14 @@
+[
+    {
+        "title": "Executive Summary",
+        "prompt": "Summarize the following document in exactly 5 key bullet points that capture the most important ideas, insights, or actions. Focus on clarity, relevance, and brevity."
+    },
+    {
+        "title": "Inconsistencies in the document",
+        "prompt": "Review the following document and identify up to 5 inconsistencies in logic, tone, structure, or factual accuracy, including misaligned metrics, goals, or terminology. If no clear inconsistencies are found, instead suggest up to 5 actionable improvements to enhance clarity, coherence, or effectiveness."
+    },
+    {
+        "title": "Key financial indicators",
+        "prompt": "Analyze the following document and extract up to 5 key financial indicators such as revenue, profit, expenses, growth rates, margins, or financial ratios. If the document contains no direct financial indicators, identify up to 5 pieces of content that may be related to financial topics (e.g. economic performance, budgeting, funding, or resource allocation). If there are none, please state so."
+    }
+]
