@@ -314,7 +314,11 @@ router.post(
 
 router.put(
   "/:docId",
-  validate([param("docId").isUUID(4), body("workspace").isString().notEmpty()]),
+  validate([
+    param("docId").isUUID(4),
+    body("workspace").isString().notEmpty(),
+    body("versionTagName").isString(),
+  ]),
   async (req: AuthenticatedRequest, res: Response) => {
     if (!req.files || !req.files.file) {
       return res.status(400).json({
@@ -324,7 +328,7 @@ router.put(
     }
 
     try {
-      const { workspace } = req.body;
+      const { workspace, versionTagName } = req.body;
       const { docId } = req.params;
 
       await checkPermissionForWorkspace(req, res, workspace);
@@ -344,6 +348,7 @@ router.put(
         mimetype: file.mimetype,
         workspaceOrigin: workspace,
         docId,
+        versionTagName,
       });
       const fileDataClone = Buffer.from(file.data); // => clone unencrypted file for LLM processing
 

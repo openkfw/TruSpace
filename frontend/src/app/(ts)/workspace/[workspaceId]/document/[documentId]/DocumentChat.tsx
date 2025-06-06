@@ -148,6 +148,12 @@ export default function DocumentChat({
                                  version.cid === messageData?.documentCid
                            )?.meta.version
                         }
+                        versionTagName= {
+                           documentVersions.find(
+                              (version) =>
+                                 version.cid === messageData?.documentCid
+                           )?.meta.versionTagName
+                        }
                         timestamp={chat.meta.timestamp}
                         message={messageData.message}
                         onInfoPanelIconClick={

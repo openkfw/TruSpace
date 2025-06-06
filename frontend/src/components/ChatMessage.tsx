@@ -8,6 +8,7 @@ export default function ChatMessage({
    creator,
    timestamp,
    version,
+   versionTagName,
    message,
    showMoreActions,
    onInfoPanelIconClick
@@ -38,6 +39,7 @@ export default function ChatMessage({
             </div>
             <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
                {translations("messageForVersion")} {version}
+               {versionTagName ? `, ${versionTagName}` : ""}
             </span>
          </div>
          {showMoreActions && (

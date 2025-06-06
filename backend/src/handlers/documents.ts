@@ -18,6 +18,7 @@ export function createDocumentRequest({
   version,
   size,
   mimetype,
+  versionTagName,
 }: {
   filename: string;
   docId?: string;
@@ -26,6 +27,7 @@ export function createDocumentRequest({
   version?: string;
   size?: number;
   mimetype?: string;
+  versionTagName?: string;
 }): DocumentRequest {
   const docRequest: DocumentRequest = {
     docId: docId || uuidv4(),
@@ -38,6 +40,7 @@ export function createDocumentRequest({
       workspaceOrigin,
       encrypted: "true",
       mimetype,
+      versionTagName
     },
   };
   return docRequest;

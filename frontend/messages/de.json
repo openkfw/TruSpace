@@ -153,7 +153,8 @@
       "download": "Herunterladen",
       "failedToFetch": "Dokument konnte nicht abgerufen werden",
       "invalidResponse": "Ungültige Antwort",
-      "language": "Versionssprache"
+      "language": "Versionssprache",
+      "versionTagName": "Name des Versionstags"
    },
    "navbar": {
       "more": "Mehr",
@@ -197,7 +198,7 @@
    },
    "chat": {
       "user": "Benutzer",
-      "messageForVersion": "Nachricht für Version gepostet:",
+      "messageForVersion": "Bezogen auf die Dokumentversion:",
       "reply": "Antwort",
       "forward": "Nach vorne",
       "copy": "Kopie",
@@ -285,7 +286,8 @@
       "download": "Herunterladen",
       "versions": "Versionen",
       "metadata": "Metadaten",
-      "maxFileSize": "(Maximale Größe: 110MB)"
+      "maxFileSize": "(Maximale Größe: 110MB)",
+      "versionTagName": "Name des Versionstags"
    },
    "shareWorkspace": {
       "title": "Fügen Sie Arbeitsbereichsmitarbeiter hinzu",
