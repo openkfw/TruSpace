@@ -26,6 +26,8 @@ The purpose of TruSpace is to make collaboration on documents between several st
 
 ## Play around in a sandbox demo environment
 
+To check how TruSpace works, get to the sandbox installation at https://truspace.dev, register a new user, login and start playing with private and public workspaces!
+
 ## Run it locally on my machine
 
 For a very **quick and easy** TruSpace setup (e.g. for demos and first look), run:
@@ -36,27 +38,19 @@ git clone git@github.com:openkfw/TruSpace.git
 sh start.sh
 ```
 
-it spins up docker compose containing backend api and IPFS clusters and additionally NextJS frontend in dev mode. After startup, the frontend is available on `http://localhost:3000`. Register a user and start using it!
+This command spins up `docker compose` containing backend api and IPFS clusters and additionally NextJS frontend in dev mode. After startup, the frontend is available on `http://localhost:3000`. Register a user, login and create a workspace for documents!
 
 To enable AI analysis, you need to download the LLM model of your choice, as an example here is `gemma3:1b` and you can see the full list at the [ollama DB](https://ollama.com/library?q=mistral&sort=popular).
 
-- Login to the Open Web UI on `http://localhost:3333`. For login, use the values from the `.env` file, by default `admin@admin.com/admin`. Type the model you specified in the `.env` file in the search bar and Open Web UI offers you to download it.
+- Login to the Open Web UI on `http://localhost:3333`. For login, use the values from the `.env` file (`ADMIN_USER_EMAIL`), by default `admin@admin.com/admin`. Type the model you specified in the `.env` in the `OLLAMA_MODEL` variable in the search bar and Open Web UI offers you to download it.
 
   ![Screenshot of downloading AI model](./doc/screenshotDownloadAIModel.png)
 
-- Once the
+- Once the model is downloaded, AI analysis is executed upon each document upload automatically.
 
-**You made it**
+**You made it and should see this**
 
-## Install a standalone server
-
-## Connect to other TruSpace nodes
-
-## Check out architecture, guides, details
-
-For installation guide, please see [Installation and running of local environment](./DEV_INSTALLATION.md)
-
-**You made it!**
+![Screenshot of dashboard](./doc/screenshot_dashboard.png)
 
 If something doesn't work, check that all containers are running with `docker ps`. They should show these containers:
 | CONTAINER ID | IMAGE | COMMAND | CREATED | STATUS | PORTS | NAMES |
@@ -66,6 +60,16 @@ If something doesn't work, check that all containers are running with `docker ps
 | 7b4...| truspace-backend | "sh ./entrypoint.sh" | 26 minutes ago | Up 26 minutes | 0.0.0.0:8000->8000/tcp | truspace-backend-1 |
 | 783... |truspace-frontend | "sh startup.sh" | 26 minutes ago | Up 26 minutes (healthy) | 0.0.0.0:3000->3000/tcp, :::3000->3000/tcp | truspace-frontend-1|
 | 590... | ipfs/kubo:release | "/sbin/tini -- /usr/…" | 26 minutes ago | Up 26 minutes (healthy) | 0.0.0.0:4001->4001/tcp, 0.0.0.0:5001->5001/tcp, 4001/udp, 0.0.0.0:8080->8080/tcp, 8081/tcp | ipfs0 |
+
+## Install a standalone server
+
+## Connect to other TruSpace nodes
+
+## Check out architecture, guides, details
+
+For installation guide, please see [Installation and running of local environment](./doc/DEV_INSTALLATION.md)
+
+**You made it!**
 
 If you want to run in production mode, start:
 
