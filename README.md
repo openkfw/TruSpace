@@ -66,7 +66,7 @@ If you want to run in production mode, e.g. on your virtual machine, start:
 ```bash
 git clone https://github.com/openkfw/TruSpace.git
 cd production
-sh start-prod.sh
+bash start-prod.sh
 ```
 
 > ⚠️ **Warning:**  

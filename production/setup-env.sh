@@ -1,10 +1,9 @@
 #!/bin/bash
 
-
 EXAMPLE_FILE="../.env.example"
 ENV_FILE=".env"
 
-if [[ ! -f "$EXAMPLE_FILE" ]]; then
+if [ ! -f "$EXAMPLE_FILE" ]; then
   echo "❌ $EXAMPLE_FILE not found!"
   exit 1
 fi
