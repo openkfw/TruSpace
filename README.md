@@ -4,39 +4,7 @@ The purpose of TruSpace is to make collaboration on documents between several st
 
 **Collaborative, decentralized document sharing and editing platform** built with **Next.js**, **Express.js**, **SQLite**, and **IPFS Cluster**. Enhanced with local LLM capabilities via **Ollama**, **Open Web UI** and a nice web-interface.
 
----
-
-## 📌 Table of Contents
-
-1. [Introduction](#🧭-introduction)
-2. [Key Features](#✨-key-features)
-3. [Getting Started](#🚀-getting-started)
-   - [Prerequisites](#🔧-prerequisites)
-   - [Environment Variables](#⚙️-environment-variables)
-   - [Quick start](#📥-quick-start)
-4. [Usage](#🧑‍💻-usage)
-   - [Creating Workspaces](#🔧-creating-workspaces)
-   - [Uploading and Editing Documents](#📤-uploading-and-editing-documents)
-   - [LLM Summarization](#🤖-llm-summarization)
-   - [IPFS Sync](#🔄-ipfs-sync)
-5. [Architecture Overview](#🏗-architecture-overview)
-6. [Tech Stack](#🧰-tech-stack)
-7. [Security & Data Privacy](#🔐-security--data-privacy)
-8. [Decentralization with IPFS Cluster](#🌐-decentralization-with-ipfs-cluster)
-9. [Contribution Guide](#🤝-contribution-guide)
-10. [Roadmap](#🛣-roadmap)
-11. [License](#📜-license)
-12. [Community & Support](#💬-community--support)
-
----
-
-## 🧭 Introduction
-
-**TruSpace** is an open-source platform designed to enable **sovereign**, **decentralized**, and **intelligent** document collaboration between individuals and organizations.
-
----
-
-## ✨ Key Features
+✨ Key Features
 
 - 🆓 100% open-source, sovereign and self-hostable - no cloud provider needed
 - 🔄 Automatic sync of data between trusted IPFS cluster nodes/partners (private or public setup)
@@ -48,17 +16,17 @@ The purpose of TruSpace is to make collaboration on documents between several st
 
 ---
 
-## 🚀 Getting Started
+# I need to...
 
-### 🔧 Prerequisites
+- 🧪 [Play around in a sandbox demo environment](#play-around-in-a-sandbox-demo-environment)
+- 💻 [Run it locally on my machine](#run-it-locally-on-my-machine)
+- 🛠️ [Install a standalone server](#install-a-standalone-server)
+- 🌐 [Connect to other TruSpace nodes](#connect-to-other-truspace-nodes)
+- 📚 [Check out architecture, guides, details](#check-out-architecture-guides-details)
 
-- Node.js (>= 22)
-- Docker (for IPFS cluster and Ollama models)
-- File storage for docker volumes
+## Play around in a sandbox demo environment
 
-For installation guide, please see [Installation and running of local environment](./DEV_INSTALLATION.md)
-
-### 📥 Quick start
+## Run it locally on my machine
 
 For a very **quick and easy** TruSpace setup (e.g. for demos and first look), run:
 
@@ -76,7 +44,17 @@ To enable AI analysis, you need to download the LLM model of your choice, as an 
 
   ![Screenshot of downloading AI model](./doc/screenshotDownloadAIModel.png)
 
-Add commentMore actions
+- Once the
+
+**You made it**
+
+## Install a standalone server
+
+## Connect to other TruSpace nodes
+
+## Check out architecture, guides, details
+
+For installation guide, please see [Installation and running of local environment](./DEV_INSTALLATION.md)
 
 **You made it!**
 
@@ -143,7 +121,9 @@ For a complete reference and description of all variables, see
 
 ---
 
-## Tech Architectural overview
+## Tech Architecture overview
+
+In the overview, you can see how the components work together. The UI and API is part of this repository and provides the interface and the translation to other services. Once you start TruSpace, it pulls and connects to containers from Open Web UI (for AI processing) and IPFS/IPFS-Cluster to persist the data. The respective ports are outlined in the image.
 
 ![Architecture](./doc/tech-arch-diagram.PNG "Tech Architecture overview")
 
