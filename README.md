@@ -63,7 +63,15 @@ If something doesn't work, check that all containers are running with `docker ps
 
 ## Install a standalone server
 
+There's an extensive guide how to install TruSpace on a (virtual) server or a Raspberry Pi. It includes steps how to install surrounding architecture like docker, a reverse proxy `nginx`, certificates via `LetsEncrypt` and all the other administrative steps. Have a look [here](./doc/installStandaloneServer.md)
+
 ## Connect to other TruSpace nodes
+
+You have a TruSpace node running and would like to connect to another (private) network to sync the TruSpace data? Here's what to do:
+
+- TODO swarm key?
+- other secrets?
+- service.json cluster
 
 ## Check out architecture, guides, details
 
@@ -91,7 +99,7 @@ cp .env.example .env
 This project uses a set of environment variables to configure its frontend, backend, IPFS, and AI components.
 
 For a complete reference and description of all variables, see  
-➡️ [ENVIRONMENT_VARIABLES.md](./ENVIRONMENT_VARIABLES.md)
+➡️ [ENVIRONMENT_VARIABLES.md](./doc/ENVIRONMENT_VARIABLES.md)
 
 ---
 
