@@ -73,75 +73,30 @@ You have a TruSpace node running and would like to connect to another (private) 
 - other secrets?
 - service.json cluster
 
-## Check out architecture, guides, details
+## Check out architecture, guides, details..
 
-For installation guide, please see [Installation and running of local environment](./doc/DEV_INSTALLATION.md)
+### Run development environment for coding
 
-**You made it!**
-
-If you want to run in production mode, start:
-
-```bash
-git clone git@github.com:openkfw/TruSpace.git
-bash scripts/production/start-prod.sh
-```
-
-This script is meant for production run. If you want to start application for local development or testing follow [Dev Installation](./DEV_INSTALLATION.md) manual.
+For an installation guide in a development setup, please see [Installation and running of local environment](./doc/DEV_INSTALLATION.md)
 
 ### ⚙️ Environment Variables
-
-Create a `.env` file in the root directory for development or in `scripts/production` for production usage. Use `.env.example` as a template:
-
-```bash
-cp .env.example .env
-```
 
 This project uses a set of environment variables to configure its frontend, backend, IPFS, and AI components.
 
 For a complete reference and description of all variables, see  
 ➡️ [ENVIRONMENT_VARIABLES.md](./doc/ENVIRONMENT_VARIABLES.md)
 
----
+### 🧑‍💻 User Guide
 
-## 🧑‍💻 Usage
+An extensive user guide with screenshots is available in the folder [User Guide](./doc/User%20Guide/)
 
-### 🔧 Create workspaces
-
-- Navigate to the app
-- Click **Add Workspace** in left menu
-- Assign a name to a workspace
-- Share workspace with contributors and partners using the share button
-
-### 📤 Upload and collaborate on documents
-
-- Upload PDFs, Word documents or upload any other type of documents to share with other collaborators. AI views are calculated on upload of word or PDF files.
-- Edit documents directly in browser with a collaborative WYSIWYG editor
-- Upload additional versions if needed
-- In the chat screen, document interactions on the document, e.g. approvals or acknowledgements
-
-### 🤖 Generate LLM AI perspectives
-
-- Document summaries are triggered automatically (for .pdf and .docx documents)
-- View multiple perspectives (e.g. management, legal, digitalisation)
-- Add your own user perspectives from configured prompts. Details in [LLM Prompts](./doc/prompts.md)
-
-### 🔄 IPFS Sync
-
-- All documents are stored on IPFS
-- TruSpace nodes form a decentralized mesh
-- Changes are synced automatically using the pinning strategy by IPFS Cluster
-
----
-
-## Tech Architecture overview
+### Tech Architecture overview
 
 In the overview, you can see how the components work together. The UI and API is part of this repository and provides the interface and the translation to other services. Once you start TruSpace, it pulls and connects to containers from Open Web UI (for AI processing) and IPFS/IPFS-Cluster to persist the data. The respective ports are outlined in the image.
 
 ![Architecture](./doc/tech-arch-diagram.PNG "Tech Architecture overview")
 
----
-
-## 🧰 Tech Stack
+### 🧰 Tech Stack
 
 | Layer          | Technology                                                          |
 | -------------- | ------------------------------------------------------------------- |
@@ -152,24 +107,26 @@ In the overview, you can see how the components work together. The UI and API is
 | LLM Engine     | [Ollama](https://ollama.com/)                                       |
 | AI API and RAG | [Open Web UI](https://openwebui.com/)                               |
 
----
+### Data model for workspaces in IPFS
 
-## 🔐 Security & Data Privacy
+The data model has a hierarchical structure of workspaces, documents and metadata. They are linked using UUIDs in the metadata-fields of the IPFS files. Each data entry is a single (small) file to avoid merge conflicts in the IPFS network, e.g. in case of network split. The concept is outlined in the visual representation of the [Data model](./doc/datamodel.png "Data model")
 
-- Sensitive data (e.g. login credentials) is stored encrypted in **SQLite** on the local node
-- Documents are synced only to **trusted IPFS peers**, IPFS can be configured as private network by default
-- All inter-node communications are encrypted
-- Documents are encrypted with workspace ID
+The specific fields are described in [backend/src/types/interfaces/truspace.ts](backend/src/types/interfaces/truspace.ts)
 
----
-
-## 🌐 Decentralization with IPFS Cluster
+### 🔄 IPFS Sync for the decentralization of data
 
 - Each organization runs its own node
 - Nodes automatically replicate documents and metadata (e.g. chats, versions, AI perspectives) within the network
 - Fault-tolerant and censorship-resistant
 
----
+TODO
+
+### 🔐 Security & Data Privacy
+
+- Sensitive data (e.g. login credentials) is stored encrypted in **SQLite** on the local node
+- Documents are synced only to **trusted IPFS peers**, IPFS can be configured as private network by default
+- All inter-node communications are encrypted
+- Documents are encrypted with workspace ID
 
 ## 🤝 Contribution Guide
 
@@ -201,13 +158,3 @@ This project is licensed under the **GNU General Public License v3.0**. See the 
 
 - Discussions: [GitHub Discussions](https://github.com/openkfw/TruSpace/discussions)
 - Report issues: [GitHub Issues](https://github.com/openkfw/TruSpace/issues)
-
----
-
-## Data model for workspaces in IPFS
-
-The data model has a hierarchical structure of workspaces, documents and metadata. They are linked using UUIDs in the metadata-fields of the IPFS files. Each data entry is a single (small) file to avoid merge conflicts in the IPFS network, e.g. in case of network split. The concept is outlined below:
-
-![Data model](./doc/datamodel.png "Data model")
-
-The specific fields are described in [backend/src/types/interfaces/truspace.ts](backend/src/types/interfaces/truspace.ts)
