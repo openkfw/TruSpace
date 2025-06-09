@@ -201,6 +201,7 @@ export default function DocumentUpload({
       setAuthor(defaultAuthor);
       setOpen(false);
       setIsUploading(false);
+      setVersionTagName("");
    };
 
    const uploadButtonTitle = docId
@@ -317,6 +318,7 @@ export default function DocumentUpload({
                               type="text"
                               onChange={handleVersionTagNameInputChange}
                               value={versionTagName}
+                              maxLength={50}
                            />
                         </div>
                      ) : undefined}

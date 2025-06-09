@@ -317,7 +317,7 @@ router.put(
   validate([
     param("docId").isUUID(4),
     body("workspace").isString().notEmpty(),
-    body("versionTagName").isString(),
+    body("versionTagName").isString().isLength({ max: 50 }),
   ]),
   async (req: AuthenticatedRequest, res: Response) => {
     if (!req.files || !req.files.file) {
