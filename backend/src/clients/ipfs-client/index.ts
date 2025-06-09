@@ -81,7 +81,7 @@ export class IpfsClient implements IClient {
     const status = (
       await this.#gatewayAxios.get("/", {
         // don't throw error on status
-        validateStatus: function (_status) {
+        validateStatus: function (_status: any) {
           return true;
         },
       })
