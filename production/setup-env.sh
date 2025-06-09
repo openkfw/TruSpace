@@ -60,8 +60,6 @@ while IFS= read -r line || [ -n "$line" ]; do
     PROMPT_VALUE="${PROMPT_VALUE%\"}"
     PROMPT_VALUE="${PROMPT_VALUE#\"}"
 
-    echo "🔍 Found value: $PROMPT_VALUE"
-
     echo
     echo "🔧 Setting variable: $VAR_NAME"
     echo "   $COMMENT"
