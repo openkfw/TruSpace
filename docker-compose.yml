@@ -27,6 +27,7 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       JWT_MAX_AGE: ${JWT_MAX_AGE}
       CORS_ORIGIN: ${CORS_ORIGIN}
+      REGISTER_USERS_AS_INACTIVE: ${REGISTER_USERS_AS_INACTIVE}
     ports:
       - ${API_PORT}:${API_PORT}
     entrypoint: sh ./entrypoint.sh

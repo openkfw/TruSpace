@@ -73,6 +73,7 @@ bash start-prod.sh
 > If you encounter an error such as  
 > `Error response from daemon: error while creating mount source path '/.../truspace/production/volumes/cluster0': chown /.../truspace/production/volumes/cluster0: permission denied`  
 > you may need to set the correct permissions for the `/production/volumes` folders using `chown` or `chmod` commands, depending on your system setup.
+> You can use commands like `sudo chown -R 1000:1000 ./volumes` or `sudo chmod -R 744 ./volumes` and restart the application with `bash start-prod.sh`
 
 This script is meant for production run. If you want to start application for local development or testing follow [Dev Installation](./DEV_INSTALLATION.md) manual.
 

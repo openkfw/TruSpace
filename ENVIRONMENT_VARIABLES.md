@@ -25,6 +25,7 @@ This document provides a detailed overview of the environment variables used to 
 | `CONTENT_SECURITY_POLICY_SCRIPT_URLS`  | Comma-separated list of script-src URLs for the Content Security Policy.                                   |                       | false    |
 | `CONTENT_SECURITY_POLICY_WORKER_URLS`  | Comma-separated list of worker-src URLs for the Content Security Policy.                                   |                       | false    |
 | `RATE_LIMIT_PER_MINUTE`                | Maximum number of requests allowed per minute per IP address.                                              | 200                   | false    |
+| `REGISTER_USERS_AS_INACTIVE`           | If set to "true", users are registered a insactive and must be activated manually                          |                       | false    |
 | `NODE_ENV`                             | Specifies the environment (`development`, `production`) in which the application is running.               | production            | true     |
 
 ---
