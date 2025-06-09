@@ -54,7 +54,7 @@ done
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 # Check if .env file exists
 if [ ! -f "$SCRIPT_DIR/.env" ]; then
-    sh "$SCRIPT_DIR/setup-env.sh"
+    bash "$SCRIPT_DIR/setup-env.sh"
 fi
 source "$SCRIPT_DIR/.env"
 
@@ -92,3 +92,11 @@ else
     $dockerCmd pull ghcr.io/open-webui/open-webui:ollama    
     $dockerCmd compose -f docker-compose.yml -f docker-compose-ai.yml --env-file $SCRIPT_DIR/.env up -d
 fi
+
+# Check if root user is owner of the /volumes directory. If so, change ownership to the node user
+if [ "$(stat -c '%u' /volumes)" -eq 0 ]; then
+    echo "Changing ownership of /volumes to node user..."
+    sudo chown -R node:node /volumes
+fi
+
+echo "🎉 Done! TruSpace production instance started!"

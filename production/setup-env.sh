@@ -57,6 +57,10 @@ while IFS= read -r line || [ -n "$line" ]; do
       fi
     done
     PROMPT_VALUE="${CURRENT_VALUE:-$DEFAULT_VALUE}"
+    PROMPT_VALUE="${PROMPT_VALUE%\"}"
+    PROMPT_VALUE="${PROMPT_VALUE#\"}"
+
+    echo "🔍 Found value: $PROMPT_VALUE"
 
     echo
     echo "🔧 Setting variable: $VAR_NAME"
@@ -68,7 +72,7 @@ while IFS= read -r line || [ -n "$line" ]; do
     if [[ "$COMMENT" =~ regex:/([^/]*)/ ]]; then
       REGEX_PATTERN="${BASH_REMATCH[1]}"
     fi
-
+    
     # Loop for input and validation
     while true; do
       printf "> $VAR_NAME = " > /dev/tty
@@ -76,9 +80,9 @@ while IFS= read -r line || [ -n "$line" ]; do
       FINAL_VALUE="${USER_INPUT:-$PROMPT_VALUE}"
 
       # Validate if regex is present
-      if [[ -n "$REGEX_PATTERN" && -n "$USER_INPUT" ]]; then
-        if ! [[ "$USER_INPUT" =~ $REGEX_PATTERN ]]; then
-          echo "❌ Input does not match required pattern: /$REGEX_PATTERN/" > /dev/tty
+      if [[ -n "$REGEX_PATTERN" ]]; then
+        if ! [[ "$FINAL_VALUE" =~ $REGEX_PATTERN ]]; then
+          echo "❌ Input does not match required regex pattern: /$REGEX_PATTERN/" > /dev/tty
           continue
         fi
       fi
@@ -94,6 +98,8 @@ while IFS= read -r line || [ -n "$line" ]; do
   else
     ENV_CONTENT+="$line"$'\n'
   fi
+
+  COMMENT=""
 done < "$EXAMPLE_FILE"
 
 echo
