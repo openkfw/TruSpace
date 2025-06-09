@@ -198,6 +198,12 @@ export class OpenWebUIClient {
   ) {
     if (!fileData.error) {
       try {
+        const oiReady = await this.openWebUIReady();
+        if (!oiReady) {
+          throw new Error(
+            `Open WebUI doesn't have ${config.ollama.model} LLM, and it couldn't be downloaded`
+          );
+        }
         await this.#generatePerspectives({
           requestId,
           fileData,
@@ -241,6 +247,12 @@ export class OpenWebUIClient {
   ) {
     if (!fileData.error) {
       try {
+        const oiReady = await this.openWebUIReady();
+        if (!oiReady) {
+          throw new Error(
+            `Open WebUI doesn't have ${config.ollama.model} LLM, and it couldn't be downloaded`
+          );
+        }
         await this.#generateTags({
           requestId,
           fileData,

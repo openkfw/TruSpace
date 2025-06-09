@@ -113,6 +113,15 @@ export default function DocumentVersions({ documentVersions }) {
          }
       },
       {
+         accessorKey: "versionTagName",
+         header: translations("versionTagName"),
+         cell: ({ row }) => (
+            <div className="text-base font-bold">
+               {row.original?.meta?.versionTagName || "-"}
+            </div>
+         )
+      },
+      {
          accessorKey: "language",
          header: translations("language"),
          cell: ({ row }) => {

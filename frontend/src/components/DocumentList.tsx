@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import EmptyWorkspace from "@/app/(ts)/workspace/EmptyWorkspace";
 import { formatDate, formatDateDays } from "@/app/helper/formatDate";

@@ -13,6 +13,7 @@ export interface DocumentMeta {
    creator: string;
    workspaceOrigin: string;
    language: string;
+   versionTagName?: string;
 }
 
 export interface DocumentRequest {
