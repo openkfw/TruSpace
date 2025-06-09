@@ -58,10 +58,13 @@ The purpose of TruSpace is to make collaboration on documents between several st
 
 - Docker
 - File storage for docker volumes
+- Nginx (or other prefered way to expose application)
 
 ### 📥 Quick start
 
-If you want to run in production mode, e.g. on your virtual machine, start:
+If you want to run in production mode, e.g. on your virtual machine:
+
+Setup your nginx server running on VM. Example configuration can be found here: https://github.com/openkfw/TruSpace/blob/main/production/truspace.nginx
 
 ```bash
 git clone https://github.com/openkfw/TruSpace.git
@@ -77,6 +80,16 @@ bash start-prod.sh
 ```
 
 This script is meant for production run. If you want to start application for local development or testing follow [Dev Installation](./DEV_INSTALLATION.md) manual.
+
+```bash
+# To restart environment (e.g. after you change some environmental variable in .env file) run again:
+bash start-prod.sh
+```
+
+```bash
+# To STOP environment
+docker compose -f docker-compose.yml -f docker-compose-ai.yml down --remove-orphans
+```
 
 ## 🖥️ Getting local environment started
 

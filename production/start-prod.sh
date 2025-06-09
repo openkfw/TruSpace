@@ -94,9 +94,10 @@ else
 fi
 
 # Check if root user is owner of the /volumes directory. If so, change ownership to the node user
-if [ "$(stat -c '%u' /volumes)" -eq 0 ]; then
-    echo "Changing ownership of /volumes to node user..."
-    sudo chown -R node:node /volumes
+if [ "$(stat -c '%u' ./volumes)" -eq 0 ]; then
+    echo "Changing ownership of ./volumes to app user..."
+    sudo chown -R 1000:1000 ./volumes
 fi
 
 echo "🎉 Done! TruSpace production instance started!"
+echo "App is available at ${CORS_ORIGIN:-http://localhost:3000}"
