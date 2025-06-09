@@ -1,6 +1,6 @@
-# Install brainstorming summary
+# Install TruSpace on an empty linux server
 
-Starting from an empty Ubuntu VM, follow these steps. In case a chapter is already done or clear to you, skip it
+Starting from an empty Ubuntu VM, follow these steps. In case a step is already done or clear to you upfront, simply skip it.
 
 ## Setup basic infrastructure
 
@@ -234,8 +234,9 @@ sudo chown -R <user>:<group> volumes/
 - Access TruSpace and register a user
 - Upload a document and verify that everything works
 
-## Configure access to IPFS
+## Configure access to another IPFS node
 
-- In volumes, add the IP address and cluster ID in the multicast format to service.json peers
-
-## Developer only: Starting frontend from Node
+- To connect another node, it needs to be added to the cluster and the correct swarm key of that network needs to be present
+- Enter `~/truspace/volumes/cluster0/service.json` and enter the peer node in field `peer_addresses`. For example something like `/ip4/199.223.154.279/tcp/9096/p2p/12D3KooGN5nnhiVcFeHSkRynwhH54...`
+- Restart cluster container
+- Login to cluster0 with `docker exec -it cluster0 sh` and execute `ipfs-cluster-ctl peers ls`. The top line should say `cluster0 | Sees *1* other peers`
