@@ -25,15 +25,18 @@ import {
    TooltipProvider,
    TooltipTrigger
 } from "@/components/ui/tooltip";
-import { createPerspective, usePerspectivesStatus } from "@/lib/services";
+import {
+   createPerspective,
+   usePerspectives,
+   usePerspectivesStatus
+} from "@/lib/services";
 import parse from "html-react-parser";
 import { Bot, Info, Loader2, Plus } from "lucide-react";
 import { marked } from "marked";
 import { useTranslations } from "next-intl";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import TurndownService from "turndown";
-import { usePerspectives } from "../../../../../../lib/services";
 
 const turndownService = new TurndownService();
 
@@ -49,11 +52,26 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
    const [perspectiveText, setPerspectiveText] = useState("");
    const [editorHasError, setEditorHasError] = useState(false);
    const { perspectives, mutate } = usePerspectives(cid);
-   const {
-      status: perspectivesStatus,
-      error: prespectivesStatusError,
-      refresh: perspectivesStatusRefresh
-   } = usePerspectivesStatus(cid);
+   const { status: perspectivesStatus } = usePerspectivesStatus(cid);
+   const buttonRef = useRef(null);
+   const selectRef = useRef(null);
+   const [isWrapped, setIsWrapped] = useState(false);
+
+   useEffect(() => {
+      const checkSelectWrap = () => {
+         if (buttonRef.current && selectRef.current) {
+            const buttonTopPosition =
+               buttonRef.current.getBoundingClientRect().top;
+            const selectTopPosition =
+               selectRef.current.getBoundingClientRect().top;
+            setIsWrapped(selectTopPosition > buttonTopPosition + 5);
+         }
+      };
+
+      checkSelectWrap();
+      window.addEventListener("resize", checkSelectWrap);
+      return () => window.removeEventListener("resize", checkSelectWrap);
+   }, []);
 
    const uploadButtonTitle = translations("create");
 
@@ -208,7 +226,7 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                         </Label>
                         <Editor
                            onChange={onChangePerspectiveText}
-                           isRequired={true}
+                           isRequired
                            hasError={editorHasError}
                            errorMessage={translations("editorEmptyError")}
                            stickyToolbarTopMargin="[-30px]"
@@ -270,8 +288,9 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                            : translations("generatingAIPerspectives")}
                      </div>
                   ) : null}
-                  <div className="flex flew-row items-center justify-between">
+                  <div className="flex flew-row items-center justify-between flex-wrap">
                      <Button
+                        ref={buttonRef}
                         variant="outline"
                         onClick={() => {
                            setNewPerspectiveDialogOpen(true);
@@ -280,49 +299,52 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                      >
                         <Plus /> {translations("addYourPerspective")}
                      </Button>
-
-                     <Select
-                        onValueChange={changeCurrentPerspective}
-                        disabled={
-                           (isGenerating && perspectives?.length < 1) ||
-                           !perspectives ||
-                           perspectives.length < 1
-                        }
-                     >
-                        <SelectTrigger className="w-64 bg-slate-50 dark:bg-slate-800 dark:text-white dark:placeholder:text-white">
-                           <SelectValue
-                              placeholder={translations("selectPerspective")}
-                           />
-                        </SelectTrigger>
-                        <SelectContent>
-                           {perspectives?.map((perspective) => (
-                              <SelectItem
-                                 key={`${perspective.id}-${perspective.timestamp}`}
-                                 value={perspective.id}
-                              >
-                                 <div className="flex">
-                                    {perspective.name}
-                                    {perspective?.creatorType === "user" &&
-                                       ` (${perspective.creator})`}
-                                    {perspective?.creatorType === "ai" && (
-                                       <TooltipProvider>
-                                          <Tooltip>
-                                             <TooltipTrigger>
-                                                <Bot className="ml-2" />
-                                             </TooltipTrigger>
-                                             <TooltipContent>
-                                                {translations("aiPerspective")}
-                                             </TooltipContent>
-                                          </Tooltip>
-                                       </TooltipProvider>
-                                    )}
-                                 </div>
-                              </SelectItem>
-                           ))}
-                        </SelectContent>
-                     </Select>
+                     <div ref={selectRef} className={isWrapped ? "mt-2" : ""}>
+                        <Select
+                           onValueChange={changeCurrentPerspective}
+                           disabled={
+                              (isGenerating && perspectives?.length < 1) ||
+                              !perspectives ||
+                              perspectives.length < 1
+                           }
+                        >
+                           <SelectTrigger className="bg-slate-50 dark:bg-slate-800 dark:text-white dark:placeholder:text-white">
+                              <SelectValue
+                                 placeholder={translations("selectPerspective")}
+                              />
+                           </SelectTrigger>
+                           <SelectContent>
+                              {perspectives?.map((perspective) => (
+                                 <SelectItem
+                                    key={`${perspective.id}-${perspective.timestamp}`}
+                                    value={perspective.id}
+                                 >
+                                    <div className="flex items-center mr-1">
+                                       {perspective.name}
+                                       {perspective?.creatorType === "user" &&
+                                          ` (${perspective.creator})`}
+                                       {perspective?.creatorType === "ai" && (
+                                          <TooltipProvider>
+                                             <Tooltip>
+                                                <TooltipTrigger>
+                                                   <Bot className="ml-2" />
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                   {translations(
+                                                      "aiPerspective"
+                                                   )}
+                                                </TooltipContent>
+                                             </Tooltip>
+                                          </TooltipProvider>
+                                       )}
+                                    </div>
+                                 </SelectItem>
+                              ))}
+                           </SelectContent>
+                        </Select>
+                     </div>
                   </div>
-                  <div className="text-right"></div>
+                  <div className="text-right" />
 
                   {parse(html as string)}
 
