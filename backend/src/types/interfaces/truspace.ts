@@ -16,6 +16,7 @@ export interface DocumentMeta {
   language?: string;
   size?: number;
   mimetype?: string;
+  versionTagName?: string;
 }
 
 export interface DocumentRequest {

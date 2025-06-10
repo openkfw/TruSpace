@@ -153,7 +153,8 @@
       "download": "Download",
       "failedToFetch": "Failed to fetch document",
       "invalidResponse": "Invalid response",
-      "language": "Version language"
+      "language": "Version language",
+      "versionTagName": "Version tag name"
    },
    "navbar": {
       "more": "More",
@@ -197,7 +198,7 @@
    },
    "chat": {
       "user": "User",
-      "messageForVersion": "Message posted for document version:",
+      "messageForVersion": "Related to document version:",
       "reply": "Reply",
       "forward": "Forward",
       "copy": "Copy",
@@ -285,7 +286,8 @@
       "download": "Download",
       "versions": "Versions",
       "metadata": "Metadata",
-      "maxFileSize": "(Max size: 110MB)"
+      "maxFileSize": "(Max size: 110MB)",
+      "versionTagName": "Version tag name"
    },
    "shareWorkspace": {
       "title": "Add workspace collaborators",
