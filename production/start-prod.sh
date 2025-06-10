@@ -23,6 +23,19 @@ Help() {
     echo "Recommended docker compose version: >2"
 }
 
+get_owner_uid() {
+    if [ ! -d ./volumes ]; then
+        mkdir -p ./volumes
+    fi
+    if stat --version >/dev/null 2>&1; then
+        # GNU stat (Linux)
+        stat -c '%u' "$1"
+    else
+        # BSD stat (macOS)
+        stat -f '%u' "$1"
+    fi
+}
+
 # Find correct docker command
 dockerCmd=$(which docker)
 if [ -z "$dockerCmd" ]; then
@@ -94,7 +107,8 @@ else
 fi
 
 # Check if root user is owner of the /volumes directory. If so, change ownership to the node user
-if [ "$(stat -c '%u' ./volumes)" -eq 0 ]; then
+OWNER_UID=$(get_owner_uid ./volumes)
+if [ "$OWNER_UID" = "0" ]; then
     echo "Changing ownership of ./volumes to app user..."
     sudo chown -R 1000:1000 ./volumes
 fi
