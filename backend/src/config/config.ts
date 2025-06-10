@@ -33,6 +33,7 @@ interface Config {
     workerSrc: string[];
   };
   rateLimitPerMinute: number;
+  registerUsersAsInactive: boolean;
 }
 
 const { error, value: envVars } = envVarsSchema.validate(process.env);
@@ -84,6 +85,7 @@ export const config: Config = {
   rateLimitPerMinute: envVars.RATE_LIMIT_PER_MINUTE
     ? parseInt(envVars.RATE_LIMIT_PER_MINUTE, 10)
     : 200,
+  registerUsersAsInactive: envVars.REGISTER_USERS_AS_INACTIVE === "true",
 };
 
 if (config.jwt.secret === "super-secret-key") {

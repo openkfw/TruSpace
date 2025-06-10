@@ -4,6 +4,9 @@ The purpose of TruSpace is to make collaboration on documents between several st
 
 **Collaborative, decentralized document sharing and editing platform** built with **Next.js**, **Express.js**, **SQLite**, and **IPFS Cluster**. Enhanced with local LLM capabilities via **Ollama**, **Open Web UI** and a nice web-interface.
 
+---
+
+## ✨ Key Features
 ✨ Key Features
 
 - 🆓 100% open-source, sovereign and self-hostable - no cloud provider needed
@@ -16,7 +19,47 @@ The purpose of TruSpace is to make collaboration on documents between several st
 
 ---
 
-# I need to...
+## 🚀 Start TruSpace in production
+
+### 🔧 Prerequisites
+
+- Docker
+- File storage for docker volumes
+- Nginx (or other prefered way to expose application)
+
+### 📥 Quick start
+
+If you want to run in production mode, e.g. on your virtual machine:
+
+Setup your nginx server running on VM. Example configuration can be found here: https://github.com/openkfw/TruSpace/blob/main/production/truspace.nginx
+More details [here](./doc/installStandaloneServer.md)
+
+```bash
+git clone https://github.com/openkfw/TruSpace.git
+cd production
+bash start-prod.sh
+
+# If running for the first time you may need to set the correct permissions for the `/volumes` folders. Run
+sudo chown -R 1000:1000 ./volumes
+# or
+sudo chmod -R 744 ./volumes
+# and restart application with
+bash start-prod.sh
+```
+
+This script is meant for production run. If you want to start application for local development or testing follow [Dev Installation](./DEV_INSTALLATION.md) manual.
+
+```bash
+# To restart environment (e.g. after you change some environmental variable in .env file) run again:
+bash start-prod.sh
+```
+
+```bash
+# To STOP environment
+docker compose -f docker-compose.yml -f docker-compose-ai.yml down --remove-orphans
+```
+
+## 🖥️ Getting local environment started
 
 - 🧪 [Play around in a sandbox demo environment](#play-around-in-a-sandbox-demo-environment)
 - 💻 [Run it locally on my machine](#run-it-locally-on-my-machine)
@@ -28,7 +71,7 @@ The purpose of TruSpace is to make collaboration on documents between several st
 
 To check how TruSpace works, get to the sandbox installation at https://truspace.dev, register a new user, login and start playing with private and public workspaces!
 
-## Run it locally on my machine
+### 📥 Run it locally on my machine
 
 For a very **quick and easy** TruSpace setup (e.g. for demos and first look), run:
 
