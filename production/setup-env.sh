@@ -70,6 +70,11 @@ while IFS= read -r line || [ -n "$line" ]; do
     if [[ "$COMMENT" =~ regex:/([^/]*)/ ]]; then
       REGEX_PATTERN="${BASH_REMATCH[1]}"
     fi
+    FORBIBBEN_REGEX_PATTERN=""
+    if [[ "$COMMENT" =~ forbiddenInProdRegex:/([^[:space:]]*)/( |$) ]]; then
+      FORBIBBEN_REGEX_PATTERN="${BASH_REMATCH[1]}"
+    fi
+
     
     # Loop for input and validation
     while true; do
@@ -81,6 +86,12 @@ while IFS= read -r line || [ -n "$line" ]; do
       if [[ -n "$REGEX_PATTERN" ]]; then
         if ! [[ "$FINAL_VALUE" =~ $REGEX_PATTERN ]]; then
           echo "❌ Input does not match required regex pattern: /$REGEX_PATTERN/" > /dev/tty
+          continue
+        fi
+      fi
+      if [[ -n "$FORBIBBEN_REGEX_PATTERN" ]]; then
+        if [[ "$FINAL_VALUE" =~ $FORBIBBEN_REGEX_PATTERN ]]; then
+          echo "❌ Input is matching forbidden value: /$FORBIBBEN_REGEX_PATTERN/. Please change it!" > /dev/tty
           continue
         fi
       fi
