@@ -74,18 +74,16 @@ class JobQueue {
     templateId,
     cid,
     prompts,
-    fileId,
   }: {
     templateId: "tags" | "perspectives" | "language";
     cid: string;
     prompts: Prompt[];
-    fileId: string;
   }) {
     const requestId = this.#generateRequestId(cid, templateId);
     this.addJobFromTemplate({
       requestId,
       templateId,
-      attributes: { cid, prompts, requestId, fileId },
+      attributes: { cid, prompts, requestId },
     });
     return requestId;
   }
@@ -217,10 +215,15 @@ class JobQueue {
     this.#isProcessing = false;
   }
 
+  // todo hmm
   #generateRequestId = (
     cid: string,
-    type: "perspectives" | "tags" | "language"
+    type: "perspectives" | "tags" | "language",
+    suffix = undefined
   ): string => {
+    if (suffix) {
+      return `req_${type}_${cid}_${suffix}`;
+    }
     return `req_${type}_${cid}`;
   };
 }

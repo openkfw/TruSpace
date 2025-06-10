@@ -172,6 +172,21 @@ export const createPerspective = async (formData, errorText) => {
    return data;
 };
 
+export const customPerspective = async (formData, errorText) => {
+   const url = `${PERSPECTIVES_ENDPOINT}/generate-custom`;
+   const options: RequestInit = {
+      method: "POST",
+      body: formData,
+      credentials: "include"
+   };
+   const response = await fetch(url, options);
+   if (!response.ok) {
+      throw new Error(errorText);
+   }
+   const data = await response.json();
+   return data;
+};
+
 export const usePerspectives = (cid: string) => {
    const { data, error, isLoading, isValidating, mutate } = useSWR(
       `${PERSPECTIVES_ENDPOINT}/version/${cid}`,

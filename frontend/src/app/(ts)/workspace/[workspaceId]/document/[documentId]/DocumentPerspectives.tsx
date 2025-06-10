@@ -25,7 +25,11 @@ import {
    TooltipProvider,
    TooltipTrigger
 } from "@/components/ui/tooltip";
-import { createPerspective, usePerspectivesStatus } from "@/lib/services";
+import {
+   createPerspective,
+   customPerspective,
+   usePerspectivesStatus
+} from "@/lib/services";
 import parse from "html-react-parser";
 import { Bot, Info, Loader2, Plus } from "lucide-react";
 import { marked } from "marked";
@@ -44,9 +48,12 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
    const [promptModelDialogOpen, setPromptModelDialogOpen] = useState(false);
    const [newPerspectiveDialogOpen, setNewPerspectiveDialogOpen] =
       useState(false);
+   const [customPromptDialogOpen, setCustomPromptDialogOpen] = useState(false);
    const [isCreating, setIsCreating] = useState(false);
    const [perspectiveType, setPerspectiveType] = useState("");
    const [perspectiveText, setPerspectiveText] = useState("");
+   const [promptTitle, setPromptTitle] = useState("");
+   const [promptText, setPromptText] = useState("");
    const [editorHasError, setEditorHasError] = useState(false);
    const { perspectives, mutate } = usePerspectives(cid);
    const {
@@ -114,6 +121,36 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
             setPerspectiveType("");
             setPerspectiveText("");
             setEditorHasError(false);
+         } catch (err) {
+            console.error(err);
+         } finally {
+            setIsCreating(false);
+            setTimeout(() => mutate(), 1000);
+         }
+      }
+   };
+
+   // TODO check each line
+   const handleCustomSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!promptTitle.trim().length || !promptText.trim().length) {
+         console.error("prompt title or text missing");
+         setEditorHasError(true); //
+      } else {
+         setIsCreating(true);
+         const formData = new FormData();
+         formData.append("promptTitle", promptTitle);
+         formData.append("prompt", promptText);
+         formData.append("workspaceOrigin", workspaceOrigin);
+         formData.append("docId", docId);
+         formData.append("cid", cid);
+
+         try {
+            await customPerspective(formData, null);
+            setCustomPromptDialogOpen(false);
+            setPromptTitle("");
+            setPromptText("");
+            setEditorHasError(false); //
          } catch (err) {
             console.error(err);
          } finally {
@@ -259,6 +296,80 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
             </DialogContent>
          </Dialog>
 
+         <Dialog
+            open={customPromptDialogOpen}
+            onOpenChange={(open) => setCustomPromptDialogOpen(open)}
+         >
+            <DialogContent
+               className="sm:max-w-2xl overflow-auto max-h-screen"
+               onInteractOutside={(e) => e.preventDefault()}
+            >
+               <DialogHeader>
+                  <DialogTitle>{"EN:CREATE CUSTOM PROMPT"}</DialogTitle>
+               </DialogHeader>
+               <DialogDescription />
+               <form onSubmit={handleCustomSubmit}>
+                  <div className="grid gap-4 py-4">
+                     <div>
+                        <Label htmlFor="author">{"EN: CUSTOM PROMPT"}</Label>
+                        <Input
+                           className="mt-2 bg-slate-50 dark:bg-slate-800 dark:text-white dark:placeholder:text-white"
+                           id="promptTitle"
+                           type="text"
+                           value={promptTitle}
+                           onChange={(e) => setPromptTitle(e.target.value)}
+                           placeholder={translations(
+                              "perspectiveNamePlaceholder"
+                           )}
+                           required
+                        />
+                     </div>
+                     <div>
+                        <Label htmlFor="author">{"EN: CUSTOM PROMPT"}</Label>
+                        <Input
+                           className="mt-2 bg-slate-50 dark:bg-slate-800 dark:text-white dark:placeholder:text-white"
+                           id="perspectiveType"
+                           type="text"
+                           value={promptText}
+                           onChange={(e) => setPromptText(e.target.value)}
+                           placeholder={translations(
+                              "perspectiveNamePlaceholder"
+                           )}
+                           required
+                        />
+                     </div>
+                  </div>
+                  <DialogFooter className="flex flex-row justify-between space-x-4">
+                     <Button
+                        className="w-1/2 sm:w-auto"
+                        type="button"
+                        variant="destructive"
+                        onClick={() => {
+                           setNewPerspectiveDialogOpen(false);
+                           setEditorHasError(false);
+                        }}
+                     >
+                        {translations("cancel")}
+                     </Button>
+                     <Button
+                        disabled={isCreating}
+                        type="submit"
+                        className="w-1/2 sm:w-auto"
+                     >
+                        {isCreating ? (
+                           <>
+                              <Loader2 className="animate-spin" />
+                              {translations("creating")}
+                           </>
+                        ) : (
+                           uploadButtonTitle
+                        )}
+                     </Button>
+                  </DialogFooter>
+               </form>
+            </DialogContent>
+         </Dialog>
+
          <div className="flex flex-col">
             <div className="h-full">
                <div className="space-y-4">
@@ -279,6 +390,16 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                         className="mr-4"
                      >
                         <Plus /> {translations("addYourPerspective")}
+                     </Button>
+
+                     <Button
+                        variant="outline"
+                        onClick={() => {
+                           setCustomPromptDialogOpen(true);
+                        }}
+                        className="mr-4"
+                     >
+                        <Plus /> {"EN:Custom prompt"}
                      </Button>
 
                      <Select

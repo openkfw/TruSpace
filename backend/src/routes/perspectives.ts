@@ -85,4 +85,34 @@ router.post(
   }
 );
 
+router.post(
+  "/generate-custom",
+  validate([
+    body("promptTitle").isString().notEmpty(),
+    body("prompt").isString().notEmpty(),
+    body("workspaceOrigin").isUUID(4).notEmpty(),
+    body("docId").isUUID(4).notEmpty(),
+    body("cid").isString().notEmpty(),
+  ]),
+  async (req: AuthenticatedRequest, res: Response) => {
+    const { cid, prompt, promptTitle } = req.body;
+    const customSummaryTaskId = await taskQueue.addJob({
+      templateId: "perspectives",
+      cid,
+      prompts: [{ title: promptTitle, prompt: prompt }],
+    });
+
+    const customPromptInitialResponse = {
+      requestId: `${customSummaryTaskId}`,
+      message: "Request accepted. Processing started for task.",
+      statusEndpoint: `/api/perspectives/status/${customSummaryTaskId}`,
+    };
+
+    console.log("generate-custom ", customPromptInitialResponse);
+
+    const result = customPromptInitialResponse;
+    res.json(result);
+  }
+);
+
 export default router;
