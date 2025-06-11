@@ -1,9 +1,10 @@
 "use client";
 
-import { Moon, Sun } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 
-import { useTranslations } from "next-intl";
+import { Moon, Sun } from "lucide-react";
+
 import { Button } from "./ui/button";
 import {
    DropdownMenu,

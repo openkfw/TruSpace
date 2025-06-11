@@ -1,18 +1,19 @@
 "use client";
 
-import { Workspace } from "@/interfaces";
-import { loadWorkspaces } from "@/lib/services";
-import { useParams, usePathname } from "next/navigation";
 import {
    createContext,
+   type Dispatch,
+   type ReactNode,
+   type SetStateAction,
    useCallback,
    useContext,
    useEffect,
-   useState,
-   type Dispatch,
-   type ReactNode,
-   type SetStateAction
-} from "react";
+   useState} from "react";
+
+import { useParams, usePathname } from "next/navigation";
+
+import { Workspace } from "@/interfaces";
+import { loadWorkspaces } from "@/lib/services";
 
 interface WorkspaceContextType {
    workspace: Workspace | null;

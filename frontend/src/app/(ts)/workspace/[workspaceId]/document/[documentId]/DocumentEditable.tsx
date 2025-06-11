@@ -1,5 +1,11 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
+import { useTranslations } from "next-intl";
+
+import { Loader2 } from "lucide-react";
+
 import Editor from "@/components/tiptap-editor/Editor";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,9 +20,6 @@ import {
 import { useDocuments } from "@/contexts/DocumentsContext";
 import { useWorkspaceContext } from "@/contexts/WorkspaceContext";
 import { documentUpload, loadDocumentBlob } from "@/lib/services";
-import { Loader2 } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
 
 export default function DocumentEditable({
    cid,
@@ -57,7 +60,7 @@ export default function DocumentEditable({
       const formData = new FormData();
       formData.append("workspace", workspace?.uuid);
 
-      var editorContentBlob = new Blob([editorContent], {
+      const editorContentBlob = new Blob([editorContent], {
          type: "text/html"
       });
       formData.append("file", editorContentBlob, filename);

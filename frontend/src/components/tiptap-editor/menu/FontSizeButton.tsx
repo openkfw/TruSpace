@@ -1,3 +1,7 @@
+import { useTranslations } from "next-intl";
+
+import { ChevronDown } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import {
    DropdownMenu,
@@ -6,8 +10,6 @@ import {
    DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { ChevronDown } from "lucide-react";
-import { useTranslations } from "next-intl";
 
 const defaultFontSize = 16;
 const heading1DefaultFontSize = 28;
@@ -15,7 +17,7 @@ const heading2DefaultFontSize = 24;
 const heading3DefaultFontSize = 20;
 const fontSizes = [8, 10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 72, null];
 
-const FontSizeButton = ({ editor }: { editor: any }) => {
+const FontSizeButton = ({ editor }) => {
    const translations = useTranslations("editor");
    // get number from font size, e.g. 16px
    const stripFontSizeFromValue = (value: string) => {

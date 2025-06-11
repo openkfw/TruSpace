@@ -1,7 +1,8 @@
 "use server";
 
-import { Locale, defaultLocale } from "@/lib/constants";
 import { cookies } from "next/headers";
+
+import { defaultLocale,Locale } from "@/lib/constants";
 
 // In this example the locale is read from a cookie. You could alternatively
 // also read it from a database, backend service, or any other source.

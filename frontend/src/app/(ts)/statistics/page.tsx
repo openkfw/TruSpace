@@ -1,12 +1,12 @@
 "use client";
-import Chart from "@/components/Chart";
+import { ChartColumn, ChevronUp, Server, Users } from "lucide-react";
+
 import KPIBox from "@/components/KPIBox";
 import {
    useDocumentsStatistics,
    usePeers,
    useUsersStatistics
 } from "@/lib/services";
-import { ChartColumn, ChevronUp, Server, Users } from "lucide-react";
 
 export default function Statistics() {
    const { statistics: documentStatistics } = useDocumentsStatistics();

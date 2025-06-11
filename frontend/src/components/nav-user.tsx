@@ -1,5 +1,9 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+
+import Cookies from "js-cookie";
 import {
    Bell,
    BrainCircuit,
@@ -24,9 +28,6 @@ import {
    SidebarMenuItem,
    useSidebar
 } from "@/components/ui/sidebar";
-import Cookies from "js-cookie";
-import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
 import { logout } from "@/lib/services";
 
 export function NavUser({

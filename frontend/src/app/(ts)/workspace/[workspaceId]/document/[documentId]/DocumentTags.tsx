@@ -1,4 +1,11 @@
 "use client";
+import { useCallback, useEffect, useState } from "react";
+import { toast } from "react-toastify";
+
+import { useTranslations } from "next-intl";
+
+import { Bot, Loader2, Plus, X } from "lucide-react";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,12 +22,7 @@ import {
    TooltipProvider,
    TooltipTrigger
 } from "@/components/ui/tooltip";
-import { Bot, Loader2, Plus, X } from "lucide-react";
-
 import { deleteTag, loadTags, postTag } from "@/lib/services";
-import { useTranslations } from "next-intl";
-import { useCallback, useEffect, useState } from "react";
-import { toast } from "react-toastify";
 
 const colors = [
    { color: "bg-blue-600", textColor: "text-white" },

@@ -10,7 +10,7 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
-   { ignores: ["src/components/ui/**"] },
+   { ignores: ["src/components/ui/**", ".next"] },
    ...compat.config({
       extends: [
          "next/core-web-vitals",
@@ -22,7 +22,16 @@ const eslintConfig = [
          "plugin:import/typescript",
          "prettier"
       ],
-      plugins: ["unused-imports"],
+      parser: "@typescript-eslint/parser",
+      plugins: [
+         "@typescript-eslint",
+         "import",
+         "simple-import-sort",
+         "sort-exports",
+         "sort-keys",
+         "prettier",
+         "unused-imports"
+      ],
       rules: {
          "unused-imports/no-unused-imports": "error",
          "@typescript-eslint/no-unused-vars": [
@@ -35,20 +44,22 @@ const eslintConfig = [
                ignoreRestSiblings: true
             }
          ],
-         "import/order": [
+         "simple-import-sort/imports": [
             "warn",
             {
                groups: [
-                  "builtin",
-                  "external",
-                  "internal",
-                  "parent",
-                  "sibling",
-                  "index"
-               ],
-               alphabetize: { order: "asc", caseInsensitive: true }
+                  ["^react"],
+                  ["^next"],
+                  ["^@?\\w"],
+                  ["^"],
+                  ["^\\.\\.(?!/?$)", "^\\.\\./?$"],
+                  ["^\\./(?=.*/)(?!/?$)", "^\\.(?!/?$)", "^\\./?$"],
+                  ["^.+\\.s?css$"]
+               ]
             }
          ],
+         "simple-import-sort/exports": "warn",
+         "import/order": "off",
          "react-hooks/exhaustive-deps": "off",
          "react/jsx-boolean-value": ["warn", "never"],
          "react/self-closing-comp": "warn"
