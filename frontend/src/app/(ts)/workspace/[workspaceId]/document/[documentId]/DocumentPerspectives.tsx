@@ -37,6 +37,7 @@ import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import TurndownService from "turndown";
+import { Checkbox } from "../../../../../../components/ui/checkbox";
 import { usePerspectives } from "../../../../../../lib/services";
 
 const turndownService = new TurndownService();
@@ -55,6 +56,7 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
    const [promptTitle, setPromptTitle] = useState("");
    const [promptText, setPromptText] = useState("");
    const [editorHasError, setEditorHasError] = useState(false);
+   const [savePromptForWorkspace, setSavePromptForWorkspace] = useState(false);
    const { perspectives, mutate } = usePerspectives(cid);
    const {
       status: perspectivesStatus,
@@ -338,6 +340,37 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                            required
                         />
                      </div>
+                     <div className="flex flex-row items-center mt-4">
+                        <Checkbox
+                           checked={savePromptForWorkspace}
+                           onCheckedChange={() =>
+                              setSavePromptForWorkspace(!savePromptForWorkspace)
+                           }
+                           className="mr-2"
+                        />
+                        <span className="mr-2">
+                           {translations("workspaceDialog.setPrivate")}
+                        </span>
+                        {/* <TooltipProvider>
+                           <Tooltip
+                              open={tooltipOpen}
+                              onOpenChange={setTooltipOpen}
+                           >
+                              <TooltipTrigger asChild>
+                                 <CircleHelp
+                                    onClick={handleTooltipClick}
+                                    className="text-muted-foreground h-5 w-5 cursor-pointer hover:text-primary transition-colors"
+                                 />
+                              </TooltipTrigger>
+                              <TooltipContent
+                                 className="text-sm shadow-md max-w-xs p-3 rounded-md"
+                                 sideOffset={8}
+                              >
+                                 {translations("workspaceDialog.workspaceHint")}
+                              </TooltipContent>
+                           </Tooltip>
+                        </TooltipProvider> */}
+                     </div>
                   </div>
                   <DialogFooter className="flex flex-row justify-between space-x-4">
                      <Button
@@ -345,8 +378,8 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                         type="button"
                         variant="destructive"
                         onClick={() => {
-                           setNewPerspectiveDialogOpen(false);
-                           setEditorHasError(false);
+                           setCustomPromptDialogOpen(false);
+                           setEditorHasError(false); //
                         }}
                      >
                         {translations("cancel")}
