@@ -27,7 +27,7 @@ export const findJobStatusDb = async (requestId: string) => {
   }
 };
 
-export const findJobStatusByCidDb = async (cid: string) => {
+export const findJobsByCidDb = async (cid: string) => {
   try {
     const queryStatus = await db<JobStatus>("job_status")
       .select("id", "request_id", "status", "error", "created_at", "updated_at")

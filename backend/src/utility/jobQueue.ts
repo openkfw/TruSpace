@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   createJobStatusDb,
-  findJobStatusByCidDb,
   findJobStatusDb,
   getJobNotFinishedAndResetStatusesDb,
   getJobStatusPendingDb,
@@ -75,12 +74,14 @@ class JobQueue {
     templateId,
     cid,
     prompts,
+    identifier,
   }: {
     templateId: "tags" | "perspectives" | "language";
     cid: string;
     prompts: Prompt[];
+    identifier?: string;
   }) {
-    const requestId = this.#generateRequestId(cid, templateId);
+    const requestId = this.#generateRequestId(cid, templateId, identifier);
     this.addJobFromTemplate({
       requestId,
       templateId,
@@ -185,39 +186,38 @@ class JobQueue {
     }
   }
 
-  async getJobStatusByCid(cid: string): Promise<JobStatusResponse | undefined> {
-    if (this.#useDatabase) {
-      const jobStatuses = await findJobStatusByCidDb(cid);
-      // const queue = await getJobStatusPendingDb(cid);
+  // async getJobStatusByCid(cid: string): Promise<JobStatusResponse | undefined> {
+  //   if (this.#useDatabase) {
+  //     const jobStatuses = await findJobStatusByCidDb(cid);
+  //     const queue = await getJobStatusPendingDb(cid);
 
-      //   if (!jobStatuses?.length) {
-      //     return undefined;
-      //   }
-      //   return {
-      //     status: jobStatus.status,
-      //     timestamp: jobStatus.created_at,
-      //     jobsBefore: jobStatus.status === "pending" ? queue?.length || -1 : -1,
-      //     result: null,
-      //     error: jobStatus.error,
-      //   };
-      // }
+  //     if (!jobStatuses?.length) {
+  //       return undefined;
+  //     }
+  //     return {
+  //       status: jobStatus.status,
+  //       timestamp: jobStatus.created_at,
+  //       jobsBefore: jobStatus.status === "pending" ? queue?.length || -1 : -1,
+  //       result: null,
+  //       error: jobStatus.error,
+  //     };
+  //   }
 
-      // const foundJob = this.#queue.find((job) => job.id === jobId);
-      // if (foundJob) {
-      //   return {
-      //     status: foundJob.status,
-      //     timestamp: foundJob.timestamp,
-      //     jobsBefore:
-      //       foundJob.status === "pending"
-      //         ? this.#queue.findIndex((jobLoop) => jobLoop.id === foundJob.id)
-      //         : -1,
-      //     result: foundJob.result,
-      //     error: foundJob.error,
-      //   };
-      // }
-    }
-    return undefined;
-  }
+  //   const foundJob = this.#queue.find((job) => job.id === jobId);
+  //   if (foundJob) {
+  //     return {
+  //       status: foundJob.status,
+  //       timestamp: foundJob.timestamp,
+  //       jobsBefore:
+  //         foundJob.status === "pending"
+  //           ? this.#queue.findIndex((jobLoop) => jobLoop.id === foundJob.id)
+  //           : -1,
+  //       result: foundJob.result,
+  //       error: foundJob.error,
+  //     };
+  //   }
+  //   return undefined;
+  // }
 
   async #processQueue(): Promise<void> {
     if (this.#isProcessing) return;
@@ -258,7 +258,7 @@ class JobQueue {
   #generateRequestId = (
     cid: string,
     type: "perspectives" | "tags" | "language",
-    suffix = undefined
+    suffix: string | undefined
   ): string => {
     if (suffix) {
       return `req_${type}_${cid}_${suffix}`;

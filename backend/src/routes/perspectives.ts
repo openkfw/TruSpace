@@ -100,6 +100,7 @@ router.post(
       templateId: "perspectives",
       cid,
       prompts: [{ title: promptTitle, prompt: prompt }],
+      identifier: promptTitle,
     });
 
     const customPromptInitialResponse = {
