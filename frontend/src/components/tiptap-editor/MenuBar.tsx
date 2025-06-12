@@ -1,5 +1,7 @@
 /* eslint-disable jsx-a11y/alt-text */
 
+import { useTranslations } from "next-intl";
+
 import {
    AlignCenter,
    AlignLeft,
@@ -21,8 +23,7 @@ import {
    Undo,
    WrapText
 } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { AllowedButtons } from "./Editor";
+
 import BackgroundColorButton from "./menu/BackgroundColorButton";
 import ButtonGroup from "./menu/ButtonGroup";
 import DropDownButton from "./menu/DropDownButton";
@@ -31,8 +32,10 @@ import MenuButton from "./menu/MenuButton";
 import TableDropdownButton from "./menu/TableDropdownButton";
 import TextColorButton from "./menu/TextColorButton";
 import TextType from "./menu/TextType";
+import { AllowedButtons } from "./Editor";
 
 interface MenuBarProps {
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any
    editor: any;
    displayInfo: (message: string) => void;
    stickyToolbarTopMargin?: string;

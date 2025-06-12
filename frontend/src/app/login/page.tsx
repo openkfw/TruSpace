@@ -1,4 +1,14 @@
 "use client";
+import React, { useEffect } from "react";
+import { useForm } from "react-hook-form";
+
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+
+import Cookies from "js-cookie";
+
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,15 +20,10 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { User } from "@/interfaces";
 import { getLoginCookie, isTokenExpired, redirectToLogin } from "@/lib/";
 import { loginUser } from "@/lib/services";
-import Cookies from "js-cookie";
-import { useTranslations } from "next-intl";
-import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import React, { useEffect } from "react";
-import { useForm } from "react-hook-form";
+
 import { validateEmail } from "../helper/validateEmail";
 
 export default function Login({}: React.ComponentPropsWithoutRef<"div">) {
@@ -33,7 +38,7 @@ export default function Login({}: React.ComponentPropsWithoutRef<"div">) {
       formState: { errors }
    } = useForm();
 
-   const onSubmit = async (data: any) => {
+   const onSubmit = async (data: User) => {
       const result = await loginUser(data);
       if (result.status === "success") {
          Cookies.set("login", JSON.stringify(result.user));

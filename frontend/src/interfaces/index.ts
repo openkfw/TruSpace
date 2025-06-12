@@ -13,6 +13,7 @@ export interface DocumentMeta {
    creator: string;
    workspaceOrigin: string;
    language: string;
+   versionTagName?: string;
 }
 
 export interface DocumentRequest {
@@ -59,7 +60,7 @@ export interface WorkspaceCreateResponse {
 }
 
 export interface Workspace extends WorkspaceRequest {
-   logo: any;
+   logo: string | File;
    cid: string;
 }
 
@@ -123,4 +124,11 @@ interface PdfPage {
 
 interface PdfTextContent {
    items: Array<unknown>;
+}
+
+export interface User {
+   name: string;
+   email: string;
+   password: string;
+   confirmPassword: string;
 }

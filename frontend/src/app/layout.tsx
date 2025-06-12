@@ -1,12 +1,18 @@
-import { DocumentsProvider } from "@/contexts/DocumentsContext";
-import { WorkspaceProvider } from "@/contexts/WorkspaceContext";
-import { GeistMono } from "geist/font/mono";
-import { GeistSans } from "geist/font/sans";
+import { Slide, ToastContainer } from "react-toastify";
+
 import type { Metadata } from "next";
+import Script from "next/script";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
-import { Slide, ToastContainer } from "react-toastify";
+
+import { GeistMono } from "geist/font/mono"; // eslint-disable-line import/no-unresolved
+import { GeistSans } from "geist/font/sans"; // eslint-disable-line import/no-unresolved
+
+import { DocumentsProvider } from "@/contexts/DocumentsContext";
+import { WorkspaceProvider } from "@/contexts/WorkspaceContext";
+
 import { ThemeProvider } from "../components/theme-provider";
+
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -23,6 +29,9 @@ export default async function RootLayout({
 
    return (
       <html lang={locale} suppressHydrationWarning>
+         <head>
+            <Script src="/runtime/config.js" strategy="beforeInteractive" />
+         </head>
          <body
             className={`${GeistSans.variable} ${GeistMono.variable} antialiased`}
          >

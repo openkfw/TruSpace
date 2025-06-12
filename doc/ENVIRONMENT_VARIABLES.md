@@ -14,18 +14,19 @@ This document provides a detailed overview of the environment variables used to 
 
 ## ⚙️ Backend Configuration
 
-| Variable                               | Description                                                                                                | Default Value         | Required |
-| -------------------------------------- | ---------------------------------------------------------------------------------------------------------- | --------------------- | -------- |
-| `API_PORT`                             | Port on which the backend API server listens.                                                              | 8000                  | true     |
-| `DATABASE_PATH`                        | Path to the SQLite database file.                                                                          | /app/data/truspace.db | true     |
-| `LOG_LEVEL`                            | Logging verbosity (`DEBUG`, `INFO`, `WARNING`, `ERROR`). Use `DEBUG` during development for detailed logs. | DEBUG                 | true     |
-| `CONTENT_SECURITY_POLICY_DEFAULT_URLS` | Comma-separated list of default-src URLs for the Content Security Policy.                                  |                       | false    |
-| `CONTENT_SECURITY_POLICY_IMG_URLS`     | Comma-separated list of img-src URLs for the Content Security Policy.                                      |                       | false    |
-| `CONTENT_SECURITY_POLICY_FRAME_URLS`   | Comma-separated list of frame-src URLs for the Content Security Policy.                                    |                       | false    |
-| `CONTENT_SECURITY_POLICY_SCRIPT_URLS`  | Comma-separated list of script-src URLs for the Content Security Policy.                                   |                       | false    |
-| `CONTENT_SECURITY_POLICY_WORKER_URLS`  | Comma-separated list of worker-src URLs for the Content Security Policy.                                   |                       | false    |
-| `RATE_LIMIT_PER_MINUTE`                | Maximum number of requests allowed per minute per IP address.                                              | 200                   | false    |
-| `NODE_ENV`                             | Specifies the environment (`development`, `production`) in which the application is running.               | production            | true     |
+| Variable                               | Description                                                                                                        | Default Value         | Required |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | --------------------- | -------- |
+| `API_PORT`                             | Port on which the backend API server listens.                                                                      | 8000                  | true     |
+| `DATABASE_PATH`                        | Path to the SQLite database file which stores user credentials and other sensitive data that is not decentralized. | /app/data/truspace.db | true     |
+| `LOG_LEVEL`                            | Logging verbosity (`DEBUG`, `INFO`, `WARNING`, `ERROR`). Use `DEBUG` during development for detailed logs.         | DEBUG                 | true     |
+| `CONTENT_SECURITY_POLICY_DEFAULT_URLS` | Comma-separated list of default-src URLs for the Content Security Policy.                                          |                       | false    |
+| `CONTENT_SECURITY_POLICY_IMG_URLS`     | Comma-separated list of img-src URLs for the Content Security Policy.                                              |                       | false    |
+| `CONTENT_SECURITY_POLICY_FRAME_URLS`   | Comma-separated list of frame-src URLs for the Content Security Policy.                                            |                       | false    |
+| `CONTENT_SECURITY_POLICY_SCRIPT_URLS`  | Comma-separated list of script-src URLs for the Content Security Policy.                                           |                       | false    |
+| `CONTENT_SECURITY_POLICY_WORKER_URLS`  | Comma-separated list of worker-src URLs for the Content Security Policy.                                           |                       | false    |
+| `RATE_LIMIT_PER_MINUTE`                | Maximum number of requests allowed per minute per IP address.                                                      | 200                   | false    |
+| `REGISTER_USERS_AS_INACTIVE`           | If set to "true", users are registered a inactive and must be activated manually                                  |                       | false    |
+| `NODE_ENV`                             | Specifies the environment (`development`, `production`) in which the application is running.                       | production            | true     |
 
 ---
 
@@ -78,11 +79,11 @@ This document provides a detailed overview of the environment variables used to 
 
 ## 🤨 AI Integration (Ollama)
 
-| Variable                       | Description                                                          | Default Value   | Required |
-| ------------------------------ | -------------------------------------------------------------------- | --------------- | -------- |
-| `OLLAMA_MODEL`                 | Name of the default model to use (e.g., llama3.2:latest).            | llama3.2:latest | true     |
-| `AUTO_DOWNLOAD`                | Whether to auto-download model weights on startup.                   | true            | false    |
-| `DISABLE_ALL_AI_FUNCTIONALITY` | Set to true to disable AI features. Useful for limited environments. | false           | false    |
+| Variable                       | Description                                                          | Default Value | Required |
+| ------------------------------ | -------------------------------------------------------------------- | ------------- | -------- |
+| `OLLAMA_MODEL`                 | Name of the default model to use (e.g., llama3.2:latest).            | gemma3:1b     | true     |
+| `AUTO_DOWNLOAD`                | Whether to auto-download model weights on startup.                   | true          | false    |
+| `DISABLE_ALL_AI_FUNCTIONALITY` | Set to true to disable AI features. Useful for limited environments. | false         | false    |
 
 ---
 

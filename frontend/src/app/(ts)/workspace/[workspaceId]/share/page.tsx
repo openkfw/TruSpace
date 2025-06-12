@@ -1,4 +1,12 @@
 "use client";
+import { useContext, useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+
+import { useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
+
+import { LockOpen, UserCircle, Users, X } from "lucide-react";
+
 import { validateEmail } from "@/app/helper/validateEmail";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,11 +16,6 @@ import {
    getUsersInWorkspace,
    postPermission
 } from "@/lib/services";
-import { LockOpen, UserCircle, Users, X } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { useParams } from "next/navigation";
-import { useContext, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
 
 export default function WorkspaceShare() {
    const [users, setUsers] = useState([]);
@@ -50,10 +53,13 @@ export default function WorkspaceShare() {
       }
    });
 
-   const addUser = async (data: any) => {
-      data.workspaceId = workspaceId;
+   const addUser = async (data: { email: string }) => {
+      const requestData = {
+         workspaceId: Array.isArray(workspaceId) ? workspaceId[0] : workspaceId,
+         email: data.email
+      };
       try {
-         await postPermission(data);
+         await postPermission(requestData);
          const usersInWorkspace = await getUsersInWorkspace(workspaceId);
          setUsers(usersInWorkspace);
          reset();

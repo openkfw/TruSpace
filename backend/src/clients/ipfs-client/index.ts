@@ -81,7 +81,7 @@ export class IpfsClient implements IClient {
     const status = (
       await this.#gatewayAxios.get("/", {
         // don't throw error on status
-        validateStatus: function (_status) {
+        validateStatus: function (_status: any) {
           return true;
         },
       })
@@ -134,6 +134,7 @@ export class IpfsClient implements IClient {
         size: clusterRes.metadata.size
           ? Number(clusterRes.metadata.size)
           : undefined,
+        versionTagName: clusterRes.metadata.versionTagName || "",
         // mimetype: clusterRes.metadata.mimetype, // If available and needed
       },
     };
@@ -181,6 +182,7 @@ export class IpfsClient implements IClient {
           language: undefined,
           size: 0,
           encrypted: "false",
+          versionTagName: "",
         },
         documentVersions: [],
       };
@@ -715,6 +717,7 @@ export class IpfsClient implements IClient {
         encrypted: pin.meta.encrypted || "false",
         size: pin.meta.size ? Number(pin.meta.size) : 0,
         language: language,
+        versionTagName: pin.meta.versionTagName || "",
         // mimetype: pin.meta.mimetype, // If available and needed
       },
     };

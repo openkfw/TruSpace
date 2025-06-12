@@ -35,12 +35,15 @@
     "mammoth": "^1.9.0",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
+    "nodemon": "^3.1.9",
     "node-fetch": "^3.3.2",
     "ollama": "^0.5.12",
     "pdfkit": "^0.16.0",
     "sqlite": "^5.1.1",
     "sqlite3": "^5.1.7",
     "swagger-ui-express": "^5.0.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3",
     "undici": "^7.3.0",
     "uuid": "^11.0.5",
     "winston": "^3.17.0"
@@ -58,7 +61,7 @@
     "@types/jsonwebtoken": "^9.0.9",
     "@types/knex": "^0.15.2",
     "@types/morgan": "^1.9.9",
-    "@types/node": "^22.10.7",
+    "@types/node": "^22.15.29",
     "@types/node-fetch": "^2.6.12",
     "@types/pdfkit": "^0.13.9",
     "@types/swagger-ui-express": "^4.1.7",
@@ -68,10 +71,7 @@
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.2",
     "globals": "^15.14.0",
-    "nodemon": "^3.1.9",
     "prettier": "^3.4.2",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.7.3",
     "typescript-eslint": "^8.20.0"
   }
 }

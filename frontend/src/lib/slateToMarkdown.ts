@@ -7,7 +7,7 @@ type SlateNode = {
    code?: boolean;
    underline?: boolean;
    strikethrough?: boolean;
-   [key: string]: any;
+   [key: string]: string | boolean | SlateNode[] | undefined;
 };
 
 export const slateToMarkdown = (nodes: SlateNode[]): string => {

@@ -14,11 +14,17 @@ interface UserDb {
 export const createUserDb = async (
   name: string,
   email: string,
-  hash: string
+  hash: string,
+  status: string = "active"
 ) => {
   try {
     const userId = await db<UserDb>("users")
-      .insert({ username: name, email: email, password_hash: hash })
+      .insert({
+        username: name,
+        email: email,
+        password_hash: hash,
+        status: status,
+      })
       .returning<number>("id");
     return userId;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

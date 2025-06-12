@@ -1,4 +1,11 @@
 "use client";
+import React, { useState } from "react";
+import { toast } from "react-toastify";
+
+import { useTranslations } from "next-intl";
+
+import { Loader2 } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import {
    Dialog,
@@ -11,10 +18,7 @@ import {
 import { useDocuments } from "@/contexts/DocumentsContext";
 import { useWorkspaceContext } from "@/contexts/WorkspaceContext";
 import { documentUpload } from "@/lib/services";
-import { Loader2 } from "lucide-react";
-import { useTranslations } from "next-intl";
-import React, { useState } from "react";
-import { toast } from "react-toastify";
+
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 

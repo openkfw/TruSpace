@@ -1,12 +1,15 @@
 "use client";
+import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+
+import { LayoutDashboard } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 import {
    SidebarMenu,
    SidebarMenuButton,
    SidebarMenuItem
 } from "@/components/ui/sidebar";
-import { LayoutDashboard } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
 
 export function NavDashboard({ activePath }: { activePath: string }) {
    const translations = useTranslations("navbar");
@@ -20,13 +23,14 @@ export function NavDashboard({ activePath }: { activePath: string }) {
                tooltip={translations("dashboard")}
                isActive={activePath === "/dashboard"}
             >
-               <span
-                  className="cursor-pointer truncate"
+               <Button
+                  variant="ghost"
+                  className="flex justify-start"
                   onClick={() => router.push("/dashboard")}
                >
                   <LayoutDashboard />
                   {translations("dashboard")}
-               </span>
+               </Button>
             </SidebarMenuButton>
          </SidebarMenuItem>
       </SidebarMenu>

@@ -1,3 +1,14 @@
+import { useMemo } from "react";
+
+import { useTranslations } from "next-intl";
+
+import {
+   flexRender,
+   getCoreRowModel,
+   useReactTable
+} from "@tanstack/react-table";
+import { Dot, MoreVertical } from "lucide-react";
+
 import { formatDate, formatDateDays } from "@/app/helper/formatDate";
 import {
    DropdownMenu,
@@ -20,14 +31,7 @@ import {
    TooltipTrigger
 } from "@/components/ui/tooltip";
 import { DOCUMENTS_ENDPOINT } from "@/lib/services";
-import {
-   flexRender,
-   getCoreRowModel,
-   useReactTable
-} from "@tanstack/react-table";
-import { Dot, MoreVertical } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { useMemo } from "react";
+
 import { Button } from "../../../../../../components/ui/button";
 
 export default function DocumentVersions({ documentVersions }) {
@@ -111,6 +115,15 @@ export default function DocumentVersions({ documentVersions }) {
                </div>
             );
          }
+      },
+      {
+         accessorKey: "versionTagName",
+         header: translations("versionTagName"),
+         cell: ({ row }) => (
+            <div className="text-base font-bold">
+               {row.original?.meta?.versionTagName || "-"}
+            </div>
+         )
       },
       {
          accessorKey: "language",

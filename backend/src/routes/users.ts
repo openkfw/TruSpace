@@ -28,7 +28,12 @@ router.post(
 
     const passwordHash = await hashPassword(body.password);
     try {
-      const result = await createUserDb(body.name, body.email, passwordHash);
+      const result = await createUserDb(
+        body.name,
+        body.email,
+        passwordHash,
+        config.registerUsersAsInactive ? "inactive" : "active"
+      );
       if (!result) {
         throw Error("Unknown error");
       }

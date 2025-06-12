@@ -1,8 +1,10 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
+
 import { setUserLocale } from "@/i18n/service";
 import { locales } from "@/lib/constants";
-import { useLocale, useTranslations } from "next-intl";
+
 import { Button } from "./ui/button";
 import {
    DropdownMenu,

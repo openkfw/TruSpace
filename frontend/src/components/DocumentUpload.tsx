@@ -1,4 +1,12 @@
 "use client";
+import React, { useRef, useState } from "react";
+import { toast } from "react-toastify";
+
+import { useTranslations } from "next-intl";
+
+import { Loader2, Upload, X } from "lucide-react";
+import * as pdfjs from "pdfjs-dist";
+
 import { Button } from "@/components/ui/button";
 import {
    Dialog,
@@ -8,17 +16,13 @@ import {
    DialogHeader,
    DialogTitle
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { useDocuments } from "@/contexts/DocumentsContext";
 import { useWorkspaceContext } from "@/contexts/WorkspaceContext";
 import { documentUpload } from "@/lib/services";
 import { isPdfBlank } from "@/lib/utils";
-import { Loader2, Upload, X } from "lucide-react";
-import { useTranslations } from "next-intl";
-import * as pdfjs from "pdfjs-dist";
-import React, { useRef, useState } from "react";
-import { toast } from "react-toastify";
+
 import { Label } from "./ui/label";
-("");
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
    "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -42,10 +46,11 @@ export default function DocumentUpload({
    const { workspace } = useWorkspaceContext();
    const { fetchDocuments, refreshUntilVersionFound } = useDocuments();
    const [author, setAuthor] = useState("");
-   const [defaultAuthor, setDefaultAuthor] = useState("");
+   const [defaultAuthor, _setDefaultAuthor] = useState("");
    const [files, setFiles] = useState<File[]>([]);
    const [blankStatuses, setBlankStatuses] = useState<boolean[]>([]);
    const [fileSizeErrors, setFileSizeErrors] = useState<boolean[]>([]);
+   const [versionTagName, setVersionTagName] = useState<string>("");
 
    const inputRef = useRef<HTMLInputElement>(null);
 
@@ -126,6 +131,12 @@ export default function DocumentUpload({
       handleFileChange(e.target.files);
    };
 
+   const handleVersionTagNameInputChange = (
+      e: React.ChangeEvent<HTMLInputElement>
+   ) => {
+      setVersionTagName(e.target.value);
+   };
+
    const handleClick = () => {
       inputRef.current?.click();
    };
@@ -157,6 +168,7 @@ export default function DocumentUpload({
          }
          const formData = new FormData();
          formData.append("workspace", workspace?.uuid);
+         formData.append("versionTagName", versionTagName);
          formData.append("author", author);
          formData.append("file", file, file.name);
          try {
@@ -192,6 +204,7 @@ export default function DocumentUpload({
       setAuthor(defaultAuthor);
       setOpen(false);
       setIsUploading(false);
+      setVersionTagName("");
    };
 
    const uploadButtonTitle = docId
@@ -299,6 +312,19 @@ export default function DocumentUpload({
                            )}
                         </div>
                      ))}
+                     {docId ? (
+                        <div className="mt-6">
+                           <Label htmlFor="file">
+                              {documentTranslations("versionTagName")}
+                           </Label>
+                           <Input
+                              type="text"
+                              onChange={handleVersionTagNameInputChange}
+                              value={versionTagName}
+                              maxLength={50}
+                           />
+                        </div>
+                     ) : undefined}
                   </div>
                </div>
                <DialogFooter className="flex flex-row justify-between space-x-4">
