@@ -186,39 +186,6 @@ class JobQueue {
     }
   }
 
-  // async getJobStatusByCid(cid: string): Promise<JobStatusResponse | undefined> {
-  //   if (this.#useDatabase) {
-  //     const jobStatuses = await findJobStatusByCidDb(cid);
-  //     const queue = await getJobStatusPendingDb(cid);
-
-  //     if (!jobStatuses?.length) {
-  //       return undefined;
-  //     }
-  //     return {
-  //       status: jobStatus.status,
-  //       timestamp: jobStatus.created_at,
-  //       jobsBefore: jobStatus.status === "pending" ? queue?.length || -1 : -1,
-  //       result: null,
-  //       error: jobStatus.error,
-  //     };
-  //   }
-
-  //   const foundJob = this.#queue.find((job) => job.id === jobId);
-  //   if (foundJob) {
-  //     return {
-  //       status: foundJob.status,
-  //       timestamp: foundJob.timestamp,
-  //       jobsBefore:
-  //         foundJob.status === "pending"
-  //           ? this.#queue.findIndex((jobLoop) => jobLoop.id === foundJob.id)
-  //           : -1,
-  //       result: foundJob.result,
-  //       error: foundJob.error,
-  //     };
-  //   }
-  //   return undefined;
-  // }
-
   async #processQueue(): Promise<void> {
     if (this.#isProcessing) return;
     this.#isProcessing = true;
@@ -254,7 +221,6 @@ class JobQueue {
     this.#isProcessing = false;
   }
 
-  // todo hmm
   #generateRequestId = (
     cid: string,
     type: "perspectives" | "tags" | "language",

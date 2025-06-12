@@ -5,7 +5,6 @@ import { Prompt } from "../../types/interfaces";
 interface JobStatus {
   id: number;
   request_id: string;
-  cid: string;
   status: "pending" | "processing" | "completed" | "failed";
   error?: string;
   attributes?: { [key: string]: string | number | boolean | Prompt[] };
@@ -27,18 +26,6 @@ export const findJobStatusDb = async (requestId: string) => {
   }
 };
 
-export const findJobsByCidDb = async (cid: string) => {
-  try {
-    const queryStatus = await db<JobStatus>("job_status")
-      .select("id", "request_id", "status", "error", "created_at", "updated_at")
-      .where({ cid });
-    return queryStatus;
-  } catch (error) {
-    logger.error(`Error finding Query Status for document cid ${cid}:`, error);
-    return undefined;
-  }
-};
-
 export const getJobStatusPendingDb = async (
   jobIdToSkip?: string
 ): Promise<JobStatus[] | undefined> => {
@@ -47,7 +34,6 @@ export const getJobStatusPendingDb = async (
       .select(
         "id",
         "request_id",
-        "cid",
         "status",
         "template_id",
         "error",
@@ -84,7 +70,6 @@ export const getJobNotFinishedAndResetStatusesDb = async (): Promise<
       .select(
         "id",
         "request_id",
-        "cid",
         "status",
         "template_id",
         "attributes",
