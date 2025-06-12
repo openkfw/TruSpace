@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import { useTranslations } from "next-intl";
 
 import parse from "html-react-parser";
-import { Bot, Info, Loader2, Plus } from "lucide-react";
+import { Bot, CircleHelp, Info, Loader2, Plus } from "lucide-react";
 import { marked } from "marked";
 import TurndownService from "turndown";
 
@@ -41,6 +41,7 @@ import {
    usePerspectives,
    usePerspectivesStatus
 } from "@/lib/services";
+import { isTouchDevice } from "@/lib/utils";
 import { Checkbox } from "../../../../../../components/ui/checkbox";
 
 const turndownService = new TurndownService();
@@ -53,6 +54,8 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
    const [newPerspectiveDialogOpen, setNewPerspectiveDialogOpen] =
       useState(false);
    const [customPromptDialogOpen, setCustomPromptDialogOpen] = useState(false);
+   const [customPromptTooltipOpen, setCustomPromptTooltipOpen] =
+      useState(false);
    const [isCreating, setIsCreating] = useState(false);
    const [perspectiveType, setPerspectiveType] = useState("");
    const [perspectiveText, setPerspectiveText] = useState("");
@@ -156,6 +159,12 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
             setIsCreating(false);
             setTimeout(() => mutate(), 1000);
          }
+      }
+   };
+
+   const handleTooltipClick = () => {
+      if (isTouchDevice()) {
+         setCustomPromptTooltipOpen((prev) => !prev);
       }
    };
 
@@ -330,10 +339,10 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                            className="mr-2"
                         />
                         <span className="mr-2">{t("savePrompt")}</span>
-                        {/* <TooltipProvider>
+                        <TooltipProvider>
                            <Tooltip
-                              open={tooltipOpen}
-                              onOpenChange={setTooltipOpen}
+                              open={customPromptTooltipOpen}
+                              onOpenChange={setCustomPromptTooltipOpen}
                            >
                               <TooltipTrigger asChild>
                                  <CircleHelp
@@ -345,10 +354,10 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                                  className="text-sm shadow-md max-w-xs p-3 rounded-md"
                                  sideOffset={8}
                               >
-                                 {translations("workspaceDialog.workspaceHint")}
+                                 {t("saveCustomPromptHint")}
                               </TooltipContent>
                            </Tooltip>
-                        </TooltipProvider> */}
+                        </TooltipProvider>
                      </div>
                   </div>
                   <DialogFooter className="flex flex-row justify-between space-x-4">

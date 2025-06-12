@@ -250,7 +250,8 @@
       "promptTitle": "Prompt title",
       "promptTitlePlaceHolder": "Enter a title of your prompt",
       "promptBodyPlaceholder": "Enter your prompt",
-      "savePrompt": "Save prompt"
+      "savePrompt": "Save prompt",
+      "saveCustomPromptHint": "TODO: Saving prompts doesn't work"
    },
    "documentEditable": {
       "cancel": "Cancel",
