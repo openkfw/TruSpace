@@ -5,5 +5,6 @@
     "source.fixAll.eslint": "always",
     "source.organizeImports": "always",
     "source.fixAll.ts": "always"
-  }
+  },
+  "cSpell.words": ["uuidv"]
 }

@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 import { body, param } from "express-validator";
+import { v4 as uuidv4 } from "uuid";
 import { IpfsClient } from "../clients/ipfs-client";
 import validate from "../middlewares/validate";
 import { AuthenticatedRequest } from "../types";
@@ -100,7 +101,7 @@ router.post(
       templateId: "perspectives",
       cid,
       prompts: [{ title: promptTitle, prompt: prompt }],
-      identifier: promptTitle,
+      identifier: uuidv4(),
     });
 
     const customPromptInitialResponse = {
@@ -108,8 +109,6 @@ router.post(
       message: "Request accepted. Processing started for task.",
       statusEndpoint: `/api/perspectives/status/${customSummaryTaskId}`,
     };
-
-    console.log("generate-custom ", customPromptInitialResponse);
 
     const result = customPromptInitialResponse;
     res.json(result);
