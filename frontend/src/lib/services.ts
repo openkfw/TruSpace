@@ -195,16 +195,22 @@ export const usePerspectives = (cid: string) => {
    );
 
    return {
-      perspectives: data?.map((perspective) => ({
-         id: perspective.meta.perspectiveType,
-         name: perspective.meta.perspectiveType,
-         text: perspective.meta.data,
-         creatorType: perspective.meta.creatorType,
-         creator: perspective.meta.creator,
-         model: perspective.meta.model,
-         prompt: perspective.meta.prompt,
-         timestamp: perspective.meta.timestamp
-      })),
+      perspectives: data
+         ?.map((perspective) => ({
+            id: perspective.cid,
+            name: perspective.meta.perspectiveType,
+            text: perspective.meta.data,
+            creatorType: perspective.meta.creatorType,
+            creator: perspective.meta.creator,
+            model: perspective.meta.model,
+            prompt: perspective.meta.prompt,
+            timestamp: perspective.meta.timestamp
+         }))
+         .sort(
+            (a: any, b: any) =>
+               Number(new Date(a.timestamp).getTime()) -
+               Number(new Date(b.timestamp).getTime())
+         ),
       error,
       isLoading,
       isValidating,
