@@ -1,4 +1,13 @@
 "use client";
+
+import React, { useState } from "react";
+import { toast } from "react-toastify";
+
+import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+
+import { Loader2 } from "lucide-react";
+
 import {
    Dialog,
    DialogContent,
@@ -7,16 +16,11 @@ import {
    DialogHeader,
    DialogTitle
 } from "@/components/ui/dialog";
-import { deleteWorkspace } from "@/lib/services";
-import { useTranslations } from "next-intl";
-import React, { useState } from "react";
-import { Button } from "./ui/button";
-
-import { Workspace } from "@/interfaces";
-import { Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
 import { useWorkspaceContext } from "@/contexts/WorkspaceContext";
+import { Workspace } from "@/interfaces";
+import { deleteWorkspace } from "@/lib/services";
+
+import { Button } from "./ui/button";
 
 interface WorkspaceDialogProps {
    open: boolean;

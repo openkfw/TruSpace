@@ -1,3 +1,9 @@
+import { Fragment, useEffect, useState } from "react";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
+
 import {
    Breadcrumb,
    BreadcrumbItem,
@@ -6,10 +12,6 @@ import {
 } from "@/components/ui/breadcrumb";
 import { useDocuments } from "@/contexts/DocumentsContext";
 import { useWorkspaceContext } from "@/contexts/WorkspaceContext";
-import { useTranslations } from "next-intl";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Fragment, useEffect, useState } from "react";
 
 export default function Breadcrumbs() {
    const pathname = usePathname();
@@ -58,7 +60,6 @@ export default function Breadcrumbs() {
    useEffect(() => {
       const paths = createBreadcrumbPaths();
       setBreadcrumbPaths(paths);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [workspace, document, translations, pathname]);
 
    return (

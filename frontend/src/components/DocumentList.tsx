@@ -1,4 +1,26 @@
 "use client";
+import { useEffect, useMemo, useState } from "react";
+import { defaultStyles, FileIcon } from "react-file-icon";
+import { toast } from "react-toastify";
+
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+
+import {
+   flexRender,
+   getCoreRowModel,
+   useReactTable
+} from "@tanstack/react-table";
+import {
+   CircleUser,
+   CircleUserRound,
+   Dot,
+   Lock,
+   MessageSquareText,
+   MoreVertical
+} from "lucide-react";
+
 import EmptyWorkspace from "@/app/(ts)/workspace/EmptyWorkspace";
 import { formatDate, formatDateDays } from "@/app/helper/formatDate";
 import SearchBar from "@/components/SearchBar";
@@ -20,25 +42,7 @@ import {
 import { useDocuments } from "@/contexts/DocumentsContext";
 import { useDebounce } from "@/hooks/useDebounce";
 import { deleteDocument, DOCUMENTS_ENDPOINT } from "@/lib/services";
-import {
-   flexRender,
-   getCoreRowModel,
-   useReactTable
-} from "@tanstack/react-table";
-import {
-   CircleUser,
-   CircleUserRound,
-   Dot,
-   Lock,
-   MessageSquareText,
-   MoreVertical
-} from "lucide-react";
-import { useTranslations } from "next-intl";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
-import { defaultStyles, FileIcon } from "react-file-icon";
-import { toast } from "react-toastify";
+
 import { Badge } from "./ui/badge";
 import {
    Tooltip,
@@ -102,13 +106,7 @@ const DocumentList = ({ workspaceId }) => {
                   ? row.original.meta.filename.slice(0, -13)
                   : row.original.meta.filename;
                return (
-                  <div
-                     onClick={() => {
-                        router.push(
-                           `/workspace/${workspaceId || row.original.meta.workspaceOrigin}/document/${row.original.docId}`
-                        );
-                     }}
-                  >
+                  <div>
                      <div className="text-lg font-bold mb-1 mt-3">
                         {fileName}
                         {isEditableFile && (
@@ -156,14 +154,7 @@ const DocumentList = ({ workspaceId }) => {
                const collaboratorsNumber =
                   row.original.uniqueContributorsLength;
                return (
-                  <div
-                     onClick={() => {
-                        router.push(
-                           `/workspace/${workspaceId || row.original.meta.workspaceOrigin}/document/${row.original.docId}`
-                        );
-                     }}
-                     className="flex"
-                  >
+                  <div className="flex">
                      {collaboratorsNumber > 0 && <CircleUserRound />}
                      {collaboratorsNumber > 1 && (
                         <CircleUser className="-ml-1" />
@@ -185,14 +176,7 @@ const DocumentList = ({ workspaceId }) => {
             header: "",
             cell: ({ row }) => {
                return (
-                  <div
-                     className="flex"
-                     onClick={() => {
-                        router.push(
-                           `/workspace/${workspaceId}/document/${row.original.docId}`
-                        );
-                     }}
-                  >
+                  <div className="flex">
                      <MessageSquareText className="mt-1" />{" "}
                      <span className="text-lg ml-1">
                         {row.original.chatsLength}
@@ -354,6 +338,11 @@ const DocumentList = ({ workspaceId }) => {
                   {filteredDocuments.map((document) => (
                      <TableRow
                         key={document.docId}
+                        onClick={() =>
+                           router.push(
+                              `/workspace/${workspaceId || document.meta.workspaceOrigin}/document/${document.docId}`
+                           )
+                        }
                         className="cursor-pointer hover:bg-border/25 dark:hover:bg-ring/40"
                      >
                         {columns.map((column) => (

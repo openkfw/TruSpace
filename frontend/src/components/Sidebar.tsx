@@ -1,4 +1,12 @@
 "use client";
+import { useEffect, useState } from "react";
+
+import Image from "next/image";
+import { usePathname, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+
+import Cookies from "js-cookie";
+
 import { NavUser } from "@/components/nav-user";
 import {
    Sidebar,
@@ -12,11 +20,7 @@ import {
 import { useWorkspaceContext } from "@/contexts/WorkspaceContext";
 import { Workspace } from "@/interfaces";
 import { getLoginCookie } from "@/lib";
-import Cookies from "js-cookie";
-import { useTranslations } from "next-intl";
-import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+
 import { NavDashboard } from "./NavDashboard";
 import { NavStatistics } from "./NavStatistics";
 import { NavWorkspaces } from "./NavWorkspaces";

@@ -1,6 +1,7 @@
 "use client";
-import { FilePlus } from "lucide-react";
 import { useTranslations } from "next-intl";
+
+import { FilePlus } from "lucide-react";
 
 export default function EmptyWorkspace() {
    const translations = useTranslations("general");

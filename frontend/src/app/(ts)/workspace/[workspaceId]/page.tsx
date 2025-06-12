@@ -1,8 +1,8 @@
 import AuthGuard from "@/components/AuthGuard";
 import DocumentList from "@/components/DocumentList";
-import WorkspaceTour from "@/components/WorkspaceTour";
 import WorkspaceMenu from "@/components/WorkspaceMenu";
 import WorkspaceTitle from "@/components/WorkspaceTitle";
+import WorkspaceTour from "@/components/WorkspaceTour";
 
 export default async function WorkspacePage({
    params

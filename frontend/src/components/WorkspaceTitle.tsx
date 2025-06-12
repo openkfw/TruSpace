@@ -1,10 +1,13 @@
 "use client";
+import { useEffect, useState } from "react";
+
+import { useTranslations } from "next-intl";
+
+import { Calendar, Files, Lock, LockOpen, User, Users } from "lucide-react";
+
 import { useDocuments } from "@/contexts/DocumentsContext";
 import { useWorkspaceContext } from "@/contexts/WorkspaceContext";
 import { loadWorkspaceContributors } from "@/lib/services";
-import { Calendar, Files, Lock, LockOpen, User, Users } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
 
 const fmtCreatedOn = (isoString) => {
    if (!isoString) return "n/a";
