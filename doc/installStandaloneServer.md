@@ -97,24 +97,24 @@ nginx: configuration file /etc/nginx/nginx.conf test is successful
 sudo certbot --nginx -d EXAMPLE.COM -d oi.EXAMPLE.COM -d api.EXAMPLE.COM
 ```
 
-Expected result (for domain `truspace.be`):
+Expected result:
 
 ```bash
 Saving debug log to /var/log/letsencrypt/letsencrypt.log
-Requesting a certificate for truspace.be and 2 more domains
+Requesting a certificate for EXAMPLE.COM and 2 more domains
 
 Successfully received certificate.
-Certificate is saved at: /etc/letsencrypt/live/truspace.be/fullchain.pem
-Key is saved at:         /etc/letsencrypt/live/truspace.be/privkey.pem
+Certificate is saved at: /etc/letsencrypt/live/EXAMPLE.COM/fullchain.pem
+Key is saved at:         /etc/letsencrypt/live/EXAMPLE.COM/privkey.pem
 This certificate expires on 2025-08-31.
 These files will be updated when the certificate renews.
 Certbot has set up a scheduled task to automatically renew this certificate in the background.
 
 Deploying certificate
-Successfully deployed certificate for truspace.be to /etc/nginx/sites-enabled/truspace.be
-Successfully deployed certificate for oi.truspace.be to /etc/nginx/sites-enabled/truspace.be
-Successfully deployed certificate for api.truspace.be to /etc/nginx/sites-enabled/truspace.be
-Congratulations! You have successfully enabled HTTPS on https://truspace.be, https://oi.truspace.be, and https://api.truspace.be
+Successfully deployed certificate for EXAMPLE.COM to /etc/nginx/sites-enabled/EXAMPLE.COM
+Successfully deployed certificate for oi.EXAMPLE.COM to /etc/nginx/sites-enabled/EXAMPLE.COM
+Successfully deployed certificate for api.EXAMPLE.COM to /etc/nginx/sites-enabled/EXAMPLE.COM
+Congratulations! You have successfully enabled HTTPS on https://EXAMPLE.COM, https://oi.EXAMPLE.COM, and https://api.EXAMPLE.COM
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 If you like Certbot, please consider supporting our work by:
@@ -123,86 +123,86 @@ If you like Certbot, please consider supporting our work by:
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ```
 
-- The resulting config in `nano  /etc/nginx/sites-available/EXAMPLE.COM` should be something like (here for the domain `truspace.dev`):
+- The resulting config in `nano  /etc/nginx/sites-available/EXAMPLE.COM` should be something like:
 
 ```nginx
 # Redirect HTTP to HTTPS globally
 server {
-    server_name truspace.dev;
+    server_name EXAMPLE.COM;
     location / {
         proxy_pass http://localhost:3000;
     }
 
     listen 443 ssl; # managed by Certbot
-    ssl_certificate /etc/letsencrypt/live/truspace.dev/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/letsencrypt/live/truspace.dev/privkey.pem; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/EXAMPLE.COM/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/EXAMPLE.COM/privkey.pem; # managed by Certbot
     include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
 
 }
 
 server {
-    server_name oi.truspace.dev;
+    server_name oi.EXAMPLE.COM;
     location / {
         proxy_pass http://localhost:3333;
     }
 
     listen 443 ssl; # managed by Certbot
-    ssl_certificate /etc/letsencrypt/live/truspace.dev/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/letsencrypt/live/truspace.dev/privkey.pem; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/EXAMPLE.COM/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/EXAMPLE.COM/privkey.pem; # managed by Certbot
     include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
 
 }
 
 server {
-    server_name api.truspace.dev;
+    server_name api.EXAMPLE.COM;
     location / {
         proxy_pass http://localhost:8000;
     }
 
     listen 443 ssl; # managed by Certbot
-    ssl_certificate /etc/letsencrypt/live/truspace.dev/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/letsencrypt/live/truspace.dev/privkey.pem; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/EXAMPLE.COM/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/EXAMPLE.COM/privkey.pem; # managed by Certbot
     include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
 
 }
 
 server {
-    if ($host = truspace.dev) {
+    if ($host = EXAMPLE.COM) {
         return 301 https://$host$request_uri;
     } # managed by Certbot
 
 
     listen 80;
-    server_name truspace.dev;
+    server_name EXAMPLE.COM;
     return 404; # managed by Certbot
 
 
 }
 
 server {
-    if ($host = oi.truspace.dev) {
+    if ($host = oi.EXAMPLE.COM) {
         return 301 https://$host$request_uri;
     } # managed by Certbot
 
 
     listen 80;
-    server_name oi.truspace.dev;
+    server_name oi.EXAMPLE.COM;
     return 404; # managed by Certbot
 
 
 }
 
 server {
-    if ($host = api.truspace.dev) {
+    if ($host = api.EXAMPLE.COM) {
         return 301 https://$host$request_uri;
     } # managed by Certbot
 
 
     listen 80;
-    server_name api.truspace.dev;
+    server_name api.EXAMPLE.COM;
     return 404; # managed by Certbot
 
 
@@ -296,7 +296,7 @@ cp .env.example .env
 ```
 
 - **Update** the environment variables, because some of these are used when the containers are startup the first time and volumes created!
-- In the future, the updating of .env might be streamlined through a shell script in `/production/setup-env.sh`!
+- You can also update the .env file through a shell script in `/production/setup-env.sh`!
 
 ## Start and test TruSpace backend
 
@@ -312,6 +312,15 @@ cp .env.example .env
 sudo chown -R <user>:<group> volumes/
 ```
 
+There are different commands that can help you identify the user and group:
+
+```bash
+whoami # prints the current user
+ls -al # prints the current user and group of the current directory
+cut -d: -f1 /etc/passwd # prints all users
+cut -d: -f1 /etc/group # prints all groups
+```
+
 The result should look something like this
 
 | IMAGE                                | COMMAND                | STATUS                        | PORTS                                                                                                                      | NAMES              |
@@ -321,7 +330,7 @@ The result should look something like this
 | truspace-backend                     | "sh ./entrypoint.sh"   | Restarting (1) 24 seconds ago |                                                                                                                            | truspace-backend-1 |
 | ipfs/kubo:release                    | "/sbin/tini -- /usr/…" | Up 14 minutes (healthy)       | 0.0.0.0:4001->4001/tcp, [::]:4001->4001/tcp, 0.0.0.0:5001->5001/tcp, [::]:5001->5001/tcp, 4001/udp, 0.0.0.0:8080->8080/tcp |
 
-You can also make sure that everything is correctly running when the status in the top right corner are all green.
+You can also make sure that everything is correctly running when the status in the top right corner are all green (can take a few minutes for th OI bubble).
 
 ## Configure AI backend with OI and test
 
