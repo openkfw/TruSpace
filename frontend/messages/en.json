@@ -248,7 +248,9 @@
       "title": "Perspectives",
       "askCustomPrompt": "Ask AI with custom prompt",
       "promptTitle": "Prompt title",
-      "promptTitlePlaceHolder": "Enter a title of your prompt"
+      "promptTitlePlaceHolder": "Enter a title of your prompt",
+      "promptBodyPlaceholder": "Enter your prompt",
+      "savePrompt": "Save prompt"
    },
    "documentEditable": {
       "cancel": "Cancel",

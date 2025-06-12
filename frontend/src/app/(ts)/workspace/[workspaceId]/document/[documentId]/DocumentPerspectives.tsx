@@ -310,14 +310,14 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                         />
                      </div>
                      <div>
-                        <Label htmlFor="author">{"EN: CUSTOM PROMPT"}</Label>
+                        <Label htmlFor="author">{t("prompt")}</Label>
                         <Input
                            className="mt-2 bg-slate-50 dark:bg-slate-800 dark:text-white dark:placeholder:text-white"
                            id="perspectiveType"
                            type="text"
                            value={promptText}
                            onChange={(e) => setPromptText(e.target.value)}
-                           placeholder={t("perspectiveNamePlaceholder")}
+                           placeholder={t("promptBodyPlaceholder")}
                            required
                         />
                      </div>
@@ -329,9 +329,7 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                            }
                            className="mr-2"
                         />
-                        <span className="mr-2">
-                           {t("workspaceDialog.setPrivate")}
-                        </span>
+                        <span className="mr-2">{t("savePrompt")}</span>
                         {/* <TooltipProvider>
                            <Tooltip
                               open={tooltipOpen}
