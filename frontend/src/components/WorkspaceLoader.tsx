@@ -1,7 +1,8 @@
 "use client";
+import { useEffect } from "react";
+
 import { useWorkspaceContext } from "@/contexts/WorkspaceContext";
 import { loadWorkspaces } from "@/lib/services";
-import { useEffect } from "react";
 
 const WorkspaceLoader = () => {
    const { setAvailableWorkspaces, setWorkspacesLoading } =
@@ -11,7 +12,7 @@ const WorkspaceLoader = () => {
       const fetchWorkspaces = async () => {
          setWorkspacesLoading(true);
          const workspaces = await loadWorkspaces();
-         if ((workspaces as any)?.status === "failure") {
+         if ((workspaces as { status?: unknown })?.status === "failure") {
             setAvailableWorkspaces([]);
          } else {
             setAvailableWorkspaces(workspaces);

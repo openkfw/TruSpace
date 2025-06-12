@@ -1,3 +1,5 @@
+import { ChevronDown } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import {
    Popover,
@@ -10,7 +12,6 @@ import {
    TooltipProvider,
    TooltipTrigger
 } from "@/components/ui/tooltip";
-import { ChevronDown } from "lucide-react";
 
 export default function MenuButtonWithDropdown({
    onClick,

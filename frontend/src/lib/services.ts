@@ -1,6 +1,7 @@
-import config from "@/config";
-import { Workspace } from "@/interfaces";
 import useSWR from "swr";
+
+import config from "@/config";
+import { User, Workspace } from "@/interfaces";
 
 const fetcher = (url) =>
    fetch(url, {
@@ -69,7 +70,7 @@ export const loadDocumentBlob = async (cid: string) => {
    return data;
 };
 
-export const documentUpload = async (formData, docId, errorText) => {
+export const documentUpload = async (formData, docId, _errorText) => {
    const url = docId
       ? `${DOCUMENTS_ENDPOINT}/${docId}`
       : `${DOCUMENTS_ENDPOINT}`;
@@ -230,7 +231,7 @@ export function usePerspectivesStatus(cid: string) {
          revalidateOnFocus: false,
          shouldRetryOnError: true,
          dedupingInterval: 1000,
-         onErrorRetry(error, key, config, revalidate, revalidateOpts) {
+         onErrorRetry(error, _key, _config, _revalidate, _revalidateOpts) {
             if (error.status === 404) return;
          }
       }
@@ -258,7 +259,7 @@ export function useLanguageStatus(cid: string) {
          revalidateOnFocus: false,
          shouldRetryOnError: true,
          dedupingInterval: 1000,
-         onErrorRetry(error, key, config, revalidate, revalidateOpts) {
+         onErrorRetry(error, _key, _config, _revalidate, _revalidateOpts) {
             if (error.status === 404) return;
          }
       }
@@ -401,7 +402,7 @@ export function useTagsStatus(cid: string) {
          revalidateOnFocus: false,
          shouldRetryOnError: true,
          dedupingInterval: 1000,
-         onErrorRetry(error, key, config, revalidate, revalidateOpts) {
+         onErrorRetry(error, _key, _config, _revalidate, _revalidateOpts) {
             if (error.status === 404) return;
          }
       }
@@ -410,7 +411,7 @@ export function useTagsStatus(cid: string) {
    return { status: data, error, refresh: mutate };
 }
 
-export const registerUser = async (data: any) => {
+export const registerUser = async (data: User) => {
    const url = `${USERS_ENDPOINT}/register`;
    const options: RequestInit = {
       method: "POST",
@@ -433,7 +434,7 @@ export const registerUser = async (data: any) => {
    return result;
 };
 
-export const loginUser = async (data: any) => {
+export const loginUser = async (data: User) => {
    const url = `${USERS_ENDPOINT}/login`;
    const options: RequestInit = {
       method: "POST",
@@ -458,7 +459,10 @@ export async function getHealth() {
    return data;
 }
 
-export const postPermission = async (formData) => {
+export const postPermission = async (formData: {
+   email: string;
+   workspaceId: string;
+}) => {
    const options: RequestInit = {
       method: "POST",
       headers: {
@@ -478,7 +482,7 @@ export const postPermission = async (formData) => {
    return data;
 };
 
-export const getUsersInWorkspace = async (workspaceId) => {
+export const getUsersInWorkspace = async (workspaceId: string | string[]) => {
    const url = `${PERMISSIONS_ENDPOINT}/users-in-workspace/${workspaceId}`;
    const options: RequestInit = {
       method: "GET",
@@ -495,7 +499,7 @@ export const getUsersInWorkspace = async (workspaceId) => {
    return data;
 };
 
-export const deleteUserPermission = async (permissionId) => {
+export const deleteUserPermission = async (permissionId: number) => {
    const url = `${PERMISSIONS_ENDPOINT}/users-in-workspace/remove/${permissionId}`;
    const options: RequestInit = {
       method: "DELETE",

@@ -1,4 +1,14 @@
 "use client";
+import { useCallback, useEffect, useState } from "react";
+import { toast } from "react-toastify";
+
+import { useTranslations } from "next-intl";
+
+import parse from "html-react-parser";
+import { Bot, Info, Loader2, Plus } from "lucide-react";
+import { marked } from "marked";
+import TurndownService from "turndown";
+
 import { formatDate } from "@/app/helper/formatDate";
 import Editor from "@/components/tiptap-editor/Editor";
 import { Button } from "@/components/ui/button";
@@ -28,17 +38,10 @@ import {
 import {
    createPerspective,
    customPerspective,
+   usePerspectives,
    usePerspectivesStatus
 } from "@/lib/services";
-import parse from "html-react-parser";
-import { Bot, Info, Loader2, Plus } from "lucide-react";
-import { marked } from "marked";
-import { useTranslations } from "next-intl";
-import { useCallback, useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import TurndownService from "turndown";
 import { Checkbox } from "../../../../../../components/ui/checkbox";
-import { usePerspectives } from "../../../../../../lib/services";
 
 const turndownService = new TurndownService();
 
@@ -58,11 +61,7 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
    const [editorHasError, setEditorHasError] = useState(false);
    const [savePromptForWorkspace, setSavePromptForWorkspace] = useState(false);
    const { perspectives, mutate } = usePerspectives(cid);
-   const {
-      status: perspectivesStatus,
-      error: prespectivesStatusError,
-      refresh: perspectivesStatusRefresh
-   } = usePerspectivesStatus(cid);
+   const { status: perspectivesStatus } = usePerspectivesStatus(cid);
 
    const uploadButtonTitle = translations("create");
 
@@ -247,7 +246,7 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                         </Label>
                         <Editor
                            onChange={onChangePerspectiveText}
-                           isRequired={true}
+                           isRequired
                            hasError={editorHasError}
                            errorMessage={translations("editorEmptyError")}
                            stickyToolbarTopMargin="[-30px]"
@@ -476,7 +475,7 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                         </SelectContent>
                      </Select>
                   </div>
-                  <div className="text-right"></div>
+                  <div className="text-right" />
 
                   {parse(html as string)}
 

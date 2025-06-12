@@ -1,5 +1,9 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+
+import Cookies from "js-cookie";
 import {
    Bell,
    BrainCircuit,
@@ -24,9 +28,6 @@ import {
    SidebarMenuItem,
    useSidebar
 } from "@/components/ui/sidebar";
-import Cookies from "js-cookie";
-import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
 import { logout } from "@/lib/services";
 
 export function NavUser({
@@ -73,7 +74,10 @@ export function NavUser({
                   align="end"
                   sideOffset={4}
                >
-                  <DropdownMenuLabel className="p-0 font-normal" data-test-id="sidebar-user-menu-label">
+                  <DropdownMenuLabel
+                     className="p-0 font-normal"
+                     data-test-id="sidebar-user-menu-label"
+                  >
                      <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                         <Avatar className="h-8 w-8 rounded-lg">
                            <AvatarImage src={user.avatar} alt={user.name} />

@@ -1,14 +1,18 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import { MessageCircle } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+
+import { MessageCircle } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Document } from "@/interfaces";
+
 import DocumentChat from "./DocumentChat";
 
 interface FloatingChatProps {
    cid: string;
    docId: string;
    workspaceOrigin: string;
-   documentVersions: any[];
+   documentVersions: Document[];
    pageNumber: number;
    setPageNumber: (page: number) => void;
    newNoteVisible: boolean;

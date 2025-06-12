@@ -1,7 +1,8 @@
 "use client";
-import { PdfJs, TextItem } from "@/interfaces";
-import { clsx, type ClassValue } from "clsx";
+import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+
+import { PdfJs, TextItem } from "@/interfaces";
 
 export function cn(...inputs: ClassValue[]) {
    return twMerge(clsx(inputs));
@@ -27,7 +28,7 @@ export const isPdfBlank = async (
 
                const textItems = text.items.filter(
                   (item): item is TextItem =>
-                     typeof (item as any).str === "string"
+                     typeof (item as TextItem).str === "string"
                );
 
                const pageText = textItems.map((item) => item.str).join(" ");

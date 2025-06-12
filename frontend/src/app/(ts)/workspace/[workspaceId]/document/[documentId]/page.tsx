@@ -1,5 +1,12 @@
 "use client";
 
+import { useCallback, useEffect, useState } from "react";
+
+import { useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
+
+import { Download } from "lucide-react";
+
 import DocumentUpload from "@/components/DocumentUpload";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,10 +19,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useDocuments } from "@/contexts/DocumentsContext";
 import { DOCUMENTS_ENDPOINT, useTagsStatus } from "@/lib/services";
-import { Download } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { useParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+
 import DocumentData from "./DocumentData";
 import DocumentEditable from "./DocumentEditable";
 import DocumentPerspectives from "./DocumentPerspectives";
@@ -41,11 +45,7 @@ export default function DocumentDetailsPage() {
       return "details";
    });
 
-   const {
-      status: tagsStatus,
-      error: tagsStatusError,
-      refresh: tagsStatusRefresh
-   } = useTagsStatus(document?.cid);
+   const { status: tagsStatus } = useTagsStatus(document?.cid);
 
    const [newNoteVisible, setNewNoteVisible] = useState(false);
    const [newNotePosition, setNewNotePosition] = useState<{

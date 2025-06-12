@@ -1,3 +1,9 @@
+import { useState } from "react";
+
+import { useTranslations } from "next-intl";
+
+import { ChevronDown, PaintBucket } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import {
    Popover,
@@ -10,9 +16,6 @@ import {
    TooltipProvider,
    TooltipTrigger
 } from "@/components/ui/tooltip";
-import { ChevronDown, PaintBucket } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { useState } from "react";
 
 const colors = [
    [
@@ -143,12 +146,13 @@ export default function BackgroundColorButton({ editor }) {
                            {translations("noBackgroundColor")}
                         </Button>
                         <div className="grid grid-cols-8 gap-1">
-                           {colors[0].map((color, rowIndex) =>
-                              colors.map((shades, colIndex) => (
-                                 <div
+                           {colors[0].map((_color, rowIndex) =>
+                              colors.map((_shades, colIndex) => (
+                                 <Button
+                                    variant="outline"
                                     title={colors[colIndex][rowIndex]}
                                     key={`${colIndex}-${rowIndex}`}
-                                    className="w-6 h-6 cursor-pointer border border-gray-300"
+                                    className="border-gray-300 rounded-none"
                                     style={{
                                        backgroundColor:
                                           colors[colIndex][rowIndex]
@@ -158,7 +162,7 @@ export default function BackgroundColorButton({ editor }) {
                                           colors[colIndex][rowIndex]
                                        )
                                     }
-                                 ></div>
+                                 />
                               ))
                            )}
                         </div>

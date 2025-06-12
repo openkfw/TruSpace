@@ -1,4 +1,12 @@
 "use client";
+import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+
+import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+
+import { CircleHelp, Loader2 } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import {
    Dialog,
@@ -10,21 +18,17 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useWorkspaceContext } from "@/contexts/WorkspaceContext";
-import { createWorkspace } from "@/lib/services";
-import { CircleHelp, Loader2 } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import { Checkbox } from "./ui/checkbox";
 import {
    Tooltip,
+   TooltipContent,
    TooltipProvider,
-   TooltipTrigger,
-   TooltipContent
+   TooltipTrigger
 } from "@/components/ui/tooltip";
+import { useWorkspaceContext } from "@/contexts/WorkspaceContext";
+import { createWorkspace } from "@/lib/services";
 import { isTouchDevice } from "@/lib/utils";
+
+import { Checkbox } from "./ui/checkbox";
 
 interface WorkspaceDialogProps {
    open: boolean;

@@ -1,11 +1,11 @@
 "use client";
-import DocumentCreateDialog from "@/components/DocumentCreateDialog";
-import DocumentUpload from "@/components/DocumentUpload";
+import { useState } from "react";
+
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
-import { useWorkspaceContext } from "@/contexts/WorkspaceContext";
-import DeleteWorkspaceDialog from "./DeleteWorkspaceDialog";
+
+import DocumentCreateDialog from "@/components/DocumentCreateDialog";
+import DocumentUpload from "@/components/DocumentUpload";
 import {
    Menubar,
    MenubarContent,
@@ -13,7 +13,10 @@ import {
    MenubarMenu,
    MenubarTrigger
 } from "@/components/ui/menubar";
+import { useWorkspaceContext } from "@/contexts/WorkspaceContext";
+
 import { Separator } from "./ui/separator";
+import DeleteWorkspaceDialog from "./DeleteWorkspaceDialog";
 
 function WorkspaceMenu() {
    const translations = useTranslations("navbar");

@@ -1,4 +1,9 @@
 "use client";
+import React, { useState } from "react";
+
+import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+
 import {
    ChevronRight,
    Folder,
@@ -9,8 +14,8 @@ import {
    Share2,
    Trash2
 } from "lucide-react";
-import React, { useState } from "react";
 
+import { Button } from "@/components/ui/button";
 import {
    Collapsible,
    CollapsibleContent,
@@ -35,8 +40,7 @@ import {
    useSidebar
 } from "@/components/ui/sidebar";
 import { Workspace } from "@/interfaces";
-import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
+
 import AuthGuard from "./AuthGuard";
 import DeleteWorkspaceDialog from "./DeleteWorkspaceDialog";
 import WorkspaceDialog from "./WorkspaceDialog";
@@ -77,13 +81,14 @@ export function NavWorkspaces({
                      asChild
                      tooltip={translations("addWorkspace")}
                   >
-                     <span
-                        className="cursor-pointer truncate"
+                     <Button
+                        variant="ghost"
+                        className="flex justify-start"
                         onClick={() => setIsDialogOpen(true)}
                      >
                         <Plus />
                         {translations("addWorkspace")}
-                     </span>
+                     </Button>
                   </SidebarMenuButton>
                </SidebarMenuItem>
                {publicWorkspaces.length > 0 ? (

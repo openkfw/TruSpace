@@ -8,7 +8,7 @@ export default function LinkBubbleMenu({ editor }) {
          editor={editor}
          tippyOptions={{ duration: 100 }}
          pluginKey={"linkMenu"}
-         shouldShow={({ editor, view, state, oldState, from, to, trigger }) => {
+         shouldShow={({ editor }) => {
             // only show the bubble menu for tables
             return editor
                .can()
@@ -20,7 +20,7 @@ export default function LinkBubbleMenu({ editor }) {
          }}
          contextMenuElement={editor?.view.dom}
       >
-         <div className="bubble-menu link-bubble-menu flex items-center flex-wrap max-w-xs"></div>
+         <div className="bubble-menu link-bubble-menu flex items-center flex-wrap max-w-xs" />
       </BubbleMenu>
    );
 }

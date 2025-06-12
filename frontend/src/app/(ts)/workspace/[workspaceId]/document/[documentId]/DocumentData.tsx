@@ -1,4 +1,11 @@
 "use client";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "react-toastify";
+
+import { useTranslations } from "next-intl";
+
+import { FileLock2, Link, Loader2, UserCircle } from "lucide-react";
+
 import { formatDate } from "@/app/helper/formatDate";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,10 +17,6 @@ import {
    TooltipTrigger
 } from "@/components/ui/tooltip";
 import { useLanguage, useLanguageStatus } from "@/lib/services";
-import { FileLock2, Link, Loader2, UserCircle } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { toast } from "react-toastify";
 
 export default function DocumentData({
    docId,
@@ -42,11 +45,7 @@ export default function DocumentData({
    const [copyButtonTooltipText, setCopyButtonTooltipText] =
       useState<string>("");
 
-   const {
-      status: languageStatus,
-      error: languageStatusError,
-      refresh: languageStatusRefresh
-   } = useLanguageStatus(cId);
+   const { status: languageStatus } = useLanguageStatus(cId);
 
    const {
       language: documentLanguage,
@@ -127,7 +126,6 @@ export default function DocumentData({
       }
 
       setDisplayLanguage(langToSet);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [
       meta?.language,
       documentLanguage,

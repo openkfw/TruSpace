@@ -1,10 +1,14 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import { DOCUMENTS_ENDPOINT } from "@/lib/services";
-import { ChevronLeft, ChevronRight, StickyNote } from "lucide-react";
-import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
+
+import { useTranslations } from "next-intl";
+
+import { ChevronLeft, ChevronRight, StickyNote } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { DOCUMENTS_ENDPOINT } from "@/lib/services";
+
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 
@@ -61,7 +65,7 @@ export default function DocumentPreviewPDF({
    // detect click in document canvas with class "react-pdf__Page" with coordinates
    // and use them to determine the position of the annotation
    const handleClick = useCallback(
-      (e: any) => {
+      (e: React.MouseEvent<HTMLElement>) => {
          const documentPages = previewContainer.current?.pages?.current;
          const documentPage = documentPages?.[Object.keys(documentPages)[0]];
          const canvas = documentPage?.querySelector("canvas");
@@ -112,7 +116,6 @@ export default function DocumentPreviewPDF({
       addCanvasClickListener();
       return () => {
          const documentPage =
-            // eslint-disable-next-line react-hooks/exhaustive-deps
             previewContainer.current?.pages?.current?.[pageNumber - 1];
          if (documentPage) {
             documentPage.removeEventListener("click", handleClick);
@@ -185,5 +188,5 @@ export default function DocumentPreviewPDF({
       );
    }
 
-   return <div></div>;
+   return <div />;
 }

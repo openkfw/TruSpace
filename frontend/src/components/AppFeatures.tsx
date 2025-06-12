@@ -1,4 +1,8 @@
 "use client";
+import { useEffect, useRef, useState } from "react";
+
+import { useTranslations } from "next-intl";
+
 import clsx from "clsx";
 import {
    Brain,
@@ -10,8 +14,6 @@ import {
    Trash2,
    Upload
 } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { useEffect, useRef, useState } from "react";
 
 const templates = [
    {
