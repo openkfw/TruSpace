@@ -5,7 +5,14 @@ import { toast } from "react-toastify";
 import { useTranslations } from "next-intl";
 
 import parse from "html-react-parser";
-import { Bot, CircleHelp, Info, Loader2, Plus } from "lucide-react";
+import {
+   Bot,
+   CircleHelp,
+   Info,
+   Loader2,
+   MessageCircleQuestion,
+   Plus
+} from "lucide-react";
 import { marked } from "marked";
 import TurndownService from "turndown";
 
@@ -420,7 +427,7 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                         }}
                         className="mr-4"
                      >
-                        <Plus /> {t("askCustomPrompt")}
+                        <MessageCircleQuestion /> {t("askCustomPrompt")}
                      </Button>
 
                      <Select
