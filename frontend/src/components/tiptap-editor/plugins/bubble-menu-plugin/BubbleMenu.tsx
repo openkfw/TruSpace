@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import { useCurrentEditor } from "@tiptap/react";
 
-import { BubbleMenuPlugin , BubbleMenuPluginProps } from "./bubble-menu-plugin";
-
+import { BubbleMenuPlugin, BubbleMenuPluginProps } from "./bubble-menu-plugin";
 
 type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 

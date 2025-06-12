@@ -8,7 +8,8 @@ import {
    useCallback,
    useContext,
    useEffect,
-   useState} from "react";
+   useState
+} from "react";
 
 import { useParams, usePathname } from "next/navigation";
 

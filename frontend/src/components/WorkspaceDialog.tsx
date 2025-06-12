@@ -22,7 +22,8 @@ import {
    Tooltip,
    TooltipContent,
    TooltipProvider,
-   TooltipTrigger} from "@/components/ui/tooltip";
+   TooltipTrigger
+} from "@/components/ui/tooltip";
 import { useWorkspaceContext } from "@/contexts/WorkspaceContext";
 import { createWorkspace } from "@/lib/services";
 import { isTouchDevice } from "@/lib/utils";

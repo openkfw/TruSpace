@@ -11,9 +11,7 @@ declare module "@tiptap/core" {
          /**
           * Set the text alignment
           */
-         setTextAlign: (
-            alignment: string
-         ) => ReturnType;
+         setTextAlign: (alignment: string) => ReturnType;
          /**
           * Unset the text alignment
           */

@@ -5,7 +5,8 @@ import {
    type ReactNode,
    useCallback,
    useContext,
-   useState} from "react";
+   useState
+} from "react";
 
 import { useTranslations } from "next-intl";
 

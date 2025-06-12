@@ -151,7 +151,7 @@ export default function DocumentChat({
                                  version.cid === messageData?.documentCid
                            )?.meta.version
                         }
-                        versionTagName= {
+                        versionTagName={
                            documentVersions.find(
                               (version) =>
                                  version.cid === messageData?.documentCid
@@ -171,7 +171,6 @@ export default function DocumentChat({
                                 }
                               : null
                         }
-                        showMoreActions={false}
                      />
                   );
                })

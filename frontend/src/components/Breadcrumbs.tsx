@@ -60,7 +60,6 @@ export default function Breadcrumbs() {
    useEffect(() => {
       const paths = createBreadcrumbPaths();
       setBreadcrumbPaths(paths);
-       
    }, [workspace, document, translations, pathname]);
 
    return (
