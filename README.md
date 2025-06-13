@@ -17,8 +17,8 @@ The purpose of TruSpace is to make collaboration on documents between several st
 
 ## Quick start, I want to..
 
-- 🧪 [Play around in a sandbox demo environment](#play-around-in-a-sandbox-demo-environment)
-- 💻 [Run it locally on my machine](#run-it-locally-on-my-machine)
+- 🧪 [Play around in a sandbox demo environment](#play-around-in-an-online-sandbox-demo-environment)
+- 💻 [Run it locally on my machine](#-run-it-locally-on-my-machine)
 - 🛠️ [Install a standalone server](#install-a-standalone-server)
 - 🌐 [Connect to other TruSpace nodes](#connect-to-other-truspace-nodes)
 - 📚 [Check out architecture, guides, details](#check-out-architecture-guides-details)
