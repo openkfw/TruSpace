@@ -69,3 +69,6 @@ if [ "$FRONTEND_DEV" = "true" ]; then
     npm i
     npm run dev
 fi
+
+# to be on the safe side, remove all ipfs bootstrap peers
+docker compose exec ipfs0 ipfs bootstrap rm --all
