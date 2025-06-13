@@ -23,13 +23,13 @@ The purpose of TruSpace is to make collaboration on documents between several st
 - 🌐 [Connect to other TruSpace nodes](#connect-to-other-truspace-nodes)
 - 📚 [Check out architecture, guides, details](#check-out-architecture-guides-details)
 
---
+---
 
 ## Play around in an online sandbox demo environment
 
 To check how TruSpace works, get to the sandbox installation at https://truspace.dev, register a new user, login and start playing with private and public workspaces! It's an experiment-sandbox, so your data might get deleted occasionally.
 
---
+---
 
 ## 📥 Run it locally on my machine
 
@@ -67,13 +67,13 @@ If something doesn't work, check that all containers are running with `docker ps
 | 783... |truspace-frontend | "sh startup.sh" | 26 minutes ago | Up 26 minutes (healthy) | 0.0.0.0:3000->3000/tcp, :::3000->3000/tcp | truspace-frontend-1|
 | 590... | ipfs/kubo:release | "/sbin/tini -- /usr/…" | 26 minutes ago | Up 26 minutes (healthy) | 0.0.0.0:4001->4001/tcp, 0.0.0.0:5001->5001/tcp, 4001/udp, 0.0.0.0:8080->8080/tcp, 8081/tcp | ipfs0 |
 
---
+---
 
 ## Install a standalone server
 
 There's an extensive guide how to install TruSpace on a (virtual) server or a Raspberry Pi. It includes steps how to install surrounding architecture like docker, a reverse proxy `nginx`, certificates via `LetsEncrypt` and all the other administrative steps. Have a look [here](./doc/installStandaloneServer.md)
 
---
+---
 
 ## Connect to other TruSpace nodes
 
