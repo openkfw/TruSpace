@@ -7,59 +7,17 @@ The purpose of TruSpace is to make collaboration on documents between several st
 ---
 
 ## ✨ Key Features
+
 ✨ Key Features
 
 - 🆓 100% open-source, sovereign and self-hostable - no cloud provider needed
-- 🔄 Automatic sync of data between trusted IPFS cluster nodes/partners (private or public setup)
+- 🔄 Fully decentralized storage using IPFS Cluster: Automatic sync of data between trusted IPFS cluster nodes/partners (private or public setup)
 - 🧠 Local AI interpretation of documents using Ollama + Open Web UI using customisable pre-defined prompts
 - 🗂️ Workspace-based organization of content and participants
-- 📄 Rich-text collaborative editing (WYSIWYG)
-- 🌍 Fully decentralized storage using IPFS Cluster
-- 🔐 Local storage of sensitive data in SQLite
 
 ---
 
-## 🚀 Start TruSpace in production
-
-### 🔧 Prerequisites
-
-- Docker
-- File storage for docker volumes
-- Nginx (or other prefered way to expose application)
-
-### 📥 Quick start
-
-If you want to run in production mode, e.g. on your virtual machine:
-
-Setup your nginx server running on VM. Example configuration can be found here: https://github.com/openkfw/TruSpace/blob/main/production/truspace.nginx
-More details [here](./doc/installStandaloneServer.md)
-
-```bash
-git clone https://github.com/openkfw/TruSpace.git
-cd production
-bash start-prod.sh
-
-# If running for the first time you may need to set the correct permissions for the `/volumes` folders. Run
-sudo chown -R 1000:1000 ./volumes
-# or
-sudo chmod -R 744 ./volumes
-# and restart application with
-bash start-prod.sh
-```
-
-This script is meant for production run. If you want to start application for local development or testing follow [Dev Installation](./DEV_INSTALLATION.md) manual.
-
-```bash
-# To restart environment (e.g. after you change some environmental variable in .env file) run again:
-bash start-prod.sh
-```
-
-```bash
-# To STOP environment
-docker compose -f docker-compose.yml -f docker-compose-ai.yml down --remove-orphans
-```
-
-## 🖥️ Getting local environment started
+## Quick start, I want to..
 
 - 🧪 [Play around in a sandbox demo environment](#play-around-in-a-sandbox-demo-environment)
 - 💻 [Run it locally on my machine](#run-it-locally-on-my-machine)
@@ -67,13 +25,17 @@ docker compose -f docker-compose.yml -f docker-compose-ai.yml down --remove-orph
 - 🌐 [Connect to other TruSpace nodes](#connect-to-other-truspace-nodes)
 - 📚 [Check out architecture, guides, details](#check-out-architecture-guides-details)
 
-## Play around in a sandbox demo environment
+--
 
-To check how TruSpace works, get to the sandbox installation at https://truspace.dev, register a new user, login and start playing with private and public workspaces!
+## Play around in an online sandbox demo environment
+
+To check how TruSpace works, get to the sandbox installation at https://truspace.dev, register a new user, login and start playing with private and public workspaces! It's an experiment-sandbox, so your data might get deleted occasionally.
+
+--
 
 ### 📥 Run it locally on my machine
 
-For a very **quick and easy** TruSpace setup (e.g. for demos and first look), run:
+For a very **quick and easy** TruSpace setup (e.g. for demos and first look) on your local machine, run:
 
 ```bash
 git clone git@github.com:openkfw/TruSpace.git
@@ -104,9 +66,13 @@ If something doesn't work, check that all containers are running with `docker ps
 | 783... |truspace-frontend | "sh startup.sh" | 26 minutes ago | Up 26 minutes (healthy) | 0.0.0.0:3000->3000/tcp, :::3000->3000/tcp | truspace-frontend-1|
 | 590... | ipfs/kubo:release | "/sbin/tini -- /usr/…" | 26 minutes ago | Up 26 minutes (healthy) | 0.0.0.0:4001->4001/tcp, 0.0.0.0:5001->5001/tcp, 4001/udp, 0.0.0.0:8080->8080/tcp, 8081/tcp | ipfs0 |
 
+--
+
 ## Install a standalone server
 
 There's an extensive guide how to install TruSpace on a (virtual) server or a Raspberry Pi. It includes steps how to install surrounding architecture like docker, a reverse proxy `nginx`, certificates via `LetsEncrypt` and all the other administrative steps. Have a look [here](./doc/installStandaloneServer.md)
+
+--
 
 ## Connect to other TruSpace nodes
 
