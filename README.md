@@ -44,6 +44,8 @@ sh start.sh
 
 This command creates a simple environment configuration, creates docker volumes and spins up `docker compose` containing backend api and IPFS clusters and additionally NextJS frontend in dev mode. After startup, the frontend is available on `http://localhost:3000`. Register a user, login and create a workspace for documents!
 
+If you plan to use another domain (e.g. a raspberry), make sure that the respective domains are updated from `localhost` to `domain` in the `.env` file.
+
 To enable AI analysis, you need to download the LLM model of your choice, as an example here is `gemma3:1b` and you can see the full list at the [ollama DB](https://ollama.com/library?q=mistral&sort=popular).
 
 - Login to the Open Web UI on `http://localhost:3333`. For login, use the values from the `.env` file (`ADMIN_USER_EMAIL`), by default `admin@admin.com/admin`. Type the model you specified in the `.env` in the `OLLAMA_MODEL` variable in the search bar and Open Web UI offers you to download it.
