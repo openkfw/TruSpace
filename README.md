@@ -8,8 +8,6 @@ The purpose of TruSpace is to make collaboration on documents between several st
 
 ## ✨ Key Features
 
-✨ Key Features
-
 - 🆓 100% open-source, sovereign and self-hostable - no cloud provider needed
 - 🔄 Fully decentralized storage using IPFS Cluster: Automatic sync of data between trusted IPFS cluster nodes/partners (private or public setup)
 - 🧠 Local AI interpretation of documents using Ollama + Open Web UI using customisable pre-defined prompts
@@ -33,17 +31,18 @@ To check how TruSpace works, get to the sandbox installation at https://truspace
 
 --
 
-### 📥 Run it locally on my machine
+## 📥 Run it locally on my machine
 
 For a very **quick and easy** TruSpace setup (e.g. for demos and first look) on your local machine, run:
 
 ```bash
 git clone git@github.com:openkfw/TruSpace.git
+cd TruSpace
 # Start development server
 sh start.sh
 ```
 
-This command spins up `docker compose` containing backend api and IPFS clusters and additionally NextJS frontend in dev mode. After startup, the frontend is available on `http://localhost:3000`. Register a user, login and create a workspace for documents!
+This command creates a simple environment configuration, creates docker volumes and spins up `docker compose` containing backend api and IPFS clusters and additionally NextJS frontend in dev mode. After startup, the frontend is available on `http://localhost:3000`. Register a user, login and create a workspace for documents!
 
 To enable AI analysis, you need to download the LLM model of your choice, as an example here is `gemma3:1b` and you can see the full list at the [ollama DB](https://ollama.com/library?q=mistral&sort=popular).
 
