@@ -1,6 +1,6 @@
-# Install TruSpace on an empty linux server
+# Install brainstorming summary
 
-Starting from an empty Ubuntu VM, follow these steps. In case a step is already done or clear to you upfront, simply skip it.
+Starting from an empty Ubuntu VM, follow these steps. In case a chapter is already done or clear to you, skip it
 
 ## Setup basic infrastructure
 
@@ -19,11 +19,11 @@ sudo apt install git -y
 
 - Open the firewall ports:
   - 443 for https communication
-- Setup the DNS records to reflect the domain (e.g. `example.com`) together with API endpoint (e.g. `api.example.com` and Open Web UI endpoint (e.g. `oi.example.com`)
+- Setup the DNS records to reflect the domain (e.g. `EXAMPLE.COM`) together with API endpoint (e.g. `api.EXAMPLE.COM` and Open Web UI endpoint (e.g. `oi.EXAMPLE.COM`)
 
 ## Setup forward proxy nginx with SSL and LetsEncrypt
 
-- Ensure your domain (e.g., `truspace.dev`) has an A record pointing to your server's public IP address.
+- Ensure your domain (e.g., `EXAMPLE.COM`, `truspace.dev`) has an A record pointing to your server's public IP address.
 - Install `nginx` and `certbot` for SSL certs
 
 ```bash
@@ -38,10 +38,10 @@ sudo systemctl enable nginx
 sudo systemctl start nginx
 ```
 
-- Create a config file for your domain. In all commands, please replace `example.com` with your domain:
+- Create a config file for your domain. In all commands, please replace `EXAMPLE.COM` with your domain (e.g. `truspace.dev`):
 
 ```bash
-sudo nano /etc/nginx/sites-available/example.com
+sudo nano /etc/nginx/sites-available/EXAMPLE.COM
 ```
 
 - Paste this basic configuration (without SSL yet):
@@ -49,7 +49,7 @@ sudo nano /etc/nginx/sites-available/example.com
 ```nginx
 server {
     listen 80;
-    server_name truspace.dev;
+    server_name EXAMPLE.COM;
     location / {
         proxy_pass http://localhost:3000;
     }
@@ -57,7 +57,7 @@ server {
 
 server {
     listen 80;
-    server_name oi.truspace.dev;
+    server_name oi.EXAMPLE.COM;
     location / {
         proxy_pass http://localhost:3333;
     }
@@ -65,7 +65,7 @@ server {
 
 server {
     listen 80;
-    server_name api.truspace.dev;
+    server_name api.EXAMPLE.COM;
     location / {
         proxy_pass http://localhost:8000;
     }
@@ -75,7 +75,7 @@ server {
 - Enable the config:
 
 ```bash
-sudo ln -s /etc/nginx/sites-available/example.com /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/EXAMPLE.COM /etc/nginx/sites-enabled/
 ```
 
 - Test and reload:
@@ -84,92 +84,125 @@ sudo ln -s /etc/nginx/sites-available/example.com /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
 ```
 
+Expected result:
+
+```bash
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+```
+
 - To get certificates from LetsEncrypt, use certbot. Certbot will automatically edit your `nginx` config to include HTTPS.
 
 ```bash
-sudo certbot --nginx -d truspace.dev -d oi.truspace.dev -d api.truspace.dev
+sudo certbot --nginx -d EXAMPLE.COM -d oi.EXAMPLE.COM -d api.EXAMPLE.COM
 ```
 
-- The resulting config in `/etc/nginx/sites-available/example.com` should be something like:
+Expected result:
+
+```bash
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+Requesting a certificate for EXAMPLE.COM and 2 more domains
+
+Successfully received certificate.
+Certificate is saved at: /etc/letsencrypt/live/EXAMPLE.COM/fullchain.pem
+Key is saved at:         /etc/letsencrypt/live/EXAMPLE.COM/privkey.pem
+This certificate expires on 2025-08-31.
+These files will be updated when the certificate renews.
+Certbot has set up a scheduled task to automatically renew this certificate in the background.
+
+Deploying certificate
+Successfully deployed certificate for EXAMPLE.COM to /etc/nginx/sites-enabled/EXAMPLE.COM
+Successfully deployed certificate for oi.EXAMPLE.COM to /etc/nginx/sites-enabled/EXAMPLE.COM
+Successfully deployed certificate for api.EXAMPLE.COM to /etc/nginx/sites-enabled/EXAMPLE.COM
+Congratulations! You have successfully enabled HTTPS on https://EXAMPLE.COM, https://oi.EXAMPLE.COM, and https://api.EXAMPLE.COM
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+If you like Certbot, please consider supporting our work by:
+ * Donating to ISRG / Let's Encrypt:   https://letsencrypt.org/donate
+ * Donating to EFF:                    https://eff.org/donate-le
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+```
+
+- The resulting config in `nano  /etc/nginx/sites-available/EXAMPLE.COM` should be something like:
 
 ```nginx
 # Redirect HTTP to HTTPS globally
 server {
-    server_name truspace.dev;
+    server_name EXAMPLE.COM;
     location / {
         proxy_pass http://localhost:3000;
     }
 
     listen 443 ssl; # managed by Certbot
-    ssl_certificate /etc/letsencrypt/live/truspace.dev/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/letsencrypt/live/truspace.dev/privkey.pem; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/EXAMPLE.COM/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/EXAMPLE.COM/privkey.pem; # managed by Certbot
     include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
 
 }
 
 server {
-    server_name oi.truspace.dev;
+    server_name oi.EXAMPLE.COM;
     location / {
         proxy_pass http://localhost:3333;
     }
 
     listen 443 ssl; # managed by Certbot
-    ssl_certificate /etc/letsencrypt/live/truspace.dev/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/letsencrypt/live/truspace.dev/privkey.pem; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/EXAMPLE.COM/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/EXAMPLE.COM/privkey.pem; # managed by Certbot
     include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
 
 }
 
 server {
-    server_name api.truspace.dev;
+    server_name api.EXAMPLE.COM;
     location / {
         proxy_pass http://localhost:8000;
     }
 
     listen 443 ssl; # managed by Certbot
-    ssl_certificate /etc/letsencrypt/live/truspace.dev/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/letsencrypt/live/truspace.dev/privkey.pem; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/EXAMPLE.COM/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/EXAMPLE.COM/privkey.pem; # managed by Certbot
     include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
 
 }
 
 server {
-    if ($host = truspace.dev) {
+    if ($host = EXAMPLE.COM) {
         return 301 https://$host$request_uri;
     } # managed by Certbot
 
 
     listen 80;
-    server_name truspace.dev;
+    server_name EXAMPLE.COM;
     return 404; # managed by Certbot
 
 
 }
 
 server {
-    if ($host = oi.truspace.dev) {
+    if ($host = oi.EXAMPLE.COM) {
         return 301 https://$host$request_uri;
     } # managed by Certbot
 
 
     listen 80;
-    server_name oi.truspace.dev;
+    server_name oi.EXAMPLE.COM;
     return 404; # managed by Certbot
 
 
 }
 
 server {
-    if ($host = api.truspace.dev) {
+    if ($host = api.EXAMPLE.COM) {
         return 301 https://$host$request_uri;
     } # managed by Certbot
 
 
     listen 80;
-    server_name api.truspace.dev;
+    server_name api.EXAMPLE.COM;
     return 404; # managed by Certbot
 
 
@@ -178,7 +211,73 @@ server {
 
 ## Install docker
 
-- Install docker according to [install and post install](https://docs.docker.com/engine/install/linux-postinstall/)
+- Install docker according to [this guide](https://docs.docker.com/engine/install/ubuntu/)
+
+To make sure that your installation worked, run `sudo docker run hello-world`. Expected output:
+
+```bash
+Unable to find image 'hello-world:latest' locally
+latest: Pulling from library/hello-world
+e6590344b1a5: Pull complete
+Digest: sha256:0b6a027b5cf322f09f6706c754e086a232ec1ddba835c8a15c6cb74ef0d43c29
+Status: Downloaded newer image for hello-world:latest
+
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+
+To generate this message, Docker took the following steps:
+ 1. The Docker client contacted the Docker daemon.
+ 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
+    (amd64)
+ 3. The Docker daemon created a new container from that image which runs the
+    executable that produces the output you are currently reading.
+ 4. The Docker daemon streamed that output to the Docker client, which sent it
+    to your terminal.
+
+To try something more ambitious, you can run an Ubuntu container with:
+ $ docker run -it ubuntu bash
+
+Share images, automate workflows, and more with a free Docker ID:
+ https://hub.docker.com/
+
+For more examples and ideas, visit:
+ https://docs.docker.com/get-started/
+```
+
+- Make sure to enable the entire docker functionality in the [post install guide](https://docs.docker.com/engine/install/linux-postinstall/)
+
+To make sure that your installation worked for all non-root users, run
+
+```bash
+newgrp docker
+docker run hello-world
+```
+
+Expected output:
+
+```bash
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+
+To generate this message, Docker took the following steps:
+ 1. The Docker client contacted the Docker daemon.
+ 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
+    (amd64)
+ 3. The Docker daemon created a new container from that image which runs the
+    executable that produces the output you are currently reading.
+ 4. The Docker daemon streamed that output to the Docker client, which sent it
+    to your terminal.
+
+To try something more ambitious, you can run an Ubuntu container with:
+ $ docker run -it ubuntu bash
+
+Share images, automate workflows, and more with a free Docker ID:
+ https://hub.docker.com/
+
+For more examples and ideas, visit:
+ https://docs.docker.com/get-started/
+```
+
 - Login again to the system in order to execute docker with the correct user
 
 ## Clone and configure the TruSpace repository
@@ -190,21 +289,33 @@ git clone git@github.com:openkfw/TruSpace.git
 cd truspace
 ```
 
-- Copy `.env.example` to `.env`
+## 📥 Start of the server
+
+If you want to run in production mode, e.g. on your virtual machine:
 
 ```bash
-cp .env.example .env
-cp ./frontend/.env.example ./frontend/.env
+cd production
+bash start-prod.sh
 ```
 
-- **Update** the environment variables, because some of these are used when the containers are startup the first time and volumes created!
-
-## Start and test TruSpace backend
-
-- Start all containers using the `start.sh` script
+If running for the first time you may need to set the correct permissions for the `/volumes` folders, run:
 
 ```bash
-./start.sh
+sudo chown -R 1000:1000 ./volumes
+# or
+sudo chmod -R 744 ./volumes
+# and restart application with
+bash start-prod.sh
+```
+
+```bash
+# To restart environment, e.g. after you change some environmental variables or updating the repo) run again:
+bash start-prod.sh
+```
+
+```bash
+# To STOP environment
+docker compose -f docker-compose.yml -f docker-compose-ai.yml down --remove-orphans
 ```
 
 The result should look something like this
@@ -216,13 +327,9 @@ The result should look something like this
 | truspace-backend                     | "sh ./entrypoint.sh"   | Restarting (1) 24 seconds ago |                                                                                                                            | truspace-backend-1 |
 | ipfs/kubo:release                    | "/sbin/tini -- /usr/…" | Up 14 minutes (healthy)       | 0.0.0.0:4001->4001/tcp, [::]:4001->4001/tcp, 0.0.0.0:5001->5001/tcp, [::]:5001->5001/tcp, 4001/udp, 0.0.0.0:8080->8080/tcp |
 
+You can also make sure that everything is correctly running when the status in the top right corner are all green (can take a few minutes for th OI bubble).
+
 ## Configure AI backend with OI and test
-
-- After initial start, all volumes are created with root and not the docker user. Therefore from the `truspace` folder, you have to change the volumes permissions
-
-```bash
-sudo chown -R <user>:<group> volumes/
-```
 
 - Login to the subdomain of the [Open Web UI](https://oi.truspace.dev) using the credentials in the `.env` file: `ADMIN_USER_EMAIL` and `ADMIN_USER_PASSWORD`
 - Go to `Administration` and `Connection` and update the connection endpoint of ollama to `http://localhost:11434`. No API key is needed.
@@ -234,9 +341,8 @@ sudo chown -R <user>:<group> volumes/
 - Access TruSpace and register a user
 - Upload a document and verify that everything works
 
-## Configure access to another IPFS node
+## Configure access to IPFS
 
-- To connect another node, it needs to be added to the cluster and the correct swarm key of that network needs to be present
-- Enter `~/truspace/volumes/cluster0/service.json` and enter the peer node in field `peer_addresses`. For example something like `/ip4/199.223.154.279/tcp/9096/p2p/12D3KooGN5nnhiVcFeHSkRynwhH54...`
-- Restart cluster container
-- Login to cluster0 with `docker exec -it cluster0 sh` and execute `ipfs-cluster-ctl peers ls`. The top line should say `cluster0 | Sees *1* other peers`
+- In volumes, add the IP address and cluster ID in the multicast format to service.json peers
+
+## Developer only: Starting frontend from Node

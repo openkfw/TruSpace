@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 
 import { useTranslations } from "next-intl";
@@ -72,6 +72,25 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
    const [savePromptForWorkspace, setSavePromptForWorkspace] = useState(false);
    const { perspectives, mutate } = usePerspectives(cid);
    const { status: perspectivesStatus } = usePerspectivesStatus(cid);
+   const buttonRef = useRef(null);
+   const selectRef = useRef(null);
+   const [isWrapped, setIsWrapped] = useState(false);
+
+   useEffect(() => {
+      const checkSelectWrap = () => {
+         if (buttonRef.current && selectRef.current) {
+            const buttonTopPosition =
+               buttonRef.current.getBoundingClientRect().top;
+            const selectTopPosition =
+               selectRef.current.getBoundingClientRect().top;
+            setIsWrapped(selectTopPosition > buttonTopPosition + 5);
+         }
+      };
+
+      checkSelectWrap();
+      window.addEventListener("resize", checkSelectWrap);
+      return () => window.removeEventListener("resize", checkSelectWrap);
+   }, []);
 
    const uploadButtonTitle = t("create");
 
@@ -409,8 +428,9 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                            : t("generatingAIPerspectives")}
                      </div>
                   ) : null}
-                  <div className="flex flew-row items-center justify-between">
+                  <div className="flex flew-row items-center justify-between flex-wrap">
                      <Button
+                        ref={buttonRef}
                         variant="outline"
                         onClick={() => {
                            setNewPerspectiveDialogOpen(true);
@@ -429,45 +449,48 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                      >
                         <MessageCircleQuestion /> {t("askCustomPrompt")}
                      </Button>
-
-                     <Select
-                        onValueChange={changeCurrentPerspective}
-                        disabled={
-                           (isGenerating && perspectives?.length < 1) ||
-                           !perspectives ||
-                           perspectives.length < 1
-                        }
-                     >
-                        <SelectTrigger className="w-64 bg-slate-50 dark:bg-slate-800 dark:text-white dark:placeholder:text-white">
-                           <SelectValue placeholder={t("selectPerspective")} />
-                        </SelectTrigger>
-                        <SelectContent>
-                           {perspectives?.map((perspective) => (
-                              <SelectItem
-                                 key={`${perspective.id}-${perspective.timestamp}`}
-                                 value={perspective.id}
-                              >
-                                 <div className="flex">
-                                    {perspective.name}
-                                    {perspective?.creatorType === "user" &&
-                                       ` (${perspective.creator})`}
-                                    {perspective?.creatorType === "ai" && (
-                                       <TooltipProvider>
-                                          <Tooltip>
-                                             <TooltipTrigger>
-                                                <Bot className="ml-2" />
-                                             </TooltipTrigger>
-                                             <TooltipContent>
-                                                {t("aiPerspective")}
-                                             </TooltipContent>
-                                          </Tooltip>
-                                       </TooltipProvider>
-                                    )}
-                                 </div>
-                              </SelectItem>
-                           ))}
-                        </SelectContent>
-                     </Select>
+                     <div ref={selectRef} className={isWrapped ? "mt-2" : ""}>
+                        <Select
+                           onValueChange={changeCurrentPerspective}
+                           disabled={
+                              (isGenerating && perspectives?.length < 1) ||
+                              !perspectives ||
+                              perspectives.length < 1
+                           }
+                        >
+                           <SelectTrigger className="bg-slate-50 dark:bg-slate-800 dark:text-white dark:placeholder:text-white">
+                              <SelectValue
+                                 placeholder={t("selectPerspective")}
+                              />
+                           </SelectTrigger>
+                           <SelectContent>
+                              {perspectives?.map((perspective) => (
+                                 <SelectItem
+                                    key={`${perspective.id}-${perspective.timestamp}`}
+                                    value={perspective.id}
+                                 >
+                                    <div className="flex items-center mr-1">
+                                       {perspective.name}
+                                       {perspective?.creatorType === "user" &&
+                                          ` (${perspective.creator})`}
+                                       {perspective?.creatorType === "ai" && (
+                                          <TooltipProvider>
+                                             <Tooltip>
+                                                <TooltipTrigger>
+                                                   <Bot className="ml-2" />
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                   {t("aiPerspective")}
+                                                </TooltipContent>
+                                             </Tooltip>
+                                          </TooltipProvider>
+                                       )}
+                                    </div>
+                                 </SelectItem>
+                              ))}
+                           </SelectContent>
+                        </Select>
+                     </div>
                   </div>
                   <div className="text-right" />
 
