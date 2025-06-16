@@ -289,36 +289,33 @@ git clone git@github.com:openkfw/TruSpace.git
 cd truspace
 ```
 
-- Copy `.env.example` to `.env`
+## 📥 Start of the server
+
+If you want to run in production mode, e.g. on your virtual machine:
 
 ```bash
-cp .env.example .env
+cd production
+bash start-prod.sh
 ```
 
-- **Update** the environment variables, because some of these are used when the containers are startup the first time and volumes created!
-- You can also update the .env file through a shell script in `/production/setup-env.sh`!
-
-## Start and test TruSpace backend
-
-- Start all containers using the `start.sh` script
+If running for the first time you may need to set the correct permissions for the `/volumes` folders, run:
 
 ```bash
-./start.sh
+sudo chown -R 1000:1000 ./volumes
+# or
+sudo chmod -R 744 ./volumes
+# and restart application with
+bash start-prod.sh
 ```
 
-- After initial start, all volumes are created with root and not the docker user. Therefore from the `truspace` folder, you have to change the volumes permissions
-
 ```bash
-sudo chown -R <user>:<group> volumes/
+# To restart environment, e.g. after you change some environmental variables or updating the repo) run again:
+bash start-prod.sh
 ```
 
-There are different commands that can help you identify the user and group:
-
 ```bash
-whoami # prints the current user
-ls -al # prints the current user and group of the current directory
-cut -d: -f1 /etc/passwd # prints all users
-cut -d: -f1 /etc/group # prints all groups
+# To STOP environment
+docker compose -f docker-compose.yml -f docker-compose-ai.yml down --remove-orphans
 ```
 
 The result should look something like this
