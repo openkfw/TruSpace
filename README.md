@@ -51,6 +51,14 @@ Once the model is downloaded, AI analysis is executed upon each document upload 
 
 **You made it and should see this**
 
+![Screenshot of login screen](./doc/screenshot_login.png)
+
+There'se an option to change the app langugae, too. Go ahead and _Sign up_ a new user.
+
+![Screenshot of register screen](./doc/screenshot_register.png)
+
+Fill out the required fields. The user account is local, your data is not going anywhere. After the submission, the app takes you back to the login screen, and from there to the dashboard.
+
 ![Screenshot of dashboard](./doc/screenshot_dashboard.png)
 
 If something doesn't work, check that all containers are running with `docker ps`. They should show these containers:
