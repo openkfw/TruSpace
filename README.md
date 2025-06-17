@@ -166,5 +166,6 @@ This project is licensed under the **GNU General Public License v3.0**. See the 
 
 ## 💬 Community & Support
 
+- User guide: [User Guide](./doc/User%20Guide/README.md)
 - Discussions: [GitHub Discussions](https://github.com/openkfw/TruSpace/discussions)
 - Report issues: [GitHub Issues](https://github.com/openkfw/TruSpace/issues)
