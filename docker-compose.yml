@@ -32,10 +32,6 @@ services:
       - ${API_PORT}:${API_PORT}
     entrypoint: sh ./entrypoint.sh
 
-  ##################################################################################
-  ## Cluster PEER 0 ################################################################
-  ##################################################################################
-
   ipfs0:
     container_name: ipfs0
     image: ipfs/kubo:release
@@ -47,7 +43,7 @@ services:
       - "${IPFS_GATEWAY_PORT}:${IPFS_GATEWAY_PORT}" # ipfs gateway - expose if needed/wanted
     volumes:
       - ./volumes/ipfs0:/data/ipfs
-      - ./ipfs-init/init-ipfs.sh:/scripts/init-ipfs.sh:ro
+      - ./init-scripts/init-ipfs.sh:/scripts/init-ipfs.sh:ro
     entrypoint: ["/scripts/init-ipfs.sh"]
 
   cluster0:
@@ -65,6 +61,7 @@ services:
       CLUSTER_RESTAPI_HTTPLISTENMULTIADDRESS: ${CLUSTER_RESTAPI_HTTPLISTENMULTIADDRESS} # Expose API
       CLUSTER_PINSVCAPI_HTTPLISTENMULTIADDRESS: ${CLUSTER_PINSVCAPI_HTTPLISTENMULTIADDRESS} # Exposes Pinning Service API
       CLUSTER_MONITORPINGINTERVAL: ${CLUSTER_MONITORPINGINTERVAL} # Speed up peer discovery
+      CLUSTER_PEERS: ${CLUSTER_PEERS}
     ports:
       # Open API port (allows ipfs-cluster-ctl usage on host)
       - "${OPEN_API_PORT}:${OPEN_API_PORT}"

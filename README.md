@@ -80,7 +80,8 @@ There's an extensive guide how to install TruSpace on a (virtual) server or a Ra
 You have a TruSpace node running and would like to connect to another (private) network to sync the TruSpace data? Here's what to do:
 
 - TODO swarm key?
-- other secrets?
+- other secrets? cluster secret recommended generator
+  `export CLUSTER_SECRET=$(od  -vN 32 -An -tx1 /dev/urandom | tr -d ' \n')`
 - service.json cluster
 
 ## Check out architecture, guides, details..

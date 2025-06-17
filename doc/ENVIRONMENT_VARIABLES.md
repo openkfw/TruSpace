@@ -37,7 +37,7 @@ This document provides a detailed overview of the environment variables used to 
 | Variable                                   | Description                                                                       | Default Value                                                    | Required |
 | ------------------------------------------ | --------------------------------------------------------------------------------- | ---------------------------------------------------------------- | -------- |
 | `START_PRIVATE_NETWORK`                    | Option to allow or disable connection to public IPFS nodes                        | true                                                             | true     |
-| `SWARM_KEY_SECRET`                         | If `START_PRIVATE_NETWORK` is "true" then swarm key secret is required.           |  | false    |
+| `SWARM_KEY_SECRET`                         | If `START_PRIVATE_NETWORK` is "true" then swarm key secret is required.           |                                                                  | false    |
 | `IPFS_CLUSTER_HOST`                        | Address of the IPFS Cluster REST API.                                             | [http://cluster0:9094](http://cluster0:9094)                     | true     |
 | `IPFS_PINSVC_HOST`                         | Address of the IPFS pinning service API.                                          | [http://cluster0:9097](http://cluster0:9097)                     | true     |
 | `IPFS_GATEWAY_HOST`                        | Address of the IPFS gateway (used to fetch content).                              | [http://ipfs0:8080](http://ipfs0:8080)                           | true     |
@@ -48,6 +48,7 @@ This document provides a detailed overview of the environment variables used to 
 | `CLUSTER_SWARM_PORT`                       | Port for peer-to-peer swarm communication.                                        | 9096                                                             | true     |
 | `OPEN_API_PORT`                            | Port used by the IPFS Cluster REST API.                                           | 9094                                                             | true     |
 | `PINNING_SERVICE_PORT`                     | Port used by the pinning service API.                                             | 9097                                                             | true     |
+| `CLUSTER_PEERS`                            | Comma separated multiaddresses of cluster peers                                   |                                                                  | false    |
 
 ### Cluster 0
 
