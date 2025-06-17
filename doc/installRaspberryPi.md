@@ -21,7 +21,12 @@ cp .env.example .env
 ```
 
 - Update `.env` with respective host names
-- In `frontend` folder copy `env.example` into `env` and update host name (TODO - I don't think this is needed)
+
+# OPTIONAL: Configure Large Language Model (LLM)
+
+- LLM is configured in `.env` file
+- Default is `gemma3:1b`
+- Available models are at https://ollama.com/library
 
 # Build IPFS cluster image
 
@@ -50,13 +55,6 @@ or
 ./start.sh
 ```
 
-# Configure OI and download model
-
-- Login to the OI at `<hostname>:3333`
-- Configure a new connection for ollama using `http://ollama:11434` instead of `docker.internal`
-- Pull an AI model from the search bar, e.g. `gemma3:1b`, the model should be pulled from ollama
-- Test the AI with a simple conversion in Open Web UI
-
 # Register and login to TruSpace
 
 - Execute `<hostname>:3000` and register a user
@@ -70,3 +68,13 @@ or
 - Enter `~/truspace/volumes/cluster0/service.json` and enter the peer node in field `peer_addresses`
 - Restart cluster container
 - Login to cluster0 with `docker exec -it cluster0 sh` and execute `ipfs-cluster-ctl peers ls`. The top line should say `cluster0 | Sees *1* other peers`
+
+---
+
+# Alternative configuration of OI and model
+
+- Login to the OI at `<hostname>:3333`
+- Configure a new connection for ollama using `http://ollama:11434` instead of `docker.internal`
+- Pull an AI model from the search bar, e.g. `gemma3:1b`, the model should be pulled from ollama
+- Make sure that `OLLAMA_MODEL` in `.env` is the same value, so that Truspace actually uses the desired model
+- Test the AI with a simple conversion in Open Web UI
