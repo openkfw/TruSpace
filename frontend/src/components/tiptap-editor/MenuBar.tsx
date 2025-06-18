@@ -239,9 +239,7 @@ export const MenuBar = ({
                         icon: <Image />,
                         label: translations("pasteFromClipboard"),
                         onClick: () => {
-                           displayInfo(
-                              translations("pasteImageFromClipboardInfo")
-                           );
+                           displayInfo(translations("pasteImageFromClipboard"));
                         }
                      }
                   ]}

@@ -20,7 +20,6 @@ add_cluster_peers() {
     echo "Creating peerstore file: $PEERSTORE_FILE"
     > "$PEERSTORE_FILE"
     
-    # Parse comma-separated peers and write to file
     echo "Writing peers to peerstore..."
     count=0
     
@@ -46,6 +45,9 @@ add_cluster_peers() {
     echo "Total peers: $(wc -l < "$PEERSTORE_FILE")"
     echo ""
 }
+
+# generate env file if it does not exist
+[[ -e .env ]] || cp .env.example .env
 
 SCRIPT_DIR=$(dirname -- $0)
 source $SCRIPT_DIR/.env
@@ -80,9 +82,6 @@ for d in "${dirs[@]}"; do
     mkdir -p "$d"
   fi
 done
-
-# generate env file if it does not exist
-[[ -e .env ]] || cp .env.example .env
 
 echo "INFO: Starting dev environment"
 
