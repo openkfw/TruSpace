@@ -28,19 +28,13 @@ import {
    SidebarMenuItem,
    useSidebar
 } from "@/components/ui/sidebar";
+import { useUser } from "@/contexts/UserContext";
+import { COOKIE_NAME } from "@/lib";
 import { logout } from "@/lib/services";
 
-export function NavUser({
-   user
-}: {
-   user: {
-      name: string;
-      email: string;
-      initials?: string;
-      avatar?: string;
-   };
-}) {
+export function NavUser() {
    const { isMobile } = useSidebar();
+   const { user } = useUser();
    const translations = useTranslations("navbar");
    const router = useRouter();
 
@@ -117,7 +111,7 @@ export function NavUser({
                      onClick={async () => {
                         try {
                            await logout();
-                           Cookies.remove("login");
+                           Cookies.remove(COOKIE_NAME);
                            router.push("/login");
                         } catch (error) {
                            console.error("Failed to log out:", error);

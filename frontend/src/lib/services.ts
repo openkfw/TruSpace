@@ -22,7 +22,7 @@ const PERSPECTIVES_ENDPOINT = `${API_URL}/perspectives`;
 export const CHATS_ENDPOINT = `${API_URL}/chats`;
 const TAGS_ENDPOINT = `${API_URL}/tags`;
 const WORKSPACES_ENDPOINT = `${API_URL}/workspaces`;
-const USERS_ENDPOINT = `${API_URL}/users`;
+export const USERS_ENDPOINT = `${API_URL}/users`;
 const HEALTH_ENDPOINT = `${API_URL}/health`;
 const PERMISSIONS_ENDPOINT = `${API_URL}/permissions`;
 const LANGUAGE_ENDPOINT = `${API_URL}/language`;
@@ -560,4 +560,21 @@ export const logout = async (): Promise<{
       console.error("Error during logout:", error);
       throw error;
    }
+};
+
+export const uploadAvatar = async (formData: FormData) => {
+   const res = await fetch(`${USERS_ENDPOINT}/avatar`, {
+      method: "POST",
+      credentials: "include",
+      body: formData
+   });
+   return res.json();
+};
+
+export const downloadAvatar = async () => {
+   const res = await fetch(`${USERS_ENDPOINT}/avatar`, {
+      method: "GET",
+      credentials: "include"
+   });
+   return res;
 };

@@ -63,9 +63,9 @@ else
 fi
 
 # if frontend is in dev mode, start it
-if [ "$FRONTEND_DEV" = "true" ]; then
-    echo "INFO: Starting frontend in development mode"
-    cd ./frontend
-    npm i
-    npm run dev
-fi
+# if [ "$FRONTEND_DEV" = "true" ]; then
+#     echo "INFO: Starting frontend in development mode"
+#     cd ./frontend
+#     npm i
+#     npm run dev
+# fi
