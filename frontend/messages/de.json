@@ -19,7 +19,10 @@
       "noDocumentDescription": "Neues Dokument hinzufügen, indem Sie auf die Schaltfläche Dokument erstellen oder Dokument hochladen klicken",
       "share": "Aktie",
       "document": "Dokument",
-      "workspace": "Arbeitsbereich"
+      "workspace": "Arbeitsbereich",
+      "userSettings": "Nutzer Einstellungen",
+      "uploadAvatar": "Klicken Sie auf den Avatar, um ein neues Foto hochzuladen",
+      "saveSettings": "Einstellungen speichern"
    },
    "theme": {
       "light": "Hell",

@@ -19,7 +19,7 @@ export default function Breadcrumbs() {
    const { document } = useDocuments();
    const { workspace } = useWorkspaceContext();
    const [breadcrumbPaths, setBreadcrumbPaths] = useState([]);
-   const staticPaths = ["dashboard", "statistics", "share"];
+   const staticPaths = ["dashboard", "statistics", "share", "userSettings"];
 
    const isVisibleBreadcrumb = (step) => {
       const { label } = step;

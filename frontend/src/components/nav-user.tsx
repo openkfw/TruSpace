@@ -97,7 +97,9 @@ export function NavUser({
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuGroup>
-                     <DropdownMenuItem>
+                     <DropdownMenuItem
+                        onClick={() => router.push("/userSettings")}
+                     >
                         <UserRoundCog />
                         {translations("userSettings")}
                      </DropdownMenuItem>
