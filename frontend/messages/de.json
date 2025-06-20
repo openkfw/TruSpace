@@ -17,11 +17,11 @@
       "dashboard": "Dashboard",
       "noDocuments": "Keine Dokumente",
       "noDocumentDescription": "Neues Dokument hinzufügen, indem Sie auf die Schaltfläche Dokument erstellen oder Dokument hochladen klicken",
-      "share": "Aktie",
+      "share": "Teilen",
       "document": "Dokument",
       "workspace": "Arbeitsbereich",
-      "userSettings": "Nutzer Einstellungen",
-      "uploadAvatar": "Klicken Sie auf den Avatar, um ein neues Foto hochzuladen",
+      "userSettings": "Nutzer-Einstellungen",
+      "uploadAvatar": "Klicken Sie auf den Avatar, um ein neues Bild hochzuladen",
       "saveSettings": "Einstellungen speichern"
    },
    "theme": {
@@ -119,7 +119,7 @@
    "documentPreview": {
       "preview": "Vorschau",
       "noPreview": "Keine Vorschau verfügbar",
-      "unsupportedFormat": "Dieses Dateiformat wird für die Vorschau nicht unterstützt.",
+      "unsupportedFormat": "Dieses Dateiformat wird für die Vorschau nicht unterstützt",
       "page": "Seite",
       "of": "von"
    },
@@ -141,7 +141,7 @@
       "documentLanguages": "Dokumentsprachen:",
       "generatingAILanguageQueue": "In Warteschlange für Sprachanalyse...",
       "generatingAILanguage": "Sprachanalyse...",
-      "languageGenerationError": "Beim Generieren der Sprache ist ein Fehler aufgetreten"
+      "languageGenerationError": "Bei der Bestimmung der Sprache ist ein Fehler aufgetreten"
    },
    "documentVersion": {
       "version": "Version",
@@ -156,7 +156,7 @@
       "download": "Herunterladen",
       "failedToFetch": "Dokument konnte nicht abgerufen werden",
       "invalidResponse": "Ungültige Antwort",
-      "language": "Versionssprache",
+      "language": "Sprache",
       "versionTagName": "Name des Versionstags"
    },
    "navbar": {
@@ -239,8 +239,8 @@
       "by": "von",
       "info": "Info",
       "prompt": "Prompt",
-      "perspectiveName": "Perspektivenname",
-      "perspectiveText": "Perspektiventext",
+      "perspectiveName": "Titel der Perspektive",
+      "perspectiveText": "Perspektive",
       "perspectiveGenerationError": "Fehler bei der Generierung der Perspektive",
       "model": "Modell",
       "morePromptInfo": "Prompt- und Modelldetails anzeigen",
@@ -273,7 +273,7 @@
       "generatingAITagsQueue2": "Aufträge verarbeitet werden. Dies kann mehrere Minuten dauern."
    },
    "document": {
-      "blankPdfError": "PDFs ohne eingebetteten Text sind nicht erlaubt",
+      "blankPdfError": "PDFs ohne eingebetteten Text sind nicht möglich",
       "documentUploaded": "Dokument erfolgreich hochgeladen",
       "documentUploadeNoAI": "Dokument erfolgreich hochgeladen, KI-Verarbeitung wegen fehlendem Textinhalt übersprungen",
       "documentUploadError": "Beim Hochladen des Dokuments ist ein Fehler aufgetreten",
@@ -372,7 +372,7 @@
       "undo": "Rückgängig"
    },
    "tour": {
-      "workspaceMenuDescription": "👋 Willkommen! Dies ist das Arbeitsbereich-Menü. Hier findest du alle Aktionen, die du zur Verwaltung deines Arbeitsbereichs benötigst.",
+      "workspaceMenuDescription": "👋 Willkommen! Dies ist das Arbeitsbereich-Menü. Hier finden Sie alle Aktionen, die Sie zur Verwaltung deines Arbeitsbereichs benötigen.",
       "confirmButton": "Verstanden"
    }
 }
