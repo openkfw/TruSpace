@@ -114,6 +114,8 @@ An extensive user guide with screenshots is available in the folder [User Guide]
 
 In the overview, you can see how the components work together. The UI and API is part of this repository and provides the interface and the translation to other services. Once you start TruSpace, it pulls and connects to containers from Open Web UI (for AI processing) and IPFS/IPFS-Cluster to persist the data. The respective ports are outlined in the image.
 
+For the connection to other nodes, ports 4001 (IPFS swarm) and 9096/9097 (IPFS cluster) need to be opened.
+
 ![Architecture](./doc/tech-arch-diagram.PNG "Tech Architecture overview")
 
 ### 🧰 Tech Stack
