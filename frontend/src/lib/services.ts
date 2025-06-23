@@ -395,7 +395,7 @@ export function useTagsStatus(cid: string) {
    return { status: data, error, refresh: mutate };
 }
 
-export const registerUser = async (data: any) => {
+export const registerUser = async (data: Record<string, string>) => {
    const url = `${USERS_ENDPOINT}/register`;
    const options: RequestInit = {
       method: "POST",
@@ -406,7 +406,9 @@ export const registerUser = async (data: any) => {
          name: data.name,
          email: data.email,
          password: data.password,
-         confirmPassword: data.confirmPassword
+         confirmPassword: data.confirmPassword,
+         lang: data.lang,
+         confirmationLink: data.confirmationLink
       }),
       credentials: "include"
    };
@@ -418,7 +420,7 @@ export const registerUser = async (data: any) => {
    return result;
 };
 
-export const loginUser = async (data: any) => {
+export const loginUser = async (data: Record<string, string>) => {
    const url = `${USERS_ENDPOINT}/login`;
    const options: RequestInit = {
       method: "POST",
@@ -554,6 +556,31 @@ export const logout = async (): Promise<{
       return await response.json();
    } catch (error) {
       console.error("Error during logout:", error);
+      throw error;
+   }
+};
+
+export const confirmRegistration = async (
+   token: string
+): Promise<{
+   status: string;
+   message: string;
+}> => {
+   try {
+      const response = await fetch(
+         `${USERS_ENDPOINT}/confirm-registration?token=${token}`,
+         {
+            method: "GET"
+         }
+      );
+
+      if (!response.ok) {
+         throw new Error("Failed to confirm registration");
+      }
+
+      return await response.json();
+   } catch (error) {
+      console.error("Error during registration confirmation:", error);
       throw error;
    }
 };

@@ -34,6 +34,14 @@ interface Config {
   };
   rateLimitPerMinute: number;
   registerUsersAsInactive: boolean;
+  smtpServer: {
+    host: string;
+    port: number;
+    secure: boolean;
+    user: string;
+    password: string;
+  };
+  emailSender: string;
 }
 
 const { error, value: envVars } = envVarsSchema.validate(process.env);
@@ -86,6 +94,14 @@ export const config: Config = {
     ? parseInt(envVars.RATE_LIMIT_PER_MINUTE, 10)
     : 200,
   registerUsersAsInactive: envVars.REGISTER_USERS_AS_INACTIVE === "true",
+  smtpServer: {
+    host: envVars.SMTP_HOST,
+    port: envVars.SMTP_PORT,
+    secure: envVars.SMTP_SSL,
+    user: envVars.SMTP_USER,
+    password: envVars.SMTP_PASSWORD,
+  },
+  emailSender: envVars.EMAIL_SENDER,
 };
 
 if (config.jwt.secret === "super-secret-key") {

@@ -1,17 +1,26 @@
 import express, { Request, Response } from "express";
-import { body, validationResult } from "express-validator";
+import { body, query, validationResult } from "express-validator";
+import fs from "fs";
+import { compile } from "handlebars";
 import jwt from "jsonwebtoken";
+import path from "path";
 import {
+  activateUserDb,
   createUserDb,
   findUserByEmailDb,
+  findUserByTokenDb,
   getTotalRecentlyAddedUsersDb,
   getTotalUsersDb,
 } from "../clients/db";
 import { config } from "../config/config";
+import logger from "../config/winston";
 import { hashPassword, verifyPassword } from "../encryption";
+import { sendEmail } from "../mailing/mailing";
+import { registrationConfirmation } from "../mailing/mailingConstants";
 import { authenticateCookie } from "../middlewares/authenticate";
 import validate from "../middlewares/validate";
 import { JwtPayload } from "../types/interfaces";
+import { USER_STATUS } from "../utility/constants";
 
 const router = express.Router();
 
@@ -22,33 +31,70 @@ router.post(
     body("email").isEmail(),
     body("password").isString(),
     body("confirmPassword").isString(),
+    body("confirmationLink").isString(),
+    body("lang").isString(),
   ]),
   async (req: Request, res: Response) => {
-    const body = req.body;
+    const { name, email, password, confirmationLink, lang } = req.body;
+    const { registerUsersAsInactive } = config;
 
-    const passwordHash = await hashPassword(body.password);
+    const passwordHash = await hashPassword(password);
+    const token = jwt.sign({ email: email }, Buffer.from(config.jwt.secret), {
+      expiresIn: 1200000,
+    });
     try {
       const result = await createUserDb(
-        body.name,
-        body.email,
+        name,
+        email,
         passwordHash,
-        config.registerUsersAsInactive ? "inactive" : "active"
+        registerUsersAsInactive ? USER_STATUS.inactive : USER_STATUS.active,
+        token
       );
       if (!result) {
         throw Error("Unknown error");
       }
-      res.json({
-        status: "success",
-        message: "Your registration request has been processed",
-      });
-    } catch (error: any) {
-      if (error.message === "email taken") {
+      if (registerUsersAsInactive) {
+        const filePath = path.join(
+          process.cwd(),
+          "src/mailing/templates/registrationConfirmation.html"
+        );
+        const source = fs.readFileSync(filePath, "utf-8");
+        const template = compile(source);
+        const replacements = {
+          lang: lang,
+          header: registrationConfirmation[lang].header,
+          user: name,
+          text: registrationConfirmation[lang].text,
+          confirmRegistrationUrl: `${confirmationLink}?token=${token}`,
+          confirmRegistrationTitle: registrationConfirmation[lang].link,
+          footer: registrationConfirmation[lang].footer,
+        };
+        const htmlTemplateToSend = template(replacements);
+
+        await sendEmail(
+          email,
+          registrationConfirmation[lang].subject,
+          htmlTemplateToSend
+        );
         res.json({
+          status: "success",
+          message: "email sent",
+        });
+      } else {
+        res.json({
+          status: "success",
+          message: "Your registration request has been processed",
+        });
+      }
+    } catch (error: any) {
+      logger.error(error);
+      if (error.message === "email taken") {
+        res.status(400).json({
           status: "failure",
           message: "Email address is already registered",
         });
       } else {
-        res.json({
+        res.status(500).json({
           status: "failure",
           message: "Unknown error occured",
         });
@@ -88,7 +134,7 @@ router.post(
       }
 
       if (config.env === "production") {
-        const isActive = user.status === "active";
+        const isActive = user.status === USER_STATUS.active;
 
         if (!isActive) {
           return res.status(401).json({
@@ -171,6 +217,27 @@ router.get(
       res.status(500).json({
         status: "failure",
         message: "Unable to fetch statistics",
+      });
+    }
+  }
+);
+
+router.get(
+  "/confirm-registration",
+  validate([query("token").isString().notEmpty()]),
+  async (req: Request, res: Response) => {
+    const token = req.query.token as string;
+    const user = await findUserByTokenDb(token);
+    if (user) {
+      await activateUserDb(user.id);
+      res.status(200).json({
+        status: "success",
+        message: "User activated successfully",
+      });
+    } else {
+      res.status(400).json({
+        status: "failure",
+        message: "Invalid token",
       });
     }
   }

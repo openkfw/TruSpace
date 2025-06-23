@@ -40,6 +40,14 @@
       "invalidCredentials": "The email or password you entered is incorrect",
       "activationRequired": "User account requires activation"
    },
+   "confirmRegistration": {
+      "confirmButton": "Confirm account registration",
+      "continueToLogin": "Continue to login",
+      "title": "Finish your registration",
+      "text": "Please, click the button below to finish your registration",
+      "confirmError": "Account confirmation error: token is invalid",
+      "confirmSuccess": "Success! Account registration finished, you can proceed to login page"
+   },
    "register": {
       "title": "Register",
       "subtitle": "Enter your information below to register",
@@ -69,7 +77,8 @@
       "registerSuccess": "Registration was successful",
       "passwordDescription": "Your password must meet the following requirements:",
       "registerError": "An error occurred during registration",
-      "backToLogin": "Back to login"
+      "backToLogin": "Back to login",
+      "emailSent": "Registration confirmation email has been sent"
    },
    "homePage": {
       "documentName": "Document name",

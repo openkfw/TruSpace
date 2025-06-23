@@ -14,6 +14,7 @@ import {
    PopoverContent,
    PopoverTrigger
 } from "@/components/ui/popover";
+import { getUserLocale } from "@/i18n/service";
 import { registerUser } from "@/lib/services";
 import { CheckCircle, Eye, EyeOff, XCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -22,7 +23,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import { validateEmail } from "../helper/validateEmail";
+import { validateEmail } from "../../lib/validateEmail";
 
 export default function Register() {
    const translations = useTranslations("register");
@@ -59,10 +60,20 @@ export default function Register() {
    ];
 
    const onSubmit = async (data) => {
-      const result = await registerUser(data);
+      const locale = await getUserLocale();
+      const enhancedData = {
+         ...data,
+         lang: locale,
+         confirmationLink: `${window.location.origin}/confirm`
+      };
+      const result = await registerUser(enhancedData);
       if (result.status === "success") {
          setEmailTaken(false);
-         toast.success(translations("registerSuccess"));
+         if (result.message === "email sent") {
+            toast.success(translations("emailSent"));
+         } else {
+            toast.success(translations("registerSuccess"));
+         }
          router.push("/login");
       }
       if (result.status === "failure") {

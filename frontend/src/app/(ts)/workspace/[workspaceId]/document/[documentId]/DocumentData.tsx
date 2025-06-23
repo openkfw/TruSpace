@@ -1,5 +1,4 @@
 "use client";
-import { formatDate } from "@/app/helper/formatDate";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +8,7 @@ import {
    TooltipProvider,
    TooltipTrigger
 } from "@/components/ui/tooltip";
+import { formatDate } from "@/lib/formatDate";
 import { useLanguage, useLanguageStatus } from "@/lib/services";
 import { FileLock2, Link, Loader2, UserCircle } from "lucide-react";
 import { useTranslations } from "next-intl";

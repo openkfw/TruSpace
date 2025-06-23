@@ -1,5 +1,4 @@
 "use client";
-import { formatDate } from "@/app/helper/formatDate";
 import Editor from "@/components/tiptap-editor/Editor";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +24,7 @@ import {
    TooltipProvider,
    TooltipTrigger
 } from "@/components/ui/tooltip";
+import { formatDate } from "@/lib/formatDate";
 import { createPerspective, usePerspectivesStatus } from "@/lib/services";
 import parse from "html-react-parser";
 import { Bot, Info, Loader2, Plus } from "lucide-react";

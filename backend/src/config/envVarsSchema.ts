@@ -59,6 +59,17 @@ export const envVarsSchema = Joi.object({
     .empty("")
     .default("Kennwort123")
     .note("Maybe force admin to set MASTER_PASSWORD before booting up?"),
+  SMTP_HOST: Joi.string().allow("").empty("").default("host.docker.internal"),
+  SMTP_PORT: Joi.number()
+    .optional()
+    .allow("")
+    .empty("")
+    .default(1025)
+    .note("Token validity in seconds"),
+  SMTP_SSL: Joi.boolean().optional().allow("").empty("").default(false),
+  SMTP_USER: Joi.string().allow("").empty("").default(""),
+  SMTP_PASSWORD: Joi.string().allow("").empty("").default(""),
+  emailSender: Joi.string().allow("").empty("").default("TruSpace <truspace@truspace.com>"),
 })
   .unknown()
   .required();

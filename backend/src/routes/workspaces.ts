@@ -18,6 +18,7 @@ import { getContributorsWorkspace } from "../handlers/workspaces";
 import validate from "../middlewares/validate";
 import { AuthenticatedRequest } from "../types";
 import { WorkspaceRequest } from "../types/interfaces/index";
+import { USER_PERMISSION_STATUS } from "../utility/constants";
 
 const router = express.Router();
 
@@ -97,7 +98,7 @@ router.post(
       workspaceId,
       email: req.user?.email as string,
       role: "owner",
-      status: "active",
+      status: USER_PERMISSION_STATUS.active,
     });
     await createWorkspacePasswordDb(
       workspaceId,

@@ -1,4 +1,3 @@
-import { formatDate, formatDateDays } from "@/app/helper/formatDate";
 import {
    DropdownMenu,
    DropdownMenuContent,
@@ -19,6 +18,7 @@ import {
    TooltipProvider,
    TooltipTrigger
 } from "@/components/ui/tooltip";
+import { formatDate, formatDateDays } from "@/lib/formatDate";
 import { DOCUMENTS_ENDPOINT } from "@/lib/services";
 import {
    flexRender,

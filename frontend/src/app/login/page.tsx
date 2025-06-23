@@ -19,7 +19,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { validateEmail } from "../helper/validateEmail";
+import { validateEmail } from "../../lib/validateEmail";
 
 export default function Login({}: React.ComponentPropsWithoutRef<"div">) {
    const [loginError, setLoginError] = React.useState(false);

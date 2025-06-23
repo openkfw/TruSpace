@@ -1,4 +1,4 @@
-import { formatDate } from "@/app/helper/formatDate";
+import { formatDate } from "@/lib/formatDate";
 import { ExternalLink } from "lucide-react";
 import { useTranslations } from "next-intl";
 import InfoLabel from "./InfoLabel";
