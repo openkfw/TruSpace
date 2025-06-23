@@ -101,8 +101,6 @@ export default function DocumentData({
          if (languageDisplayMap[normalizedMetaLang]) {
             langToSet = `${languageDisplayMap[normalizedMetaLang].flag} ${languageDisplayMap[normalizedMetaLang].name}`;
             usedSource = "meta.language (props)";
-         } else {
-            toast.error(translations("languageNotFound"));
          }
       }
 
@@ -120,8 +118,6 @@ export default function DocumentData({
          if (languageDisplayMap[normalizedDocLang]) {
             langToSet = `${languageDisplayMap[normalizedDocLang].flag} ${languageDisplayMap[normalizedDocLang].name}`;
             usedSource = "documentLanguage (AI)";
-         } else {
-            toast.error(translations("languageNotFound"));
          }
       }
 
