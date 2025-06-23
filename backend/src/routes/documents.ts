@@ -229,21 +229,18 @@ router.post(
           templateId: "perspectives",
           cid,
           prompts: summaryPrompts,
-          fileId: fileData.id,
         });
 
         tagsTaskId = await TaskQueue.addJob({
           templateId: "tags",
           cid,
           prompts: [tagsPrompt],
-          fileId: fileData.id,
         });
 
         languageTaskId = await TaskQueue.addJob({
           templateId: "language",
           cid,
           prompts: [languagePrompt],
-          fileId: fileData.id,
         });
       }
 
@@ -388,21 +385,18 @@ router.put(
           templateId: "perspectives",
           cid,
           prompts: summaryPrompts,
-          fileId: fileData.id,
         });
 
         tagsTaskId = await TaskQueue.addJob({
           templateId: "tags",
           cid,
           prompts: [tagsPrompt],
-          fileId: fileData.id,
         });
 
         languageTaskId = await TaskQueue.addJob({
           templateId: "language",
           cid,
           prompts: [languagePrompt],
-          fileId: fileData.id,
         });
       }
 
@@ -415,7 +409,7 @@ router.put(
             summariesInitialResponse: {
               requestId: `${summariesTaskId}`,
               message: "Request accepted. Processing started for task.",
-              statusEndpoint: `/api/perspectives/status/r${summariesTaskId}`,
+              statusEndpoint: `/api/perspectives/status/${summariesTaskId}`,
             },
             tagsInitialResponse: {
               requestId: `${tagsTaskId}`,
