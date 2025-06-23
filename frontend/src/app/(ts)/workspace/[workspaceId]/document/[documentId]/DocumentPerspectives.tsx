@@ -59,6 +59,9 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
    const buttonRef = useRef(null);
    const selectRef = useRef(null);
    const [isWrapped, setIsWrapped] = useState(false);
+   const [selectedPerspective, setSelectedPerspective] = useState<
+      string | undefined
+   >(undefined);
 
    useEffect(() => {
       const checkSelectWrap = () => {
@@ -149,6 +152,19 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
          mutate();
       }
    }, [mutate, perspectivesStatus]);
+
+   useEffect(() => {
+      if (
+         !isGenerating &&
+         perspectives &&
+         perspectives.length > 0 &&
+         selectedPerspective == null
+      ) {
+         const first = perspectives[0].id;
+         setSelectedPerspective(first);
+         changeCurrentPerspective(first);
+      }
+   }, [isGenerating, perspectives, selectedPerspective]);
 
    return (
       <>
@@ -304,7 +320,11 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                      </Button>
                      <div ref={selectRef} className={isWrapped ? "mt-2" : ""}>
                         <Select
-                           onValueChange={changeCurrentPerspective}
+                           value={selectedPerspective}
+                           onValueChange={(value) => {
+                              setSelectedPerspective(value);
+                              changeCurrentPerspective(value);
+                           }}
                            disabled={
                               (isGenerating && perspectives?.length < 1) ||
                               !perspectives ||
@@ -317,32 +337,41 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                               />
                            </SelectTrigger>
                            <SelectContent>
-                              {perspectives?.map((perspective) => (
-                                 <SelectItem
-                                    key={`${perspective.id}-${perspective.timestamp}`}
-                                    value={perspective.id}
-                                 >
-                                    <div className="flex items-center mr-1">
-                                       {perspective.name}
-                                       {perspective?.creatorType === "user" &&
-                                          ` (${perspective.creator})`}
-                                       {perspective?.creatorType === "ai" && (
-                                          <TooltipProvider>
-                                             <Tooltip>
-                                                <TooltipTrigger>
-                                                   <Bot className="ml-2" />
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                   {translations(
-                                                      "aiPerspective"
-                                                   )}
-                                                </TooltipContent>
-                                             </Tooltip>
-                                          </TooltipProvider>
-                                       )}
-                                    </div>
-                                 </SelectItem>
-                              ))}
+                              {perspectives
+                                 ?.sort(
+                                    (
+                                       a: { name: string },
+                                       b: { name: string }
+                                    ) => a.name.localeCompare(b.name)
+                                 )
+                                 .map((perspective) => (
+                                    <SelectItem
+                                       key={`${perspective.id}-${perspective.timestamp}`}
+                                       value={perspective.id}
+                                    >
+                                       <div className="flex items-center mr-1">
+                                          {perspective.name}
+                                          {perspective?.creatorType ===
+                                             "user" &&
+                                             ` (${perspective.creator})`}
+                                          {perspective?.creatorType ===
+                                             "ai" && (
+                                             <TooltipProvider>
+                                                <Tooltip>
+                                                   <TooltipTrigger>
+                                                      <Bot className="ml-2" />
+                                                   </TooltipTrigger>
+                                                   <TooltipContent>
+                                                      {translations(
+                                                         "aiPerspective"
+                                                      )}
+                                                   </TooltipContent>
+                                                </Tooltip>
+                                             </TooltipProvider>
+                                          )}
+                                       </div>
+                                    </SelectItem>
+                                 ))}
                            </SelectContent>
                         </Select>
                      </div>
