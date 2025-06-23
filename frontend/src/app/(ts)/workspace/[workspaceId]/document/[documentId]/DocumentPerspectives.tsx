@@ -74,8 +74,11 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
    const { perspectives, mutate } = usePerspectives(cid);
    const { status: perspectivesStatus } = usePerspectivesStatus(cid);
    const buttonRef = useRef(null);
+   const promptButtonRef = useRef(null);
    const selectRef = useRef(null);
    const [isWrapped, setIsWrapped] = useState(false);
+   const [isPromptWrapped, setIsPromptWrapped] = useState(false);
+
    const [selectedPerspective, setSelectedPerspective] = useState<
       string | undefined
    >(undefined);
@@ -91,9 +94,25 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
          }
       };
 
+      const checkPromptWrap = () => {
+         if (buttonRef.current && promptButtonRef.current) {
+            const buttonTopPosition =
+               buttonRef.current.getBoundingClientRect().top;
+            const promptTopPosition =
+               promptButtonRef.current.getBoundingClientRect().top;
+            setIsPromptWrapped(promptTopPosition > buttonTopPosition + 5);
+         }
+      };
+
       checkSelectWrap();
+      checkPromptWrap();
       window.addEventListener("resize", checkSelectWrap);
-      return () => window.removeEventListener("resize", checkSelectWrap);
+      window.addEventListener("resize", checkPromptWrap);
+
+      return () => {
+         window.removeEventListener("resize", checkSelectWrap);
+         window.removeEventListener("resize", checkPromptWrap);
+      };
    }, []);
 
    const uploadButtonTitle = t("create");
@@ -458,11 +477,12 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                      </Button>
 
                      <Button
+                        ref={promptButtonRef}
                         variant="outline"
                         onClick={() => {
                            setCustomPromptDialogOpen(true);
                         }}
-                        className="mr-4"
+                        className={`mr-4 ${isPromptWrapped ? "mt-2" : ""}`}
                      >
                         <MessageCircleQuestion /> {t("askCustomPrompt")}
                      </Button>
