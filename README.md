@@ -38,7 +38,6 @@ For a very **quick and easy** TruSpace setup (e.g. for demos and first look) on 
 ```bash
 git clone git@github.com:openkfw/TruSpace.git
 cd TruSpace
-# Start development server
 sh start.sh
 ```
 
@@ -46,15 +45,19 @@ This command creates a simple environment configuration, creates docker volumes 
 
 If you plan to use another domain (e.g. a raspberry), make sure that the respective domains are updated from `localhost` to `domain` in the `.env` file.
 
-To enable AI analysis, you need to download the LLM model of your choice, as an example here is `gemma3:1b` and you can see the full list at the [ollama DB](https://ollama.com/library?q=mistral&sort=popular).
+To enable AI analysis, Truspace downloads a model configured in `.env`, as an example here is `gemma3:1b` and you can see the full list at the [ollama DB](https://ollama.com/library?q=mistral&sort=popular).
 
-- Login to the Open Web UI on `http://localhost:3333`. For login, use the values from the `.env` file (`ADMIN_USER_EMAIL`), by default `admin@admin.com/admin`. Type the model you specified in the `.env` in the `OLLAMA_MODEL` variable in the search bar and Open Web UI offers you to download it.
-
-  ![Screenshot of downloading AI model](./doc/screenshotDownloadAIModel.png)
-
-- Once the model is downloaded, AI analysis is executed upon each document upload automatically.
+Once the model is downloaded, AI analysis is executed upon each document upload automatically.
 
 **You made it and should see this**
+
+![Screenshot of login screen](./doc/screenshot_login.png)
+
+There'se an option to change the app langugae, too. Go ahead and _Sign up_ a new user.
+
+![Screenshot of register screen](./doc/screenshot_register.png)
+
+Fill out the required fields. The user account is local, your data is not going anywhere. After the submission, the app takes you back to the login screen, and from there to the dashboard.
 
 ![Screenshot of dashboard](./doc/screenshot_dashboard.png)
 
@@ -71,7 +74,7 @@ If something doesn't work, check that all containers are running with `docker ps
 
 ## Install a standalone server
 
-There's an extensive guide how to install TruSpace on a (virtual) server or a Raspberry Pi. It includes steps how to install surrounding architecture like docker, a reverse proxy `nginx`, certificates via `LetsEncrypt` and all the other administrative steps. Have a look [here](./doc/installStandaloneServer.md)
+There's an extensive guide how to install TruSpace on a (virtual) server or a Raspberry Pi. It includes steps how to install surrounding architecture like docker, a reverse proxy `nginx`, certificates via `LetsEncrypt` and all the other administrative steps. Have a look [here](./doc/installStandaloneServer.md) for a standalone server or [here](./doc/installRaspberryPi.md) for a setup on Raspberry Pi.
 
 ---
 
@@ -166,5 +169,6 @@ This project is licensed under the **GNU General Public License v3.0**. See the 
 
 ## 💬 Community & Support
 
+- User guide: [User Guide](./doc/User%20Guide/README.md)
 - Discussions: [GitHub Discussions](https://github.com/openkfw/TruSpace/discussions)
 - Report issues: [GitHub Issues](https://github.com/openkfw/TruSpace/issues)

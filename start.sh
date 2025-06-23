@@ -4,6 +4,9 @@
 # Usage: ./start.sh [--local-frontend]
 # If --local-frontend is passed, it will start the frontend locally
 
+# generate env file if it does not exist
+[[ -e .env ]] || cp .env.example .env
+
 SCRIPT_DIR=$(dirname -- $0)
 source $SCRIPT_DIR/.env
 echo "INFO: Current script directory: $SCRIPT_DIR"
@@ -37,9 +40,6 @@ for d in "${dirs[@]}"; do
     mkdir -p "$d"
   fi
 done
-
-# generate env file if it does not exist
-[[ -e .env ]] || cp .env.example .env
 
 echo "INFO: Starting dev environment"
 
