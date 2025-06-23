@@ -207,7 +207,7 @@ router.post(
       logger.error(`Error uploading avatar: ${JSON.stringify(error, null, 2)}`);
       res.status(500).json({
         status: "failure",
-        message: "TODO",
+        message: "Avatar upload failed",
       });
     }
   }
@@ -220,8 +220,9 @@ router.get(
     const user = await findUserByEmailDb(req.user?.email as string);
     const cid = user?.avatar_cid;
     if (!cid) {
-      // TODO what to return?
-      return res.json(null);
+      return res
+        .status(404)
+        .json({ status: "failure", message: "Could not find avatar" });
     }
     return new IpfsClient().downloadAvatar(req, res, cid);
   }

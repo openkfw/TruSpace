@@ -45,7 +45,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       router.push(`/workspace/${workspace.uuid}`);
    };
 
-   if (!availableWorkspaces || !userContext.isLoggedIn)
+   if (!availableWorkspaces || !userContext.user)
       return <div>{translations("loading")}</div>;
 
    return (

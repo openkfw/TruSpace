@@ -62,10 +62,10 @@ else
     docker compose -f docker-compose.yml $FRONTEND_DOCKER_COMPOSE_FILE -f docker-compose-ai.yml --env-file $SCRIPT_DIR/.env up -d
 fi
 
-# if frontend is in dev mode, start it
-# if [ "$FRONTEND_DEV" = "true" ]; then
-#     echo "INFO: Starting frontend in development mode"
-#     cd ./frontend
-#     npm i
-#     npm run dev
-# fi
+if frontend is in dev mode, start it
+if [ "$FRONTEND_DEV" = "true" ]; then
+    echo "INFO: Starting frontend in development mode"
+    cd ./frontend
+    npm i
+    npm run dev
+fi

@@ -12,7 +12,7 @@ import { useUser } from "@/contexts/UserContext";
 import { uploadAvatar } from "@/lib/services";
 
 export default function UserSettings() {
-   const { user, updateUser, loading, updateAvatar } = useUser();
+   const { user, loading, updateAvatar } = useUser();
    const [file, setFile] = useState<File>();
    const registerTranslations = useTranslations("register");
    const generalTranslations = useTranslations("general");
@@ -34,17 +34,19 @@ export default function UserSettings() {
       }
    };
 
-   const onSubmit = async () => {
-      // TODO other fields, updateUser
-      const formData = new FormData();
-      formData.append("file", file, file.name);
-      await uploadAvatar(formData);
-      console.log("User settings saved:", user);
+   const handleSubmit = async () => {
+      // TODO when appropriate add other fields, updateUser instead of uploadAvatar
+      try {
+         const formData = new FormData();
+         formData.append("file", file, file.name);
+         await uploadAvatar(formData);
+         console.log("User settings saved:", user);
+      } catch (err) {
+         console.error("Updating user failed: ", err);
+      }
    };
 
-   if (loading) return null;
-
-   if (!user) return null;
+   if (loading || !user) return <div>{generalTranslations("loading")}</div>;
 
    return (
       <div className="max-w-md mx-auto mt-16 p-6 space-y-8">
@@ -98,7 +100,7 @@ export default function UserSettings() {
                   disabled
                />
             </div>
-            <Button type="submit" onClick={onSubmit} className="w-full">
+            <Button type="submit" onClick={handleSubmit} className="w-full">
                {generalTranslations("saveSettings")}
             </Button>
          </div>

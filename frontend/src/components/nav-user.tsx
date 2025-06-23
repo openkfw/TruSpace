@@ -28,12 +28,10 @@ import {
    useSidebar
 } from "@/components/ui/sidebar";
 import { useUser } from "@/contexts/UserContext";
-import { deleteLoginCookie } from "@/lib";
-import { logout } from "@/lib/services";
 
 export function NavUser() {
    const { isMobile } = useSidebar();
-   const { user } = useUser();
+   const { user, logout } = useUser();
    const translations = useTranslations("navbar");
    const router = useRouter();
 
@@ -107,15 +105,7 @@ export function NavUser() {
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
-                     onClick={async () => {
-                        try {
-                           await logout();
-                           deleteLoginCookie();
-                           router.push("/login");
-                        } catch (error) {
-                           console.error("Failed to log out:", error);
-                        }
-                     }}
+                     onClick={async () => logout()}
                      data-test-id="logout-button"
                   >
                      <LogOut />

@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useUser } from "@/contexts/UserContext";
 import { User } from "@/interfaces";
 import { COOKIE_OPTIONS, setLoginCookie } from "@/lib/";
 import { loginUser } from "@/lib/services";
@@ -25,6 +26,7 @@ import { loginUser } from "@/lib/services";
 import { validateEmail } from "../helper/validateEmail";
 
 export default function Login({}: React.ComponentPropsWithoutRef<"div">) {
+   const { refreshUser } = useUser();
    const [loginError, setLoginError] = React.useState(false);
    const [statusError, setStatusError] = React.useState(false);
    const translations = useTranslations("login");
@@ -40,6 +42,7 @@ export default function Login({}: React.ComponentPropsWithoutRef<"div">) {
       const result = await loginUser(data);
       if (result.status === "success") {
          setLoginCookie(result.user, COOKIE_OPTIONS);
+         refreshUser();
          router.push("/home");
       }
       if (result.status === "failure") {

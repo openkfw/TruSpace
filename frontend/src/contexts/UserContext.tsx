@@ -20,7 +20,7 @@ import {
    deleteLoginCookie,
    setLoginCookie
 } from "@/lib";
-import { downloadAvatar } from "@/lib/services";
+import { downloadAvatar, logout as apiLogout } from "@/lib/services";
 
 interface User {
    name: string;
@@ -29,12 +29,6 @@ interface User {
    loginTime?: string;
    expires: number; // milliseconds since UNIX epoch
    initials: string;
-}
-
-interface UserData {
-   name: string;
-   email: string;
-   avatar?: string;
 }
 
 interface UserUpdates {
@@ -48,13 +42,13 @@ interface UserContextType {
    user: User | null;
    loading: boolean;
    isLoggedIn: boolean;
-   login: (userData: UserData) => void;
    logout: () => void;
    updateUser: (updates: UserUpdates) => void;
    updateAvatar: (avatarUrl: string) => void;
+   refreshUser: () => Promise<void>;
 }
 
-const getInitials = (name) => {
+const getInitials = (name: string) => {
    return name
       .split(" ")
       .map((n) => n[0])
@@ -99,12 +93,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
    // Function to set up periodic token checking
    const setupTokenCheck = useCallback(
       (expires: number) => {
-         // Clear existing interval
          if (tokenCheckInterval.current) {
             clearInterval(tokenCheckInterval.current);
          }
 
-         // Calculate time until expiration
          const expiresAt = new Date(expires * 1000).getTime();
          const now = Date.now();
          const timeUntilExpiration = expiresAt - now;
@@ -116,7 +108,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
          }
 
          // Set up interval to check every minute, or sooner if token expires soon
-         const checkInterval = Math.min(60000, timeUntilExpiration / 2); // Check every minute or halfway to expiration
+         const checkInterval = Math.min(60000, timeUntilExpiration / 2);
 
          tokenCheckInterval.current = setInterval(() => {
             if (isTokenExpired(expires)) {
@@ -134,75 +126,78 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       [handleTokenExpiration, isTokenExpired]
    );
 
+   const fetchAvatar = useCallback(async () => {
+      try {
+         const response = await downloadAvatar();
+
+         if (response.ok) {
+            const blob = await response.blob();
+            const avatar = URL.createObjectURL(blob);
+            setUser((prev) => (prev ? { ...prev, avatar } : null));
+            return avatar;
+         }
+      } catch (err) {
+         console.error("Error loading avatar:", err);
+      }
+      return null;
+   }, []);
+
+   const initializeUser = useCallback(async () => {
+      try {
+         setLoading(true);
+         const savedUser = Cookies.get(COOKIE_NAME);
+
+         if (!savedUser) {
+            console.log("No cookie found");
+            setUser(null);
+            return;
+         }
+
+         const userData: User = JSON.parse(savedUser);
+
+         if (isTokenExpired(userData.expires)) {
+            console.log("Token expired");
+            deleteLoginCookie();
+            setUser(null);
+            return;
+         }
+
+         setUser({
+            ...userData,
+            initials: getInitials(userData.name)
+         });
+
+         setupTokenCheck(userData.expires);
+
+         try {
+            await fetchAvatar();
+         } catch (avatarError) {
+            console.error("Error fetching avatar:", avatarError);
+            // Don't fail the entire login process if avatar fails
+         }
+      } catch (error) {
+         console.error("Error loading user from cookie:", error);
+         deleteLoginCookie();
+         setUser(null);
+      } finally {
+         setLoading(false);
+      }
+   }, [router, isTokenExpired, setupTokenCheck, fetchAvatar]);
+
+   const refreshUser = useCallback(async () => {
+      await initializeUser();
+   }, [initializeUser]);
+
    // Loading user data from cookie on mount
    useEffect(() => {
-      const fetchAvatar = async () => {
-         try {
-            const response = await downloadAvatar();
-
-            if (response.ok) {
-               const blob = await response.blob();
-               const avatar = URL.createObjectURL(blob);
-               setUser((prev) => (prev ? { ...prev, avatar } : null));
-               return avatar;
-            }
-         } catch (err) {
-            console.error("Error loading avatar:", err);
-         }
-         return null;
-      };
-
-      const initializeUser = async () => {
-         try {
-            setLoading(true);
-            const savedUser = Cookies.get(COOKIE_NAME);
-
-            if (!savedUser) {
-               console.log("No cookie found");
-               router.push("/login");
-               return;
-            }
-
-            const userData: User = JSON.parse(savedUser);
-
-            if (isTokenExpired(userData.expires)) {
-               console.log("Token expired");
-               deleteLoginCookie();
-               router.push("/login");
-               return;
-            }
-
-            setUser({
-               ...userData,
-               initials: getInitials(userData.name)
-            });
-
-            setupTokenCheck(userData.expires);
-
-            try {
-               await fetchAvatar();
-            } catch (avatarError) {
-               console.error("Error fetching avatar:", avatarError);
-               // Don't fail the entire login process if avatar fails
-            }
-         } catch (error) {
-            console.error("Error loading user from cookie:", error);
-            deleteLoginCookie();
-            router.push("/login");
-         } finally {
-            setLoading(false);
-         }
-      };
-
       initializeUser();
 
-      // Cleanup interval on unmount
       return () => {
          if (tokenCheckInterval.current) {
             clearInterval(tokenCheckInterval.current);
          }
       };
-   }, [router, isTokenExpired, setupTokenCheck]);
+   }, [initializeUser]);
 
    // Save user data to cookie whenever user state changes
    useEffect(() => {
@@ -225,23 +220,21 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       }
    }, [user]);
 
-   const login = (userData: UserData): void => {
-      // You'll need to implement this based on your login response
-      // This should include setting the expires timestamp
-      console.log("Login function needs implementation", userData);
-   };
+   const logout = async (): Promise<void> => {
+      try {
+         await apiLogout();
+      } catch (error) {
+         console.error("Failed to log out:", error);
+      } finally {
+         setUser(null);
+         deleteLoginCookie();
 
-   const logout = (): void => {
-      setUser(null);
-      deleteLoginCookie();
-
-      // Clear token check interval
-      if (tokenCheckInterval.current) {
-         clearInterval(tokenCheckInterval.current);
-         tokenCheckInterval.current = null;
+         if (tokenCheckInterval.current) {
+            clearInterval(tokenCheckInterval.current);
+            tokenCheckInterval.current = null;
+         }
+         router.push("/login");
       }
-
-      router.push("/login");
    };
 
    const updateUser = (updates: UserUpdates): void => {
@@ -250,7 +243,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
          const updatedUser = { ...prevUser, ...updates };
 
-         // Regenerate initials if name changed
          if (updates.name) {
             updatedUser.initials = getInitials(updates.name);
          }
@@ -270,15 +262,16 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
    };
 
    const isLoggedIn: boolean = Boolean(user);
+   console.log("isLoggedIn: ", isLoggedIn);
 
    const value: UserContextType = {
       user,
       loading,
       isLoggedIn,
-      login,
       logout,
       updateUser,
-      updateAvatar
+      updateAvatar,
+      refreshUser
    };
 
    return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
