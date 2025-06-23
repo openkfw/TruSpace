@@ -2,11 +2,20 @@ import Cookies from "js-cookie";
 
 export const COOKIE_NAME = "login";
 
+export const COOKIE_OPTIONS = {
+   secure: process.env.NODE_ENV === "production",
+   sameSite: "strict" as const
+};
+
 interface LoginCookie {
    name: string;
    email: string;
    expires: number; // milliseconds since UNIX epoch
 }
+
+export const setLoginCookie = (data, options) => {
+   Cookies.set(COOKIE_NAME, JSON.stringify(data), options);
+};
 
 export const getLoginCookie = (): LoginCookie | null => {
    try {
@@ -17,7 +26,6 @@ export const getLoginCookie = (): LoginCookie | null => {
 
          const expires = new Date(parsedCookie?.expires * 1000);
          if (expires.getTime() < Date.now()) {
-            console.log("4");
             deleteLoginCookie();
          } else {
             return parsedCookie;
@@ -25,19 +33,16 @@ export const getLoginCookie = (): LoginCookie | null => {
       }
    } catch (error) {
       console.error("Error parsing login cookie:", error);
-      console.log("5");
       deleteLoginCookie();
    }
 };
 
 export const deleteLoginCookie = () => {
-   console.log("deleteCookieCalled");
    return Cookies.remove(COOKIE_NAME);
 };
 
 export const isTokenExpired = (token) => {
    if (!token) {
-      console.log("there is no token");
       return true;
    }
 
@@ -55,5 +60,6 @@ export const isTokenExpired = (token) => {
 };
 
 export const redirectToLogin = (router) => {
+   console.log("redirectToLogin");
    router.push("/login");
 };

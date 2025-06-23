@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 
 import Cookies from "js-cookie";
 
-import { COOKIE_NAME } from "@/lib";
+import { COOKIE_NAME, COOKIE_OPTIONS, setLoginCookie } from "@/lib";
 import { downloadAvatar } from "@/lib/services";
 
 interface User {
@@ -62,11 +62,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
    const [user, setUser] = useState<User | null>(null);
    const [loading, setLoading] = useState<boolean>(true);
 
-   const COOKIE_OPTIONS = {
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict" as const
-   };
-
    // Loading user data from cookie on mount
    useEffect(() => {
       const fetchAvatar = async () => {
@@ -89,6 +84,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       try {
          const savedUser = Cookies.get(COOKIE_NAME);
          if (!savedUser) {
+            console.log("no cookie");
             router.push("/login");
             return;
          }
@@ -97,6 +93,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
          const expires = new Date(userData?.expires * 1000);
          if (expires.getTime() < Date.now()) {
             Cookies.remove(COOKIE_NAME);
+            console.log("expired");
             router.push("/login");
             return;
          }
@@ -122,6 +119,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
    useEffect(() => {
       if (user) {
          try {
+            setLoginCookie(user, COOKIE_OPTIONS);
             Cookies.set(COOKIE_NAME, JSON.stringify(user), COOKIE_OPTIONS);
          } catch (error) {
             console.error("Error saving user to cookies:", error);

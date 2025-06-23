@@ -1,11 +1,13 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+
+import Cookies from "js-cookie";
 
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { Button } from "@/components/ui/button";
@@ -18,14 +20,19 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useUser } from "@/contexts/UserContext";
 import { User } from "@/interfaces";
+import {
+   COOKIE_OPTIONS,
+   getLoginCookie,
+   isTokenExpired,
+   redirectToLogin,
+   setLoginCookie
+} from "@/lib/";
 import { loginUser } from "@/lib/services";
 
 import { validateEmail } from "../helper/validateEmail";
 
 export default function Login({}: React.ComponentPropsWithoutRef<"div">) {
-   const { updateUser } = useUser();
    const [loginError, setLoginError] = React.useState(false);
    const [statusError, setStatusError] = React.useState(false);
    const translations = useTranslations("login");
@@ -40,8 +47,7 @@ export default function Login({}: React.ComponentPropsWithoutRef<"div">) {
    const onSubmit = async (data: User) => {
       const result = await loginUser(data);
       if (result.status === "success") {
-         // Cookies.set(COOKIE_NAME, JSON.stringify(result.user));
-         updateUser(result.user);
+         setLoginCookie(result.user, COOKIE_OPTIONS);
          router.push("/home");
       }
       if (result.status === "failure") {
@@ -52,6 +58,18 @@ export default function Login({}: React.ComponentPropsWithoutRef<"div">) {
          }
       }
    };
+
+   useEffect(() => {
+      const parsedData = getLoginCookie();
+      if (parsedData) {
+         if (isTokenExpired(parsedData)) {
+            router.push("/home");
+         } else {
+            Cookies.remove("login");
+            redirectToLogin(router);
+         }
+      }
+   }, [router]);
 
    const emailValidation = register("email", {
       required: t("emailRequired"),
