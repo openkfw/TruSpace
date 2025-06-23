@@ -207,6 +207,7 @@ export const usePerspectives = (cid: string) => {
             timestamp: perspective.meta.timestamp
          }))
          .sort(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (a: any, b: any) =>
                Number(new Date(a.timestamp).getTime()) -
                Number(new Date(b.timestamp).getTime())
