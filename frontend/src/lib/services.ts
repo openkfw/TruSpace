@@ -173,6 +173,21 @@ export const createPerspective = async (formData, errorText) => {
    return data;
 };
 
+export const customPerspective = async (formData, errorText) => {
+   const url = `${PERSPECTIVES_ENDPOINT}/generate-custom`;
+   const options: RequestInit = {
+      method: "POST",
+      body: formData,
+      credentials: "include"
+   };
+   const response = await fetch(url, options);
+   if (!response.ok) {
+      throw new Error(errorText);
+   }
+   const data = await response.json();
+   return data;
+};
+
 export const usePerspectives = (cid: string) => {
    const { data, error, isLoading, isValidating, mutate } = useSWR(
       `${PERSPECTIVES_ENDPOINT}/version/${cid}`,
@@ -180,16 +195,23 @@ export const usePerspectives = (cid: string) => {
    );
 
    return {
-      perspectives: data?.map((perspective) => ({
-         id: perspective.meta.perspectiveType,
-         name: perspective.meta.perspectiveType,
-         text: perspective.meta.data,
-         creatorType: perspective.meta.creatorType,
-         creator: perspective.meta.creator,
-         model: perspective.meta.model,
-         prompt: perspective.meta.prompt,
-         timestamp: perspective.meta.timestamp
-      })),
+      perspectives: data
+         ?.map((perspective) => ({
+            id: perspective.cid,
+            name: perspective.meta.perspectiveType,
+            text: perspective.meta.data,
+            creatorType: perspective.meta.creatorType,
+            creator: perspective.meta.creator,
+            model: perspective.meta.model,
+            prompt: perspective.meta.prompt,
+            timestamp: perspective.meta.timestamp
+         }))
+         .sort(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (a: any, b: any) =>
+               Number(new Date(a.timestamp).getTime()) -
+               Number(new Date(b.timestamp).getTime())
+         ),
       error,
       isLoading,
       isValidating,

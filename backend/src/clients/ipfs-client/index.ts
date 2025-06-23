@@ -588,7 +588,11 @@ export class IpfsClient implements IClient {
     const perspectives = pinRes.results.map((r: PinRequest) => {
       return this.#transformPinToPerspective(r.pin);
     });
-    return this.#fetchPerspectiveFiles(perspectives);
+    return (await this.#fetchPerspectiveFiles(perspectives)).sort(
+      (a: Perspective, b: Perspective) =>
+        Number(new Date(a.meta.timestamp).getTime()) -
+        Number(new Date(b.meta.timestamp).getTime())
+    );
   }
 
   /**
