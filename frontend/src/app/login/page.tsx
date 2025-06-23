@@ -1,13 +1,11 @@
 "use client";
-import React, { useEffect } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-
-import Cookies from "js-cookie";
 
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { Button } from "@/components/ui/button";
@@ -21,13 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { User } from "@/interfaces";
-import {
-   COOKIE_OPTIONS,
-   getLoginCookie,
-   isTokenExpired,
-   redirectToLogin,
-   setLoginCookie
-} from "@/lib/";
+import { COOKIE_OPTIONS, setLoginCookie } from "@/lib/";
 import { loginUser } from "@/lib/services";
 
 import { validateEmail } from "../helper/validateEmail";
@@ -58,18 +50,6 @@ export default function Login({}: React.ComponentPropsWithoutRef<"div">) {
          }
       }
    };
-
-   useEffect(() => {
-      const parsedData = getLoginCookie();
-      if (parsedData) {
-         if (isTokenExpired(parsedData)) {
-            router.push("/home");
-         } else {
-            Cookies.remove("login");
-            redirectToLogin(router);
-         }
-      }
-   }, [router]);
 
    const emailValidation = register("email", {
       required: t("emailRequired"),

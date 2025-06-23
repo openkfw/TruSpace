@@ -3,7 +3,6 @@
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 
-import Cookies from "js-cookie";
 import {
    Bell,
    BrainCircuit,
@@ -29,7 +28,7 @@ import {
    useSidebar
 } from "@/components/ui/sidebar";
 import { useUser } from "@/contexts/UserContext";
-import { COOKIE_NAME } from "@/lib";
+import { deleteLoginCookie } from "@/lib";
 import { logout } from "@/lib/services";
 
 export function NavUser() {
@@ -111,7 +110,7 @@ export function NavUser() {
                      onClick={async () => {
                         try {
                            await logout();
-                           Cookies.remove(COOKIE_NAME);
+                           deleteLoginCookie();
                            router.push("/login");
                         } catch (error) {
                            console.error("Failed to log out:", error);

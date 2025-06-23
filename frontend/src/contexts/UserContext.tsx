@@ -3,18 +3,23 @@
 import {
    createContext,
    type ReactNode,
+   useCallback,
    useContext,
    useEffect,
-   useState,
-   useCallback,
-   useRef
+   useRef,
+   useState
 } from "react";
 
 import { useRouter } from "next/navigation";
 
 import Cookies from "js-cookie";
 
-import { COOKIE_NAME, COOKIE_OPTIONS, setLoginCookie } from "@/lib";
+import {
+   COOKIE_NAME,
+   COOKIE_OPTIONS,
+   deleteLoginCookie,
+   setLoginCookie
+} from "@/lib";
 import { downloadAvatar } from "@/lib/services";
 
 interface User {
@@ -49,6 +54,15 @@ interface UserContextType {
    updateAvatar: (avatarUrl: string) => void;
 }
 
+const getInitials = (name) => {
+   return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase();
+};
+
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const useUser = (): UserContextType => {
@@ -65,13 +79,11 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
    const [loading, setLoading] = useState<boolean>(true);
    const tokenCheckInterval = useRef<NodeJS.Timeout | null>(null);
 
-   // Function to handle token expiration and logout
    const handleTokenExpiration = useCallback(() => {
       console.log("Token expired, logging out");
       setUser(null);
-      Cookies.remove(COOKIE_NAME);
+      deleteLoginCookie();
 
-      // Clear any existing interval
       if (tokenCheckInterval.current) {
          clearInterval(tokenCheckInterval.current);
          tokenCheckInterval.current = null;
@@ -80,7 +92,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       router.push("/login");
    }, [router]);
 
-   // Function to check if token is expired
    const isTokenExpired = useCallback((expires: number): boolean => {
       return new Date(expires * 1000).getTime() < Date.now();
    }, []);
@@ -125,7 +136,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
    // Loading user data from cookie on mount
    useEffect(() => {
-      const fetchAvatar = async (userData: User) => {
+      const fetchAvatar = async () => {
          try {
             const response = await downloadAvatar();
 
@@ -154,38 +165,29 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
             const userData: User = JSON.parse(savedUser);
 
-            // Check if token is expired
             if (isTokenExpired(userData.expires)) {
                console.log("Token expired");
-               Cookies.remove(COOKIE_NAME);
+               deleteLoginCookie();
                router.push("/login");
                return;
             }
 
-            // Generate initials
-            const initials = userData.name
-               .split(" ")
-               .map((n) => n[0])
-               .join("")
-               .slice(0, 2)
-               .toUpperCase();
+            setUser({
+               ...userData,
+               initials: getInitials(userData.name)
+            });
 
-            const userWithInitials = { ...userData, initials };
-            setUser(userWithInitials);
-
-            // Set up token expiration checking
             setupTokenCheck(userData.expires);
 
-            // Fetch avatar after setting user
             try {
-               await fetchAvatar(userWithInitials);
+               await fetchAvatar();
             } catch (avatarError) {
                console.error("Error fetching avatar:", avatarError);
                // Don't fail the entire login process if avatar fails
             }
          } catch (error) {
             console.error("Error loading user from cookie:", error);
-            Cookies.remove(COOKIE_NAME);
+            deleteLoginCookie();
             router.push("/login");
          } finally {
             setLoading(false);
@@ -206,7 +208,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
    useEffect(() => {
       if (user) {
          try {
-            // Create a copy without the avatar blob URL for cookie storage
             const userForCookie = { ...user };
             delete userForCookie.avatar; // Don't store blob URL in cookie
 
@@ -220,7 +221,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
             console.error("Error saving user to cookies:", error);
          }
       } else {
-         Cookies.remove(COOKIE_NAME);
+         deleteLoginCookie();
       }
    }, [user]);
 
@@ -232,7 +233,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
    const logout = (): void => {
       setUser(null);
-      Cookies.remove(COOKIE_NAME);
+      deleteLoginCookie();
 
       // Clear token check interval
       if (tokenCheckInterval.current) {
@@ -251,12 +252,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
          // Regenerate initials if name changed
          if (updates.name) {
-            updatedUser.initials = updates.name
-               .split(" ")
-               .map((n) => n[0])
-               .join("")
-               .slice(0, 2)
-               .toUpperCase();
+            updatedUser.initials = getInitials(updates.name);
          }
 
          return updatedUser;
