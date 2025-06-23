@@ -146,13 +146,9 @@ export const updateJobStatusDb = async (
   }
 };
 
-export const deleteMultipleJobStatusesDb = async (
-  requestIds: string[],
-) => {
+export const deleteMultipleJobStatusesDb = async (requestIds: string[]) => {
   try {
-    await db<JobStatus>("job_status")
-      .whereIn( "request_id", requestIds )
-      .del();
+    await db<JobStatus>("job_status").whereIn("request_id", requestIds).del();
   } catch (error) {
     logger.error("Error during updating query status:", error);
   }
