@@ -44,7 +44,6 @@ async function handleRequest(
 ) {
    const pathString = path.join("/");
    const url = `${apiUrl}/${pathString}`;
-   console.log("handling request ", url);
 
    // Include original cookies
    const requestHeaders = new Headers(request.headers);

@@ -4,25 +4,16 @@ import { useEffect } from "react";
 
 import { useRouter } from "next/navigation";
 
-import {
-   deleteLoginCookie,
-   getLoginCookie,
-   isTokenExpired,
-   redirectToLogin
-} from "@/lib";
+import { useUser } from "@/contexts/UserContext";
+import { redirectToLogin } from "@/lib";
 
 export default function Root() {
    const router = useRouter();
+   const { isLoggedIn } = useUser();
 
    useEffect(() => {
-      const loginCookie = getLoginCookie();
-      if (loginCookie) {
-         if (isTokenExpired(loginCookie)) {
-            deleteLoginCookie();
-            redirectToLogin(router);
-         } else {
-            router.push("/home");
-         }
+      if (isLoggedIn) {
+         router.push("/home");
       } else {
          redirectToLogin(router);
       }

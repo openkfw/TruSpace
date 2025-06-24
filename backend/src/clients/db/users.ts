@@ -7,6 +7,7 @@ interface UserDb {
   email: string;
   status: string;
   password_hash: string;
+  avatar_cid?: string;
   created_at?: Date;
   updated_at?: Date;
 }
@@ -47,6 +48,7 @@ export const findUserByEmailDb = async (email: string) => {
         "email",
         "status",
         "password_hash",
+        "avatar_cid",
         "created_at"
       )
       .where({ email })
@@ -77,5 +79,16 @@ export const getTotalRecentlyAddedUsersDb = async (): Promise<number> => {
   } catch (error) {
     logger.error("Error fetching total users:", error);
     throw new Error("Failed to fetch total users");
+  }
+};
+
+export const storeAvatarCidDb = async (email: string, cid: string) => {
+  try {
+    await db<UserDb>("users")
+      .update({ avatar_cid: cid })
+      .where({ email: email });
+  } catch (error) {
+    logger.error("Error updating user", error);
+    throw new Error("Error updating user");
   }
 };

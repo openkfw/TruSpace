@@ -1,36 +1,24 @@
 import Cookies from "js-cookie";
 
-interface LoginCookie {
-   name: string;
-   email: string;
-   expires: number; // milliseconds since UNIX epoch
-}
+export const COOKIE_NAME = "login";
 
-export const getLoginCookie = (): LoginCookie | null => {
-   try {
-      const loginCookie = Cookies.get("login");
-      if (loginCookie) {
-         const parsedCookie = JSON.parse(loginCookie || null);
+export const COOKIE_OPTIONS = {
+   secure: process.env.NODE_ENV === "production",
+   sameSite: "strict" as const
+};
 
-         const expires = new Date(parsedCookie?.expires * 1000);
-         if (expires.getTime() < Date.now()) {
-            deleteLoginCookie();
-         } else {
-            return parsedCookie;
-         }
-      }
-   } catch (error) {
-      console.error("Error parsing login cookie:", error);
-      deleteLoginCookie();
-   }
+export const setLoginCookie = (data, options) => {
+   Cookies.set(COOKIE_NAME, JSON.stringify(data), options);
 };
 
 export const deleteLoginCookie = () => {
-   return Cookies.remove("login");
+   return Cookies.remove(COOKIE_NAME);
 };
 
 export const isTokenExpired = (token) => {
-   if (!token) return true;
+   if (!token) {
+      return true;
+   }
 
    try {
       const expirationDate = new Date(token.expires * 1000);

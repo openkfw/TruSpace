@@ -6,12 +6,17 @@ import {
   findUserByEmailDb,
   getTotalRecentlyAddedUsersDb,
   getTotalUsersDb,
+  storeAvatarCidDb,
 } from "../clients/db";
 import { config } from "../config/config";
 import { hashPassword, verifyPassword } from "../encryption";
 import { authenticateCookie } from "../middlewares/authenticate";
 import validate from "../middlewares/validate";
 import { JwtPayload } from "../types/interfaces";
+import { AuthenticatedRequest } from "../types";
+import { IpfsClient } from "../clients/ipfs-client";
+import { UploadedFile } from "express-fileupload";
+import logger from "../config/winston";
 
 const router = express.Router();
 
@@ -173,6 +178,52 @@ router.get(
         message: "Unable to fetch statistics",
       });
     }
+  }
+);
+
+router.post(
+  "/avatar",
+  authenticateCookie,
+  async (req: AuthenticatedRequest, res: Response) => {
+    if (!req.files || !req.files.file) {
+      return res.status(400).json({
+        success: false,
+        message: "No document uploaded",
+      });
+    }
+    try {
+      const file = req.files.file as UploadedFile;
+
+      const client = new IpfsClient();
+      const cid = await client.uploadAvatar(file);
+
+      await storeAvatarCidDb(req.user?.email as string, cid);
+      return res.json({
+        status: "success",
+        message: "Avatar uploaded",
+      });
+    } catch (error) {
+      logger.error(`Error uploading avatar: ${JSON.stringify(error, null, 2)}`);
+      res.status(500).json({
+        status: "failure",
+        message: "Avatar upload failed",
+      });
+    }
+  }
+);
+
+router.get(
+  "/avatar",
+  authenticateCookie,
+  async (req: AuthenticatedRequest, res: Response) => {
+    const user = await findUserByEmailDb(req.user?.email as string);
+    const cid = user?.avatar_cid;
+    if (!cid) {
+      return res
+        .status(404)
+        .json({ status: "failure", message: "Could not find avatar" });
+    }
+    return new IpfsClient().downloadAvatar(req, res, cid);
   }
 );
 
