@@ -75,7 +75,7 @@
       "backToLogin": "Back to login"
    },
    "settings": {
-      "updateSuccess": "User settings updated",
+      "updateSuccess": "User settings updated successfully",
       "updateError": "Something went wrong while updating user settings"
    },
    "homePage": {
