@@ -93,7 +93,7 @@ export const config: Config = {
   rateLimitPerMinute: envVars.RATE_LIMIT_PER_MINUTE
     ? parseInt(envVars.RATE_LIMIT_PER_MINUTE, 10)
     : 200,
-  registerUsersAsInactive: envVars.REGISTER_USERS_AS_INACTIVE === "true",
+  registerUsersAsInactive: envVars.REGISTER_USERS_AS_INACTIVE,
   smtpServer: {
     host: envVars.SMTP_HOST,
     port: envVars.SMTP_PORT,

@@ -137,16 +137,15 @@ router.post(
         });
       }
 
-      if (config.env === "production") {
-        const isActive = user.status === USER_STATUS.active;
+      const isActive = user.status === USER_STATUS.active;
 
-        if (!isActive) {
-          return res.status(401).json({
-            status: "failure",
-            message: "Account inactive",
-          });
-        }
+      if (!isActive) {
+        return res.status(401).json({
+          status: "failure",
+          message: "Account inactive",
+        });
       }
+
       const payload: JwtPayload = {
         name: user.username,
         email: user.email,
