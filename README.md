@@ -80,11 +80,18 @@ There's an extensive guide how to install TruSpace on a (virtual) server or a Ra
 
 ## Connect to other TruSpace nodes
 
-You have a TruSpace node running and would like to connect to another (private) network to sync the TruSpace data? Here's what to do:
+You have a TruSpace node running and would like to connect to another (private) network to sync the TruSpace data? The connection requires to
 
-- TODO swarm key?
-- other secrets?
-- service.json cluster
+- Retrieve the address of the target node to connect to
+- The **swarm key** to allow the IPFS nodes to connecto to each other
+- The **cluster secret** to allow the IPFS cluster to share the pinning information of the pinned files
+
+Here is a step by step guide:
+
+- On the target node, open the file `/volumes/cluster0/service.json`. You get a long JSON tree, at the beginning is the field `secret`, e.g `141a2511dae98...e3c47f69d1e12203246f92`. This should be copied in your `.env` file in the variable `CLUSTER_SECRET`. This enables the two cluster nodes to connect to each other.
+- On the target node, open the file `/volumes/cluster0/identity.json`. Copy the value in the field `id`.
+- On your installation, open the file `/volumes/cluster0/service.json` and search for the field `peer_addresses`. If you haven't connected to other nodes before, it is `"peer_addresses": []`. Enter the target node IP address and the node `id` that you retrieved before in this field, e.g. `"peer_addresses": []`. IPFS uses the multiaddress format, e.g. it is `"peer_addresses":["/ip4/192.168.1.100/tcp/9096/p2p/target_ID"]`
+- Restart all containers
 
 ## Check out architecture, guides, details..
 
@@ -106,6 +113,8 @@ An extensive user guide with screenshots is available in the folder [User Guide]
 ### Tech Architecture overview
 
 In the overview, you can see how the components work together. The UI and API is part of this repository and provides the interface and the translation to other services. Once you start TruSpace, it pulls and connects to containers from Open Web UI (for AI processing) and IPFS/IPFS-Cluster to persist the data. The respective ports are outlined in the image.
+
+For the connection to other nodes, ports 4001 (IPFS swarm) and 9096/9097 (IPFS cluster) need to be opened.
 
 ![Architecture](./doc/tech-arch-diagram.PNG "Tech Architecture overview")
 
