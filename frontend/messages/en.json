@@ -76,7 +76,7 @@
    },
    "settings": {
       "updateSuccess": "User settings updated",
-      "updateError": "Something went wrong while updating user settings alebo settings, daco take"
+      "updateError": "Something went wrong while updating user settings"
    },
    "homePage": {
       "documentName": "Document name",
