@@ -40,7 +40,6 @@ export default function UserSettings() {
          const formData = new FormData();
          formData.append("file", file, file.name);
          await uploadAvatar(formData);
-         console.log("User settings saved:", user);
       } catch (err) {
          console.error("Updating user failed: ", err);
       }

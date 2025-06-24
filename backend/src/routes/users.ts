@@ -196,8 +196,7 @@ router.post(
 
       const client = new IpfsClient();
       const cid = await client.uploadAvatar(file);
-      console.log(cid);
-      // store cid in DB
+
       await storeAvatarCidDb(req.user?.email as string, cid);
       return res.json({
         status: "success",

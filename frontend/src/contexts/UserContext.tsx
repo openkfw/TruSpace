@@ -262,7 +262,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
    };
 
    const isLoggedIn: boolean = Boolean(user);
-   console.log("isLoggedIn: ", isLoggedIn);
 
    const value: UserContextType = {
       user,
