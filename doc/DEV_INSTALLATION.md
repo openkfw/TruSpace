@@ -14,6 +14,9 @@ If you are running on Windows, use [WSL](https://learn.microsoft.com/en-us/windo
 
 There is an option to run local environment without AI functionality (Ollama and Open WebUI), by setting `DISABLE_ALL_AI_FUNCTIONALITY=true` in `.env` file in the root folder prior to running of `sh start.sh`.
 
+For development purposes and testing of email notifications you can use some dockerised mail catcher like Mailhog. You can simply start it in docker using following command `docker run -p 8025:8025 -p 1025:1025 --name="mailhog" -e MH_HOSTNAME='mailhog.local' mailhog/mailhog`.
+Afterwards you can find mailbox UI at <http://localhost:8025/>
+
 ## Starting dev environment on Windows
 
 To start the dev environment on Windows in WSL, a few changes need to be made:

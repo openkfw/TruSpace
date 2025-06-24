@@ -26,6 +26,7 @@ The purpose of TruSpace is to make collaboration on documents between several st
 - Docker
 - File storage for docker volumes
 - Nginx (or other prefered way to expose application)
+- SMTP server
 
 ### 📥 Quick start
 
