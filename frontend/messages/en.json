@@ -74,6 +74,10 @@
       "registerError": "An error occurred during registration",
       "backToLogin": "Back to login"
    },
+   "settings": {
+      "updateSuccess": "User settings updated",
+      "updateError": "Something went wrong while updating user settings alebo settings, daco take"
+   },
    "homePage": {
       "documentName": "Document name",
       "documentId": "Document ID",

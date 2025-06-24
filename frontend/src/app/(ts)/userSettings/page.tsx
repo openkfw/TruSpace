@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { toast } from "react-toastify";
 
 import { useTranslations } from "next-intl";
 
@@ -16,6 +17,7 @@ export default function UserSettings() {
    const [file, setFile] = useState<File>();
    const registerTranslations = useTranslations("register");
    const generalTranslations = useTranslations("general");
+   const settingsTranslations = useTranslations("settings");
 
    const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -40,8 +42,10 @@ export default function UserSettings() {
          const formData = new FormData();
          formData.append("file", file, file.name);
          await uploadAvatar(formData);
+         toast.success(settingsTranslations("updateSuccess"));
       } catch (err) {
          console.error("Updating user failed: ", err);
+         toast.error(settingsTranslations("updateError"));
       }
    };
 

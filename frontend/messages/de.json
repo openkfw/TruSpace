@@ -74,6 +74,10 @@
       "registerError": "Bei der Registrierung ist ein Fehler aufgetreten",
       "backToLogin": "Zurück zur Anmeldung"
    },
+   "settings": {
+      "updateSuccess": "Benutzereinstellungen aktualisiert",
+      "updateError": "Beim Aktualisieren der Benutzereinstellungen ist ein Fehler aufgetreten"
+   },
    "homePage": {
       "documentName": "Name",
       "documentId": "Dokument-ID",
