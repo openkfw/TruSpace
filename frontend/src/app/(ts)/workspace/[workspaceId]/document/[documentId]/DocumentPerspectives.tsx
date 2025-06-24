@@ -74,8 +74,14 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
    const { perspectives, mutate } = usePerspectives(cid);
    const { status: perspectivesStatus } = usePerspectivesStatus(cid);
    const buttonRef = useRef(null);
+   const promptButtonRef = useRef(null);
    const selectRef = useRef(null);
    const [isWrapped, setIsWrapped] = useState(false);
+   const [isPromptWrapped, setIsPromptWrapped] = useState(false);
+
+   const [selectedPerspective, setSelectedPerspective] = useState<
+      string | undefined
+   >(undefined);
 
    useEffect(() => {
       const checkSelectWrap = () => {
@@ -88,9 +94,25 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
          }
       };
 
+      const checkPromptWrap = () => {
+         if (buttonRef.current && promptButtonRef.current) {
+            const buttonTopPosition =
+               buttonRef.current.getBoundingClientRect().top;
+            const promptTopPosition =
+               promptButtonRef.current.getBoundingClientRect().top;
+            setIsPromptWrapped(promptTopPosition > buttonTopPosition + 5);
+         }
+      };
+
       checkSelectWrap();
+      checkPromptWrap();
       window.addEventListener("resize", checkSelectWrap);
-      return () => window.removeEventListener("resize", checkSelectWrap);
+      window.addEventListener("resize", checkPromptWrap);
+
+      return () => {
+         window.removeEventListener("resize", checkSelectWrap);
+         window.removeEventListener("resize", checkPromptWrap);
+      };
    }, []);
 
    const uploadButtonTitle = t("create");
@@ -200,6 +222,19 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
          mutate();
       }
    }, [mutate, perspectivesStatus]);
+
+   useEffect(() => {
+      if (
+         !isGenerating &&
+         perspectives &&
+         perspectives.length > 0 &&
+         selectedPerspective == null
+      ) {
+         const first = perspectives[0].id;
+         setSelectedPerspective(first);
+         changeCurrentPerspective(first);
+      }
+   }, [isGenerating, perspectives, selectedPerspective]);
 
    return (
       <>
@@ -442,17 +477,22 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                      </Button>
 
                      <Button
+                        ref={promptButtonRef}
                         variant="outline"
                         onClick={() => {
                            setCustomPromptDialogOpen(true);
                         }}
-                        className="mr-4"
+                        className={`mr-4 ${isPromptWrapped ? "mt-2" : ""}`}
                      >
                         <MessageCircleQuestion /> {t("askCustomPrompt")}
                      </Button>
                      <div ref={selectRef} className={isWrapped ? "mt-2" : ""}>
                         <Select
-                           onValueChange={changeCurrentPerspective}
+                           value={selectedPerspective}
+                           onValueChange={(value) => {
+                              setSelectedPerspective(value);
+                              changeCurrentPerspective(value);
+                           }}
                            disabled={
                               (isGenerating && perspectives?.length < 1) ||
                               !perspectives ||
@@ -465,30 +505,39 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                               />
                            </SelectTrigger>
                            <SelectContent>
-                              {perspectives?.map((perspective) => (
-                                 <SelectItem
-                                    key={`${perspective.id}-${perspective.timestamp}`}
-                                    value={perspective.id}
-                                 >
-                                    <div className="flex items-center mr-1">
-                                       {perspective.name}
-                                       {perspective?.creatorType === "user" &&
-                                          ` (${perspective.creator})`}
-                                       {perspective?.creatorType === "ai" && (
-                                          <TooltipProvider>
-                                             <Tooltip>
-                                                <TooltipTrigger>
-                                                   <Bot className="ml-2" />
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                   {t("aiPerspective")}
-                                                </TooltipContent>
-                                             </Tooltip>
-                                          </TooltipProvider>
-                                       )}
-                                    </div>
-                                 </SelectItem>
-                              ))}
+                              {perspectives
+                                 ?.sort(
+                                    (
+                                       a: { name: string },
+                                       b: { name: string }
+                                    ) => a.name.localeCompare(b.name)
+                                 )
+                                 .map((perspective) => (
+                                    <SelectItem
+                                       key={`${perspective.id}-${perspective.timestamp}`}
+                                       value={perspective.id}
+                                    >
+                                       <div className="flex items-center mr-1">
+                                          {perspective.name}
+                                          {perspective?.creatorType ===
+                                             "user" &&
+                                             ` (${perspective.creator})`}
+                                          {perspective?.creatorType ===
+                                             "ai" && (
+                                             <TooltipProvider>
+                                                <Tooltip>
+                                                   <TooltipTrigger>
+                                                      <Bot className="ml-2" />
+                                                   </TooltipTrigger>
+                                                   <TooltipContent>
+                                                      {t("aiPerspective")}
+                                                   </TooltipContent>
+                                                </Tooltip>
+                                             </TooltipProvider>
+                                          )}
+                                       </div>
+                                    </SelectItem>
+                                 ))}
                            </SelectContent>
                         </Select>
                      </div>
