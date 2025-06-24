@@ -55,6 +55,21 @@ or
 ./start.sh
 ```
 
+---
+
+**NOTE**
+
+If you plan to use a custom local domain (e.g. `truspace.local` instead of `localhost`), you have to set the respective environment variable and update CORS settings in the `.env`file, therefore
+
+```bash
+export NEXT_PUBLIC_API_URL=http://truspace.local:8000/api && ./start.sh
+```
+
+and in the `.env` file update the line
+`CORS_ORIGIN=http://truspace.local:3000`
+
+---
+
 # Register and login to TruSpace
 
 - Execute `<hostname>:3000` and register a user
