@@ -7,12 +7,6 @@ export const COOKIE_OPTIONS = {
    sameSite: "strict" as const
 };
 
-interface LoginCookie {
-   name: string;
-   email: string;
-   expires: number; // milliseconds since UNIX epoch
-}
-
 export const setLoginCookie = (data, options) => {
    Cookies.set(COOKIE_NAME, JSON.stringify(data), options);
 };
@@ -28,10 +22,6 @@ export const isTokenExpired = (token) => {
 
    try {
       const expirationDate = new Date(token.expires * 1000);
-      if (expirationDate <= new Date())
-         console.log(
-            `Token is valid until ${expirationDate.toISOString()}, it is now ${new Date().toISOString()}`
-         );
       return expirationDate <= new Date();
    } catch (error) {
       console.error("Error checking token expiration:", error);

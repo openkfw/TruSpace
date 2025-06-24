@@ -74,7 +74,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
    const tokenCheckInterval = useRef<NodeJS.Timeout | null>(null);
 
    const handleTokenExpiration = useCallback(() => {
-      console.log("Token expired, logging out");
       setUser(null);
       deleteLoginCookie();
 
@@ -148,7 +147,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
          const savedUser = Cookies.get(COOKIE_NAME);
 
          if (!savedUser) {
-            console.log("No cookie found");
             setUser(null);
             return;
          }
@@ -156,7 +154,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
          const userData: User = JSON.parse(savedUser);
 
          if (isTokenExpired(userData.expires)) {
-            console.log("Token expired");
             deleteLoginCookie();
             setUser(null);
             return;
