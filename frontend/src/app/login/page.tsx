@@ -19,7 +19,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useUser } from "@/contexts/UserContext";
-import { User } from "@/interfaces";
 import { COOKIE_OPTIONS, setLoginCookie } from "@/lib/";
 import { loginUser } from "@/lib/services";
 import { validateEmail } from "@/lib/validateEmail";
