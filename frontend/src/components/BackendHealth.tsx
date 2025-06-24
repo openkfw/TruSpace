@@ -1,3 +1,9 @@
+import { useEffect, useState } from "react";
+
+import { useTranslations } from "next-intl";
+
+import { CheckCircle, XCircle } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import {
    Tooltip,
@@ -6,9 +12,6 @@ import {
    TooltipTrigger
 } from "@/components/ui/tooltip";
 import { getHealth } from "@/lib/services";
-import { CheckCircle, XCircle } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
 
 const READY = "🟢";
 const ERROR = "🔴";

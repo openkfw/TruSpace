@@ -1,7 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Button } from "./ui/button";
+
 import { useTranslations } from "next-intl";
+
+import { Button } from "./ui/button";
 
 export default function WorkspaceTour() {
    const [show, setShow] = useState(false);

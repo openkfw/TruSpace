@@ -42,6 +42,8 @@ This document provides a detailed overview of the environment variables used to 
 
 | Variable                                   | Description                                                                       | Default Value                                                    | Required |
 | ------------------------------------------ | --------------------------------------------------------------------------------- | ---------------------------------------------------------------- | -------- |
+| `START_PRIVATE_NETWORK`                    | Option to allow or disable connection to public IPFS nodes                        | true                                                             | true     |
+| `SWARM_KEY_SECRET`                         | If `START_PRIVATE_NETWORK` is "true" then swarm key secret is required.           |  | false    |
 | `IPFS_CLUSTER_HOST`                        | Address of the IPFS Cluster REST API.                                             | [http://cluster0:9094](http://cluster0:9094)                     | true     |
 | `IPFS_PINSVC_HOST`                         | Address of the IPFS pinning service API.                                          | [http://cluster0:9097](http://cluster0:9097)                     | true     |
 | `IPFS_GATEWAY_HOST`                        | Address of the IPFS gateway (used to fetch content).                              | [http://ipfs0:8080](http://ipfs0:8080)                           | true     |

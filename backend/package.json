@@ -18,6 +18,7 @@
   "dependencies": {
     "@opendocsg/pdf2md": "^0.2.1",
     "@types/nodemailer": "^6.4.17",
+    "@types/node": "^22.15.29",
     "axios": "^1.7.9",
     "bcrypt": "^5.1.1",
     "cookie-parser": "~1.4.4",
@@ -64,7 +65,6 @@
     "@types/jsonwebtoken": "^9.0.9",
     "@types/knex": "^0.15.2",
     "@types/morgan": "^1.9.9",
-    "@types/node": "^22.15.29",
     "@types/node-fetch": "^2.6.12",
     "@types/pdfkit": "^0.13.9",
     "@types/swagger-ui-express": "^4.1.7",

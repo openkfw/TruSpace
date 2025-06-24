@@ -1,48 +1,52 @@
 "use client";
 
-import { Color } from "@tiptap/extension-color";
-import Highlight from "@tiptap/extension-highlight";
-
-import Link from "@tiptap/extension-link";
-import ListItem from "@tiptap/extension-list-item";
-import Table from "@tiptap/extension-table";
-import TableCell from "@tiptap/extension-table-cell";
-import TableHeader from "@tiptap/extension-table-header";
-import TableRow from "@tiptap/extension-table-row";
-import TextAlign from "@tiptap/extension-text-align";
-import TextStyle from "@tiptap/extension-text-style";
-import Underline from "@tiptap/extension-underline";
-import { EditorContent, Editor as EditorType, useEditor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import { CircleAlert } from "lucide-react";
-import { useTranslations } from "next-intl";
 import { useState } from "react";
+
+import { useTranslations } from "next-intl";
+
+import { Color } from "@tiptap/extension-color";
+import { Highlight } from "@tiptap/extension-highlight";
+import { Link } from "@tiptap/extension-link";
+import { ListItem } from "@tiptap/extension-list-item";
+import { Table } from "@tiptap/extension-table";
+import { TableCell } from "@tiptap/extension-table-cell";
+import { TableHeader } from "@tiptap/extension-table-header";
+import { TableRow } from "@tiptap/extension-table-row";
+import { TextAlign } from "@tiptap/extension-text-align";
+import { TextStyle } from "@tiptap/extension-text-style";
+import { Underline } from "@tiptap/extension-underline";
+import { Editor as EditorType, EditorContent, useEditor } from "@tiptap/react";
+import { StarterKit } from "@tiptap/starter-kit";
+import { CircleAlert } from "lucide-react";
 import ImageResize from "tiptap-extension-resize-image";
-import { Button } from "../ui/button";
+
+import { Button } from "@/components/ui/button";
 import {
    Dialog,
    DialogContent,
    DialogDescription,
    DialogHeader,
    DialogTitle
-} from "../ui/dialog";
-import { MenuBar } from "./MenuBar";
+} from "@/components/ui/dialog";
+
 import { BackgroundColor } from "./plugins/background-color/background-color-plugin";
 import BubbleMenuExtension from "./plugins/bubble-menu-plugin";
 import { BubbleMenu } from "./plugins/bubble-menu-plugin/BubbleMenu";
 import { FontSize } from "./plugins/font-size/font-size-plugin";
+import { MenuBar } from "./MenuBar";
+
 import "./styles.css";
 
-const allowedImageTypes = [
-   "image/bmp",
-   "image/gif",
-   "image/jpeg",
-   "image/jpg",
-   "image/png",
-   "image/tiff",
-   "image/webp",
-   "image/x-icon"
-];
+// const allowedImageTypes = [
+//    "image/bmp",
+//    "image/gif",
+//    "image/jpeg",
+//    "image/jpg",
+//    "image/png",
+//    "image/tiff",
+//    "image/webp",
+//    "image/x-icon"
+// ];
 
 export interface AllowedButtons {
    bold?: boolean;

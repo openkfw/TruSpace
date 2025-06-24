@@ -1,4 +1,12 @@
 "use client";
+import React from "react";
+import { useForm } from "react-hook-form";
+
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,18 +18,14 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { getLoginCookie, isTokenExpired, redirectToLogin } from "@/lib/";
+import { useUser } from "@/contexts/UserContext";
+import { User } from "@/interfaces";
+import { COOKIE_OPTIONS, setLoginCookie } from "@/lib/";
 import { loginUser } from "@/lib/services";
-import Cookies from "js-cookie";
-import { useTranslations } from "next-intl";
-import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import React, { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { validateEmail } from "../../lib/validateEmail";
+import { validateEmail } from "@/lib/validateEmail";
 
 export default function Login({}: React.ComponentPropsWithoutRef<"div">) {
+   const { refreshUser } = useUser();
    const [loginError, setLoginError] = React.useState(false);
    const [statusError, setStatusError] = React.useState(false);
    const translations = useTranslations("login");
@@ -33,10 +37,11 @@ export default function Login({}: React.ComponentPropsWithoutRef<"div">) {
       formState: { errors }
    } = useForm();
 
-   const onSubmit = async (data: any) => {
+   const onSubmit = async (data) => {
       const result = await loginUser(data);
       if (result.status === "success") {
-         Cookies.set("login", JSON.stringify(result.user));
+         setLoginCookie(result.user, COOKIE_OPTIONS);
+         refreshUser();
          router.push("/home");
       }
       if (result.status === "failure") {
@@ -47,18 +52,6 @@ export default function Login({}: React.ComponentPropsWithoutRef<"div">) {
          }
       }
    };
-
-   useEffect(() => {
-      const parsedData = getLoginCookie();
-      if (parsedData) {
-         if (isTokenExpired(parsedData)) {
-            router.push("/home");
-         } else {
-            Cookies.remove("login");
-            redirectToLogin(router);
-         }
-      }
-   }, [router]);
 
    const emailValidation = register("email", {
       required: t("emailRequired"),

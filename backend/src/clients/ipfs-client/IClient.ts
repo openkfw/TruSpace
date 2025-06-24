@@ -56,4 +56,12 @@ export interface IClient {
   pinSvcStatus(): Promise<boolean>;
   gatewayStatus(): Promise<boolean>;
   clusterStatus(): Promise<boolean>;
+
+  // avatar doesn't belong to a workspace
+  uploadAvatar(file: File): Promise<any>;
+  downloadAvatar(
+    req: AuthenticatedRequest,
+    res: Response,
+    cid: string
+  ): Promise<any>;
 }

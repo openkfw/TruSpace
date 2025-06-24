@@ -1,3 +1,13 @@
+import { useMemo } from "react";
+
+import { useTranslations } from "next-intl";
+
+import {
+   flexRender,
+   getCoreRowModel,
+   useReactTable
+} from "@tanstack/react-table";
+import { Dot, MoreVertical } from "lucide-react";
 import {
    DropdownMenu,
    DropdownMenuContent,
@@ -20,14 +30,7 @@ import {
 } from "@/components/ui/tooltip";
 import { formatDate, formatDateDays } from "@/lib/formatDate";
 import { DOCUMENTS_ENDPOINT } from "@/lib/services";
-import {
-   flexRender,
-   getCoreRowModel,
-   useReactTable
-} from "@tanstack/react-table";
-import { Dot, MoreVertical } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { useMemo } from "react";
+
 import { Button } from "../../../../../../components/ui/button";
 
 export default function DocumentVersions({ documentVersions }) {

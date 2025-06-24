@@ -4,6 +4,9 @@
 # Usage: ./start.sh [--local-frontend]
 # If --local-frontend is passed, it will start the frontend locally
 
+# generate env file if it does not exist
+[[ -e .env ]] || cp .env.example .env
+
 SCRIPT_DIR=$(dirname -- $0)
 source $SCRIPT_DIR/.env
 echo "INFO: Current script directory: $SCRIPT_DIR"
@@ -17,8 +20,26 @@ else
     export FRONTEND_DOCKER_COMPOSE_FILE="-f docker-compose-frontend.yml"
 fi
 
-# generate env file if it does not exist
-[[ -e .env ]] || cp .env.example .env
+# check for necessary docker volumes, if they don't exist, generate them
+dirs=(
+  "./volumes"
+  "./volumes/db"
+  "./volumes/db0"
+  "./volumes/db1"
+  "./volumes/ipfs0"
+  "./volumes/cluster0"
+  "./volumes/ipfs1"
+  "./volumes/cluster1"
+  "./volumes/ollama"
+  "./volumes/open-webui"
+)
+
+for d in "${dirs[@]}"; do
+  if [ ! -d "$d" ]; then
+    echo "Creating $d"
+    mkdir -p "$d"
+  fi
+done
 
 echo "INFO: Starting dev environment"
 

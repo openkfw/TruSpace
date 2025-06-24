@@ -1,4 +1,14 @@
 "use client";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+
+import { CheckCircle, Eye, EyeOff, XCircle } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import {
    Card,
@@ -16,14 +26,7 @@ import {
 } from "@/components/ui/popover";
 import { getUserLocale } from "@/i18n/service";
 import { registerUser } from "@/lib/services";
-import { CheckCircle, Eye, EyeOff, XCircle } from "lucide-react";
-import { useTranslations } from "next-intl";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "react-toastify";
-import { validateEmail } from "../../lib/validateEmail";
+import { validateEmail } from "@/lib/validateEmail";
 
 export default function Register() {
    const translations = useTranslations("register");

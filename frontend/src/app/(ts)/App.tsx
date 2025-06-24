@@ -1,7 +1,8 @@
 "use client";
+import Script from "next/script";
+
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { Header } from "@/components/Header";
-import Script from "next/script";
 
 export default function App({ children }: { children: React.ReactNode }) {
    return (

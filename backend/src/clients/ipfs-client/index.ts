@@ -71,6 +71,50 @@ export class IpfsClient implements IClient {
     }
     return instance;
   }
+  async downloadAvatar(
+    req: AuthenticatedRequest,
+    res: Response,
+    cid: string
+  ): Promise<any> {
+    try {
+      const result = await this.#gatewayAxios.get(`/ipfs/${cid}`, {
+        responseType: "arraybuffer",
+      });
+
+      const fileBuffer = Buffer.from(result.data);
+
+      res.setHeader("Content-Type", result.headers["content-type"]);
+      res.setHeader("Content-Disposition", `attachment; filename="${cid}"`);
+
+      res.end(fileBuffer);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      logger.error(err);
+      res.status(404);
+    }
+  }
+  async uploadAvatar(file: File): Promise<any> {
+    const form = new FormData();
+
+    form.append("file", file.data, {
+      filename: file.name,
+      contentType: file.mimetype,
+    });
+
+    const result = await this.#clusterAxios.post(
+      `/add?stream-channels=false`,
+      form,
+      {
+        headers: {
+          ...form.getHeaders(),
+        },
+        timeout: 30000,
+        maxContentLength: Infinity,
+      }
+    );
+    const data = result.data[0];
+    return data.cid;
+  }
 
   async pinSvcStatus(): Promise<boolean> {
     const pinSvcStatus = (await this.#pinSvcAxios.get("/pins?limit=10")).status;
@@ -544,7 +588,11 @@ export class IpfsClient implements IClient {
     const perspectives = pinRes.results.map((r: PinRequest) => {
       return this.#transformPinToPerspective(r.pin);
     });
-    return this.#fetchPerspectiveFiles(perspectives);
+    return (await this.#fetchPerspectiveFiles(perspectives)).sort(
+      (a: Perspective, b: Perspective) =>
+        Number(new Date(a.meta.timestamp).getTime()) -
+        Number(new Date(b.meta.timestamp).getTime())
+    );
   }
 
   /**

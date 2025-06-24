@@ -1,6 +1,7 @@
+import useSWR from "swr";
+
 import config from "@/config";
 import { Workspace } from "@/interfaces";
-import useSWR from "swr";
 
 const fetcher = (url) =>
    fetch(url, {
@@ -21,7 +22,7 @@ const PERSPECTIVES_ENDPOINT = `${API_URL}/perspectives`;
 export const CHATS_ENDPOINT = `${API_URL}/chats`;
 const TAGS_ENDPOINT = `${API_URL}/tags`;
 const WORKSPACES_ENDPOINT = `${API_URL}/workspaces`;
-const USERS_ENDPOINT = `${API_URL}/users`;
+export const USERS_ENDPOINT = `${API_URL}/users`;
 const HEALTH_ENDPOINT = `${API_URL}/health`;
 const PERMISSIONS_ENDPOINT = `${API_URL}/permissions`;
 const LANGUAGE_ENDPOINT = `${API_URL}/language`;
@@ -69,7 +70,7 @@ export const loadDocumentBlob = async (cid: string) => {
    return data;
 };
 
-export const documentUpload = async (formData, docId, errorText) => {
+export const documentUpload = async (formData, docId, _errorText) => {
    const url = docId
       ? `${DOCUMENTS_ENDPOINT}/${docId}`
       : `${DOCUMENTS_ENDPOINT}`;
@@ -172,6 +173,21 @@ export const createPerspective = async (formData, errorText) => {
    return data;
 };
 
+export const customPerspective = async (formData, errorText) => {
+   const url = `${PERSPECTIVES_ENDPOINT}/generate-custom`;
+   const options: RequestInit = {
+      method: "POST",
+      body: formData,
+      credentials: "include"
+   };
+   const response = await fetch(url, options);
+   if (!response.ok) {
+      throw new Error(errorText);
+   }
+   const data = await response.json();
+   return data;
+};
+
 export const usePerspectives = (cid: string) => {
    const { data, error, isLoading, isValidating, mutate } = useSWR(
       `${PERSPECTIVES_ENDPOINT}/version/${cid}`,
@@ -179,16 +195,23 @@ export const usePerspectives = (cid: string) => {
    );
 
    return {
-      perspectives: data?.map((perspective) => ({
-         id: perspective.meta.perspectiveType,
-         name: perspective.meta.perspectiveType,
-         text: perspective.meta.data,
-         creatorType: perspective.meta.creatorType,
-         creator: perspective.meta.creator,
-         model: perspective.meta.model,
-         prompt: perspective.meta.prompt,
-         timestamp: perspective.meta.timestamp
-      })),
+      perspectives: data
+         ?.map((perspective) => ({
+            id: perspective.cid,
+            name: perspective.meta.perspectiveType,
+            text: perspective.meta.data,
+            creatorType: perspective.meta.creatorType,
+            creator: perspective.meta.creator,
+            model: perspective.meta.model,
+            prompt: perspective.meta.prompt,
+            timestamp: perspective.meta.timestamp
+         }))
+         .sort(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (a: any, b: any) =>
+               Number(new Date(a.timestamp).getTime()) -
+               Number(new Date(b.timestamp).getTime())
+         ),
       error,
       isLoading,
       isValidating,
@@ -215,7 +238,7 @@ export function usePerspectivesStatus(cid: string) {
          revalidateOnFocus: false,
          shouldRetryOnError: true,
          dedupingInterval: 1000,
-         onErrorRetry(error, key, config, revalidate, revalidateOpts) {
+         onErrorRetry(error, _key, _config, _revalidate, _revalidateOpts) {
             if (error.status === 404) return;
          }
       }
@@ -243,7 +266,7 @@ export function useLanguageStatus(cid: string) {
          revalidateOnFocus: false,
          shouldRetryOnError: true,
          dedupingInterval: 1000,
-         onErrorRetry(error, key, config, revalidate, revalidateOpts) {
+         onErrorRetry(error, _key, _config, _revalidate, _revalidateOpts) {
             if (error.status === 404) return;
          }
       }
@@ -386,7 +409,7 @@ export function useTagsStatus(cid: string) {
          revalidateOnFocus: false,
          shouldRetryOnError: true,
          dedupingInterval: 1000,
-         onErrorRetry(error, key, config, revalidate, revalidateOpts) {
+         onErrorRetry(error, _key, _config, _revalidate, _revalidateOpts) {
             if (error.status === 404) return;
          }
       }
@@ -445,7 +468,10 @@ export async function getHealth() {
    return data;
 }
 
-export const postPermission = async (formData) => {
+export const postPermission = async (formData: {
+   email: string;
+   workspaceId: string;
+}) => {
    const options: RequestInit = {
       method: "POST",
       headers: {
@@ -465,7 +491,7 @@ export const postPermission = async (formData) => {
    return data;
 };
 
-export const getUsersInWorkspace = async (workspaceId) => {
+export const getUsersInWorkspace = async (workspaceId: string | string[]) => {
    const url = `${PERMISSIONS_ENDPOINT}/users-in-workspace/${workspaceId}`;
    const options: RequestInit = {
       method: "GET",
@@ -482,7 +508,7 @@ export const getUsersInWorkspace = async (workspaceId) => {
    return data;
 };
 
-export const deleteUserPermission = async (permissionId) => {
+export const deleteUserPermission = async (permissionId: number) => {
    const url = `${PERMISSIONS_ENDPOINT}/users-in-workspace/remove/${permissionId}`;
    const options: RequestInit = {
       method: "DELETE",
@@ -583,4 +609,21 @@ export const confirmRegistration = async (
       console.error("Error during registration confirmation:", error);
       throw error;
    }
+};
+
+export const uploadAvatar = async (formData: FormData) => {
+   const res = await fetch(`${USERS_ENDPOINT}/avatar`, {
+      method: "POST",
+      credentials: "include",
+      body: formData
+   });
+   return res.json();
+};
+
+export const downloadAvatar = async () => {
+   const res = await fetch(`${USERS_ENDPOINT}/avatar`, {
+      method: "GET",
+      credentials: "include"
+   });
+   return res;
 };

@@ -1,4 +1,10 @@
 "use client";
+import { useCallback, useEffect, useState } from "react";
+
+import { useTranslations } from "next-intl";
+
+import { Download } from "lucide-react";
+
 import ChatMessage from "@/components/ChatMessage";
 import InfoLabel from "@/components/InfoLabel";
 import { Button } from "@/components/ui/button";
@@ -11,9 +17,6 @@ import {
 } from "@/components/ui/tooltip";
 import { ChatMessage as Chat } from "@/interfaces";
 import { getChatsPdfExportUrl, loadChats, postChat } from "@/lib/services";
-import { Download } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { useCallback, useEffect, useState } from "react";
 
 export default function DocumentChat({
    cid,
@@ -148,7 +151,7 @@ export default function DocumentChat({
                                  version.cid === messageData?.documentCid
                            )?.meta.version
                         }
-                        versionTagName= {
+                        versionTagName={
                            documentVersions.find(
                               (version) =>
                                  version.cid === messageData?.documentCid
@@ -168,7 +171,6 @@ export default function DocumentChat({
                                 }
                               : null
                         }
-                        showMoreActions={false}
                      />
                   );
                })

@@ -1,6 +1,7 @@
 // This file is necessary for correctly passing cookies
-import { getApiUrl } from "@/lib/services";
 import { NextRequest, NextResponse } from "next/server";
+
+import { getApiUrl } from "@/lib/services";
 
 const apiUrl = getApiUrl();
 
@@ -43,7 +44,6 @@ async function handleRequest(
 ) {
    const pathString = path.join("/");
    const url = `${apiUrl}/${pathString}`;
-   console.log("handling request ", url);
 
    // Include original cookies
    const requestHeaders = new Headers(request.headers);

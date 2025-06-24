@@ -17,9 +17,12 @@
       "dashboard": "Dashboard",
       "noDocuments": "Keine Dokumente",
       "noDocumentDescription": "Neues Dokument hinzufügen, indem Sie auf die Schaltfläche Dokument erstellen oder Dokument hochladen klicken",
-      "share": "Aktie",
+      "share": "Teilen",
       "document": "Dokument",
-      "workspace": "Arbeitsbereich"
+      "workspace": "Arbeitsbereich",
+      "userSettings": "Nutzer-Einstellungen",
+      "uploadAvatar": "Klicken Sie auf den Avatar, um ein neues Bild hochzuladen",
+      "saveSettings": "Einstellungen speichern"
    },
    "theme": {
       "light": "Hell",
@@ -80,6 +83,10 @@
       "backToLogin": "Zurück zur Anmeldung",
       "emailSent": "Die E-Mail zur Registrierungsbestätigung wurde gesendet"
    },
+   "settings": {
+      "updateSuccess": "Benutzereinstellungen aktualisiert",
+      "updateError": "Beim Aktualisieren der Benutzereinstellungen ist ein Fehler aufgetreten"
+   },
    "homePage": {
       "documentName": "Name",
       "documentId": "Dokument-ID",
@@ -125,7 +132,7 @@
    "documentPreview": {
       "preview": "Vorschau",
       "noPreview": "Keine Vorschau verfügbar",
-      "unsupportedFormat": "Dieses Dateiformat wird für die Vorschau nicht unterstützt.",
+      "unsupportedFormat": "Dieses Dateiformat wird für die Vorschau nicht unterstützt",
       "page": "Seite",
       "of": "von"
    },
@@ -147,7 +154,7 @@
       "documentLanguages": "Dokumentsprachen:",
       "generatingAILanguageQueue": "In Warteschlange für Sprachanalyse...",
       "generatingAILanguage": "Sprachanalyse...",
-      "languageGenerationError": "Beim Generieren der Sprache ist ein Fehler aufgetreten"
+      "languageGenerationError": "Bei der Bestimmung der Sprache ist ein Fehler aufgetreten"
    },
    "documentVersion": {
       "version": "Version",
@@ -162,7 +169,7 @@
       "download": "Herunterladen",
       "failedToFetch": "Dokument konnte nicht abgerufen werden",
       "invalidResponse": "Ungültige Antwort",
-      "language": "Versionssprache",
+      "language": "Sprache",
       "versionTagName": "Name des Versionstags"
    },
    "navbar": {
@@ -229,32 +236,38 @@
       "aiDisclaimer": "Diese Perspektive wird von einem LLM-Modell generiert. Sie könnte einige Fehler oder Inkonsistenzen enthalten.",
       "aiNote": "Diese Perspektive wird von einem LLM-Modell generiert. Sie könnte einige Fehler oder Inkonsistenzen enthalten. Bitte überprüfen Sie die Informationen, bevor Sie sie verwenden.",
       "aiPerspective": "Perspektive von KI generiert",
+      "by": "von",
       "cancel": "Abbrechen",
+      "create": "Erstellen",
+      "created": "Erstellt",
+      "createPerspectiveTitle": "Neue Perspektive erstellen",
+      "creating": "Erstellen...",
       "creator": "Autor",
       "creatorPlaceholder": "Autor eingeben",
-      "create": "Erstellen",
-      "createPerspectiveTitle": "Neue Perspektive erstellen",
       "documentType": "Dokumenttyp",
       "documentTypePlaceholder": "Dokumenttyp eingeben",
-      "perspectiveNamePlaceholder": "Perspektivenname eingeben",
+      "editorEmptyError": "Bitte füllen Sie dieses Feld aus.",
       "generatingAIPerspectives": "Bitte warten. KI-Perspektiven werden generiert. Dies kann bis zu 15 Minuten dauern.",
       "generatingAIPerspectivesQueue1": "Bitte warten. Dieser Auftrag befindet sich in der Warteschlange. Es müssen noch ",
       "generatingAIPerspectivesQueue2": "Aufträge verarbeitet werden. Dies kann mehrere Minuten dauern.",
-      "creating": "Erstellen...",
-      "created": "Erstellt",
-      "by": "von",
       "info": "Info",
-      "prompt": "Prompt",
-      "perspectiveName": "Perspektivenname",
-      "perspectiveText": "Perspektiventext",
-      "perspectiveGenerationError": "Fehler bei der Generierung der Perspektive",
       "model": "Modell",
       "morePromptInfo": "Prompt- und Modelldetails anzeigen",
       "noPerspective": "Keine Perspektive verfügbar",
-      "title": "Perspektiven",
+      "perspectiveGenerationError": "Fehler bei der Generierung der Perspektive",
+      "perspectiveName": "Perspektivenname",
+      "perspectiveNamePlaceholder": "Perspektivenname eingeben",
+      "perspectiveText": "Perspektiventext",
+      "prompt": "Prompt",
       "promptModelDialogTitle": "Modell auswählen",
-      "editorEmptyError": "Bitte füllen Sie dieses Feld aus.",
-      "selectPerspective": "Wählen Sie eine Perspektive"
+      "selectPerspective": "Wählen Sie eine Perspektive",
+      "title": "Perspektiven",
+      "askCustomPrompt": "DE:Ask AI with custom prompt",
+      "promptTitle": "DE:Prompt title",
+      "promptTitlePlaceHolder": "DE:Enter a title of your prompt",
+      "promptBodyPlaceholder": "DE:Enter your prompt",
+      "savePrompt": "DE:Save prompt",
+      "saveCustomPromptHint": "TODO: Saving prompts doesn't work"
    },
    "documentEditable": {
       "cancel": "Abbrechen",
@@ -279,7 +292,7 @@
       "generatingAITagsQueue2": "Aufträge verarbeitet werden. Dies kann mehrere Minuten dauern."
    },
    "document": {
-      "blankPdfError": "PDFs ohne eingebetteten Text sind nicht erlaubt",
+      "blankPdfError": "PDFs ohne eingebetteten Text sind nicht möglich",
       "documentUploaded": "Dokument erfolgreich hochgeladen",
       "documentUploadeNoAI": "Dokument erfolgreich hochgeladen, KI-Verarbeitung wegen fehlendem Textinhalt übersprungen",
       "documentUploadError": "Beim Hochladen des Dokuments ist ein Fehler aufgetreten",
@@ -311,7 +324,6 @@
       "errors_detected": "Fehler erkannt"
    },
    "languages": {
-      "languageNotFound": "Sprache nicht unterstützt",
       "en": "Englisch",
       "de": "Deutsch",
       "es": "Spanisch",
@@ -378,7 +390,7 @@
       "undo": "Rückgängig"
    },
    "tour": {
-      "workspaceMenuDescription": "👋 Willkommen! Dies ist das Arbeitsbereich-Menü. Hier findest du alle Aktionen, die du zur Verwaltung deines Arbeitsbereichs benötigst.",
+      "workspaceMenuDescription": "👋 Willkommen! Dies ist das Arbeitsbereich-Menü. Hier finden Sie alle Aktionen, die Sie zur Verwaltung deines Arbeitsbereichs benötigen.",
       "confirmButton": "Verstanden"
    }
 }

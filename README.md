@@ -7,92 +7,57 @@ The purpose of TruSpace is to make collaboration on documents between several st
 ---
 
 ## ✨ Key Features
-✨ Key Features
 
 - 🆓 100% open-source, sovereign and self-hostable - no cloud provider needed
-- 🔄 Automatic sync of data between trusted IPFS cluster nodes/partners (private or public setup)
+- 🔄 Fully decentralized storage using IPFS Cluster: Automatic sync of data between trusted IPFS cluster nodes/partners (private or public setup)
 - 🧠 Local AI interpretation of documents using Ollama + Open Web UI using customisable pre-defined prompts
 - 🗂️ Workspace-based organization of content and participants
-- 📄 Rich-text collaborative editing (WYSIWYG)
-- 🌍 Fully decentralized storage using IPFS Cluster
-- 🔐 Local storage of sensitive data in SQLite
 
 ---
 
-## 🚀 Start TruSpace in production
+## Quick start, I want to..
 
-### 🔧 Prerequisites
-
-- Docker
-- File storage for docker volumes
-- Nginx (or other prefered way to expose application)
-- SMTP server
-
-### 📥 Quick start
-
-If you want to run in production mode, e.g. on your virtual machine:
-
-Setup your nginx server running on VM. Example configuration can be found here: https://github.com/openkfw/TruSpace/blob/main/production/truspace.nginx
-More details [here](./doc/installStandaloneServer.md)
-
-```bash
-git clone https://github.com/openkfw/TruSpace.git
-cd production
-bash start-prod.sh
-
-# If running for the first time you may need to set the correct permissions for the `/volumes` folders. Run
-sudo chown -R 1000:1000 ./volumes
-# or
-sudo chmod -R 744 ./volumes
-# and restart application with
-bash start-prod.sh
-```
-
-This script is meant for production run. If you want to start application for local development or testing follow [Dev Installation](./DEV_INSTALLATION.md) manual.
-
-```bash
-# To restart environment (e.g. after you change some environmental variable in .env file) run again:
-bash start-prod.sh
-```
-
-```bash
-# To STOP environment
-docker compose -f docker-compose.yml -f docker-compose-ai.yml down --remove-orphans
-```
-
-## 🖥️ Getting local environment started
-
-- 🧪 [Play around in a sandbox demo environment](#play-around-in-a-sandbox-demo-environment)
-- 💻 [Run it locally on my machine](#run-it-locally-on-my-machine)
+- 🧪 [Play around in a sandbox demo environment](#play-around-in-an-online-sandbox-demo-environment)
+- 💻 [Run it locally on my machine](#-run-it-locally-on-my-machine)
 - 🛠️ [Install a standalone server](#install-a-standalone-server)
 - 🌐 [Connect to other TruSpace nodes](#connect-to-other-truspace-nodes)
 - 📚 [Check out architecture, guides, details](#check-out-architecture-guides-details)
 
-## Play around in a sandbox demo environment
+---
 
-To check how TruSpace works, get to the sandbox installation at https://truspace.dev, register a new user, login and start playing with private and public workspaces!
+## Play around in an online sandbox demo environment
 
-### 📥 Run it locally on my machine
+To check how TruSpace works, get to the sandbox installation at https://truspace.dev, register a new user, login and start playing with private and public workspaces! It's an experiment-sandbox, so your data might get deleted occasionally.
 
-For a very **quick and easy** TruSpace setup (e.g. for demos and first look), run:
+---
+
+## 📥 Run it locally on my machine
+
+For a very **quick and easy** TruSpace setup (e.g. for demos and first look) on your local machine, run:
 
 ```bash
 git clone git@github.com:openkfw/TruSpace.git
-# Start development server
+cd TruSpace
 sh start.sh
 ```
 
-This command spins up `docker compose` containing backend api and IPFS clusters and additionally NextJS frontend in dev mode. After startup, the frontend is available on `http://localhost:3000`. Register a user, login and create a workspace for documents!
+This command creates a simple environment configuration, creates docker volumes and spins up `docker compose` containing backend api and IPFS clusters and additionally NextJS frontend in dev mode. After startup, the frontend is available on `http://localhost:3000`. Register a user, login and create a workspace for documents!
 
-To enable AI analysis, you need to download the LLM model of your choice, as an example here is `gemma3:1b` and you can see the full list at the [ollama DB](https://ollama.com/library?q=mistral&sort=popular).
+If you plan to use another domain (e.g. a raspberry), make sure that the respective domains are updated from `localhost` to `domain` in the `.env` file.
 
-- Login to the Open Web UI on `http://localhost:3333`. For login, use the values from the `.env` file (`ADMIN_USER_EMAIL`), by default `admin@admin.com/admin`. Type the model you specified in the `.env` in the `OLLAMA_MODEL` variable in the search bar and Open Web UI offers you to download it.
+To enable AI analysis, Truspace downloads a model configured in `.env`, as an example here is `gemma3:1b` and you can see the full list at the [ollama DB](https://ollama.com/library?q=mistral&sort=popular).
 
-  ![Screenshot of downloading AI model](./doc/screenshotDownloadAIModel.png)
-
-- Once the model is downloaded, AI analysis is executed upon each document upload automatically.
+Once the model is downloaded, AI analysis is executed upon each document upload automatically.
 
 **You made it and should see this**
+
+![Screenshot of login screen](./doc/screenshot_login.png)
+
+There'se an option to change the app langugae, too. Go ahead and _Sign up_ a new user.
+
+![Screenshot of register screen](./doc/screenshot_register.png)
+
+Fill out the required fields. The user account is local, your data is not going anywhere. After the submission, the app takes you back to the login screen, and from there to the dashboard.
 
 ![Screenshot of dashboard](./doc/screenshot_dashboard.png)
 
@@ -105,17 +70,28 @@ If something doesn't work, check that all containers are running with `docker ps
 | 783... |truspace-frontend | "sh startup.sh" | 26 minutes ago | Up 26 minutes (healthy) | 0.0.0.0:3000->3000/tcp, :::3000->3000/tcp | truspace-frontend-1|
 | 590... | ipfs/kubo:release | "/sbin/tini -- /usr/…" | 26 minutes ago | Up 26 minutes (healthy) | 0.0.0.0:4001->4001/tcp, 0.0.0.0:5001->5001/tcp, 4001/udp, 0.0.0.0:8080->8080/tcp, 8081/tcp | ipfs0 |
 
+---
+
 ## Install a standalone server
 
-There's an extensive guide how to install TruSpace on a (virtual) server or a Raspberry Pi. It includes steps how to install surrounding architecture like docker, a reverse proxy `nginx`, certificates via `LetsEncrypt` and all the other administrative steps. Have a look [here](./doc/installStandaloneServer.md)
+There's an extensive guide how to install TruSpace on a (virtual) server or a Raspberry Pi. It includes steps how to install surrounding architecture like docker, a reverse proxy `nginx`, certificates via `LetsEncrypt` and all the other administrative steps. Have a look [here](./doc/installStandaloneServer.md) for a standalone server or [here](./doc/installRaspberryPi.md) for a setup on Raspberry Pi.
+
+---
 
 ## Connect to other TruSpace nodes
 
-You have a TruSpace node running and would like to connect to another (private) network to sync the TruSpace data? Here's what to do:
+You have a TruSpace node running and would like to connect to another (private) network to sync the TruSpace data? The connection requires to
 
-- TODO swarm key?
-- other secrets?
-- service.json cluster
+- Retrieve the address of the target node to connect to
+- The **swarm key** to allow the IPFS nodes to connecto to each other
+- The **cluster secret** to allow the IPFS cluster to share the pinning information of the pinned files
+
+Here is a step by step guide:
+
+- On the target node, open the file `/volumes/cluster0/service.json`. You get a long JSON tree, at the beginning is the field `secret`, e.g `141a2511dae98...e3c47f69d1e12203246f92`. This should be copied in your `.env` file in the variable `CLUSTER_SECRET`. This enables the two cluster nodes to connect to each other.
+- On the target node, open the file `/volumes/cluster0/identity.json`. Copy the value in the field `id`.
+- On your installation, open the file `/volumes/cluster0/service.json` and search for the field `peer_addresses`. If you haven't connected to other nodes before, it is `"peer_addresses": []`. Enter the target node IP address and the node `id` that you retrieved before in this field, e.g. `"peer_addresses": []`. IPFS uses the multiaddress format, e.g. it is `"peer_addresses":["/ip4/192.168.1.100/tcp/9096/p2p/target_ID"]`
+- Restart all containers
 
 ## Check out architecture, guides, details..
 
@@ -137,6 +113,8 @@ An extensive user guide with screenshots is available in the folder [User Guide]
 ### Tech Architecture overview
 
 In the overview, you can see how the components work together. The UI and API is part of this repository and provides the interface and the translation to other services. Once you start TruSpace, it pulls and connects to containers from Open Web UI (for AI processing) and IPFS/IPFS-Cluster to persist the data. The respective ports are outlined in the image.
+
+For the connection to other nodes, ports 4001 (IPFS swarm) and 9096/9097 (IPFS cluster) need to be opened.
 
 ![Architecture](./doc/tech-arch-diagram.PNG "Tech Architecture overview")
 
@@ -200,5 +178,6 @@ This project is licensed under the **GNU General Public License v3.0**. See the 
 
 ## 💬 Community & Support
 
+- User guide: [User Guide](./doc/User%20Guide/README.md)
 - Discussions: [GitHub Discussions](https://github.com/openkfw/TruSpace/discussions)
 - Report issues: [GitHub Issues](https://github.com/openkfw/TruSpace/issues)

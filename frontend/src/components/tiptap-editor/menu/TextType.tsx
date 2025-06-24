@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import {
    Heading1,
    Heading2,
@@ -9,7 +11,7 @@ import {
    Heading6,
    Type
 } from "lucide-react";
-import { useTranslations } from "next-intl";
+
 import {
    Select,
    SelectContent,

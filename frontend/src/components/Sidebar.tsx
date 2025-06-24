@@ -1,4 +1,10 @@
 "use client";
+import { useEffect, useState } from "react";
+
+import Image from "next/image";
+import { usePathname, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+
 import { NavUser } from "@/components/nav-user";
 import {
    Sidebar,
@@ -9,14 +15,10 @@ import {
    SidebarRail,
    useSidebar
 } from "@/components/ui/sidebar";
+import { useUser } from "@/contexts/UserContext";
 import { useWorkspaceContext } from "@/contexts/WorkspaceContext";
 import { Workspace } from "@/interfaces";
-import { getLoginCookie } from "@/lib";
-import Cookies from "js-cookie";
-import { useTranslations } from "next-intl";
-import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+
 import { NavDashboard } from "./NavDashboard";
 import { NavStatistics } from "./NavStatistics";
 import { NavWorkspaces } from "./NavWorkspaces";
@@ -29,29 +31,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
    const [displayedWorkspaces, setDisplayedWorkspaces] =
       useState<Workspace[]>(availableWorkspaces);
    const translations = useTranslations("general");
-   const [loggedUser, setLoggedUser] = useState(null);
    const { open } = useSidebar();
-
-   useEffect(() => {
-      const login = Cookies.get("login");
-      if (!login) {
-         router.push("/login");
-         return;
-      }
-      try {
-         const userData = getLoginCookie();
-         const initials = userData.name
-            .split(" ")
-            .map((n) => n[0])
-            .join("")
-            .slice(0, 2)
-            .toUpperCase();
-         setLoggedUser({ ...userData, initials });
-      } catch (e) {
-         console.log(e);
-         router.push("/login");
-      }
-   }, [router]);
+   const userContext = useUser();
 
    useEffect(() => {
       if (availableWorkspaces) {
@@ -64,7 +45,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       router.push(`/workspace/${workspace.uuid}`);
    };
 
-   if (!availableWorkspaces || !loggedUser)
+   if (!availableWorkspaces || !userContext.user)
       return <div>{translations("loading")}</div>;
 
    return (
@@ -105,7 +86,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             />
          </SidebarContent>
          <SidebarFooter className="mb-2">
-            <NavUser user={loggedUser} />
+            <NavUser />
          </SidebarFooter>
          <SidebarRail />
       </Sidebar>

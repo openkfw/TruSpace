@@ -1,3 +1,21 @@
+import { useTranslations } from "next-intl";
+
+import {
+   ArrowLeftFromLine,
+   ArrowRightFromLine,
+   ChevronDown,
+   Columns4,
+   Paintbrush,
+   PanelLeft,
+   PanelTop,
+   Rows4,
+   SquareDashed,
+   Table,
+   TableCellsMerge,
+   TableCellsSplit,
+   Trash2
+} from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import {
    DropdownMenu,
@@ -18,22 +36,7 @@ import {
    TooltipProvider,
    TooltipTrigger
 } from "@/components/ui/tooltip";
-import {
-   ArrowLeftFromLine,
-   ArrowRightFromLine,
-   ChevronDown,
-   Columns4,
-   Paintbrush,
-   PanelLeft,
-   PanelTop,
-   Rows4,
-   SquareDashed,
-   Table,
-   TableCellsMerge,
-   TableCellsSplit,
-   Trash2
-} from "lucide-react";
-import { useTranslations } from "next-intl";
+
 import AddColumnAfter from "../icons/AddColumnAfter";
 import AddColumnBefore from "../icons/AddColumnBefore";
 import AddRowAfter from "../icons/AddRowAfter";
@@ -69,9 +72,10 @@ export default function TableDropdownButton({ editor }) {
                                  <div className="grid grid-cols-5 gap-x-2 gap-y-2 p-2">
                                     {Array.from({ length: 25 }).map(
                                        (_, index) => (
-                                          <div
+                                          <Button
+                                             variant="outline"
                                              key={index}
-                                             className="w-6 h-6 border border-gray-300 hover:bg-blue-300 cursor-pointer"
+                                             className="border-gray-300 hover:bg-blue-300 rounded-none"
                                              onMouseEnter={(e) => {
                                                 const cells =
                                                    e.currentTarget.parentElement
@@ -133,7 +137,7 @@ export default function TableDropdownButton({ editor }) {
                                                    tableHtml
                                                 );
                                              }}
-                                          ></div>
+                                          />
                                        )
                                     )}
                                  </div>

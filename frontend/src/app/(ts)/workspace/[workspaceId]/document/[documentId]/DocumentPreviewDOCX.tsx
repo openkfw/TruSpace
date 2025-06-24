@@ -1,6 +1,8 @@
-import { loadDocumentBlob } from "@/lib/services";
-import * as docxPreview from "docx-preview";
 import { useEffect, useState } from "react";
+
+import * as docxPreview from "docx-preview";
+
+import { loadDocumentBlob } from "@/lib/services";
 
 export default function DocumentPreviewDOCX({ cid }) {
    const [docx, setDocx] = useState<Blob>();
@@ -29,7 +31,7 @@ export default function DocumentPreviewDOCX({ cid }) {
 
    return (
       <div className="h-[90vh] overflow-auto">
-         <div id="docx-preview"></div>
+         <div id="docx-preview" />
       </div>
    );
 }

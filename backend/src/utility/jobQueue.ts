@@ -74,18 +74,18 @@ class JobQueue {
     templateId,
     cid,
     prompts,
-    fileId,
+    identifier,
   }: {
     templateId: "tags" | "perspectives" | "language";
     cid: string;
     prompts: Prompt[];
-    fileId: string;
+    identifier?: string;
   }) {
-    const requestId = this.#generateRequestId(cid, templateId);
+    const requestId = this.#generateRequestId(cid, templateId, identifier);
     this.addJobFromTemplate({
       requestId,
       templateId,
-      attributes: { cid, prompts, requestId, fileId },
+      attributes: { cid, prompts, requestId },
     });
     return requestId;
   }
@@ -150,21 +150,25 @@ class JobQueue {
     return jobObject.id;
   }
 
+  async #getJobStatusFromDatabase(jobId: string) {
+    const jobStatus = await findJobStatusDb(jobId);
+    const queue = await getJobStatusPendingDb(jobId);
+
+    if (!jobStatus) {
+      return undefined;
+    }
+    return {
+      status: jobStatus.status,
+      timestamp: jobStatus.created_at,
+      jobsBefore: jobStatus.status === "pending" ? queue?.length || -1 : -1,
+      result: null,
+      error: jobStatus.error,
+    };
+  }
+
   async getJobStatus(jobId: string): Promise<JobStatusResponse | undefined> {
     if (this.#useDatabase) {
-      const jobStatus = await findJobStatusDb(jobId);
-      const queue = await getJobStatusPendingDb(jobId);
-
-      if (!jobStatus) {
-        return undefined;
-      }
-      return {
-        status: jobStatus.status,
-        timestamp: jobStatus.created_at,
-        jobsBefore: jobStatus.status === "pending" ? queue?.length || -1 : -1,
-        result: null,
-        error: jobStatus.error,
-      };
+      return this.#getJobStatusFromDatabase(jobId);
     }
 
     const foundJob = this.#queue.find((job) => job.id === jobId);
@@ -219,8 +223,12 @@ class JobQueue {
 
   #generateRequestId = (
     cid: string,
-    type: "perspectives" | "tags" | "language"
+    type: "perspectives" | "tags" | "language",
+    suffix: string | undefined
   ): string => {
+    if (suffix) {
+      return `req_${type}_${cid}_${suffix}`;
+    }
     return `req_${type}_${cid}`;
   };
 }

@@ -8,7 +8,9 @@ import {
    TableCellsMerge,
    TableCellsSplit
 } from "lucide-react";
+
 import { Button } from "../ui/button";
+
 import AddColumnAfter from "./icons/AddColumnAfter";
 import AddColumnBefore from "./icons/AddColumnBefore";
 import AddRowAfter from "./icons/AddRowAfter";
@@ -27,7 +29,7 @@ export default function TableBubbleMenu({ editor }) {
          editor={editor}
          tippyOptions={{ duration: 100 }}
          pluginKey={"tableMenu"}
-         shouldShow={({ editor, view, state, oldState, from, to, trigger }) => {
+         shouldShow={({ editor, trigger }) => {
             // only show the bubble menu for tables
             return (
                (editor.can().chain().focus().mergeCells().run() ||

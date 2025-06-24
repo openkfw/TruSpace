@@ -1,5 +1,8 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+
 import {
    Bell,
    BrainCircuit,
@@ -24,22 +27,11 @@ import {
    SidebarMenuItem,
    useSidebar
 } from "@/components/ui/sidebar";
-import Cookies from "js-cookie";
-import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
-import { logout } from "@/lib/services";
+import { useUser } from "@/contexts/UserContext";
 
-export function NavUser({
-   user
-}: {
-   user: {
-      name: string;
-      email: string;
-      initials?: string;
-      avatar?: string;
-   };
-}) {
+export function NavUser() {
    const { isMobile } = useSidebar();
+   const { user, logout } = useUser();
    const translations = useTranslations("navbar");
    const router = useRouter();
 
@@ -73,7 +65,10 @@ export function NavUser({
                   align="end"
                   sideOffset={4}
                >
-                  <DropdownMenuLabel className="p-0 font-normal" data-test-id="sidebar-user-menu-label">
+                  <DropdownMenuLabel
+                     className="p-0 font-normal"
+                     data-test-id="sidebar-user-menu-label"
+                  >
                      <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                         <Avatar className="h-8 w-8 rounded-lg">
                            <AvatarImage src={user.avatar} alt={user.name} />
@@ -93,7 +88,9 @@ export function NavUser({
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuGroup>
-                     <DropdownMenuItem>
+                     <DropdownMenuItem
+                        onClick={() => router.push("/userSettings")}
+                     >
                         <UserRoundCog />
                         {translations("userSettings")}
                      </DropdownMenuItem>
@@ -108,15 +105,7 @@ export function NavUser({
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
-                     onClick={async () => {
-                        try {
-                           await logout();
-                           Cookies.remove("login");
-                           router.push("/login");
-                        } catch (error) {
-                           console.error("Failed to log out:", error);
-                        }
-                     }}
+                     onClick={async () => logout()}
                      data-test-id="logout-button"
                   >
                      <LogOut />
