@@ -3,7 +3,6 @@
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 
-import Cookies from "js-cookie";
 import {
    Bell,
    BrainCircuit,
@@ -28,19 +27,11 @@ import {
    SidebarMenuItem,
    useSidebar
 } from "@/components/ui/sidebar";
-import { logout } from "@/lib/services";
+import { useUser } from "@/contexts/UserContext";
 
-export function NavUser({
-   user
-}: {
-   user: {
-      name: string;
-      email: string;
-      initials?: string;
-      avatar?: string;
-   };
-}) {
+export function NavUser() {
    const { isMobile } = useSidebar();
+   const { user, logout } = useUser();
    const translations = useTranslations("navbar");
    const router = useRouter();
 
@@ -97,7 +88,9 @@ export function NavUser({
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuGroup>
-                     <DropdownMenuItem>
+                     <DropdownMenuItem
+                        onClick={() => router.push("/userSettings")}
+                     >
                         <UserRoundCog />
                         {translations("userSettings")}
                      </DropdownMenuItem>
@@ -112,15 +105,7 @@ export function NavUser({
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
-                     onClick={async () => {
-                        try {
-                           await logout();
-                           Cookies.remove("login");
-                           router.push("/login");
-                        } catch (error) {
-                           console.error("Failed to log out:", error);
-                        }
-                     }}
+                     onClick={async () => logout()}
                      data-test-id="logout-button"
                   >
                      <LogOut />

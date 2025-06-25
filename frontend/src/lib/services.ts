@@ -1,7 +1,7 @@
 import useSWR from "swr";
 
 import config from "@/config";
-import { User, Workspace } from "@/interfaces";
+import { Workspace } from "@/interfaces";
 
 const fetcher = (url) =>
    fetch(url, {
@@ -22,7 +22,7 @@ const PERSPECTIVES_ENDPOINT = `${API_URL}/perspectives`;
 export const CHATS_ENDPOINT = `${API_URL}/chats`;
 const TAGS_ENDPOINT = `${API_URL}/tags`;
 const WORKSPACES_ENDPOINT = `${API_URL}/workspaces`;
-const USERS_ENDPOINT = `${API_URL}/users`;
+export const USERS_ENDPOINT = `${API_URL}/users`;
 const HEALTH_ENDPOINT = `${API_URL}/health`;
 const PERMISSIONS_ENDPOINT = `${API_URL}/permissions`;
 const LANGUAGE_ENDPOINT = `${API_URL}/language`;
@@ -418,7 +418,7 @@ export function useTagsStatus(cid: string) {
    return { status: data, error, refresh: mutate };
 }
 
-export const registerUser = async (data: User) => {
+export const registerUser = async (data: Record<string, string>) => {
    const url = `${USERS_ENDPOINT}/register`;
    const options: RequestInit = {
       method: "POST",
@@ -429,7 +429,9 @@ export const registerUser = async (data: User) => {
          name: data.name,
          email: data.email,
          password: data.password,
-         confirmPassword: data.confirmPassword
+         confirmPassword: data.confirmPassword,
+         lang: data.lang,
+         confirmationLink: data.confirmationLink
       }),
       credentials: "include"
    };
@@ -441,7 +443,7 @@ export const registerUser = async (data: User) => {
    return result;
 };
 
-export const loginUser = async (data: User) => {
+export const loginUser = async (data: Record<string, string>) => {
    const url = `${USERS_ENDPOINT}/login`;
    const options: RequestInit = {
       method: "POST",
@@ -582,4 +584,46 @@ export const logout = async (): Promise<{
       console.error("Error during logout:", error);
       throw error;
    }
+};
+
+export const confirmRegistration = async (
+   token: string
+): Promise<{
+   status: string;
+   message: string;
+}> => {
+   try {
+      const response = await fetch(
+         `${USERS_ENDPOINT}/confirm-registration?token=${token}`,
+         {
+            method: "GET"
+         }
+      );
+
+      if (!response.ok) {
+         throw new Error("Failed to confirm registration");
+      }
+
+      return await response.json();
+   } catch (error) {
+      console.error("Error during registration confirmation:", error);
+      throw error;
+   }
+};
+
+export const uploadAvatar = async (formData: FormData) => {
+   const res = await fetch(`${USERS_ENDPOINT}/avatar`, {
+      method: "POST",
+      credentials: "include",
+      body: formData
+   });
+   return res.json();
+};
+
+export const downloadAvatar = async () => {
+   const res = await fetch(`${USERS_ENDPOINT}/avatar`, {
+      method: "GET",
+      credentials: "include"
+   });
+   return res;
 };

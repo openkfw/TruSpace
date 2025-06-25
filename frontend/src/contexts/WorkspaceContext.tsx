@@ -110,7 +110,6 @@ export const WorkspaceProvider = ({ children }: { children: ReactNode }) => {
                if (pollInterval) {
                   clearInterval(pollInterval);
                   setWorkspacesLoading(false);
-                  console.log(`Workspace "${workspaceName}" not found.`);
                }
             }, 30000);
 

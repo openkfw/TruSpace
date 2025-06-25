@@ -1,5 +1,6 @@
 import db from "../../config/database";
 import logger from "../../config/winston";
+import { USER_STATUS } from "../../utility/constants";
 
 interface UserDb {
   id: number;
@@ -7,6 +8,8 @@ interface UserDb {
   email: string;
   status: string;
   password_hash: string;
+  user_token: string;
+  avatar_cid?: string;
   created_at?: Date;
   updated_at?: Date;
 }
@@ -15,7 +18,8 @@ export const createUserDb = async (
   name: string,
   email: string,
   hash: string,
-  status: string = "active"
+  status: string,
+  token: string
 ) => {
   try {
     const userId = await db<UserDb>("users")
@@ -24,6 +28,7 @@ export const createUserDb = async (
         email: email,
         password_hash: hash,
         status: status,
+        user_token: token,
       })
       .returning<number>("id");
     return userId;
@@ -47,6 +52,7 @@ export const findUserByEmailDb = async (email: string) => {
         "email",
         "status",
         "password_hash",
+        "avatar_cid",
         "created_at"
       )
       .where({ email })
@@ -54,6 +60,19 @@ export const findUserByEmailDb = async (email: string) => {
     return user;
   } catch (error) {
     logger.error(`Error finding user ${email}:`, error);
+    return undefined;
+  }
+};
+
+export const findUserByTokenDb = async (token: string) => {
+  try {
+    const user = await db<UserDb>("users")
+      .select("id")
+      .where({ user_token: token })
+      .first();
+    return user;
+  } catch (error) {
+    logger.error("Error finding user:", error);
     return undefined;
   }
 };
@@ -77,5 +96,24 @@ export const getTotalRecentlyAddedUsersDb = async (): Promise<number> => {
   } catch (error) {
     logger.error("Error fetching total users:", error);
     throw new Error("Failed to fetch total users");
+  }
+};
+
+export const activateUserDb = async (userId: number): Promise<void> => {
+  try {
+    await db("users").where({ id: userId }).update({ status: USER_STATUS.active });
+  } catch (error) {
+    logger.error("Error activating user:", error);
+  }
+};
+
+export const storeAvatarCidDb = async (email: string, cid: string) => {
+  try {
+    await db<UserDb>("users")
+      .update({ avatar_cid: cid })
+      .where({ email: email });
+  } catch (error) {
+    logger.error("Error updating user", error);
+    throw new Error("Error updating user");
   }
 };

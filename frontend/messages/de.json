@@ -17,9 +17,12 @@
       "dashboard": "Dashboard",
       "noDocuments": "Keine Dokumente",
       "noDocumentDescription": "Neues Dokument hinzufügen, indem Sie auf die Schaltfläche Dokument erstellen oder Dokument hochladen klicken",
-      "share": "Aktie",
+      "share": "Teilen",
       "document": "Dokument",
-      "workspace": "Arbeitsbereich"
+      "workspace": "Arbeitsbereich",
+      "userSettings": "Nutzer-Einstellungen",
+      "uploadAvatar": "Klicken Sie auf den Avatar, um ein neues Bild hochzuladen",
+      "saveSettings": "Einstellungen speichern"
    },
    "theme": {
       "light": "Hell",
@@ -39,6 +42,14 @@
       "title": "Login",
       "invalidCredentials": "Die eingegebene E-Mail oder das Passwort ist falsch",
       "activationRequired": "Benutzerkonto erfordert Aktivierung"
+   },
+   "confirmRegistration": {
+      "confirmButton": "Kontoregistrierung bestätigen",
+      "continueToLogin": "Weiter zur Anmeldung",
+      "title": "Schließen Sie Ihre Registrierung ab",
+      "text": "Klicken Sie bitte auf die Schaltfläche unten, um Ihre Registrierung abzuschließen",
+      "confirmError": "Fehler bei der Kontobestätigung: Token ist ungültig",
+      "confirmSuccess": "Erfolg! Die Kontoregistrierung ist abgeschlossen. Sie können zur Anmeldeseite gehen."
    },
    "register": {
       "title": "Registrieren",
@@ -69,7 +80,12 @@
       "passwordDescription": "Ihr Passwort muss die folgenden Anforderungen erfüllen:",
       "registerSuccess": "Registrierung erfolgreich",
       "registerError": "Bei der Registrierung ist ein Fehler aufgetreten",
-      "backToLogin": "Zurück zur Anmeldung"
+      "backToLogin": "Zurück zur Anmeldung",
+      "emailSent": "Die E-Mail zur Registrierungsbestätigung wurde gesendet"
+   },
+   "settings": {
+      "updateSuccess": "Benutzereinstellungen aktualisiert",
+      "updateError": "Beim Aktualisieren der Benutzereinstellungen ist ein Fehler aufgetreten"
    },
    "homePage": {
       "documentName": "Name",
@@ -116,7 +132,7 @@
    "documentPreview": {
       "preview": "Vorschau",
       "noPreview": "Keine Vorschau verfügbar",
-      "unsupportedFormat": "Dieses Dateiformat wird für die Vorschau nicht unterstützt.",
+      "unsupportedFormat": "Dieses Dateiformat wird für die Vorschau nicht unterstützt",
       "page": "Seite",
       "of": "von"
    },
@@ -138,7 +154,7 @@
       "documentLanguages": "Dokumentsprachen:",
       "generatingAILanguageQueue": "In Warteschlange für Sprachanalyse...",
       "generatingAILanguage": "Sprachanalyse...",
-      "languageGenerationError": "Beim Generieren der Sprache ist ein Fehler aufgetreten"
+      "languageGenerationError": "Bei der Bestimmung der Sprache ist ein Fehler aufgetreten"
    },
    "documentVersion": {
       "version": "Version",
@@ -153,7 +169,7 @@
       "download": "Herunterladen",
       "failedToFetch": "Dokument konnte nicht abgerufen werden",
       "invalidResponse": "Ungültige Antwort",
-      "language": "Versionssprache",
+      "language": "Sprache",
       "versionTagName": "Name des Versionstags"
    },
    "navbar": {
@@ -276,7 +292,7 @@
       "generatingAITagsQueue2": "Aufträge verarbeitet werden. Dies kann mehrere Minuten dauern."
    },
    "document": {
-      "blankPdfError": "PDFs ohne eingebetteten Text sind nicht erlaubt",
+      "blankPdfError": "PDFs ohne eingebetteten Text sind nicht möglich",
       "documentUploaded": "Dokument erfolgreich hochgeladen",
       "documentUploadeNoAI": "Dokument erfolgreich hochgeladen, KI-Verarbeitung wegen fehlendem Textinhalt übersprungen",
       "documentUploadError": "Beim Hochladen des Dokuments ist ein Fehler aufgetreten",
@@ -374,7 +390,7 @@
       "undo": "Rückgängig"
    },
    "tour": {
-      "workspaceMenuDescription": "👋 Willkommen! Dies ist das Arbeitsbereich-Menü. Hier findest du alle Aktionen, die du zur Verwaltung deines Arbeitsbereichs benötigst.",
+      "workspaceMenuDescription": "👋 Willkommen! Dies ist das Arbeitsbereich-Menü. Hier finden Sie alle Aktionen, die Sie zur Verwaltung deines Arbeitsbereichs benötigen.",
       "confirmButton": "Verstanden"
    }
 }

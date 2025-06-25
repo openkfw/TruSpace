@@ -1,4 +1,3 @@
-import AuthGuard from "@/components/AuthGuard";
 import DocumentList from "@/components/DocumentList";
 import WorkspaceMenu from "@/components/WorkspaceMenu";
 import WorkspaceTitle from "@/components/WorkspaceTitle";
@@ -11,19 +10,17 @@ export default async function WorkspacePage({
 }) {
    const workspaceId = (await params).workspaceId;
    return (
-      <AuthGuard>
-         <div>
-            <div className="flex flex-row justify-between items-start mt-2">
-               <WorkspaceTitle />
-               <div className="space-x-2">
-                  <div id="workspace-menu-tour-target">
-                     <WorkspaceMenu />
-                  </div>
-                  <WorkspaceTour />
+      <div>
+         <div className="flex flex-row justify-between items-start mt-2">
+            <WorkspaceTitle />
+            <div className="space-x-2">
+               <div id="workspace-menu-tour-target">
+                  <WorkspaceMenu />
                </div>
+               <WorkspaceTour />
             </div>
-            <DocumentList workspaceId={workspaceId} />
          </div>
-      </AuthGuard>
+         <DocumentList workspaceId={workspaceId} />
+      </div>
    );
 }
