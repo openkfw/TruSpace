@@ -38,6 +38,7 @@ interface Config {
     host: string;
     port: number;
     secure: boolean;
+    tls:boolean;
     user: string;
     password: string;
   };
@@ -98,6 +99,7 @@ export const config: Config = {
     host: envVars.SMTP_HOST,
     port: envVars.SMTP_PORT,
     secure: envVars.SMTP_SSL,
+    tls:envVars.SMTP_TLS,
     user: envVars.SMTP_USER,
     password: envVars.SMTP_PASSWORD,
   },

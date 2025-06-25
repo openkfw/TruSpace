@@ -27,6 +27,7 @@ import { IpfsClient } from "../clients/ipfs-client";
 import { UploadedFile } from "express-fileupload";
 
 const router = express.Router();
+logger.info("Registering user");
 
 router.post(
   "/register",
@@ -57,6 +58,7 @@ router.post(
       if (!result) {
         throw Error("Unknown error");
       }
+      logger.info("Register user as inactive");
       if (registerUsersAsInactive) {
         const filePath = path.join(
           process.cwd(),
@@ -74,12 +76,13 @@ router.post(
           footer: registrationConfirmation[lang].footer,
         };
         const htmlTemplateToSend = template(replacements);
-
+        logger.info("Sending email done");
         await sendEmail(
           email,
           registrationConfirmation[lang].subject,
           htmlTemplateToSend
         );
+        logger.info("Sending email done");
         res.json({
           status: "success",
           message: "email sent",

@@ -62,6 +62,7 @@ export const envVarsSchema = Joi.object({
   SMTP_HOST: Joi.string().allow("").empty("").default("host.docker.internal"),
   SMTP_PORT: Joi.number().optional().allow("").empty(""),
   SMTP_SSL: Joi.boolean().optional().allow("").empty("").default(false),
+    SMTP_TLS: Joi.boolean().optional().allow("").empty("").default(false),
   SMTP_USER: Joi.string().allow("").empty("").default(""),
   SMTP_PASSWORD: Joi.string().allow("").empty("").default(""),
   EMAIL_SENDER: Joi.string().allow("").empty("").default(""),

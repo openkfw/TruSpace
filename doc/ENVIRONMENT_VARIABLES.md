@@ -31,6 +31,7 @@ This document provides a detailed overview of the environment variables used to 
 | `SMTP_PASSWORD`                        | SMTP server password                                                                                               |                       | false    |
 | `SMTP_PORT`                            | SMTP server port                                                                                                   |                       | false    |
 | `SMTP_SSL`                             | SMTP server secure access                                                                                          |                       | false    |
+| `SMTP_TLS`                             | SMTP server start insecure, upgrade to TLS (typically on port 587, set `SMTP_SSL` to false then in this setup)     |                       | false    |
 | `EMAIL_SENDER`                         | email address that appears as a sender in notification emails                                                      |                       | false    |
 | `NODE_ENV`                             | Specifies the environment (`development`, `production`) in which the application is running.                       | production            | true     |
 
@@ -43,7 +44,7 @@ This document provides a detailed overview of the environment variables used to 
 | Variable                                   | Description                                                                       | Default Value                                                    | Required |
 | ------------------------------------------ | --------------------------------------------------------------------------------- | ---------------------------------------------------------------- | -------- |
 | `START_PRIVATE_NETWORK`                    | Option to allow or disable connection to public IPFS nodes                        | true                                                             | true     |
-| `SWARM_KEY_SECRET`                         | If `START_PRIVATE_NETWORK` is "true" then swarm key secret is required.           |  | false    |
+| `SWARM_KEY_SECRET`                         | If `START_PRIVATE_NETWORK` is "true" then swarm key secret is required.           |                                                                  | false    |
 | `IPFS_CLUSTER_HOST`                        | Address of the IPFS Cluster REST API.                                             | [http://cluster0:9094](http://cluster0:9094)                     | true     |
 | `IPFS_PINSVC_HOST`                         | Address of the IPFS pinning service API.                                          | [http://cluster0:9097](http://cluster0:9097)                     | true     |
 | `IPFS_GATEWAY_HOST`                        | Address of the IPFS gateway (used to fetch content).                              | [http://ipfs0:8080](http://ipfs0:8080)                           | true     |
