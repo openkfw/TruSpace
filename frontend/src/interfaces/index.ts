@@ -125,10 +125,3 @@ interface PdfPage {
 interface PdfTextContent {
    items: Array<unknown>;
 }
-
-export interface User {
-   name: string;
-   email: string;
-   password: string;
-   confirmPassword: string;
-}

@@ -1,5 +1,6 @@
 import db from "../../config/database";
 import logger from "../../config/winston";
+import { USER_PERMISSION_STATUS } from "../../utility/constants";
 
 interface UserPermissionDb {
   id: number;
@@ -52,7 +53,7 @@ export const findUsersInWorkspaceDb = async (workspaceId: string) => {
     const users = await db("user_permissions")
       .leftJoin("users", "user_permissions.user_email", "=", "users.email")
       .where("user_permissions.workspace_id", "=", workspaceId)
-      .andWhere("user_permissions.status", "=", "active")
+      .andWhere("user_permissions.status", "=", USER_PERMISSION_STATUS.active)
       .select(
         "user_permissions.id",
         "user_permissions.user_email as email",

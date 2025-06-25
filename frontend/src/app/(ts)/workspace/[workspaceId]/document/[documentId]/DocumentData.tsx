@@ -1,12 +1,8 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-toastify";
-
 import { useTranslations } from "next-intl";
-
 import { FileLock2, Link, Loader2, UserCircle } from "lucide-react";
-
-import { formatDate } from "@/app/helper/formatDate";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +12,7 @@ import {
    TooltipProvider,
    TooltipTrigger
 } from "@/components/ui/tooltip";
+import { formatDate } from "@/lib/formatDate";
 import { useLanguage, useLanguageStatus } from "@/lib/services";
 
 export default function DocumentData({

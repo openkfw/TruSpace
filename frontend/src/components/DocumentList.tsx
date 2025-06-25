@@ -22,7 +22,6 @@ import {
 } from "lucide-react";
 
 import EmptyWorkspace from "@/app/(ts)/workspace/EmptyWorkspace";
-import { formatDate, formatDateDays } from "@/app/helper/formatDate";
 import SearchBar from "@/components/SearchBar";
 import { Button } from "@/components/ui/button";
 import {
@@ -41,6 +40,7 @@ import {
 } from "@/components/ui/table";
 import { useDocuments } from "@/contexts/DocumentsContext";
 import { useDebounce } from "@/hooks/useDebounce";
+import { formatDate, formatDateDays } from "@/lib/formatDate";
 import { deleteDocument, DOCUMENTS_ENDPOINT } from "@/lib/services";
 
 import { Badge } from "./ui/badge";

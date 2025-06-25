@@ -5,6 +5,7 @@ import { config } from "../config/config";
 import logger from "../config/winston";
 import { AuthenticatedRequest } from "../types";
 import { JwtPayload } from "../types/interfaces";
+import { USER_STATUS } from "../utility/constants";
 
 export async function authenticateCookie(
   req: AuthenticatedRequest,
@@ -27,7 +28,7 @@ export async function authenticateCookie(
 
     if (config.env === "production") {
       const user = await findUserByEmailDb(req.user.email);
-      if (!user || user.status !== "active") {
+      if (!user || user.status !== USER_STATUS.active) {
         return res.status(401).json({
           status: "failure",
           message: "Account inactive",
