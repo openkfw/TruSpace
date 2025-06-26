@@ -127,4 +127,22 @@ router.delete("/:wCID/:wUID", async (req: Request, res: Response) => {
   }
 });
 
+/* PUT /api/workspaces/:wUID */
+router.put("/:wUID", async (req: Request, res: Response) => {
+  const wUID = req.params.wUID;
+  const client = new IpfsClient();
+
+  try {
+    await client.updateWorkspace(wUID, req.body);
+    res.status(200).send({ message: "Workspace updated successfully" });
+  } catch (error: any) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
+      res.status(404).send({ message: "Workspace not found" });
+    } else {
+      console.error("Error updating workspace:", error);
+      res.status(500).send({ message: "Internal Server Error" });
+    }
+  }
+});
+
 export default router;

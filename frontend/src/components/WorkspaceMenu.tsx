@@ -17,6 +17,7 @@ import { useWorkspaceContext } from "@/contexts/WorkspaceContext";
 
 import { Separator } from "./ui/separator";
 import DeleteWorkspaceDialog from "./DeleteWorkspaceDialog";
+import WorkspaceTypeDialog from "./WorkspaceTypeDialog";
 
 function WorkspaceMenu() {
    const translations = useTranslations("navbar");
@@ -29,6 +30,8 @@ function WorkspaceMenu() {
    const [isDialogOpen, setIsDialogOpen] = useState(false);
    const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+   const [isWorkspaceTypeDialogOpen, setIsWorkspaceTypeDialogOpen] =
+      useState(false);
 
    return (
       <>
@@ -63,6 +66,20 @@ function WorkspaceMenu() {
                >
                   <MenubarItem
                      className="hover:bg-blue-500 hover:dark:bg-blue-800 focus:bg-blue-500 focus:dark:bg-blue-800 data-[state=open]:bg-blue-500 data-[state=open]:dark:bg-blue-800 hover:text-white focus:text-white data-[state=open]:text-white"
+                     onClick={() => {
+                        setwCID(workspace.cid);
+                        setwUID(workspace.uuid);
+                        setIsWorkspaceTypeDialogOpen(true);
+                     }}
+                  >
+                     <span>
+                        {workspace?.meta?.is_public
+                           ? translations("switchToPrivate")
+                           : translations("switchToPublic")}
+                     </span>
+                  </MenubarItem>
+                  <MenubarItem
+                     className="hover:bg-blue-500 hover:dark:bg-blue-800 focus:bg-blue-500 focus:dark:bg-blue-800 data-[state=open]:bg-blue-500 data-[state=open]:dark:bg-blue-800 hover:text-white focus:text-white data-[state=open]:text-white"
                      onClick={() =>
                         router.push(`/workspace/${workspace.uuid}/share`)
                      }
@@ -91,6 +108,11 @@ function WorkspaceMenu() {
             open={isDeleteDialogOpen}
             setOpen={setIsDeleteDialogOpen}
             wCID={wCID}
+            wUID={wUID}
+         />
+         <WorkspaceTypeDialog
+            open={isWorkspaceTypeDialogOpen}
+            setOpen={setIsWorkspaceTypeDialogOpen}
             wUID={wUID}
          />
       </>

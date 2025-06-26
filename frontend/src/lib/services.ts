@@ -127,6 +127,28 @@ export const createWorkspace = async (formData, errorText) => {
    return res;
 };
 
+export const updateWorkspace = async (
+   wUID: string,
+   formData,
+   errorText: string
+) => {
+   const options: RequestInit = {
+      method: "PUT",
+      body: JSON.stringify(formData),
+      headers: {
+         "Content-Type": "application/json"
+      },
+      credentials: "include"
+   };
+   const res = await fetch(`${WORKSPACES_ENDPOINT}/${wUID}`, options);
+   if (res.status === 409) {
+      return res;
+   } else if (!res.ok) {
+      throw new Error(errorText);
+   }
+   return res;
+};
+
 export const loadWorkspaceContributors = async (
    wId
 ): Promise<{
