@@ -127,9 +127,9 @@ export const createWorkspace = async (formData, errorText) => {
    return res;
 };
 
-export const updateWorkspace = async (
+export const updateWorkspaceType = async (
    wUID: string,
-   formData,
+   formData: { isPublic: boolean },
    errorText: string
 ) => {
    const options: RequestInit = {

@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 
-import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 
 import { Loader2 } from "lucide-react";
@@ -17,7 +16,7 @@ import {
    DialogTitle
 } from "@/components/ui/dialog";
 import { useWorkspaceContext } from "@/contexts/WorkspaceContext";
-import { updateWorkspace } from "@/lib/services";
+import { updateWorkspaceType } from "@/lib/services";
 
 import { Button } from "./ui/button";
 
@@ -33,7 +32,6 @@ export default function WorkspaceTypeDialog({
    wUID
 }: WorkspaceTypeDialogProps) {
    const translations = useTranslations("navbar");
-   const router = useRouter();
    const { refresh, workspace } = useWorkspaceContext();
 
    const [isUpdating, setIsUpdating] = useState(false);
@@ -41,18 +39,18 @@ export default function WorkspaceTypeDialog({
    const handleConfirmUpdate = async () => {
       if (!wUID) return;
       setIsUpdating(true);
-      const formData = {
+      const formData: { isPublic: boolean } = {
          isPublic: !workspace?.meta?.is_public
       };
 
       try {
-         await updateWorkspace(wUID, formData, "Update failed.");
+         await updateWorkspaceType(wUID, formData, "Update failed.");
          toast.success(
             translations("workspaceTypeDialog.workspaceTypeUpdated")
          );
          refresh("");
       } catch (err) {
-         console.error("Error updating workspace:", err);
+         console.error("Error updating workspace type:", err);
          toast.error(
             translations("workspaceTypeDialog.workspaceTypeUpdateError")
          );

@@ -418,9 +418,9 @@ export class IpfsClient implements IClient {
     return result;
   }
 
-  async updateWorkspace(
+  async updateWorkspaceType(
     workspaceId: string,
-    updates: Partial<WorkspaceRequest>
+    updates: { isPublic: boolean }
   ): Promise<WorkspaceRequest> {
     const workspace = await this.getWorkspaceById(workspaceId);
 
@@ -429,7 +429,7 @@ export class IpfsClient implements IClient {
       ...workspace,
       meta: {
         ...workspace[0].meta,
-        ...updates.meta,
+        is_public: updates.isPublic,
         type: "workspace",
       },
     };

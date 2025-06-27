@@ -133,7 +133,7 @@ router.put("/:wUID", async (req: Request, res: Response) => {
   const client = new IpfsClient();
 
   try {
-    await client.updateWorkspace(wUID, req.body);
+    await client.updateWorkspaceType(wUID, req.body);
     res.status(200).send({ message: "Workspace updated successfully" });
   } catch (error: any) {
     if (axios.isAxiosError(error) && error.response?.status === 404) {
