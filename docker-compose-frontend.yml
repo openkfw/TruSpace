@@ -15,4 +15,3 @@ services:
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
     ports:
       - ${FRONTEND_PORT}:${FRONTEND_PORT}
-    entrypoint: sh startup.sh
