@@ -110,6 +110,10 @@ For a complete reference and description of all variables, see
 
 An extensive user guide with screenshots is available in the folder [User Guide](./doc/User%20Guide/)
 
+### 🛠️ Admin Guide
+
+An extensive admin guide with screenshots is available in the folder [Admin Guide](./doc/Admin%20Guide/)
+
 ### Tech Architecture overview
 
 In the overview, you can see how the components work together. The UI and API is part of this repository and provides the interface and the translation to other services. Once you start TruSpace, it pulls and connects to containers from Open Web UI (for AI processing) and IPFS/IPFS-Cluster to persist the data. The respective ports are outlined in the image.
@@ -179,5 +183,6 @@ This project is licensed under the **GNU General Public License v3.0**. See the 
 ## 💬 Community & Support
 
 - User guide: [User Guide](./doc/User%20Guide/README.md)
+- Admin guide: [Admin Guide](./doc/Admin%20Guide/README.md)
 - Discussions: [GitHub Discussions](https://github.com/openkfw/TruSpace/discussions)
 - Report issues: [GitHub Issues](https://github.com/openkfw/TruSpace/issues)
