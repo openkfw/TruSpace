@@ -204,7 +204,7 @@ fi
 
 # Condition for public networks
 if [ "$START_PRIVATE_NETWORK" = "false" ]; then
-    echo "
+ echo "
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣄⣠⣀⡀⣀⣠⣤⣤⣤⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣄⢠⣠⣼⣿⣿⣿⣟⣿⣿⣿⣿⣿⣿⣿⣿⡿⠋⠀⠀⠀⢠⣤⣦⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠰⢦⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⣼⣿⣟⣾⣿⣽⣿⣿⣅⠈⠉⠻⣿⣿⣿⣿⣿⡿⠇⠀⠀⠀⠀⠀⠉⠀⠀⠀⠀⠀⢀⡶⠒⢉⡀⢠⣤⣶⣶⣿⣷⣆⣀⡀⠀⢲⣖⠒⠀⠀⠀⠀⠀⠀⠀
@@ -224,8 +224,8 @@ if [ "$START_PRIVATE_NETWORK" = "false" ]; then
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⠃⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠁⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠒⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 "
-    echo "Starting TruSpace in public network mode..."
-    echo "If you want to start a private network, please set START_PRIVATE_NETWORK=true in the .env file."
+echo "Starting TruSpace in public network mode..."
+echo "If you want to start a private network, please set START_PRIVATE_NETWORK=true in the .env file."
 
     if [ -f ./volumes/ipfs0/swarm.key ]; then
         echo "Removing swarm.key file..."
@@ -235,6 +235,20 @@ if [ "$START_PRIVATE_NETWORK" = "false" ]; then
         stop_application
         start_application
     fi
+else
+    echo "Starting TruSpace in private network mode..."
+    echo "Removing bootstrap nodes for private network..."
+
+    # Wait for IPFS API to be ready
+    echo "Waiting for IPFS API to be available..."
+    until curl -s http://localhost:5001/api/v0/id > /dev/null 2>&1; do
+    echo "Waiting for IPFS API..."
+    sleep 2
+    done
+
+    # Remove all bootstrap nodes
+    echo "Removing bootstrap nodes..."
+    curl -X POST "http://localhost:5001/api/v0/bootstrap/rm/all"
 fi
 
 echo "🎉 Done! TruSpace production instance started!"

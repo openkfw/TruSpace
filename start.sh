@@ -106,6 +106,13 @@ else
     docker compose -f docker-compose.yml $FRONTEND_DOCKER_COMPOSE_FILE -f docker-compose-ai.yml --env-file $SCRIPT_DIR/.env up -d
 fi
 
+# Wait until ipfs is ready and then delete bootstrap nodes
+until curl -s http://localhost:5001/api/v0/id > /dev/null 2>&1; do
+  echo "Waiting for IPFS API..."
+  sleep 2
+done
+curl -X POST "http://localhost:5001/api/v0/bootstrap/rm/all"
+
 # if frontend is in dev mode, start it
 if [ "$FRONTEND_DEV" = "true" ]; then
     echo "INFO: Starting frontend in development mode"
