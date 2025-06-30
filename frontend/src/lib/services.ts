@@ -9,10 +9,7 @@ const fetcher = (url) =>
    }).then((res) => res.json());
 
 export const getApiUrl = (): string => {
-   if (typeof window !== "undefined" && window.RUNTIME_CONFIG) {
-      return window.RUNTIME_CONFIG.API_URL;
-   }
-   return process.env.NEXT_PUBLIC_API_URL || config.apiUrl;
+   return config.apiUrl;
 };
 
 const API_URL = getApiUrl();

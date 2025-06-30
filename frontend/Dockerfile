@@ -27,18 +27,10 @@ COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Copy the startup script
-COPY startup.sh ./
-RUN chmod +x ./startup.sh
-
-# Create a writable directory for runtime config
-RUN mkdir -p /app/public/runtime
-RUN chown -R nextjs:nodejs /app/public/runtime
-
 USER nextjs
 EXPOSE 3000
 ENV PORT=3000
 # server.js is created by next build from the standalone output
 # https://nextjs.org/docs/pages/api-reference/config/next-config-js/output
 ENV HOSTNAME="0.0.0.0"
-CMD ["./startup.sh"]
+CMD ["node","server.js"]
