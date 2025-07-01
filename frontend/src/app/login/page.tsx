@@ -133,6 +133,15 @@ export default function Login({}: React.ComponentPropsWithoutRef<"div">) {
                                     {String(errors.password.message)}
                                  </p>
                               )}
+                              <div className="mt-1 text-left text-sm">
+                                 <Link
+                                    href="/forgot-password"
+                                    className="underline underline-offset-4"
+                                    data-test-id="login-forgot-password-link"
+                                 >
+                                    {translations("forgotPassword")}
+                                 </Link>
+                              </div>
                            </div>
                            <Button
                               type="submit"

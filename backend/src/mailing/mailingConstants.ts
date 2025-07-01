@@ -17,3 +17,23 @@ export const registrationConfirmation: Record<
     footer: "Beste grüße,",
   },
 };
+
+export const passwordReset: Record<
+  string,
+  Record<string, string>
+> = {
+  en: {
+    subject: "TruSpace: Reset your password",
+    header: "Dear ",
+    text: "You are receiving this e-mail as you requested to reset your password. Please proceed to the website below to set new password.",
+    link: "Set new password",
+    footer: "Best regards,",
+  },
+  de: {
+    subject: "TruSpace: Setzen Sie Ihr Passwort zurück",
+    header: "Sehr geehrter ",
+    text: "Sie erhalten diese E-Mail, da Sie Ihr Passwort zurücksetzen möchten. Bitte besuchen Sie die unten stehende Website, um ein neues Passwort festzulegen.",
+    link: "Neues Passwort festlegen",
+    footer: "Beste grüße,",
+  },
+};

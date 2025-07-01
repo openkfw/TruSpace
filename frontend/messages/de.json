@@ -41,15 +41,51 @@
       "subtitle": "Geben Sie unten Ihre Daten ein, um sich anzumelden",
       "title": "Login",
       "invalidCredentials": "Die eingegebene E-Mail oder das Passwort ist falsch",
-      "activationRequired": "Benutzerkonto erfordert Aktivierung"
+      "activationRequired": "Benutzerkonto erfordert Aktivierung",
+      "forgotPassword": "Passwort vergessen?"
    },
    "confirmRegistration": {
       "confirmButton": "Kontoregistrierung bestätigen",
       "continueToLogin": "Weiter zur Anmeldung",
       "title": "Schließen Sie Ihre Registrierung ab",
       "text": "Klicken Sie bitte auf die Schaltfläche unten, um Ihre Registrierung abzuschließen",
-      "confirmError": "Fehler bei der Kontobestätigung: Token ist ungültig",
+      "confirmError": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+      "confirmErrorToken": "Fehler bei der Kontobestätigung: Token ist ungültig",
       "confirmSuccess": "Erfolg! Die Kontoregistrierung ist abgeschlossen. Sie können zur Anmeldeseite gehen."
+   },
+   "forgotPassword": {
+      "title": "Passwort vergessen?",
+      "text": "Bitte geben Sie unten Ihre E-Mail-Adresse ein, um eine E-Mail mit weiteren Anweisungen zu erhalten",
+      "label": "E-Mail",
+      "placeholder": "e.g. example@example.com",
+      "button": "E-Mail senden",
+      "backToLogin": "Zurück zur Anmeldung",
+      "emailRequired": "E-Mail ist erforderlich",
+      "emailPattern": "Geben Sie eine gültige E-Mail-Adresse ein",
+      "success": "E-Mail wurde gesendet!",
+      "error": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
+   },
+   "resetPassword": {
+      "title": "Passwort zurücksetzen",
+      "text": "Bitte geben Sie unten Ihr neues Passwort ein",
+      "password": "Passwort",
+      "confirmPassword": "Passwort bestätigen",
+      "passwordPlaceholder": "Geben Sie Ihr Passwort ein",
+      "confirmPasswordPlaceholder": "Passwort erneut eingeben",
+      "confirmPasswordError": "Passwörter stimmen nicht überein",
+      "passwordRequired": "Passwort ist erforderlich",
+      "confirmPasswordRequired": "Bitte bestätigen Sie Ihr Passwort",
+      "passwordError": "Das Passwort ist fehlerhaft",
+      "passwordMinLength": "Mindestens 12 Zeichen",
+      "passwordUppercase": "Mindestens ein Großbuchstabe",
+      "passwordNumber": "Mindestens eine Zahl",
+      "passwordPattern": "Mindestens ein Sonderzeichen",
+      "passwordDescription": "Ihr Passwort muss die folgenden Anforderungen erfüllen:",
+      "button": "Neues Passwort festlegen",
+      "backToLogin": "Zurück zur Anmeldung",
+      "success": "Ihr neues Passwort wurde erfolgreich festgelegt!",
+      "invalidToken": "Token ist nicht mehr gültig. Bitte senden Sie das Formular für vergessenes Passwort erneut.",
+      "genericError": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
    },
    "register": {
       "title": "Registrieren",

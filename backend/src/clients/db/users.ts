@@ -117,3 +117,14 @@ export const storeAvatarCidDb = async (email: string, cid: string) => {
     throw new Error("Error updating user");
   }
 };
+
+export const updateUserPassword = async (userId: number, passwordHash: string) => {
+  try {
+    await db<UserDb>("users")
+      .update({ password_hash: passwordHash })
+      .where({ id: userId });
+  } catch (error) {
+    logger.error("Error updating user", error);
+    throw new Error("Error updating user");
+  }
+}
