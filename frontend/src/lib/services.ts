@@ -1,6 +1,5 @@
 import useSWR from "swr";
 
-import config from "@/config";
 import { Workspace } from "@/interfaces";
 
 const fetcher = (url) =>
@@ -9,10 +8,7 @@ const fetcher = (url) =>
    }).then((res) => res.json());
 
 export const getApiUrl = (): string => {
-   if (typeof window !== "undefined" && window.RUNTIME_CONFIG) {
-      return window.RUNTIME_CONFIG.API_URL;
-   }
-   return process.env.NEXT_PUBLIC_API_URL || config.apiUrl;
+   return process.env.NEXT_PUBLIC_API_URL;
 };
 
 const API_URL = getApiUrl();
