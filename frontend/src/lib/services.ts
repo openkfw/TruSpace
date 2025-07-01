@@ -612,18 +612,42 @@ export const confirmRegistration = async (
 };
 
 export const uploadAvatar = async (formData: FormData) => {
-   const res = await fetch(`${USERS_ENDPOINT}/avatar`, {
-      method: "POST",
-      credentials: "include",
-      body: formData
-   });
-   return res.json();
+   try {
+      const res = await fetch(`${USERS_ENDPOINT}/avatar`, {
+         method: "POST",
+         credentials: "include",
+         body: formData
+      });
+
+      if (!res.ok) {
+         throw new Error("Failed to upload avatar");
+      }
+      return res.json();
+   } catch (error) {
+      console.error("Error uploading avatar:", error);
+      throw error;
+   }
 };
 
 export const downloadAvatar = async () => {
-   const res = await fetch(`${USERS_ENDPOINT}/avatar`, {
-      method: "GET",
-      credentials: "include"
-   });
-   return res;
+   try {
+      const res = await fetch(`${USERS_ENDPOINT}/avatar`, {
+         method: "GET",
+         credentials: "include"
+      });
+
+      if (res.status === 404) {
+         // Avatar not found is expected for new users — return null
+         return null;
+      }
+
+      if (!res.ok) {
+         throw new Error("Failed to download avatar");
+      }
+
+      return res;
+   } catch (error) {
+      console.error("Error downloading avatar:", error);
+      throw error;
+   }
 };
