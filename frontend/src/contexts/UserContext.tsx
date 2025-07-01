@@ -14,12 +14,7 @@ import { useRouter } from "next/navigation";
 
 import Cookies from "js-cookie";
 
-import {
-   COOKIE_NAME,
-   COOKIE_OPTIONS,
-   deleteLoginCookie,
-   setLoginCookie
-} from "@/lib";
+import { COOKIE_NAME, deleteLoginCookie, setLoginCookie } from "@/lib";
 import { downloadAvatar, logout as apiLogout } from "@/lib/services";
 
 interface User {
@@ -86,7 +81,11 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
    }, [router]);
 
    const isTokenExpired = useCallback((expires: number): boolean => {
-      return new Date(expires * 1000).getTime() < Date.now();
+      const isExpired = new Date(expires * 1000).getTime() < Date.now();
+      if (isExpired) {
+         console.warn(`${COOKIE_NAME} token is expired`);
+      }
+      return isExpired;
    }, []);
 
    // Function to set up periodic token checking
@@ -147,7 +146,11 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
          const savedUser = Cookies.get(COOKIE_NAME);
 
          if (!savedUser) {
+            console.warn(
+               `Couldn't load data from cookie ${COOKIE_NAME}: ${savedUser}`
+            );
             setUser(null);
+            router.push("/login");
             return;
          }
 
@@ -156,6 +159,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
          if (isTokenExpired(userData.expires)) {
             deleteLoginCookie();
             setUser(null);
+            router.push("/login");
             return;
          }
 
@@ -176,6 +180,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
          console.error("Error loading user from cookie:", error);
          deleteLoginCookie();
          setUser(null);
+         router.push("/login");
       } finally {
          setLoading(false);
       }
@@ -203,12 +208,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
             const userForCookie = { ...user };
             delete userForCookie.avatar; // Don't store blob URL in cookie
 
-            setLoginCookie(userForCookie, COOKIE_OPTIONS);
-            Cookies.set(
-               COOKIE_NAME,
-               JSON.stringify(userForCookie),
-               COOKIE_OPTIONS
-            );
+            setLoginCookie(userForCookie);
          } catch (error) {
             console.error("Error saving user to cookies:", error);
          }
