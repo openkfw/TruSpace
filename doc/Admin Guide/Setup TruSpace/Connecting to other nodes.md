@@ -9,23 +9,35 @@ To connect another node, it needs to be added to the cluster:
    ```bash
    nano ~/truspace/volumes/cluster0/service.json
    ```
-3. In the `service.json` file, locate the `peer_addresses` field and add the address of the peer node you want to connect to. It should look something like this:
+3. In the `/volumes/cluster0/service.json` file **of your target node**, locate the `secret` field and copy this into your `.env` file as the variable `CLUSTER_SECRET`:
    ```json
    {
-     "peer_addresses": ["http://<peer-node-ip>:9096"]
+     "secret": "141a2511dae98...e3c47f69d1e12203246f92"
    }
    ```
-4. Save the changes and exit the editor.
-5. Restart the cluster container to apply the changes:
+4. In the `/volumes/cluster0/identity.json` file **of your target node**, copy the value into the field `id`
+5. In the `/volumes/cluster0/service.json` file **of your installation**, locate the `peer_addresses` field and add the address of the peer node you want to connect to (if you haven't connected to others, it will be empty). Enter the target node IP address and the node `id` that you retrieved from the target node's `/volumes/cluster0/service.json` file. The format should be:
+   ```json
+   {
+     "peer_addresses": ["/ip4/192.168.1.100/tcp/9096/p2p/target_ID"]
+   }
+   ```
+
+---
+
+6. Save the changes and exit the editor.
+7. Restart the cluster container to apply the changes:
    ```bash
    docker-compose restart cluster0
    ```
-6. Log in to the cluster container using:
+8. Log in to the cluster container using:
    ```bash
    docker exec -it cluster0 sh
    ```
-7. Execute the following command to check if the peer has been added successfully:
-   ```bash
-    ipfs-cluster-ctl peers ls
-   ```
-   The output should show the cluster0 peer and indicate that it sees _1_ other peer, confirming that the connection was successful.
+9. Execute the following command to check if the peer has been added successfully:
+
+```bash
+ ipfs-cluster-ctl peers ls
+```
+
+The output should show the cluster0 peer and indicate that it sees _1_ other peer, confirming that the connection was successful.

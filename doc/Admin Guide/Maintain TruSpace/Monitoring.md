@@ -1,0 +1,3 @@
+# Monitoring
+
+TBD monitoring strategies
