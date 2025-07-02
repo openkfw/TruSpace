@@ -129,6 +129,11 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       try {
          const response = await downloadAvatar();
 
+         if (!response) {
+            // No avatar uploaded yet — expected for new users
+            return null;
+         }
+
          if (response.ok) {
             const blob = await response.blob();
             const avatar = URL.createObjectURL(blob);

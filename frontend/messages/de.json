@@ -85,7 +85,8 @@
    },
    "settings": {
       "updateSuccess": "Benutzereinstellungen aktualisiert",
-      "updateError": "Beim Aktualisieren der Benutzereinstellungen ist ein Fehler aufgetreten"
+      "updateError": "Beim Aktualisieren der Benutzereinstellungen ist ein Fehler aufgetreten",
+      "nothingToUpload": "Es gibt nichts zum Hochladen"
    },
    "homePage": {
       "documentName": "Name",

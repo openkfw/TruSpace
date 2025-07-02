@@ -85,7 +85,8 @@
    },
    "settings": {
       "updateSuccess": "User settings updated successfully",
-      "updateError": "Something went wrong while updating user settings"
+      "updateError": "Something went wrong while updating user settings",
+      "nothingToUpload": "Nothing to upload"
    },
    "homePage": {
       "documentName": "Document name",
