@@ -71,6 +71,8 @@ export default function ResetPassword() {
          router.push("/login");
       } else if (result.message === "invalid token") {
          toast.error(translations("invalidToken"));
+      } else {
+         toast.error(translations("genericError"));
       }
    };
 

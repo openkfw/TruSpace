@@ -38,6 +38,8 @@ export default function ForgotPassword() {
       const result = await forgotPassword(enhancedData);
       if (result.status === "success") {
          toast.success(translations("success"));
+      } else {
+         toast.error(translations("error"));
       }
    };
 

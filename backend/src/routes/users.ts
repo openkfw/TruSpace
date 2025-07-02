@@ -53,7 +53,7 @@ router.post(
 
     const passwordHash = await hashPassword(password);
     const token = jwt.sign({ email: email }, Buffer.from(config.jwt.secret), {
-      expiresIn: 1200000,
+      expiresIn: 1200, // 20 minutes
     });
     try {
       const result = await createUserDb(
@@ -349,7 +349,7 @@ router.post(
         });
       }
       const token = jwt.sign({ email: email }, Buffer.from(config.jwt.secret), {
-        expiresIn: 1200000,
+        expiresIn: 1200, // 20 minutes
       });
       await createTokenDb(user.id, token);
       const filePath = path.join(
