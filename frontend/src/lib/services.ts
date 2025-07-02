@@ -647,3 +647,38 @@ export const downloadAvatar = async () => {
       throw error;
    }
 };
+
+export const forgotPassword = async (data: Record<string, string>) => {
+   const url = `${USERS_ENDPOINT}/forgot-password`;
+   const options: RequestInit = {
+      method: "POST",
+      headers: {
+         "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+         email: data.email,
+         resetPasswordLink: data.resetPasswordLink,
+         lang: data.lang
+      })
+   };
+   const response = await fetch(url, options);
+   const result = await response.json();
+   return result;
+};
+
+export const resetPassword = async (data: Record<string, string>) => {
+   const url = `${USERS_ENDPOINT}/reset-password`;
+   const options: RequestInit = {
+      method: "POST",
+      headers: {
+         "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+         password: data.password,
+         token: data.token
+      })
+   };
+   const response = await fetch(url, options);
+   const result = await response.json();
+   return result;
+};
