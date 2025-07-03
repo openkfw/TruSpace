@@ -138,9 +138,10 @@ router.put("/:wUID", async (req: Request, res: Response) => {
     res.status(200).send({ message: "Workspace updated successfully" });
   } catch (error: any) {
     if (axios.isAxiosError(error) && error.response?.status === 404) {
+      logger.error(error);
       res.status(404).send({ message: "Workspace not found" });
     } else {
-      console.error("Error updating workspace:", error);
+      logger.error(error);
       res.status(500).send({ message: "Internal Server Error" });
     }
   }
