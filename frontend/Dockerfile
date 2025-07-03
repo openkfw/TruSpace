@@ -5,8 +5,8 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm i
 COPY . .
-ARG NEXT_PUBLIC_API_URL
-ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+ARG NEXT_PUBLIC_API_URL=_NEXT_PUBLIC_API_URL_
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 
 # Next.js collects completely anonymous telemetry data about general usage.
 # Learn more here: https://nextjs.org/telemetry
@@ -26,14 +26,10 @@ COPY --from=builder /app/public ./public
 # https://nextjs.org/docs/advanced-features/output-file-tracing
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+RUN chmod -R ugo+w /app/.next
 
-# Copy the startup script
 COPY startup.sh ./
 RUN chmod +x ./startup.sh
-
-# Create a writable directory for runtime config
-RUN mkdir -p /app/public/runtime
-RUN chown -R nextjs:nodejs /app/public/runtime
 
 USER nextjs
 EXPOSE 3000
@@ -41,4 +37,6 @@ ENV PORT=3000
 # server.js is created by next build from the standalone output
 # https://nextjs.org/docs/pages/api-reference/config/next-config-js/output
 ENV HOSTNAME="0.0.0.0"
-CMD ["./startup.sh"]
+
+ENTRYPOINT ["./startup.sh"]
+CMD ["node", "server.js"]

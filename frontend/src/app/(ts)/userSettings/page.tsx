@@ -38,11 +38,16 @@ export default function UserSettings() {
 
    const handleSubmit = async () => {
       // TODO when appropriate add other fields, updateUser instead of uploadAvatar
+      if (!file) {
+         toast.info(settingsTranslations("nothingToUpload"));
+         return;
+      }
       try {
          const formData = new FormData();
          formData.append("file", file, file.name);
          await uploadAvatar(formData);
          toast.success(settingsTranslations("updateSuccess"));
+         setFile(null);
       } catch (err) {
          console.error("Updating user failed: ", err);
          toast.error(settingsTranslations("updateError"));

@@ -24,8 +24,13 @@ export async function sendEmail(
     secure: smtpServer.secure,
     auth,
   };
-  
+
   const transporter = nodemailer.createTransport(transportOptions);
+  if (!emailSender) {
+    logger.warn(
+      `EMAIL_SENDER is empty. This is probably a mistake, and sending email will fail.`
+    );
+  }
   await transporter.sendMail({
     from: emailSender,
     to: emailAddress,

@@ -389,10 +389,12 @@ export class OpenWebUIClient {
         model: config.ollama.model,
         files: [
           {
-            file: fileData,
             type: "file",
+            file: fileData,
+            name: fileData.filename,
             id: fileData.id,
             url: `/api/v1/files/${fileData.id}`,
+            status: "uploaded",
           },
         ],
         messages: [
@@ -414,10 +416,7 @@ export class OpenWebUIClient {
       );
       throw error;
     } finally {
-      await Promise.allSettled([
-        this.files.delete(fileData.id),
-        this.chats.delete(chatId),
-      ]);
+      await this.chats.delete(chatId);
     }
   }
 
@@ -475,6 +474,8 @@ export class OpenWebUIClient {
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
       TaskQueue.updateJobStatus(requestId, "failed", errorMessage);
+    } finally {
+      await this.files.delete(fileData.id);
     }
   };
 
