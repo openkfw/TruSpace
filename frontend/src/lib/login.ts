@@ -2,13 +2,8 @@ import Cookies from "js-cookie";
 
 export const COOKIE_NAME = "login";
 
-export const COOKIE_OPTIONS = {
-   secure: process.env.NODE_ENV === "production",
-   sameSite: "strict" as const
-};
-
-export const setLoginCookie = (data, options) => {
-   Cookies.set(COOKIE_NAME, JSON.stringify(data), options);
+export const setLoginCookie = (data) => {
+   Cookies.set(COOKIE_NAME, JSON.stringify(data));
 };
 
 export const deleteLoginCookie = () => {

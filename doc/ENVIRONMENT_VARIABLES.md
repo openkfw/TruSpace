@@ -55,6 +55,7 @@ This document provides a detailed overview of the environment variables used to 
 | `CLUSTER_SWARM_PORT`                       | Port for peer-to-peer swarm communication.                                        | 9096                                                             | true     |
 | `OPEN_API_PORT`                            | Port used by the IPFS Cluster REST API.                                           | 9094                                                             | true     |
 | `PINNING_SERVICE_PORT`                     | Port used by the pinning service API.                                             | 9097                                                             | true     |
+| `CLUSTER_PEERS`                            | Comma separated multiaddresses of cluster peers                                   |                                                                  | false    |
 
 ### Cluster 0
 

@@ -1,4 +1,12 @@
 "use client";
+import React from "react";
+import { toast } from "react-toastify";
+
+import Image from "next/image";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
+
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,12 +17,6 @@ import {
    CardTitle
 } from "@/components/ui/card";
 import { confirmRegistration } from "@/lib/services";
-import { useTranslations } from "next-intl";
-import Image from "next/image";
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import React from "react";
-import { toast } from "react-toastify";
 
 export default function ConfirmRegistration({}: React.ComponentPropsWithoutRef<"div">) {
    const translations = useTranslations("confirmRegistration");
@@ -24,6 +26,8 @@ export default function ConfirmRegistration({}: React.ComponentPropsWithoutRef<"
       const response = await confirmRegistration(token);
       if (response.status === "success") {
          toast.success(translations("confirmSuccess"));
+      } else if (response.message === "invalid token") {
+         toast.error(translations("confirmErrorToken"));
       } else {
          toast.error(translations("confirmError"));
       }

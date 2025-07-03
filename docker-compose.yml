@@ -39,10 +39,6 @@ services:
       - ${API_PORT}:${API_PORT}
     entrypoint: sh ./entrypoint.sh
 
-  ##################################################################################
-  ## Cluster PEER 0 ################################################################
-  ##################################################################################
-
   ipfs0:
     container_name: ipfs0
     image: ipfs/kubo:release
@@ -70,6 +66,7 @@ services:
       CLUSTER_RESTAPI_HTTPLISTENMULTIADDRESS: ${CLUSTER_RESTAPI_HTTPLISTENMULTIADDRESS} # Expose API
       CLUSTER_PINSVCAPI_HTTPLISTENMULTIADDRESS: ${CLUSTER_PINSVCAPI_HTTPLISTENMULTIADDRESS} # Exposes Pinning Service API
       CLUSTER_MONITORPINGINTERVAL: ${CLUSTER_MONITORPINGINTERVAL} # Speed up peer discovery
+      CLUSTER_PEERS: ${CLUSTER_PEERS}
     ports:
       # Open API port (allows ipfs-cluster-ctl usage on host)
       - "${OPEN_API_PORT}:${OPEN_API_PORT}"

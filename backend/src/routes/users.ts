@@ -12,12 +12,16 @@ import {
   getTotalRecentlyAddedUsersDb,
   getTotalUsersDb,
   storeAvatarCidDb,
+  updateUserPassword,
 } from "../clients/db";
 import { config } from "../config/config";
 import logger from "../config/winston";
 import { hashPassword, verifyPassword } from "../encryption";
 import { sendEmail } from "../mailing/mailing";
-import { registrationConfirmation } from "../mailing/mailingConstants";
+import {
+  registrationConfirmation,
+  passwordReset,
+} from "../mailing/mailingConstants";
 import { authenticateCookie } from "../middlewares/authenticate";
 import validate from "../middlewares/validate";
 import { JwtPayload } from "../types/interfaces";
@@ -25,6 +29,11 @@ import { USER_STATUS } from "../utility/constants";
 import { AuthenticatedRequest } from "../types";
 import { IpfsClient } from "../clients/ipfs-client";
 import { UploadedFile } from "express-fileupload";
+import {
+  createTokenDb,
+  getTokenDb,
+  removeTokensOfUserDb,
+} from "../clients/db/resetPasswordTokens";
 
 const router = express.Router();
 logger.info("Registering user");
@@ -45,7 +54,7 @@ router.post(
 
     const passwordHash = await hashPassword(password);
     const token = jwt.sign({ email: email }, Buffer.from(config.jwt.secret), {
-      expiresIn: 1200000,
+      expiresIn: 1200, // 20 minutes
     });
     try {
       const result = await createUserDb(
@@ -103,7 +112,7 @@ router.post(
       } else {
         res.status(500).json({
           status: "failure",
-          message: "Unknown error occured",
+          message: "Unknown error occurred",
         });
       }
     }
@@ -233,18 +242,37 @@ router.get(
   validate([query("token").isString().notEmpty()]),
   async (req: Request, res: Response) => {
     const token = req.query.token as string;
-    const user = await findUserByTokenDb(token);
-    if (user) {
-      await activateUserDb(user.id);
-      res.status(200).json({
-        status: "success",
-        message: "User activated successfully",
-      });
-    } else {
-      res.status(400).json({
-        status: "failure",
-        message: "Invalid token",
-      });
+    jwt.verify(token, Buffer.from(config.jwt.secret)) as jwt.JwtPayload;
+    try {
+      const user = await findUserByTokenDb(token);
+      if (user) {
+        await activateUserDb(user.id);
+        res.status(200).json({
+          status: "success",
+          message: "User activated successfully",
+        });
+      } else {
+        res.status(400).json({
+          status: "failure",
+          message: "Invalid token",
+        });
+      }
+    } catch (error: any) {
+      logger.error(error);
+      if (
+        error.message === "jwt expired" ||
+        error.message === "invalid signature"
+      ) {
+        res.status(400).json({
+          status: "error",
+          message: "invalid token",
+        });
+      } else {
+        res.status(500).json({
+          status: "failure",
+          message: "Unknown error occurred",
+        });
+      }
     }
   }
 );
@@ -292,6 +320,115 @@ router.get(
         .json({ status: "failure", message: "Could not find avatar" });
     }
     return new IpfsClient().downloadAvatar(req, res, cid);
+  }
+);
+
+router.post(
+  "/forgot-password",
+  validate([
+    body("email").isEmail(),
+    body("resetPasswordLink").isString(),
+    body("lang").isString(),
+  ]),
+  async (req: Request, res: Response) => {
+    const { email, resetPasswordLink, lang } = req.body;
+    const { smtpServer } = config;
+
+    if (!smtpServer.host || !smtpServer.port) {
+      logger.error("SMTP server not set");
+      return res.status(500).json({
+        status: "error",
+        message: "SMTP server not set",
+      });
+    }
+
+    try {
+      const user = await findUserByEmailDb(email);
+      if (!user) {
+        logger.info("No such user");
+        return res.status(200).json({
+          status: "success",
+          message: "email sent",
+        });
+      }
+      const token = jwt.sign({ email: email }, Buffer.from(config.jwt.secret), {
+        expiresIn: 1200, // 20 minutes
+      });
+      await createTokenDb(user.id, token);
+      const filePath = path.join(
+        process.cwd(),
+        "src/mailing/templates/resetPasswordEmail.html"
+      );
+      const source = fs.readFileSync(filePath, "utf-8");
+      const template = compile(source);
+      const replacements = {
+        lang: lang,
+        header: passwordReset[lang].header,
+        user: user.username,
+        text: passwordReset[lang].text,
+        resetPasswordUrl: `${resetPasswordLink}?token=${token}`,
+        resetPasswordUrlTitle: passwordReset[lang].link,
+        footer: passwordReset[lang].footer,
+      };
+      const htmlTemplateToSend = template(replacements);
+
+      await sendEmail(email, passwordReset[lang].subject, htmlTemplateToSend);
+      res.json({
+        status: "success",
+        message: "email sent",
+      });
+    } catch (error: any) {
+      logger.error(error);
+      res.status(500).json({
+        status: "failure",
+        message: "Unknown error occurred",
+      });
+    }
+  }
+);
+
+router.post(
+  "/reset-password",
+  validate([body("password").isString(), body("token").isString()]),
+  async (req: Request, res: Response) => {
+    const { password, token } = req.body;
+
+    try {
+      jwt.verify(token, Buffer.from(config.jwt.secret)) as jwt.JwtPayload;
+      const result = await getTokenDb(token);
+
+      if (!result) {
+        logger.error("invalid token");
+        return res.status(400).json({
+          status: "error",
+          message: "invalid token",
+        });
+      }
+
+      const passwordHash = await hashPassword(password);
+      await updateUserPassword(result.user_id, passwordHash);
+      await removeTokensOfUserDb(result.user_id);
+      res.json({
+        status: "success",
+        message: "password set",
+      });
+    } catch (error: any) {
+      logger.error(error);
+      if (
+        error.message === "jwt expired" ||
+        error.message === "invalid signature"
+      ) {
+        res.status(400).json({
+          status: "error",
+          message: "invalid token",
+        });
+      } else {
+        res.status(500).json({
+          status: "failure",
+          message: "Unknown error occurred",
+        });
+      }
+    }
   }
 );
 

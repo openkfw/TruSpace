@@ -1,6 +1,5 @@
 import useSWR from "swr";
 
-import config from "@/config";
 import { Workspace } from "@/interfaces";
 
 const fetcher = (url) =>
@@ -9,10 +8,7 @@ const fetcher = (url) =>
    }).then((res) => res.json());
 
 export const getApiUrl = (): string => {
-   if (typeof window !== "undefined" && window.RUNTIME_CONFIG) {
-      return window.RUNTIME_CONFIG.API_URL;
-   }
-   return process.env.NEXT_PUBLIC_API_URL || config.apiUrl;
+   return process.env.NEXT_PUBLIC_API_URL;
 };
 
 const API_URL = getApiUrl();
@@ -612,18 +608,77 @@ export const confirmRegistration = async (
 };
 
 export const uploadAvatar = async (formData: FormData) => {
-   const res = await fetch(`${USERS_ENDPOINT}/avatar`, {
-      method: "POST",
-      credentials: "include",
-      body: formData
-   });
-   return res.json();
+   try {
+      const res = await fetch(`${USERS_ENDPOINT}/avatar`, {
+         method: "POST",
+         credentials: "include",
+         body: formData
+      });
+
+      if (!res.ok) {
+         throw new Error("Failed to upload avatar");
+      }
+      return res.json();
+   } catch (error) {
+      console.error("Error uploading avatar:", error);
+      throw error;
+   }
 };
 
 export const downloadAvatar = async () => {
-   const res = await fetch(`${USERS_ENDPOINT}/avatar`, {
-      method: "GET",
-      credentials: "include"
-   });
-   return res;
+   try {
+      const res = await fetch(`${USERS_ENDPOINT}/avatar`, {
+         method: "GET",
+         credentials: "include"
+      });
+
+      if (res.status === 404) {
+         // Avatar not found is expected for new users — return null
+         return null;
+      }
+
+      if (!res.ok) {
+         throw new Error("Failed to download avatar");
+      }
+
+      return res;
+   } catch (error) {
+      console.error("Error downloading avatar:", error);
+      throw error;
+   }
+};
+
+export const forgotPassword = async (data: Record<string, string>) => {
+   const url = `${USERS_ENDPOINT}/forgot-password`;
+   const options: RequestInit = {
+      method: "POST",
+      headers: {
+         "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+         email: data.email,
+         resetPasswordLink: data.resetPasswordLink,
+         lang: data.lang
+      })
+   };
+   const response = await fetch(url, options);
+   const result = await response.json();
+   return result;
+};
+
+export const resetPassword = async (data: Record<string, string>) => {
+   const url = `${USERS_ENDPOINT}/reset-password`;
+   const options: RequestInit = {
+      method: "POST",
+      headers: {
+         "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+         password: data.password,
+         token: data.token
+      })
+   };
+   const response = await fetch(url, options);
+   const result = await response.json();
+   return result;
 };
