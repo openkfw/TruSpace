@@ -2,10 +2,10 @@ name: Docker Images CI
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "57-gh-images"]
     tags: ["v*"]
   pull_request:
-    branches: ["main"]
+    branches: ["main", "57-gh-images"]
 
 env:
   REGISTRY: docker.io
@@ -20,7 +20,7 @@ jobs:
       frontend: ${{ steps.changes.outputs.frontend }}
     steps:
       - uses: actions/checkout@v4
-      - uses: dorny/paths-filter@v2
+      - uses: dorny/paths-filter@v3
         id: changes
         with:
           filters: |
@@ -33,6 +33,9 @@ jobs:
     needs: changes
     if: ${{ needs.changes.outputs.backend == 'true' }}
     runs-on: ubuntu-latest
+    outputs:
+      image-tags: ${{ steps.meta.outputs.tags }}
+      image-digest: ${{ steps.build.outputs.digest }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -62,6 +65,7 @@ jobs:
             type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Build and push
+        id: build
         uses: docker/build-push-action@v5
         with:
           context: ./backend
@@ -76,6 +80,9 @@ jobs:
     needs: changes
     if: ${{ needs.changes.outputs.frontend == 'true' }}
     runs-on: ubuntu-latest
+    outputs:
+      image-tags: ${{ steps.meta.outputs.tags }}
+      image-digest: ${{ steps.build.outputs.digest }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -105,6 +112,7 @@ jobs:
             type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Build and push
+        id: build
         uses: docker/build-push-action@v5
         with:
           context: ./frontend
@@ -121,23 +129,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Run Trivy vulnerability scanner - Backend
-        if: needs.build-backend.result == 'success'
+        if: needs.build-backend.result == 'success' && github.event_name != 'pull_request'
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }}
+          image-ref: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ github.ref_name }}-${{ github.sha }}
           format: "sarif"
           output: "backend-trivy-results.sarif"
 
       - name: Run Trivy vulnerability scanner - Frontend
-        if: needs.build-frontend.result == 'success'
+        if: needs.build-frontend.result == 'success' && github.event_name != 'pull_request'
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }}
+          image-ref: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.ref_name }}-${{ github.sha }}
           format: "sarif"
           output: "frontend-trivy-results.sarif"
 
       - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         if: always()
         with:
           sarif_file: "."
