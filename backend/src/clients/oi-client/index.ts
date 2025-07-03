@@ -389,10 +389,12 @@ export class OpenWebUIClient {
         model: config.ollama.model,
         files: [
           {
-            file: fileData,
             type: "file",
+            file: fileData,
+            name: fileData.filename,
             id: fileData.id,
             url: `/api/v1/files/${fileData.id}`,
+            status: "uploaded",
           },
         ],
         messages: [

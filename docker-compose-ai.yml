@@ -15,6 +15,7 @@ services:
       SPACE_ID: "true" # truthy value allows setting of admin credentials ^^^
       OLLAMA_BASE_URL: http://localhost:11434 # hard-coded, because ollama is bundled in :ollama image
       CORS_ALLOW_ORIGIN: ${OI_CORS_ALLOW_ORIGIN}
+      GLOBAL_LOG_LEVEL: DEBUG
     volumes:
       - ./volumes/open-webui:/app/backend/data
       - ./volumes/ollama:/root/.ollama/models
