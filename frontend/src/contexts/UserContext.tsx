@@ -16,6 +16,15 @@ import Cookies from "js-cookie";
 import { COOKIE_NAME, deleteLoginCookie, setLoginCookie } from "@/lib";
 import { downloadAvatar, logout as apiLogout } from "@/lib/services";
 
+const routesWithoutToken = [
+   "/confirm",
+   "/forgot-password",
+   "/login",
+   "/register",
+   "/reset-password",
+   "reset-password"
+];
+
 interface User {
    name: string;
    email: string;
@@ -155,7 +164,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
                `Couldn't load data from cookie ${COOKIE_NAME}: ${savedUser}`
             );
             setUser(null);
-            if (pathname.includes("/confirm")) return;
+            if (routesWithoutToken.some((r) => r.includes(pathname))) return;
             router.push("/login");
             return;
          }
