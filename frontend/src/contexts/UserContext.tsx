@@ -1,5 +1,4 @@
 "use client";
-
 import {
    createContext,
    type ReactNode,
@@ -10,7 +9,7 @@ import {
    useState
 } from "react";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 import Cookies from "js-cookie";
 
@@ -63,6 +62,7 @@ export const useUser = (): UserContextType => {
 };
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
+   const pathname = usePathname();
    const router = useRouter();
    const [user, setUser] = useState<User | null>(null);
    const [loading, setLoading] = useState<boolean>(true);
@@ -155,6 +155,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
                `Couldn't load data from cookie ${COOKIE_NAME}: ${savedUser}`
             );
             setUser(null);
+            if (pathname.includes("/confirm")) return;
             router.push("/login");
             return;
          }

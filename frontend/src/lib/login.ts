@@ -23,7 +23,3 @@ export const isTokenExpired = (token) => {
       return true;
    }
 };
-
-export const redirectToLogin = (router) => {
-   router.push("/login");
-};
