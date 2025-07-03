@@ -21,8 +21,7 @@ const routesWithoutToken = [
    "/forgot-password",
    "/login",
    "/register",
-   "/reset-password",
-   "reset-password"
+   "/reset-password"
 ];
 
 interface User {
