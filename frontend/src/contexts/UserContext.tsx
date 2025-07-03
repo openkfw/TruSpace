@@ -1,5 +1,4 @@
 "use client";
-
 import {
    createContext,
    type ReactNode,
@@ -10,12 +9,20 @@ import {
    useState
 } from "react";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 import Cookies from "js-cookie";
 
 import { COOKIE_NAME, deleteLoginCookie, setLoginCookie } from "@/lib";
 import { downloadAvatar, logout as apiLogout } from "@/lib/services";
+
+const routesWithoutToken = [
+   "/confirm",
+   "/forgot-password",
+   "/login",
+   "/register",
+   "/reset-password"
+];
 
 interface User {
    name: string;
@@ -63,6 +70,7 @@ export const useUser = (): UserContextType => {
 };
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
+   const pathname = usePathname();
    const router = useRouter();
    const [user, setUser] = useState<User | null>(null);
    const [loading, setLoading] = useState<boolean>(true);
@@ -155,6 +163,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
                `Couldn't load data from cookie ${COOKIE_NAME}: ${savedUser}`
             );
             setUser(null);
+            if (routesWithoutToken.some((r) => r.includes(pathname))) return;
             router.push("/login");
             return;
          }
