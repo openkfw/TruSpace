@@ -4,8 +4,8 @@ on:
   push:
     branches: ["main", "57-gh-images"]
     tags: ["v*"]
-  pull_request:
-    branches: ["main", "57-gh-images"]
+  # pull_request:
+  #   branches: ["main", "57-gh-images"]
 
 env:
   REGISTRY: docker.io
@@ -20,6 +20,16 @@ jobs:
       frontend: ${{ steps.changes.outputs.frontend }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Debug - List directory structure
+        run: |
+          echo "Repository structure:"
+          find . -type d -name "backend" -o -name "frontend" | head -10
+          echo "All directories:"
+          ls -la
+          echo "Files in root:"
+          find . -maxdepth 2 -type f | head -20
+
       - uses: dorny/paths-filter@v3
         id: changes
         with:
@@ -29,9 +39,15 @@ jobs:
             frontend:
               - 'frontend/**'
 
+      - name: Debug - Show filter results
+        run: |
+          echo "Backend changed: ${{ steps.changes.outputs.backend }}"
+          echo "Frontend changed: ${{ steps.changes.outputs.frontend }}"
+          echo "All changes: ${{ steps.changes.outputs.changes }}"
+
   build-backend:
     needs: changes
-    if: ${{ needs.changes.outputs.backend == 'true' }}
+    # if: ${{ needs.changes.outputs.backend == 'true' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     outputs:
       image-tags: ${{ steps.meta.outputs.tags }}
@@ -77,8 +93,7 @@ jobs:
           cache-to: type=gha,mode=max
 
   build-frontend:
-    needs: changes
-    if: ${{ needs.changes.outputs.frontend == 'true' }}
+    # Remove path filtering for initial setup - always run
     runs-on: ubuntu-latest
     outputs:
       image-tags: ${{ steps.meta.outputs.tags }}
