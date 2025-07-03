@@ -25,7 +25,13 @@ This document provides a detailed overview of the environment variables used to 
 | `CONTENT_SECURITY_POLICY_SCRIPT_URLS`  | Comma-separated list of script-src URLs for the Content Security Policy.                                           |                       | false    |
 | `CONTENT_SECURITY_POLICY_WORKER_URLS`  | Comma-separated list of worker-src URLs for the Content Security Policy.                                           |                       | false    |
 | `RATE_LIMIT_PER_MINUTE`                | Maximum number of requests allowed per minute per IP address.                                                      | 200                   | false    |
-| `REGISTER_USERS_AS_INACTIVE`           | If set to "true", users are registered a inactive and must be activated manually                                   |                       | false    |
+| `REGISTER_USERS_AS_INACTIVE`           | If set to "true", users are registered as inactive and must be activated using confirmation email                  | false                 | false    |
+| `SMTP_HOST`                            | SMTP server address                                                                                                |                       | false    |
+| `SMTP_USER`                            | SMTP server user                                                                                                   |                       | false    |
+| `SMTP_PASSWORD`                        | SMTP server password                                                                                               |                       | false    |
+| `SMTP_PORT`                            | SMTP server port                                                                                                   |                       | false    |
+| `SMTP_SSL`                             | SMTP server secure access                                                                                          |                       | false    |
+| `EMAIL_SENDER`                         | email address that appears as a sender in notification emails                                                      |                       | false    |
 | `NODE_ENV`                             | Specifies the environment (`development`, `production`) in which the application is running.                       | production            | true     |
 
 ---
@@ -37,7 +43,7 @@ This document provides a detailed overview of the environment variables used to 
 | Variable                                   | Description                                                                       | Default Value                                                    | Required |
 | ------------------------------------------ | --------------------------------------------------------------------------------- | ---------------------------------------------------------------- | -------- |
 | `START_PRIVATE_NETWORK`                    | Option to allow or disable connection to public IPFS nodes                        | true                                                             | true     |
-| `SWARM_KEY_SECRET`                         | If `START_PRIVATE_NETWORK` is "true" then swarm key secret is required.           |  | false    |
+| `SWARM_KEY_SECRET`                         | If `START_PRIVATE_NETWORK` is "true" then swarm key secret is required.           |                                                                  | false    |
 | `IPFS_CLUSTER_HOST`                        | Address of the IPFS Cluster REST API.                                             | [http://cluster0:9094](http://cluster0:9094)                     | true     |
 | `IPFS_PINSVC_HOST`                         | Address of the IPFS pinning service API.                                          | [http://cluster0:9097](http://cluster0:9097)                     | true     |
 | `IPFS_GATEWAY_HOST`                        | Address of the IPFS gateway (used to fetch content).                              | [http://ipfs0:8080](http://ipfs0:8080)                           | true     |
@@ -48,6 +54,7 @@ This document provides a detailed overview of the environment variables used to 
 | `CLUSTER_SWARM_PORT`                       | Port for peer-to-peer swarm communication.                                        | 9096                                                             | true     |
 | `OPEN_API_PORT`                            | Port used by the IPFS Cluster REST API.                                           | 9094                                                             | true     |
 | `PINNING_SERVICE_PORT`                     | Port used by the pinning service API.                                             | 9097                                                             | true     |
+| `CLUSTER_PEERS`                            | Comma separated multiaddresses of cluster peers                                   |                                                                  | false    |
 
 ### Cluster 0
 

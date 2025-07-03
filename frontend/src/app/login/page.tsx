@@ -19,11 +19,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useUser } from "@/contexts/UserContext";
-import { User } from "@/interfaces";
-import { COOKIE_OPTIONS, setLoginCookie } from "@/lib/";
+import { setLoginCookie } from "@/lib/";
 import { loginUser } from "@/lib/services";
-
-import { validateEmail } from "../helper/validateEmail";
+import { validateEmail } from "@/lib/validateEmail";
 
 export default function Login({}: React.ComponentPropsWithoutRef<"div">) {
    const { refreshUser } = useUser();
@@ -38,10 +36,10 @@ export default function Login({}: React.ComponentPropsWithoutRef<"div">) {
       formState: { errors }
    } = useForm();
 
-   const onSubmit = async (data: User) => {
+   const onSubmit = async (data) => {
       const result = await loginUser(data);
       if (result.status === "success") {
-         setLoginCookie(result.user, COOKIE_OPTIONS);
+         setLoginCookie(result.user);
          refreshUser();
          router.push("/home");
       }
@@ -135,6 +133,15 @@ export default function Login({}: React.ComponentPropsWithoutRef<"div">) {
                                     {String(errors.password.message)}
                                  </p>
                               )}
+                              <div className="mt-1 text-left text-sm">
+                                 <Link
+                                    href="/forgot-password"
+                                    className="underline underline-offset-4"
+                                    data-test-id="login-forgot-password-link"
+                                 >
+                                    {translations("forgotPassword")}
+                                 </Link>
+                              </div>
                            </div>
                            <Button
                               type="submit"

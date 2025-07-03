@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 
 import { CheckCircle, Eye, EyeOff, XCircle } from "lucide-react";
@@ -24,13 +24,12 @@ import {
    PopoverContent,
    PopoverTrigger
 } from "@/components/ui/popover";
-import { getUserLocale } from "@/i18n/service";
-import { registerUser } from "@/lib/services";
-import { validateEmail } from "@/lib/validateEmail";
+import { resetPassword } from "@/lib/services";
 
-export default function Register() {
-   const translations = useTranslations("register");
+export default function ResetPassword() {
+   const translations = useTranslations("resetPassword");
    const router = useRouter();
+   const token = useSearchParams().get("token");
    const {
       register,
       handleSubmit,
@@ -40,7 +39,6 @@ export default function Register() {
 
    const [showPassword, setShowPassword] = useState(false);
    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-   const [emailTaken, setEmailTaken] = useState(false);
 
    const passwordChecks = [
       {
@@ -63,50 +61,22 @@ export default function Register() {
    ];
 
    const onSubmit = async (data) => {
-      const locale = await getUserLocale();
       const enhancedData = {
-         ...data,
-         lang: locale,
-         confirmationLink: `${window.location.origin}/confirm`
+         password: data.password,
+         token: token
       };
-      const result = await registerUser(enhancedData);
+      const result = await resetPassword(enhancedData);
       if (result.status === "success") {
-         setEmailTaken(false);
-         if (result.message === "email sent") {
-            toast.success(translations("emailSent"));
-         } else {
-            toast.success(translations("registerSuccess"));
-         }
+         toast.success(translations("success"));
          router.push("/login");
-      }
-      if (result.status === "failure") {
-         if (result.message === "Email address is already registered") {
-            setEmailTaken(true);
-         }
-         toast.error(translations("registerError"));
+      } else if (result.message === "invalid token") {
+         toast.error(translations("invalidToken"));
+      } else {
+         toast.error(translations("genericError"));
       }
    };
 
    const password = watch("password", "");
-
-   const nameValidation = register("name", {
-      required: translations("nameRequired"),
-      minLength: {
-         value: 3,
-         message: translations("nameMinLength")
-      },
-      pattern: {
-         value: /^[\p{L} .,'-]+(?: [\p{L} .,'-]+)*$/u,
-         message: translations("namePattern")
-      },
-      setValueAs: (value) => value.trim()
-   });
-
-   const emailValidation = register("email", {
-      required: translations("emailRequired"),
-      validate: (value) => validateEmail(value) || translations("emailPattern"),
-      setValueAs: (value) => value.trim()
-   });
 
    const passwordValidation = register("password", {
       required: translations("passwordRequired"),
@@ -136,58 +106,11 @@ export default function Register() {
                      <CardTitle className="text-2xl">
                         {translations("title")}
                      </CardTitle>
-                     <CardDescription>
-                        {translations("subtitle")}
-                     </CardDescription>
+                     <CardDescription>{translations("text")}</CardDescription>
                   </CardHeader>
                   <CardContent>
                      <form onSubmit={handleSubmit(onSubmit)}>
                         <div className="flex flex-col gap-6">
-                           <div className="grid gap-2">
-                              <Label htmlFor="name">
-                                 {translations("name")}
-                              </Label>
-                              <Input
-                                 id="name"
-                                 type="text"
-                                 {...nameValidation}
-                                 className="bg-slate-50 dark:bg-slate-800 dark:text-white dark:placeholder:text-white"
-                                 placeholder={translations("namePlaceholder")}
-                                 data-test-id="register-name"
-                              />
-                              {errors.name?.message && (
-                                 <p className="text-red-500 text-sm">
-                                    {String(errors.name.message)}
-                                 </p>
-                              )}
-                           </div>
-                           <div className="grid gap-2">
-                              <Label htmlFor="email">
-                                 {translations("email")}
-                              </Label>
-                              <Input
-                                 id="email"
-                                 type="email"
-                                 {...emailValidation}
-                                 className="bg-slate-50 dark:bg-slate-800 dark:text-white dark:placeholder:text-white"
-                                 placeholder={translations("emailPlaceholder")}
-                                 onChange={(e) => {
-                                    setEmailTaken(false);
-                                    emailValidation.onChange(e);
-                                 }}
-                                 data-test-id="register-email"
-                              />
-                              {errors.email?.message && (
-                                 <p className="text-red-500 text-sm">
-                                    {String(errors.email.message)}
-                                 </p>
-                              )}
-                              {emailTaken && (
-                                 <p className="text-red-500 text-sm">
-                                    {translations("emailAlreadyTaken")}
-                                 </p>
-                              )}
-                           </div>
                            <div className="grid gap-2 relative">
                               <Label htmlFor="password">
                                  {translations("password")}
@@ -206,7 +129,7 @@ export default function Register() {
                                           placeholder={translations(
                                              "passwordPlaceholder"
                                           )}
-                                          data-test-id="register-password"
+                                          data-test-id="reset-password"
                                        />
                                     </PopoverTrigger>
 
@@ -271,7 +194,7 @@ export default function Register() {
                                     placeholder={translations(
                                        "confirmPasswordPlaceholder"
                                     )}
-                                    data-test-id="register-password-confirm"
+                                    data-test-id="reset-password-confirm"
                                  />
                                  <Button
                                     type="button"
@@ -295,9 +218,9 @@ export default function Register() {
                            <Button
                               type="submit"
                               className="w-full"
-                              data-test-id="register-submit"
+                              data-test-id="reset-password-submit"
                            >
-                              {translations("registerButton")}
+                              {translations("button")}
                            </Button>
                            <div className="mt-4 text-center text-sm">
                               <Link

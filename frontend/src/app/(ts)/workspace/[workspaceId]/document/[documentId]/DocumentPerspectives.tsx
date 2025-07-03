@@ -16,7 +16,7 @@ import {
 import { marked } from "marked";
 import TurndownService from "turndown";
 
-import { formatDate } from "@/app/helper/formatDate";
+import { formatDate } from "@/lib/formatDate";
 import Editor from "@/components/tiptap-editor/Editor";
 import { Button } from "@/components/ui/button";
 import {

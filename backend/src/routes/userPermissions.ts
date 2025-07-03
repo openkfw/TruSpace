@@ -8,6 +8,7 @@ import {
 import { IpfsClient } from "../clients/ipfs-client";
 import validate from "../middlewares/validate";
 import { AuthenticatedRequest } from "../types";
+import { USER_PERMISSION_STATUS } from "../utility/constants";
 
 const router = express.Router();
 
@@ -42,7 +43,7 @@ router.post(
         workspaceId,
         email,
         role: "admin",
-        status: "active",
+        status: USER_PERMISSION_STATUS.active,
       });
 
       res.json({
