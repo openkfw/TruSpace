@@ -25,12 +25,22 @@ const router = express.Router();
 /* GET /api/workspaces */
 router.get("/", async (req: AuthenticatedRequest, res: Response) => {
   const allWorkspaces = await new IpfsClient().getAllWorkspaces();
-  const allowedWs = (
-    await findPermissionsByEmailDb(req.user?.email as string)
-  ).map((p) => p.workspace_id);
-  const result = allWorkspaces.filter(
-    (ws) => allowedWs.includes(ws.uuid) || ws.meta.is_public
+  const userPermissions = await findPermissionsByEmailDb(
+    req.user?.email as string
   );
+  const allowedWsWithRole: Record<string, string> = {};
+  userPermissions.forEach((p) => (allowedWsWithRole[p.workspace_id] = p.role));
+  const result = allWorkspaces
+    .filter(
+      (ws) => allowedWsWithRole[ws.uuid] !== undefined || ws.meta.is_public
+    )
+    .map((ws) => {
+      return {
+        ...ws,
+        myRole: allowedWsWithRole[ws.uuid],
+      };
+    });
+  // Sort workspaces by name
   res.json(result);
 });
 

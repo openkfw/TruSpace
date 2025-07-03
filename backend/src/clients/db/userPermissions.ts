@@ -39,7 +39,7 @@ export const createPermissionDb = async (permission: UserPermissionDto) => {
 export const findPermissionsByEmailDb = async (email: string) => {
   try {
     const perms = await db<UserPermissionDb>("user_permissions")
-      .select("workspace_id")
+      .select("workspace_id", "role")
       .where({ user_email: email });
     return perms;
   } catch (error) {
