@@ -420,7 +420,7 @@ export class IpfsClient implements IClient {
 
   async updateWorkspaceType(
     workspaceId: string,
-    updates: { isPublic: boolean }
+    updates: { email: string; isPublic: boolean }
   ): Promise<WorkspaceRequest> {
     const workspace = await this.getWorkspaceById(workspaceId);
 

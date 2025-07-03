@@ -15,6 +15,7 @@ import {
    DialogHeader,
    DialogTitle
 } from "@/components/ui/dialog";
+import { useUser } from "@/contexts/UserContext";
 import { useWorkspaceContext } from "@/contexts/WorkspaceContext";
 import { updateWorkspaceType } from "@/lib/services";
 
@@ -33,13 +34,14 @@ export default function WorkspaceTypeDialog({
 }: WorkspaceTypeDialogProps) {
    const translations = useTranslations("navbar");
    const { refresh, workspace } = useWorkspaceContext();
-
+   const { user } = useUser();
    const [isUpdating, setIsUpdating] = useState(false);
 
    const handleConfirmUpdate = async () => {
       if (!wUID) return;
       setIsUpdating(true);
-      const formData: { isPublic: boolean } = {
+      const formData: { email: string; isPublic: boolean } = {
+         email: user?.email,
          isPublic: !workspace?.meta?.is_public
       };
 

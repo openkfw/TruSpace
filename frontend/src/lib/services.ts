@@ -125,7 +125,7 @@ export const createWorkspace = async (formData, errorText) => {
 
 export const updateWorkspaceType = async (
    wUID: string,
-   formData: { isPublic: boolean },
+   formData: { email: string; isPublic: boolean },
    errorText: string
 ) => {
    const options: RequestInit = {
@@ -137,9 +137,7 @@ export const updateWorkspaceType = async (
       credentials: "include"
    };
    const res = await fetch(`${WORKSPACES_ENDPOINT}/${wUID}`, options);
-   if (res.status === 409) {
-      return res;
-   } else if (!res.ok) {
+   if (!res.ok) {
       throw new Error(errorText);
    }
    return res;

@@ -135,6 +135,16 @@ router.put("/:wUID", async (req: Request, res: Response) => {
 
   try {
     await client.updateWorkspaceType(wUID, req.body);
+    if (req.body.isPublic === false) {
+      await createPermissionDb({
+        workspaceId: wUID,
+        email: req.body?.email as string,
+        role: "owner",
+        status: USER_PERMISSION_STATUS.active,
+      });
+    } else {
+      await removePermissionsForWorkspaceDb(wUID);
+    }
     res.status(200).send({ message: "Workspace updated successfully" });
   } catch (error: any) {
     if (axios.isAxiosError(error) && error.response?.status === 404) {
