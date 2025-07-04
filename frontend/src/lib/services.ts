@@ -123,6 +123,26 @@ export const createWorkspace = async (formData, errorText) => {
    return res;
 };
 
+export const updateWorkspaceType = async (
+   wUID: string,
+   formData: { email: string; isPublic: boolean },
+   errorText: string
+) => {
+   const options: RequestInit = {
+      method: "PUT",
+      body: JSON.stringify(formData),
+      headers: {
+         "Content-Type": "application/json"
+      },
+      credentials: "include"
+   };
+   const res = await fetch(`${WORKSPACES_ENDPOINT}/${wUID}`, options);
+   if (!res.ok) {
+      throw new Error(errorText);
+   }
+   return res;
+};
+
 export const loadWorkspaceContributors = async (
    wId
 ): Promise<{

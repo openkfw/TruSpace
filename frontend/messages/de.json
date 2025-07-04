@@ -226,6 +226,8 @@
       "aiConfig": "KI Konfiguration",
       "notifications": "Mitteilungen",
       "logOut": "Ausloggen",
+      "switchToPrivate": "Zu privatem wechseln",
+      "switchToPublic": "Zu öffentlichem wechseln",
       "workspaceDialog": {
          "addWorkspace": "Fügen Sie einen neuen Arbeitsbereich hinzu",
          "workspaceName": "Name des Arbeitsbereichs",
@@ -247,6 +249,17 @@
          "workspaceDeleted": "Arbeitsbereich erfolgreich gelöscht",
          "workspaceDeletionFailed": "Arbeitsbereich konnte nicht gelöscht werden",
          "deleting": "Löschen..."
+      },
+      "workspaceTypeDialog": {
+         "confirmWorkspaceTypeUpdate": "Ja",
+         "cancelWorkspaceTypeUpdate": "Nein",
+         "updating": "Aktualisieren...",
+         "updatePublicWorkspaceTitle": "Sind Sie sicher, dass Sie diesen Arbeitsbereich öffentlich machen möchten?",
+         "updatePrivateWorkspaceTitle": "Sind Sie sicher, dass Sie diesen Arbeitsbereich privat machen möchten?",
+         "workspaceTypeUpdated": "Arbeitsbereichstyp erfolgreich aktualisiert",
+         "workspaceTypeUpdateError": "Beim Aktualisieren des Arbeitsbereichstyps ist ein Fehler aufgetreten",
+         "publicDialogTitle": "Arbeitsbereich wird öffentlich",
+         "privateDialogTitle": "Arbeitsbereich wird privat"
       }
    },
    "chat": {
