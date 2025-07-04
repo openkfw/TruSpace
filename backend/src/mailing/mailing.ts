@@ -22,6 +22,8 @@ export async function sendEmail(
     host: smtpServer.host,
     port: smtpServer.port,
     secure: smtpServer.secure,
+               // use STARTTLS, not SSL on connect
+    requireTLS: smtpServer.tls, 
     auth,
   };
 
