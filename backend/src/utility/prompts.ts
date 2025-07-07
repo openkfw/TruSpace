@@ -33,7 +33,7 @@ export const tagsPrompt = {
 export const languagePrompt: Prompt = {
   title: "language",
   prompt:
-    "Detect the primary language of the provided document. Your response must be *only* the name of the language (e.g., English, Spanish, French). If the language cannot be determined, respond *only* with '-'.",
+    'Detect the primary language of the provided document. Your response must be *only* the name of the language in JSON format (e.g., `{ "language": "English" }`, `{ "language": "Spanish" }`, `{ "language": "French" }`).',
 };
 
 /**
