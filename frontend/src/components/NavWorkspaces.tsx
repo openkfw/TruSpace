@@ -39,10 +39,12 @@ import {
    SidebarMenuSubItem,
    useSidebar
 } from "@/components/ui/sidebar";
+import { useUser } from "@/contexts/UserContext";
 import { Workspace } from "@/interfaces";
 
 import DeleteWorkspaceDialog from "./DeleteWorkspaceDialog";
 import WorkspaceDialog from "./WorkspaceDialog";
+import WorkspaceTypeDialog from "./WorkspaceTypeDialog";
 
 export function NavWorkspaces({
    onSwitch,
@@ -59,9 +61,12 @@ export function NavWorkspaces({
    const translations = useTranslations("navbar");
    const [isDialogOpen, setIsDialogOpen] = useState(false);
    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+   const [isWorkspaceTypeDialogOpen, setIsWorkspaceTypeDialogOpen] =
+      useState(false);
    const router = useRouter();
    const [wCID, setwCID] = useState<string>("");
    const [wUID, setwUID] = useState<string>("");
+   const { user } = useUser();
 
    const publicWorkspaces = workspaces
       .filter((w) => w.meta.is_public)
@@ -133,6 +138,28 @@ export function NavWorkspaces({
                                        side={isMobile ? "bottom" : "right"}
                                        align={isMobile ? "end" : "start"}
                                     >
+                                       {workspace.meta?.creator_id ===
+                                       user?.name ? (
+                                          <DropdownMenuItem
+                                             className="cursor-pointer"
+                                             onClick={() => {
+                                                setwUID(workspace.uuid);
+                                                requestAnimationFrame(() =>
+                                                   setIsWorkspaceTypeDialogOpen(
+                                                      true
+                                                   )
+                                                );
+                                             }}
+                                          >
+                                             <Lock className="text-muted-foreground" />
+                                             <span>
+                                                {translations(
+                                                   "switchToPrivate"
+                                                )}
+                                             </span>
+                                          </DropdownMenuItem>
+                                       ) : null}
+
                                        <DropdownMenuItem
                                           className="cursor-pointer"
                                           onClick={() =>
@@ -227,6 +254,26 @@ export function NavWorkspaces({
                                        side={isMobile ? "bottom" : "right"}
                                        align={isMobile ? "end" : "start"}
                                     >
+                                       {workspace.meta?.creator_id ===
+                                       user?.name ? (
+                                          <DropdownMenuItem
+                                             className="cursor-pointer"
+                                             onClick={() => {
+                                                setwUID(workspace.uuid);
+                                                requestAnimationFrame(() =>
+                                                   setIsWorkspaceTypeDialogOpen(
+                                                      true
+                                                   )
+                                                );
+                                             }}
+                                          >
+                                             <LockOpen className="text-muted-foreground" />
+                                             <span>
+                                                {translations("switchToPublic")}
+                                             </span>
+                                          </DropdownMenuItem>
+                                       ) : null}
+
                                        <DropdownMenuItem
                                           className="cursor-pointer"
                                           onClick={() =>
@@ -285,6 +332,11 @@ export function NavWorkspaces({
             wCID={wCID}
             wUID={wUID}
             setWorkspaces={setWorkspaces}
+         />
+         <WorkspaceTypeDialog
+            open={isWorkspaceTypeDialogOpen}
+            setOpen={setIsWorkspaceTypeDialogOpen}
+            wUID={wUID}
          />
       </SidebarGroup>
    );

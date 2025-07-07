@@ -225,6 +225,8 @@
       "userSettings": "User settings",
       "aiConfig": "AI configuration",
       "notifications": "Notifications",
+      "switchToPrivate": "Switch to private",
+      "switchToPublic": "Switch to public",
       "logOut": "Log Out",
       "workspaceDialog": {
          "addWorkspace": "Add a new workspace",
@@ -247,6 +249,17 @@
          "workspaceDeleted": "Workspace deleted successfully",
          "workspaceDeletionFailed": "Workspace could not be deleted",
          "deleting": "Deleting..."
+      },
+      "workspaceTypeDialog": {
+         "confirmWorkspaceTypeUpdate": "Yes",
+         "cancelWorkspaceTypeUpdate": "No",
+         "updating": "Updating...",
+         "updatePublicWorkspaceTitle": "Are you sure you want to make this workspace public?",
+         "updatePrivateWorkspaceTitle": "Are you sure you want to make this workspace private?",
+         "workspaceTypeUpdated": "Workspace type updated successfully",
+         "workspaceTypeUpdateError": "An error occurred while updating the workspace type",
+         "publicDialogTitle": "Workspace will become public",
+         "privateDialogTitle": "Workspace will become private"
       }
    },
    "chat": {

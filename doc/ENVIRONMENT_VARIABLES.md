@@ -31,6 +31,7 @@ This document provides a detailed overview of the environment variables used to 
 | `SMTP_PASSWORD`                        | SMTP server password                                                                                               |                       | false    |
 | `SMTP_PORT`                            | SMTP server port                                                                                                   |                       | false    |
 | `SMTP_SSL`                             | SMTP server secure access                                                                                          |                       | false    |
+| `SMTP_TLS`                             | SMTP server start insecure, upgrade to TLS (typically on port 587, set `SMTP_SSL` to false then in this setup)     |                       | false    |
 | `EMAIL_SENDER`                         | email address that appears as a sender in notification emails                                                      |                       | false    |
 | `NODE_ENV`                             | Specifies the environment (`development`, `production`) in which the application is running.                       | production            | true     |
 
