@@ -24,6 +24,13 @@
       "uploadAvatar": "Click avatar to upload new photo",
       "saveSettings": "Save settings"
    },
+   "statistics": {
+      "totalDocuments": "Total documents",
+      "collaborators": "Collaborators",
+      "peerServers": "Peer servers",
+      "documents": "documents",
+      "users": "users"
+   },
    "theme": {
       "light": "Light",
       "dark": "Dark",
@@ -317,7 +324,7 @@
       "promptTitlePlaceHolder": "Enter a title of your prompt",
       "promptBodyPlaceholder": "Enter your prompt",
       "savePrompt": "Save prompt",
-      "saveCustomPromptHint": "TODO: Saving prompts doesn't work"
+      "saveCustomPromptHint": "Saving prompts doesn't work"
    },
    "documentEditable": {
       "cancel": "Cancel",
