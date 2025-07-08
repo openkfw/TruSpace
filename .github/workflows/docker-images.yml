@@ -9,8 +9,8 @@ on:
 
 env:
   REGISTRY: docker.io
-  BACKEND_IMAGE_NAME: truspace/backend
-  FRONTEND_IMAGE_NAME: truspace/frontend
+  BACKEND_IMAGE_NAME: openkfw/truspace-backend
+  FRONTEND_IMAGE_NAME: openkfw/truspace-frontend
 
 jobs:
   changes:
