@@ -319,12 +319,12 @@
       "promptModelDialogTitle": "Modell auswählen",
       "selectPerspective": "Wählen Sie eine Perspektive",
       "title": "Perspektiven",
-      "askCustomPrompt": "KI mit benutzerdefiniertem Prompt fragen",
+      "askCustomPrompt": "Frag die KI mit Deinem eigenen Prompt",
       "promptTitle": "Prompt-Titel",
-      "promptTitlePlaceHolder": "Geben Sie einen Titel für Ihren Prompt ein",
-      "promptBodyPlaceholder": "Geben Sie Ihren Prompt ein",
+      "promptTitlePlaceHolder": "Gib den Titel Deines Prompts ein",
+      "promptBodyPlaceholder": "Gib Deinen Prompt ein",
       "savePrompt": "Prompt speichern",
-      "saveCustomPromptHint": "Das Speichern von Prompts funktioniert nicht"
+      "saveCustomPromptHint": "Das Speichern von Prompts funktioniert noch nicht"
    },
    "documentEditable": {
       "cancel": "Abbrechen",
