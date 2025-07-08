@@ -11,6 +11,7 @@ env:
   REGISTRY: docker.io
   BACKEND_IMAGE_NAME: openkfw/truspace-backend
   FRONTEND_IMAGE_NAME: openkfw/truspace-frontend
+  ENABLE_CODE_SCANNING: false
 
 jobs:
   changes:
@@ -155,13 +156,13 @@ jobs:
         if: needs.build-frontend.result == 'success' && github.event_name != 'pull_request'
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}@${{ needs.build-backend.outputs.image-digest }}
+          image-ref: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}@${{ needs.build-frontend.outputs.image-digest }}
           format: "sarif"
           output: "frontend-trivy-results.sarif"
 
       - name: Upload Trivy scan results to GitHub Security tab
+        if: env.ENABLE_CODE_SCANNING == 'true'
         uses: github/codeql-action/upload-sarif@v3
-        if: always()
         with:
           sarif_file: "."
 
