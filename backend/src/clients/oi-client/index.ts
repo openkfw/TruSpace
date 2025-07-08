@@ -458,6 +458,7 @@ export class OpenWebUIClient {
             timestamp: new Date().toISOString(),
             data: result.summary,
             creator: config.ollama.model,
+            creatorUiid: config.ollama.model,
             creatorType: "ai",
             prompt: result.prompt,
             model: config.ollama.model,
@@ -519,6 +520,7 @@ export class OpenWebUIClient {
             name: tag,
             color: "",
             creator: config.ollama.model,
+            creatorUiid: config.ollama.model,
             creatorType: "ai",
           },
         };

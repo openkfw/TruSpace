@@ -27,6 +27,7 @@ const routesWithoutToken = [
 interface User {
    name: string;
    email: string;
+   uiid: string;
    avatar?: string;
    loginTime?: string;
    expires: number; // milliseconds since UNIX epoch

@@ -7,6 +7,7 @@ interface UserDb {
   username: string;
   email: string;
   status: string;
+  uiid: string;
   password_hash: string;
   user_token: string;
   avatar_cid?: string;
@@ -51,6 +52,7 @@ export const findUserByEmailDb = async (email: string) => {
         "username",
         "email",
         "status",
+        "uiid",
         "password_hash",
         "avatar_cid",
         "created_at"
@@ -101,7 +103,9 @@ export const getTotalRecentlyAddedUsersDb = async (): Promise<number> => {
 
 export const activateUserDb = async (userId: number): Promise<void> => {
   try {
-    await db("users").where({ id: userId }).update({ status: USER_STATUS.active });
+    await db("users")
+      .where({ id: userId })
+      .update({ status: USER_STATUS.active });
   } catch (error) {
     logger.error("Error activating user:", error);
   }
@@ -118,7 +122,10 @@ export const storeAvatarCidDb = async (email: string, cid: string) => {
   }
 };
 
-export const updateUserPassword = async (userId: number, passwordHash: string) => {
+export const updateUserPassword = async (
+  userId: number,
+  passwordHash: string
+) => {
   try {
     await db<UserDb>("users")
       .update({ password_hash: passwordHash })
@@ -127,4 +134,4 @@ export const updateUserPassword = async (userId: number, passwordHash: string) =
     logger.error("Error updating user", error);
     throw new Error("Error updating user");
   }
-}
+};

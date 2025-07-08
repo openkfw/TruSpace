@@ -139,7 +139,7 @@ export function NavWorkspaces({
                                        align={isMobile ? "end" : "start"}
                                     >
                                        {workspace.meta?.creator_id ===
-                                       user?.name ? (
+                                       user?.uiid ? (
                                           <DropdownMenuItem
                                              className="cursor-pointer"
                                              onClick={() => {
@@ -255,7 +255,7 @@ export function NavWorkspaces({
                                        align={isMobile ? "end" : "start"}
                                     >
                                        {workspace.meta?.creator_id ===
-                                       user?.name ? (
+                                       user?.uiid ? (
                                           <DropdownMenuItem
                                              className="cursor-pointer"
                                              onClick={() => {

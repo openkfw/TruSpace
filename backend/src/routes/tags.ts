@@ -43,7 +43,9 @@ router.post(
     const color = req.body.color;
     const workspaceOrigin = req.body.workspaceOrigin;
     const docId = req.body.docId;
-    const name = req.user?.name as string;
+    const userUiId = req.user?.uiid as string;
+    const email = req.user?.email as string;
+    const userName = req.user?.name as string;
 
     const client = new IpfsClient();
     const tagRequest: TagRequest = {
@@ -56,10 +58,11 @@ router.post(
         name: encodeURIComponent(tagName),
         color: color,
         creatorType: "user",
-        creator: name,
+        creator: userName,
+        creatorUiid: userUiId
       },
     };
-    await checkPermissionForWorkspace(req, res, workspaceOrigin);
+    await checkPermissionForWorkspace(email, res, workspaceOrigin);
     const result = await client.createTag(tagRequest);
     res.json(result);
   }
