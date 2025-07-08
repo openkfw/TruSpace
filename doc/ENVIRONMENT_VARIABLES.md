@@ -91,7 +91,7 @@ This document provides a detailed overview of the environment variables used to 
 
 | Variable                       | Description                                                          | Default Value | Required |
 | ------------------------------ | -------------------------------------------------------------------- | ------------- | -------- |
-| `OLLAMA_MODEL`                 | Name of the default model to use (e.g., llama3.2:latest).            | gemma3:1b     | true     |
+| `OLLAMA_MODEL`                 | Name of the default model to use (e.g., gemma3:1b).                  | gemma3:1b     | true     |
 | `AUTO_DOWNLOAD`                | Whether to auto-download model weights on startup.                   | true          | false    |
 | `DISABLE_ALL_AI_FUNCTIONALITY` | Set to true to disable AI features. Useful for limited environments. | false         | false    |
 
@@ -99,14 +99,14 @@ This document provides a detailed overview of the environment variables used to 
 
 ## 🧑‍💼 OpenWebUI Configuration
 
-| Variable               | Description                                                        | Default Value                             | Required                     |
-| ---------------------- | ------------------------------------------------------------------ | ----------------------------------------- | ---------------------------- |
-| `OPENWEBUI_HOST`       | URL of the OpenWebUI instance.                                     | [http://webui:8080](http://webui:8080)    | true                         |
-| `OPEN_WEBUI_PORT`      | Port where OpenWebUI listens.                                      | 3333                                      | true                         |
-| `ADMIN_USER_EMAIL`     | Default admin user email for the OpenWebUI.                        | [admin@admin.com](mailto:admin@admin.com) | true                         |
-| `ADMIN_USER_PASSWORD`  | Default admin password. Change this in production!                 | admin                                     | true                         |
-| `WEBUI_SECRET_KEY`     | Secret key for session security. Use a strong value in production. | "t0p-s3cr3t"                              | true                         |
-| `OI_CORS_ALLOW_ORIGIN` | Allowed origin for CORS policy                                     | "\*"                                      | no, but strongly recommended |
+| Variable               | Description                                                        | Default Value                                 | Required                     |
+| ---------------------- | ------------------------------------------------------------------ | --------------------------------------------- | ---------------------------- |
+| `OPENWEBUI_HOST`       | URL of the OpenWebUI instance.                                     | [http://webui:8080](http://webui:8080)        | true                         |
+| `OPEN_WEBUI_PORT`      | Port where OpenWebUI listens.                                      | 3333                                          | true                         |
+| `ADMIN_USER_EMAIL`     | Default admin user email for the OpenWebUI.                        | [admin@example.com](mailto:admin@example.com) | true                         |
+| `ADMIN_USER_PASSWORD`  | Default admin password. Change this in production!                 | admin                                         | true                         |
+| `WEBUI_SECRET_KEY`     | Secret key for session security. Use a strong value in production. | "t0p-s3cr3t"                                  | true                         |
+| `OI_CORS_ALLOW_ORIGIN` | Allowed origin for CORS policy                                     | "\*"                                          | no, but strongly recommended |
 
 ---
 
