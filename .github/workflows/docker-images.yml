@@ -2,10 +2,10 @@ name: Docker Images CI
 
 on:
   push:
-    branches: ["main", "57-gh-images"]
+    branches: ["main"]
     tags: ["v*"]
   # pull_request:
-  #   branches: ["main", "57-gh-images"]
+  #   branches: ["main"]
 
 env:
   REGISTRY: docker.io
