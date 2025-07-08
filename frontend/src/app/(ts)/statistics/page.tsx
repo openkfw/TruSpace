@@ -1,4 +1,6 @@
 "use client";
+import { useTranslations } from "next-intl";
+
 import { ChartColumn, ChevronUp, Server, Users } from "lucide-react";
 
 import KPIBox from "@/components/KPIBox";
@@ -11,16 +13,18 @@ import {
 export default function Statistics() {
    const { statistics: documentStatistics } = useDocumentsStatistics();
    const { statistics: userStatistics } = useUsersStatistics();
+   const translations = useTranslations("general");
+   const statisticsTranslations = useTranslations("statistics");
    const { peers } = usePeers();
 
    return (
       <div className="pt-4">
-         <h1 className="text-3xl font-bold">Statistics</h1>
+         <h1 className="text-3xl font-bold">{translations("statistics")}</h1>
          <div className="grid grid-cols-3 gap-4 mt-4">
             <KPIBox
-               kpi="Total Documents"
+               kpi={statisticsTranslations("totalDocuments")}
                value={documentStatistics?.totalDocuments || "-"}
-               valueLabel="documents"
+               valueLabel={statisticsTranslations("documents")}
                delta={
                   <>
                      <ChevronUp />
@@ -37,9 +41,9 @@ export default function Statistics() {
                iconBgColor="blue-600"
             />
             <KPIBox
-               kpi="Collaborators"
+               kpi={statisticsTranslations("collaborators")}
                value={userStatistics?.totalUsers || "-"}
-               valueLabel="users"
+               valueLabel={statisticsTranslations("users")}
                delta={
                   <>
                      <ChevronUp />
@@ -56,7 +60,7 @@ export default function Statistics() {
                iconBgColor="blue-600"
             />
             <KPIBox
-               kpi="Peer servers"
+               kpi={statisticsTranslations("peerServers")}
                value={peers?.cluster_peers?.length || "-"}
                deltaColor="red-600"
                icon={<Server className="w-16 h-16" />}

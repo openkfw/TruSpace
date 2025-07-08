@@ -3,13 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 
-import {
-   Bell,
-   BrainCircuit,
-   ChevronsUpDown,
-   LogOut,
-   UserRoundCog
-} from "lucide-react";
+import { ChevronsUpDown, LogOut, UserRoundCog } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -93,14 +87,6 @@ export function NavUser() {
                      >
                         <UserRoundCog />
                         {translations("userSettings")}
-                     </DropdownMenuItem>
-                     <DropdownMenuItem>
-                        <BrainCircuit />
-                        {translations("aiConfig")}
-                     </DropdownMenuItem>
-                     <DropdownMenuItem>
-                        <Bell />
-                        {translations("notifications")}
                      </DropdownMenuItem>
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />

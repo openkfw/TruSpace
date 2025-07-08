@@ -12,14 +12,14 @@ export const envVarsSchema = Joi.object({
     .allow("")
     .optional()
     .empty("")
-    .default("llama3.2:latest"),
+    .default("gemma3:1b"),
   WEBUI_SECRET_KEY: Joi.string()
     .allow("")
     .optional()
     .empty("")
     .default("t0p-s3cr3t"),
   OPENWEBUI_HOST: Joi.string().default("http://localhost:3333"),
-  ADMIN_USER_EMAIL: Joi.string().default("admin@admin.com"),
+  ADMIN_USER_EMAIL: Joi.string().default("admin@example.com"),
   ADMIN_USER_PASSWORD: Joi.string().default("admin"),
   AUTO_DOWNLOAD: Joi.bool().optional().allow("").empty("").default(true),
   DISABLE_ALL_AI_FUNCTIONALITY: Joi.bool()
