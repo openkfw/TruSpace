@@ -24,6 +24,13 @@
       "uploadAvatar": "Klicken Sie auf den Avatar, um ein neues Bild hochzuladen",
       "saveSettings": "Einstellungen speichern"
    },
+   "statistics": {
+      "totalDocuments": "Gesamtdokumente",
+      "collaborators": "Mitwirkende",
+      "peerServers": "Peer-Server",
+      "documents": "dokumente",
+      "users": "benutzer"
+   },
    "theme": {
       "light": "Hell",
       "dark": "Dunkel",
@@ -312,12 +319,12 @@
       "promptModelDialogTitle": "Modell auswählen",
       "selectPerspective": "Wählen Sie eine Perspektive",
       "title": "Perspektiven",
-      "askCustomPrompt": "DE:Ask AI with custom prompt",
-      "promptTitle": "DE:Prompt title",
-      "promptTitlePlaceHolder": "DE:Enter a title of your prompt",
-      "promptBodyPlaceholder": "DE:Enter your prompt",
-      "savePrompt": "DE:Save prompt",
-      "saveCustomPromptHint": "TODO: Saving prompts doesn't work"
+      "askCustomPrompt": "KI mit benutzerdefiniertem Prompt fragen",
+      "promptTitle": "Prompt-Titel",
+      "promptTitlePlaceHolder": "Geben Sie einen Titel für Ihren Prompt ein",
+      "promptBodyPlaceholder": "Geben Sie Ihren Prompt ein",
+      "savePrompt": "Prompt speichern",
+      "saveCustomPromptHint": "Das Speichern von Prompts funktioniert nicht"
    },
    "documentEditable": {
       "cancel": "Abbrechen",
