@@ -147,7 +147,7 @@ jobs:
         if: needs.build-backend.result == 'success' && github.event_name != 'pull_request'
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ github.ref_name }}-${{ github.sha }}
+          image-ref: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}@${{ needs.build-backend.outputs.image-digest }}
           format: "sarif"
           output: "backend-trivy-results.sarif"
 
@@ -155,7 +155,7 @@ jobs:
         if: needs.build-frontend.result == 'success' && github.event_name != 'pull_request'
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.ref_name }}-${{ github.sha }}
+          image-ref: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}@${{ needs.build-backend.outputs.image-digest }}
           format: "sarif"
           output: "frontend-trivy-results.sarif"
 
