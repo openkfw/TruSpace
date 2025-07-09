@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This script starts the development environment for Truspace
+# This script starts the development environment for TruSpace
 # Usage: ./start.sh [--local-frontend]
 # If --local-frontend is passed, it will start the frontend locally
 

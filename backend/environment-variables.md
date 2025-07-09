@@ -14,7 +14,7 @@
 | Variable name                | Type    | Default value           | Explanation                                                     |
 | :--------------------------- | :------ | :---------------------- | :-------------------------------------------------------------- |
 | OLLAMA_MODEL                 | string  | gemma3:1b               | Configures language model                                       |
-| AUTO_DOWNLOAD                | boolean | true                    | If Truspace is allowed to download configured LLM automatically |
+| AUTO_DOWNLOAD                | boolean | true                    | If TruSpace is allowed to download configured LLM automatically |
 | DISABLE_ALL_AI_FUNCTIONALITY | boolean | false                   | Optionally disable using of AI in whole application             |
 | JWT_MAX_AGE                  | number  | `24 \* 60 \* 60` (24h)  | Validity of jwt cookie, in seconds                              |
 | CORS_ORIGIN                  | string  | `http://localhost:3000` | Whitelist of allowed origins                                    |
