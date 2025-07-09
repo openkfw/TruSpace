@@ -3,7 +3,7 @@
       "appName": "TruSpace",
       "appDescription": "Dein KI-gestützter Helfer für die Zusammenarbeit mit Dokumenten",
       "welcomeText": "Willkommen bei TruSpace",
-      "description": "was unter anderem ermöglicht, Arbeitsbereiche zu erstellen, zu teilen, zu löschen und anschließend Dokumente in diese Arbeitsbereiche hochzuladen. Eine Liste aller Vorgänge und Funktionen ist unten aufgeführt. Du kannst starten, indem Du in die Seitenleiste gehst und auf klicken ",
+      "description": "was unter anderem ermöglicht, Arbeitsbereiche zu erstellen, zu teilen, zu löschen und anschließend Dokumente in diese Arbeitsbereiche hochzuladen. Eine Liste aller Vorgänge und Funktionen ist unten aufgeführt. Du kannst starten, indem du in die Seitenleiste gehst und auf klicken ",
       "loading": "Laden...",
       "error": "Fehler",
       "en": "EN",
@@ -16,7 +16,7 @@
       "homePage": "Startseite",
       "dashboard": "Dashboard",
       "noDocuments": "Keine Dokumente",
-      "noDocumentDescription": "Neues Dokument hinzufügen, indem Du auf die Schaltfläche Dokument erstellen oder Dokument hochladen klickst",
+      "noDocumentDescription": "Neues Dokument hinzufügen, indem du auf die Schaltfläche Dokument erstellen oder Dokument hochladen klickst",
       "share": "Teilen",
       "document": "Dokument",
       "workspace": "Arbeitsbereich",
@@ -204,7 +204,7 @@
          "workspaceHint": "Du kannst Mitwirkende über die Funktion 'Arbeitsbereich teilen' zu einem privaten Arbeitsbereich einladen"
       },
       "workspaceDeletionDialog": {
-         "confirmWorkspaceDeletion": "Bist Du sicher, dass Du diesen Arbeitsbereich löschen möchten?",
+         "confirmWorkspaceDeletion": "Bist du sicher, dass du diesen Arbeitsbereich löschen möchten?",
          "confirmButtonWorkspaceDeletion": "Ja",
          "cancelButtonWorkspaceDeletion": "Nein",
          "workspaceDeleted": "Arbeitsbereich erfolgreich gelöscht",
@@ -390,7 +390,7 @@
       "undo": "Rückgängig"
    },
    "tour": {
-      "workspaceMenuDescription": "👋 Willkommen! Dies ist das Arbeitsbereich-Menü. Hier findest Du alle Aktionen, die Du zur Verwaltung deines Arbeitsbereichs benötigst.",
+      "workspaceMenuDescription": "👋 Willkommen! Dies ist das Arbeitsbereich-Menü. Hier findest du alle Aktionen, die du zur Verwaltung deines Arbeitsbereichs benötigst.",
       "confirmButton": "Verstanden"
    }
 }
