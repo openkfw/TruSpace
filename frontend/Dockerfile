@@ -3,7 +3,7 @@ FROM node:22-alpine AS builder
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 COPY package*.json ./
-RUN npm i
+RUN npm ci --only=production --omit=dev
 COPY . .
 ARG NEXT_PUBLIC_API_URL=_NEXT_PUBLIC_API_URL_
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
