@@ -380,6 +380,12 @@ export class OpenWebUIClient {
         `updateChatResult\n${JSON.stringify(updateChatResult, null, 2).slice(0, 180)}...`
       );
 
+      logger.debug(
+        `Data for completion file content\n${JSON.stringify(fileData.data.content)}...`
+      );
+      logger.debug(
+        `Data for completion file id\n${JSON.stringify(fileData.id)}...`
+      );
       const chatCompletionResult = await this.chats.completion({
         background_tasks: {
           tags_generation: false,
