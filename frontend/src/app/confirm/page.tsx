@@ -16,6 +16,7 @@ import {
    CardHeader,
    CardTitle
 } from "@/components/ui/card";
+import { getUserLocale } from "@/i18n/service";
 import { confirmRegistration } from "@/lib/services";
 
 export default function ConfirmRegistration({}: React.ComponentPropsWithoutRef<"div">) {
@@ -23,11 +24,18 @@ export default function ConfirmRegistration({}: React.ComponentPropsWithoutRef<"
    const token = useSearchParams().get("token");
 
    const onConfirmClick = async () => {
-      const response = await confirmRegistration(token);
+      const locale = await getUserLocale();
+      const data = {
+         lang: locale,
+         confirmationLink: `${window.location.origin}/confirm`
+      };
+      const response = await confirmRegistration(token, data);
       if (response.status === "success") {
          toast.success(translations("confirmSuccess"));
       } else if (response.message === "invalid token") {
          toast.error(translations("confirmErrorToken"));
+      } else if (response.message === "expired token") {
+         toast.error(translations("confirmErrorTokenExpired"));
       } else {
          toast.error(translations("confirmError"));
       }

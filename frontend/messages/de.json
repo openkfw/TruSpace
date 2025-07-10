@@ -58,6 +58,7 @@
       "text": "Klick bitte auf den Button unten, um deine Registrierung abzuschließen",
       "confirmError": "Es ist ein Fehler aufgetreten. Versuch's bitte nochmal.",
       "confirmErrorToken": "Fehler bei der Bestätigung: Der Link ist ungültig",
+      "confirmErrorTokenExpired": "Fehler bei der Bestätigung: Token ist abgelaufen, neue Bestätigungs-E-Mail wurde gesendet",
       "confirmSuccess": "Geschafft! Deine Registrierung ist abgeschlossen. Du kannst dich jetzt anmelden."
    },
    "forgotPassword": {
