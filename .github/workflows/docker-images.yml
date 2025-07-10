@@ -2,16 +2,14 @@ name: Docker Images CI
 
 on:
   push:
-    branches: ["main", "57-gh-images"]
+    branches: ["main"]
     tags: ["v*"]
-  # pull_request:
-  #   branches: ["main", "57-gh-images"]
 
 env:
   REGISTRY: docker.io
   BACKEND_IMAGE_NAME: openkfw/truspace-backend
   FRONTEND_IMAGE_NAME: openkfw/truspace-frontend
-  ENABLE_CODE_SCANNING: false
+  ENABLE_CODE_SCANNING: true
 
 jobs:
   changes:
