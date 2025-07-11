@@ -30,6 +30,7 @@ import {
   readExternalPrompts,
   tagsPrompt,
 } from "../utility/prompts";
+import { sendNotification } from "../mailing/notifications";
 
 (function () {
   addPerspectivesTemplate();
@@ -439,6 +440,17 @@ router.put(
               statusEndpoint: null,
             },
           };
+
+      const documentCreator = docInfo.documentVersions[0].meta.creator;
+      // const userSettings = getUserSettings(req.user?.email as string);
+      if (documentCreator !== req.user?.name) {
+        sendNotification(
+          documentCreator,
+          "addedToWorkspace",
+          `/workspace/${docInfo.meta.workspaceOrigin}/document/${docId}`,
+          docInfo.meta.filename
+        );
+      }
 
       const responseMessage =
         "Document updated successfully and AI processing initiated where applicable.";
