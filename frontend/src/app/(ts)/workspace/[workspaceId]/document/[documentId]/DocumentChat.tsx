@@ -136,8 +136,8 @@ export default function DocumentChat({
    }
 
    return (
-      <div className="flex flex-col h-full">
-         <div className="flex-1 overflow-auto space-y-4 p-4">
+      <div className="flex flex-col h-full pt-10">
+         <div className="flex-1 overflow-auto space-y-4 px-4 pb-4 mt-2">
             {chats && chats.length > 0 ? (
                chats.map((chat: Chat) => {
                   const messageData = JSON.parse(chat.meta.data);

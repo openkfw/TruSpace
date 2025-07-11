@@ -1,7 +1,10 @@
 "use client";
+
 import { useEffect, useRef, useState } from "react";
 
-import { MessageCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
+
+import { ChevronDown, MessageCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Document } from "@/interfaces";
@@ -37,15 +40,13 @@ export default function FloatingChat({
 }: FloatingChatProps) {
    const [isOpen, setIsOpen] = useState(false);
    const chatRef = useRef<HTMLDivElement>(null);
-   const buttonRef = useRef<HTMLButtonElement>(null);
+   const chatTranslations = useTranslations("chat");
 
    useEffect(() => {
       const handleClickOutside = (event: MouseEvent) => {
          if (
             chatRef.current &&
-            !chatRef.current.contains(event.target as Node) &&
-            buttonRef.current &&
-            !buttonRef.current.contains(event.target as Node)
+            !chatRef.current.contains(event.target as Node)
          ) {
             setIsOpen(false);
          }
@@ -70,20 +71,35 @@ export default function FloatingChat({
 
    return (
       <div className="fixed bottom-6 right-6 z-50">
-         <Button
-            ref={buttonRef}
-            size="icon"
-            onClick={() => setIsOpen((prev) => !prev)}
-            className="h-12 w-12 rounded-full shadow-md transition-transform duration-200 hover:scale-110"
-         >
-            <MessageCircle className="!size-6" />
-         </Button>
+         {!isOpen && (
+            <Button
+               onClick={() => setIsOpen((prev) => !prev)}
+               className="flex items-center h-16 pr-1 bg-blue-600 hover:bg-blue-700 rounded-full shadow-md group"
+            >
+               <span className="text-lg font-bold">
+                  {chatTranslations("chat")}
+               </span>
+               <div className="bg-blue-500 group-hover:bg-blue-600 p-3 rounded-full transition-colors">
+                  <MessageCircle className="!size-8 text-white fill-white transition-transform duration-200 group-hover:scale-110" />
+               </div>
+            </Button>
+         )}
 
          {isOpen && (
             <div
                ref={chatRef}
                className="absolute bottom-14 right-0 w-[400px] h-[600px] bg-card rounded-md shadow-md"
             >
+               <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setIsOpen(false)}
+                  className="absolute top-2 right-2 p-1 rounded-full"
+                  aria-label="Close chat"
+               >
+                  <ChevronDown className="!size-5" />
+               </Button>
+
                <DocumentChat
                   cid={cid}
                   docId={docId}
