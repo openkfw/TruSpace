@@ -40,16 +40,13 @@ export default function FloatingChat({
 }: FloatingChatProps) {
    const [isOpen, setIsOpen] = useState(false);
    const chatRef = useRef<HTMLDivElement>(null);
-   const buttonRef = useRef<HTMLButtonElement>(null);
    const chatTranslations = useTranslations("chat");
 
    useEffect(() => {
       const handleClickOutside = (event: MouseEvent) => {
          if (
             chatRef.current &&
-            !chatRef.current.contains(event.target as Node) &&
-            buttonRef.current &&
-            !buttonRef.current.contains(event.target as Node)
+            !chatRef.current.contains(event.target as Node)
          ) {
             setIsOpen(false);
          }
@@ -76,7 +73,6 @@ export default function FloatingChat({
       <div className="fixed bottom-6 right-6 z-50">
          {!isOpen && (
             <Button
-               ref={buttonRef}
                onClick={() => setIsOpen((prev) => !prev)}
                className="flex items-center h-16 pr-1 bg-blue-600 hover:bg-blue-700 rounded-full shadow-md group"
             >
