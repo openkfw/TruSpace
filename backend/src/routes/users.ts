@@ -11,7 +11,7 @@ import {
   findUserByTokenDb,
   getTotalRecentlyAddedUsersDb,
   getTotalUsersDb,
-  storeAvatarCidDb,
+  storeUserSettingsDb,
   updateUserPassword,
 } from "../clients/db";
 import { config } from "../config/config";
@@ -34,6 +34,7 @@ import {
   getTokenDb,
   removeTokensOfUserDb,
 } from "../clients/db/resetPasswordTokens";
+import { getUserSettings } from "../utility/user";
 
 const router = express.Router();
 logger.info("Registering user");
@@ -277,32 +278,80 @@ router.get(
   }
 );
 
-router.post(
-  "/avatar",
+router.get(
+  "/user-settings",
   authenticateCookie,
   async (req: AuthenticatedRequest, res: Response) => {
-    if (!req.files || !req.files.file) {
-      return res.status(400).json({
-        success: false,
-        message: "No document uploaded",
-      });
-    }
     try {
-      const file = req.files.file as UploadedFile;
-
-      const client = new IpfsClient();
-      const cid = await client.uploadAvatar(file);
-
-      await storeAvatarCidDb(req.user?.email as string, cid);
+      const userSettings = await getUserSettings(req.user?.email as string);
+      if (!userSettings) {
+        return res.status(404).json({
+          status: "failure",
+          message: "User not found",
+        });
+      }
       return res.json({
         status: "success",
-        message: "Avatar uploaded",
+        data: {
+          ...userSettings,
+        },
+      });
+    } catch (error) {
+      logger.error(
+        `Error fetching user settings: ${JSON.stringify(error, null, 2)}`
+      );
+      res.status(500).json({
+        status: "failure",
+        message: "User settings fetch failed",
+      });
+    }
+  }
+);
+
+router.post(
+  "/user-settings",
+  authenticateCookie,
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const file = req?.files?.file as UploadedFile;
+
+      let avatarCid: string | undefined = undefined;
+      if (file) {
+        const client = new IpfsClient();
+        avatarCid = await client.uploadAvatar(file);
+      }
+
+      const addedToWorkspace =
+        req.body.addedToWorkspace === "true";
+      const documentChanged =
+        req.body.documentChanged === "true";
+      const documentChat =
+        req.body.documentChat === "true";
+      const workspaceChange =
+        req.body.workspaceChange === "true";
+      const preferedLanguage = req.body.preferedLanguage || "en";
+
+      const notificationSettings = {
+        addedToWorkspace,
+        documentChanged,
+        documentChat,
+        workspaceChange,
+      };
+
+      await storeUserSettingsDb(req.user?.email as string, {
+        avatarCid,
+        preferedLanguage,
+        notificationSettings: JSON.stringify(notificationSettings),
+      });
+      return res.json({
+        status: "success",
+        message: "User settings updated successfully",
       });
     } catch (error) {
       logger.error(`Error uploading avatar: ${JSON.stringify(error, null, 2)}`);
       res.status(500).json({
         status: "failure",
-        message: "Avatar upload failed",
+        message: "User settings update failed",
       });
     }
   }

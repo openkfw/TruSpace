@@ -9,6 +9,7 @@ import { IpfsClient } from "../clients/ipfs-client";
 import validate from "../middlewares/validate";
 import { AuthenticatedRequest } from "../types";
 import { USER_PERMISSION_STATUS } from "../utility/constants";
+import { sendNotification } from "../mailing/notifications";
 
 const router = express.Router();
 
@@ -45,7 +46,42 @@ router.post(
         role: "admin",
         status: USER_PERMISSION_STATUS.active,
       });
-
+      // Notify the user about the workspace assignement
+      sendNotification(
+        email,
+        "addedToWorkspace",
+        `/workspace/${workspaceId}`,
+        workspaces[0].meta.name
+      );
+      // const userSettings = await getUserSettings(email);
+      // if (userSettings) {
+      //   const notificationSettings = userSettings.notificationSettings;
+      //   if (notificationSettings?.addedToWorkspace) {
+      //     const filePath = path.join(
+      //       process.cwd(),
+      //       "src/mailing/templates/addedToWorkspace.html"
+      //     );
+      //     const source = fs.readFileSync(filePath, "utf-8");
+      //     const template = compile(source);
+      //     const lang = userSettings.preferedLanguage || "en";
+      //     const replacements = {
+      //       lang,
+      //       header: assignedToWorkspace[lang].header,
+      //       user: email,
+      //       text: assignedToWorkspace[lang].text,
+      //       workspaceUrl: config.frontendUrl + "/workspace/" + workspaceId,
+      //       workspaceTitle: workspaces[0].meta.name,
+      //       footer: assignedToWorkspace[lang].footer,
+      //     };
+      //     const htmlTemplateToSend = template(replacements);
+      //     logger.info("Sending email done");
+      //     await sendEmail(
+      //       email,
+      //       assignedToWorkspace[lang].subject,
+      //       htmlTemplateToSend
+      //     );
+      //   }
+      // }
       res.json({
         status: "success",
         message: "User added to the workspace",

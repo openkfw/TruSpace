@@ -14,7 +14,11 @@ import { usePathname, useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 
 import { COOKIE_NAME, deleteLoginCookie, setLoginCookie } from "@/lib";
-import { downloadAvatar, logout as apiLogout } from "@/lib/services";
+import {
+   downloadAvatar,
+   downloadUserSettings,
+   logout as apiLogout
+} from "@/lib/services";
 
 const routesWithoutToken = [
    "/confirm",
@@ -28,6 +32,15 @@ interface User {
    name: string;
    email: string;
    avatar?: string;
+   settings?: {
+      preferedLanguage: string; // ISO 639-1 code, e.g., "en", "de"
+      notificationSettings?: {
+         addedToWorkspace?: boolean;
+         documentChanged?: boolean;
+         documentChat?: boolean;
+         workspaceChange?: boolean;
+      };
+   };
    loginTime?: string;
    expires: number; // milliseconds since UNIX epoch
    initials: string;
@@ -47,6 +60,7 @@ interface UserContextType {
    logout: () => void;
    updateUser: (updates: UserUpdates) => void;
    updateAvatar: (avatarUrl: string) => void;
+   updatePreferedLanguage: (language: string) => void;
    refreshUser: () => Promise<void>;
 }
 
@@ -132,8 +146,15 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       [handleTokenExpiration, isTokenExpired]
    );
 
-   const fetchAvatar = useCallback(async () => {
+   const fetchUserDetails = useCallback(async () => {
       try {
+         const userSettings = await downloadUserSettings();
+         if (userSettings.status === "success") {
+            setUser((prev) =>
+               prev ? { ...prev, settings: userSettings.data } : null
+            );
+         }
+
          const response = await downloadAvatar();
 
          if (!response) {
@@ -185,7 +206,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
          setupTokenCheck(userData.expires);
 
          try {
-            await fetchAvatar();
+            await fetchUserDetails();
          } catch (avatarError) {
             console.error("Error fetching avatar:", avatarError);
             // Don't fail the entire login process if avatar fails
@@ -198,7 +219,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       } finally {
          setLoading(false);
       }
-   }, [router, isTokenExpired, setupTokenCheck, fetchAvatar]);
+   }, [router, isTokenExpired, setupTokenCheck, fetchUserDetails]);
 
    const refreshUser = useCallback(async () => {
       await initializeUser();
@@ -272,6 +293,19 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       });
    };
 
+   const updatePreferedLanguage = (language: string): void => {
+      setUser((prevUser) => {
+         if (!prevUser) return null;
+         return {
+            ...prevUser,
+            settings: {
+               ...prevUser.settings,
+               preferedLanguage: language
+            }
+         };
+      });
+   };
+
    const isLoggedIn: boolean = Boolean(user);
 
    const value: UserContextType = {
@@ -281,6 +315,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       logout,
       updateUser,
       updateAvatar,
+      updatePreferedLanguage,
       refreshUser
    };
 

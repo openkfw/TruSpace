@@ -10,6 +10,8 @@ interface UserDb {
   password_hash: string;
   user_token: string;
   avatar_cid?: string;
+  prefered_language?: string; // ISO 639-1 code, e.g., "en", "de"
+  notification_settings?: string; // JSON string
   created_at?: Date;
   updated_at?: Date;
 }
@@ -53,6 +55,8 @@ export const findUserByEmailDb = async (email: string) => {
         "status",
         "password_hash",
         "avatar_cid",
+        "prefered_language",
+        "notification_settings",
         "created_at"
       )
       .where({ email })
@@ -101,16 +105,33 @@ export const getTotalRecentlyAddedUsersDb = async (): Promise<number> => {
 
 export const activateUserDb = async (userId: number): Promise<void> => {
   try {
-    await db("users").where({ id: userId }).update({ status: USER_STATUS.active });
+    await db("users")
+      .where({ id: userId })
+      .update({ status: USER_STATUS.active });
   } catch (error) {
     logger.error("Error activating user:", error);
   }
 };
 
-export const storeAvatarCidDb = async (email: string, cid: string) => {
+export const storeUserSettingsDb = async (
+  email: string,
+  {
+    avatarCid,
+    preferedLanguage = "en",
+    notificationSettings,
+  }: {
+    avatarCid?: string;
+    preferedLanguage?: string;
+    notificationSettings?: string;
+  } = {}
+) => {
   try {
     await db<UserDb>("users")
-      .update({ avatar_cid: cid })
+      .update({
+        avatar_cid: avatarCid,
+        prefered_language: preferedLanguage,
+        notification_settings: notificationSettings,
+      })
       .where({ email: email });
   } catch (error) {
     logger.error("Error updating user", error);
@@ -118,7 +139,10 @@ export const storeAvatarCidDb = async (email: string, cid: string) => {
   }
 };
 
-export const updateUserPassword = async (userId: number, passwordHash: string) => {
+export const updateUserPassword = async (
+  userId: number,
+  passwordHash: string
+) => {
   try {
     await db<UserDb>("users")
       .update({ password_hash: passwordHash })
@@ -127,4 +151,4 @@ export const updateUserPassword = async (userId: number, passwordHash: string) =
     logger.error("Error updating user", error);
     throw new Error("Error updating user");
   }
-}
+};

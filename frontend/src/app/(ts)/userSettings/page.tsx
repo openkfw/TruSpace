@@ -1,20 +1,57 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 
 import { useTranslations } from "next-intl";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+   Select,
+   SelectContent,
+   SelectItem,
+   SelectTrigger,
+   SelectValue
+} from "@/components/ui/select";
 import { useUser } from "@/contexts/UserContext";
-import { uploadAvatar } from "@/lib/services";
+import { updateUserSettings } from "@/lib/services";
 
 export default function UserSettings() {
-   const { user, loading, updateAvatar } = useUser();
+   const { user, loading, updatePreferedLanguage, updateAvatar } = useUser();
    const [file, setFile] = useState<File>();
+   const [selectedLanguage, setSelectedLanguage] = useState<string>();
+   const [notificationAddedToWorkspace, setNotificationAddedToWorkspace] =
+      useState<boolean>(false);
+   const [notificationDocumentChanged, setNotificationDocumentChanged] =
+      useState<boolean>(false);
+   const [notificationDocumentChat, setNotificationDocumentChat] =
+      useState<boolean>();
+   const [notificationWorkspaceChange, setNotificationWorkspaceChange] =
+      useState<boolean>(false);
+
+   useEffect(() => {
+      if (user) {
+         if (user.settings?.preferedLanguage) {
+            setSelectedLanguage(user.settings?.preferedLanguage);
+         }
+         setNotificationAddedToWorkspace(
+            user.settings?.notificationSettings?.addedToWorkspace || false
+         );
+         setNotificationDocumentChanged(
+            user.settings?.notificationSettings?.documentChanged || false
+         );
+         setNotificationDocumentChat(
+            user.settings?.notificationSettings?.documentChat || false
+         );
+         setNotificationWorkspaceChange(
+            user.settings?.notificationSettings?.workspaceChange || false
+         );
+      }
+   }, [user]);
    const registerTranslations = useTranslations("register");
    const generalTranslations = useTranslations("general");
    const settingsTranslations = useTranslations("settings");
@@ -36,16 +73,35 @@ export default function UserSettings() {
       }
    };
 
+   const handlePreferedLanguageChange = (language) => {
+      setSelectedLanguage(language);
+   };
+
    const handleSubmit = async () => {
-      // TODO when appropriate add other fields, updateUser instead of uploadAvatar
-      if (!file) {
-         toast.info(settingsTranslations("nothingToUpload"));
-         return;
-      }
       try {
          const formData = new FormData();
-         formData.append("file", file, file.name);
-         await uploadAvatar(formData);
+         if (file) {
+            formData.append("file", file, file.name);
+         }
+         formData.append("preferedLanguage", selectedLanguage);
+         formData.append(
+            "notificationAddedToWorkspace",
+            String(notificationAddedToWorkspace)
+         );
+         formData.append(
+            "notificationDocumentChanged",
+            String(notificationDocumentChanged)
+         );
+         formData.append(
+            "notificationDocumentChat",
+            String(notificationDocumentChat)
+         );
+         formData.append(
+            "notificationWorkspaceChange",
+            String(notificationWorkspaceChange)
+         );
+         updatePreferedLanguage(selectedLanguage);
+         await updateUserSettings(formData);
          toast.success(settingsTranslations("updateSuccess"));
          setFile(null);
       } catch (err) {
@@ -55,6 +111,8 @@ export default function UserSettings() {
    };
 
    if (loading || !user) return <div>{generalTranslations("loading")}</div>;
+
+   console.log("User settings", user);
 
    return (
       <div className="max-w-md mx-auto mt-16 p-6 space-y-8">
@@ -108,6 +166,85 @@ export default function UserSettings() {
                   disabled
                />
             </div>
+            <div>
+               <Label htmlFor="email">
+                  {settingsTranslations("preferedLanguage")}
+               </Label>
+               <Select
+                  value={selectedLanguage}
+                  onValueChange={handlePreferedLanguageChange}
+               >
+                  <SelectTrigger className="w-15 bg-slate-50 dark:bg-slate-800 dark:text-white dark:placeholder:text-white">
+                     <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="w-15">
+                     {[
+                        { key: "en", label: "English" },
+                        { key: "de", label: "Deutsch" }
+                     ].map((language) => (
+                        <SelectItem key={language.key} value={language.key}>
+                           {language.label}
+                        </SelectItem>
+                     ))}
+                  </SelectContent>
+               </Select>
+            </div>
+         </div>
+         <div className="space-y-4">
+            <h3>{settingsTranslations("notificationSettings")}</h3>
+            <p className="text-xs text-muted-foreground mb-2">
+               {settingsTranslations("notificationSettingsDescription")}
+            </p>
+            <div>
+               <Checkbox
+                  id="notificationAddedToWorkspace"
+                  checked={notificationAddedToWorkspace}
+                  onCheckedChange={(checked) =>
+                     setNotificationAddedToWorkspace(!!checked)
+                  }
+               />{" "}
+               <Label htmlFor="notificationAddedToWorkspace">
+                  {settingsTranslations("notificationAddedToWorkspace")}
+               </Label>
+            </div>
+            <div>
+               <Checkbox
+                  id="notificationDocumentChanged"
+                  checked={notificationDocumentChanged}
+                  onCheckedChange={(checked) =>
+                     setNotificationDocumentChanged(!!checked)
+                  }
+               />{" "}
+               <Label htmlFor="notificationDocumentChanged">
+                  {settingsTranslations("notificationDocumentChanged")}
+               </Label>
+            </div>
+            <div>
+               <Checkbox
+                  id="notificationDocumentChat"
+                  checked={notificationDocumentChat}
+                  onCheckedChange={(checked) =>
+                     setNotificationDocumentChat(!!checked)
+                  }
+               />{" "}
+               <Label htmlFor="notificationDocumentChat">
+                  {settingsTranslations("notificationDocumentChat")}
+               </Label>
+            </div>
+            <div>
+               <Checkbox
+                  id="notificationWorkspaceChange"
+                  checked={notificationWorkspaceChange}
+                  onCheckedChange={(checked) =>
+                     setNotificationWorkspaceChange(!!checked)
+                  }
+               />{" "}
+               <Label htmlFor="notificationWorkspaceChange">
+                  {settingsTranslations("notificationWorkspaceChanged")}
+               </Label>
+            </div>
+         </div>
+         <div className="space-y-2">
             <Button type="submit" onClick={handleSubmit} className="w-full">
                {generalTranslations("saveSettings")}
             </Button>

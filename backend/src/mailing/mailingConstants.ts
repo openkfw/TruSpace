@@ -34,3 +34,42 @@ export const passwordReset: Record<string, Record<string, string>> = {
     footer: "Viele Grüße,",
   },
 };
+
+const addedToWorkspace: Record<string, Record<string, string>> = {
+  en: {
+    subject: "TruSpace: You have been added to a workspace",
+    header: "Dear ",
+    text: "You are receiving this e-mail because you have been added to a workspace. Please proceed to the website below to see the workspace.",
+    link: "Open workspace",
+    footer: "Best regards,",
+  },
+  de: {
+    subject: "TruSpace: Du wurdest zu einem Arbeitsbereich hinzugefügt",
+    header: "Hallo ",
+    text: "Du erhältst diese E-Mail, weil du zu einem Arbeitsbereich hinzugefügt wurdest. Bitte gehe auf die unten stehende Website, um den Arbeitsbereich zu sehen.",
+    link: "Arbeitsbereich öffnen",
+    footer: "Viele Grüße,",
+  },
+};
+
+const documentChanged: Record<string, Record<string, string>> = {
+  en: {
+    subject: "TruSpace: Document has been changed",
+    header: "Dear ",
+    text: "You are receiving this e-mail because a document you are following has been changed. Please proceed to the website below to see the changes.",
+    link: "Open document",
+    footer: "Best regards,",
+  },
+  de: {
+    subject: "TruSpace: Dokument wurde geändert",
+    header: "Hallo ",
+    text: "Du erhältst diese E-Mail, weil ein Dokument, dem du folgst, geändert wurde. Bitte gehe auf die unten stehende Website, um die Änderungen zu sehen.",
+    link: "Dokument öffnen",
+    footer: "Viele Grüße,",
+  },
+};
+
+export const notifications = {
+  addedToWorkspace,
+  documentChanged,
+};

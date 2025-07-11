@@ -17,4 +17,5 @@
 | AUTO_DOWNLOAD                | boolean | true                    | If Truspace is allowed to download configured LLM automatically |
 | DISABLE_ALL_AI_FUNCTIONALITY | boolean | false                   | Optionally disable using of AI in whole application             |
 | JWT_MAX_AGE                  | number  | `24 \* 60 \* 60` (24h)  | Validity of jwt cookie, in seconds                              |
+| FRONTEND_URL                 | string  | `http://localhost:3000` | URL adress or IP address on which the app frontend is available |
 | CORS_ORIGIN                  | string  | `http://localhost:3000` | Whitelist of allowed origins                                    |
