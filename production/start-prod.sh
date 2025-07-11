@@ -1,5 +1,5 @@
 #!/bin/bash
-# This script starts the production environment for Truspace
+# This script starts the production environment for TruSpace
 # Usage: ./start-prod.sh
 
 Help() {

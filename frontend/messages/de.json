@@ -271,6 +271,7 @@
       }
    },
    "chat": {
+      "chat": "Chatten",
       "user": "Benutzer",
       "messageForVersion": "Bezogen auf die Dokumentversion:",
       "reply": "Antwort",

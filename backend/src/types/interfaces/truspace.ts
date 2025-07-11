@@ -11,6 +11,7 @@ export interface DocumentMeta {
   timestamp: string;
   version: string;
   creator: string;
+  creatorUiid: string;
   workspaceOrigin: string;
   encrypted: string;
   language?: string;
@@ -53,6 +54,7 @@ interface WorkspaceMeta {
   workspace_uuid: string;
   type: "workspace";
   creator_id: string;
+  creator_name: string;
   name: string;
   password_hash?: string;
   is_public: boolean;
@@ -82,6 +84,7 @@ interface ChatMessageMeta {
   workspaceOrigin: string;
   timestamp: string;
   creator: string;
+  creatorUiid: string;
 }
 
 export interface ChatMessageRequest {
@@ -102,6 +105,7 @@ interface PerspectiveMeta {
   data: string;
   creatorType: string;
   creator: string;
+  creatorUiid: string;
   prompt: string;
   model?: string;
 }
@@ -131,6 +135,7 @@ interface TagMeta {
   name: string;
   color: string;
   creator: string;
+  creatorUiid: string;
   creatorType: string;
 }
 
@@ -145,6 +150,7 @@ interface GeneralTemplateOfItemInWorkspaceMeta {
   docId: string;
   timestamp: string;
   creator: string;
+  creatorUiid: string;
   creatorType?: string;
 }
 

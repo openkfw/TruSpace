@@ -9,7 +9,7 @@ If you are running on Windows, use [WSL](https://learn.microsoft.com/en-us/windo
 ## Starting dev environment
 
 - Start dev environment by running `sh start.sh` It will create `.env` file from default `.env.example` file if it doesn't exist. As a next step the script spins up docker compose containing backend api and IPFS cluster, AI functionality Ollama and Open WebUI. As the last step the script installs npm packages and runs NextJS frontend in dev mode.
-- Truspace UI can be found on <http://localhost:3000/>
+- TruSpace UI can be found on <http://localhost:3000/>
 - Open WebUI can be found on <http://localhost:3333/>
 
 There is an option to run local environment without AI functionality (Ollama and Open WebUI), by setting `DISABLE_ALL_AI_FUNCTIONALITY=true` in `.env` file in the root folder prior to running of `sh start.sh`.
@@ -26,23 +26,24 @@ To start the dev environment on Windows in WSL, a few changes need to be made:
 
 These port changes are required to avoid conflicts with Windows services and errors in the startup process.
 
-After these changes, run the following: 
+After these changes, run the following:
 
 - To start the dev environment run `sh start.sh`. It will create `.env` file from default `.env.example` file if it doesn't exist. As a next step the script spins up docker compose containing backend api and IPFS cluster, AI functionality Ollama and Open WebUI. As the last step the script installs npm packages and runs NextJS frontend in dev mode.
 
-After it has spun up, stop the dev environment by killing the terminal and run the following in the root directory: 
+After it has spun up, stop the dev environment by killing the terminal and run the following in the root directory:
 
 - `chmod -R 777 volumes`. This makes sure the containers can actually access the files in their volumes.
 
 And the very last step:
--  Go to <http://localhost:3333> and login using the credentials found in your `.env` file. 
--  Go to the top right corner, click on the profile picture and select "Admin Settings" in the drop down menu. 
--  Go to the top middle and select "Settings", go to "Connections" and under "Manage Ollama API Connections" go to the very right and select the gear icon. 
-- Under URL input the following: "http://ollama:11434". The port needs to be the internal docker port. 
-- When clicking on the reload symbol, a green "Server connection verified" toast should appear in the top right corner. 
+
+- Go to <http://localhost:3333> and login using the credentials found in your `.env` file.
+- Go to the top right corner, click on the profile picture and select "Admin Settings" in the drop down menu.
+- Go to the top middle and select "Settings", go to "Connections" and under "Manage Ollama API Connections" go to the very right and select the gear icon.
+- Under URL input the following: "http://ollama:11434". The port needs to be the internal docker port.
+- When clicking on the reload symbol, a green "Server connection verified" toast should appear in the top right corner.
 - Close the dialog and click on the download icon next to the gear icon
 - Input the model name and download the model specified in your `.env` file, or one of the models found in the [Ollama Model Library](https://ollama.com/library)
-    - If the model download fails, try again. If it keeps failing, make sure the connection can be made to the ollama container by checking the instructions above.
+  - If the model download fails, try again. If it keeps failing, make sure the connection can be made to the ollama container by checking the instructions above.
 
 There is an option to run local environment without AI functionality (Ollama and Open WebUI), by setting `DISABLE_ALL_AI_FUNCTIONALITY=true` in `.env` file in the root folder prior to running of `sh start.sh`.
 

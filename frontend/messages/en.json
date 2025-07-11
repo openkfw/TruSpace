@@ -271,6 +271,7 @@
       }
    },
    "chat": {
+      "chat": "Chat",
       "user": "User",
       "messageForVersion": "Related to document version:",
       "reply": "Reply",

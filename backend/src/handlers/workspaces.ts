@@ -5,7 +5,7 @@ export async function getContributorsWorkspace(wId: string) {
   const everythingInWorkspace = await client.getEverythingInWorkspace(wId);
   const contributors = everythingInWorkspace
     .filter((t) => t.meta.creatorType !== "ai")
-    .map((t) => t.meta.creator);
+    .map((t) => t.meta.creatorUiid);
 
   const uniqueContributors = [...new Set(contributors.filter((c) => c))];
 

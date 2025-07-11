@@ -16,7 +16,7 @@ git clone https://github.com/openkfw/TruSpace.git
 - Copy `.env.example` into `.env`
 
 ```bash
-cd Truspace
+cd TruSpace
 cp .env.example .env
 ```
 

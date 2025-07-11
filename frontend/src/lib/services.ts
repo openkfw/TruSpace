@@ -125,7 +125,7 @@ export const createWorkspace = async (formData, errorText) => {
 
 export const updateWorkspaceType = async (
    wUID: string,
-   formData: { email: string; isPublic: boolean },
+   formData: { isPublic: boolean },
    errorText: string
 ) => {
    const options: RequestInit = {
@@ -218,6 +218,7 @@ export const usePerspectives = (cid: string) => {
             text: perspective.meta.data,
             creatorType: perspective.meta.creatorType,
             creator: perspective.meta.creator,
+            creatorUiid: perspective.meta.creatorUiid,
             model: perspective.meta.model,
             prompt: perspective.meta.prompt,
             timestamp: perspective.meta.timestamp

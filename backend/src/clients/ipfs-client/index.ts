@@ -169,6 +169,7 @@ export class IpfsClient implements IClient {
       cid: clusterRes.cid,
       meta: {
         creator: clusterRes.metadata.creator,
+        creatorUiid: clusterRes.metadata.creatorUiid,
         workspaceOrigin: clusterRes.metadata.workspaceOrigin,
         filename: clusterRes.metadata.filename,
         timestamp: clusterRes.metadata.timestamp,
@@ -222,6 +223,7 @@ export class IpfsClient implements IClient {
           timestamp: "",
           version: "",
           creator: "",
+          creatorUiid: "",
           workspaceOrigin: "", // This might need to be fetched differently if no versions
           language: undefined,
           size: 0,
@@ -260,7 +262,11 @@ export class IpfsClient implements IClient {
       const docInfo = await this.getDocumentVersionDetailsByCid(cid);
       const metadata = docInfo.meta;
 
-      await checkPermissionForWorkspace(req, res, metadata.workspaceOrigin);
+      await checkPermissionForWorkspace(
+        req.user?.email as string,
+        res,
+        metadata.workspaceOrigin
+      );
 
       const result = await this.#gatewayAxios.get(`/ipfs/${cid}`, {
         responseType: "arraybuffer",
@@ -420,31 +426,21 @@ export class IpfsClient implements IClient {
 
   async updateWorkspaceType(
     workspaceId: string,
-    updates: { email: string; isPublic: boolean }
-  ): Promise<WorkspaceRequest> {
+    isPublic: boolean
+  ): Promise<void> {
     const workspace = await this.getWorkspaceById(workspaceId);
-
-    const updatedWorkspace: WorkspaceRequest = {
-      uuid: workspaceId,
-      ...workspace,
-      meta: {
-        ...workspace[0].meta,
-        is_public: updates.isPublic,
-        type: "workspace",
-      },
-    };
 
     const pinRequest: WorkspaceRequest = {
       uuid: workspaceId,
       meta: {
-        ...updatedWorkspace.meta,
+        ...workspace[0].meta,
+        is_public: isPublic,
+        type: "workspace",
       },
     };
     await this.createWorkspace(pinRequest);
 
     await this.#clusterAxios.delete(`/pins/${workspace[0].cid}`);
-
-    return updatedWorkspace;
   }
 
   /**
@@ -771,6 +767,7 @@ export class IpfsClient implements IClient {
       uuid: pin.meta.workspace_uuid,
       meta: {
         creator_id: pin.meta.creator_id,
+        creator_name: pin.meta.creator_name,
         created_at: pin.meta.created_at,
         type: "workspace",
         workspace_uuid: pin.meta.workspace_uuid,
@@ -787,6 +784,7 @@ export class IpfsClient implements IClient {
       cid: pin.cid,
       meta: {
         creator: pin.meta.creator,
+        creatorUiid: pin.meta.creatorUiid,
         workspaceOrigin: pin.meta.workspaceOrigin,
         filename: pin.meta.filename,
         timestamp: pin.meta.timestamp,
@@ -813,6 +811,7 @@ export class IpfsClient implements IClient {
         perspectiveType: pin.meta.perspectiveType,
         data: pin.meta.data,
         creator: pin.meta.creator,
+        creatorUiid: pin.meta.creatorUiid,
         workspaceOrigin: pin.meta.workspaceOrigin,
       },
     };
@@ -831,6 +830,7 @@ export class IpfsClient implements IClient {
         timestamp: pin.meta.timestamp,
         data: pin.meta.data,
         creator: pin.meta.creator,
+        creatorUiid: pin.meta.creatorUiid,
         creatorType: pin.meta.creatorType,
         prompt: pin.meta.prompt,
       },
@@ -850,6 +850,7 @@ export class IpfsClient implements IClient {
         name: pin.meta.name,
         color: pin.meta.color,
         creator: pin.meta.creator,
+        creatorUiid: pin.meta.creatorUiid,
         creatorType: pin.meta.creatorType,
       },
     };
@@ -867,6 +868,7 @@ export class IpfsClient implements IClient {
         docId: pin.meta.docId,
         timestamp: pin.meta.timestamp,
         creator: pin.meta.creator,
+        creatorUiid: pin.meta.creatorUiid,
         creatorType: pin.meta.creatorType || "user",
       },
     };
