@@ -66,7 +66,7 @@ function WorkspaceMenu() {
                   align="end"
                   className="bg-blue-200 dark:bg-muted"
                >
-                  {workspace?.meta.creator_id === user?.name ? (
+                  {workspace?.meta.creator_id === user?.uiid ? (
                      <MenubarItem
                         className="hover:bg-blue-500 hover:dark:bg-blue-800 focus:bg-blue-500 focus:dark:bg-blue-800 data-[state=open]:bg-blue-500 data-[state=open]:dark:bg-blue-800 hover:text-white focus:text-white data-[state=open]:text-white"
                         onClick={() => {

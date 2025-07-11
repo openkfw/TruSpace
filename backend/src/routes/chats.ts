@@ -81,6 +81,7 @@ router.post(
         workspaceOrigin,
         timestamp: Date.now().toString(),
         creator: req.user?.name as string,
+        creatorUiid: req.user?.uiid as string,
       },
     };
 
