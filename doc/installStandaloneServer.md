@@ -1,8 +1,16 @@
-# Install brainstorming summary
+# Install TruSpace on a bare server or virtual machine running Linux
 
-Starting from an empty Ubuntu VM, follow these steps. In case a chapter is already done or clear to you, skip it
+Starting from an empty Ubuntu VM, follow these detailed steps. In case a chapter is already done or clear to you, skip it
 
 ## Setup basic infrastructure
+
+- Setup the DNS records to reflect the domain (e.g. `EXAMPLE.COM`) together with API endpoint (e.g. `api.EXAMPLE.COM` and Open Web UI endpoint (e.g. `oi.EXAMPLE.COM`) to the respective IP address of the server
+
+- Open the firewall ports:
+
+  - 443 inbound for https communication
+  - 4001 inbound/outbound for the IPFS swarm connection
+  - 9096/9097 inbound/outbound for the IPFS cluster connection
 
 - Update the system
 
@@ -16,10 +24,6 @@ Starting from an empty Ubuntu VM, follow these steps. In case a chapter is alrea
 ```bash
 sudo apt install git -y
 ```
-
-- Open the firewall ports:
-  - 443 for https communication
-- Setup the DNS records to reflect the domain (e.g. `EXAMPLE.COM`) together with API endpoint (e.g. `api.EXAMPLE.COM` and Open Web UI endpoint (e.g. `oi.EXAMPLE.COM`)
 
 ## Setup forward proxy nginx with SSL and LetsEncrypt
 
@@ -44,7 +48,7 @@ sudo systemctl start nginx
 sudo nano /etc/nginx/sites-available/EXAMPLE.COM
 ```
 
-- Paste this basic configuration (without SSL yet):
+- Paste this basic configuration and replace EXAMPLE.COM with your domain name. This configuration is without SSL, we'll do this later:
 
 ```nginx
 server {
@@ -72,7 +76,13 @@ server {
 }
 ```
 
-- Enable the config:
+- Test the nginx configuration file using
+
+```bash
+sudo nginx -t
+```
+
+- Enable the config with the respective domain name instead of `EXAMPLE.COM`:
 
 ```bash
 sudo ln -s /etc/nginx/sites-available/EXAMPLE.COM /etc/nginx/sites-enabled/
@@ -246,10 +256,9 @@ For more examples and ideas, visit:
 
 - Make sure to enable the entire docker functionality in the [post install guide](https://docs.docker.com/engine/install/linux-postinstall/)
 
-To make sure that your installation worked for all non-root users, run
+To make sure that your installation worked for all non-root users and docker is restarted when the server starts, reboot the server and try:
 
 ```bash
-newgrp docker
 docker run hello-world
 ```
 
@@ -282,11 +291,11 @@ For more examples and ideas, visit:
 
 ## Clone and configure the TruSpace repository
 
-- Clone the repository with
+- Clone the repository with anonymous access. If you have the git ssh keys configured you can also use the ssh link.
 
 ```bash
-git clone git@github.com:openkfw/TruSpace.git
-cd truspace
+git clone https://github.com/openkfw/TruSpace.git
+cd TruSpace
 ```
 
 ## 📥 Start of the server
