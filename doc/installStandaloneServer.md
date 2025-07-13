@@ -133,89 +133,107 @@ If you like Certbot, please consider supporting our work by:
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ```
 
-- The resulting config in `nano  /etc/nginx/sites-available/EXAMPLE.COM` should be something like:
+- The resulting config in `nano  /etc/nginx/sites-available/EXAMPLE.COM` should be something like the config below. Check that the headers are rewritten using `proxy_set_header` in order for CORS to work correctly.
 
 ```nginx
-# Redirect HTTP to HTTPS globally
+# ──────────────────────────────────────────────────────────────────────────────
+# HTTPS Servers
+# ──────────────────────────────────────────────────────────────────────────────
+
 server {
     server_name EXAMPLE.COM;
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate     /etc/letsencrypt/live/EXAMPLE.COM/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/EXAMPLE.COM/privkey.pem;   # managed by Certbot
+    include             /etc/letsencrypt/options-ssl-nginx.conf;          # managed by Certbot
+    ssl_dhparam         /etc/letsencrypt/ssl-dhparams.pem;               # managed by Certbot
+
     location / {
         proxy_pass http://localhost:3000;
+
+        # preserve original host for Next.js server actions
+        proxy_set_header Host              $host;
+        proxy_set_header X-Forwarded-Host  $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # (optional but recommended)
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
     }
-
-    listen 443 ssl; # managed by Certbot
-    ssl_certificate /etc/letsencrypt/live/EXAMPLE.COM/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/letsencrypt/live/EXAMPLE.COM/privkey.pem; # managed by Certbot
-    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
-    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
-
 }
 
 server {
     server_name oi.EXAMPLE.COM;
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate     /etc/letsencrypt/live/EXAMPLE.COM/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/EXAMPLE.COM/privkey.pem;   # managed by Certbot
+    include             /etc/letsencrypt/options-ssl-nginx.conf;          # managed by Certbot
+    ssl_dhparam         /etc/letsencrypt/ssl-dhparams.pem;               # managed by Certbot
+
     location / {
         proxy_pass http://localhost:3333;
+
+        proxy_set_header Host              $host;
+        proxy_set_header X-Forwarded-Host  $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
     }
-
-    listen 443 ssl; # managed by Certbot
-    ssl_certificate /etc/letsencrypt/live/EXAMPLE.COM/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/letsencrypt/live/EXAMPLE.COM/privkey.pem; # managed by Certbot
-    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
-    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
-
 }
 
 server {
     server_name api.EXAMPLE.COM;
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate     /etc/letsencrypt/live/EXAMPLE.COM/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/EXAMPLE.COM/privkey.pem;   # managed by Certbot
+    include             /etc/letsencrypt/options-ssl-nginx.conf;          # managed by Certbot
+    ssl_dhparam         /etc/letsencrypt/ssl-dhparams.pem;               # managed by Certbot
+
     location / {
         proxy_pass http://localhost:8000;
+
+        proxy_set_header Host              $host;
+        proxy_set_header X-Forwarded-Host  $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
     }
-
-    listen 443 ssl; # managed by Certbot
-    ssl_certificate /etc/letsencrypt/live/EXAMPLE.COM/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/letsencrypt/live/EXAMPLE.COM/privkey.pem; # managed by Certbot
-    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
-    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
-
 }
 
+# ──────────────────────────────────────────────────────────────────────────────
+# HTTP → HTTPS Redirects (managed by Certbot)
+# ──────────────────────────────────────────────────────────────────────────────
+
 server {
-    if ($host = EXAMPLE.COM) {
-        return 301 https://$host$request_uri;
-    } # managed by Certbot
-
-
     listen 80;
     server_name EXAMPLE.COM;
-    return 404; # managed by Certbot
-
-
+    if ($host = EXAMPLE.COM) {
+        return 301 https://$host$request_uri;
+    }
+    return 404;
 }
 
 server {
-    if ($host = oi.EXAMPLE.COM) {
-        return 301 https://$host$request_uri;
-    } # managed by Certbot
-
-
     listen 80;
     server_name oi.EXAMPLE.COM;
-    return 404; # managed by Certbot
-
-
+    if ($host = oi.EXAMPLE.COM) {
+        return 301 https://$host$request_uri;
+    }
+    return 404;
 }
 
 server {
-    if ($host = api.EXAMPLE.COM) {
-        return 301 https://$host$request_uri;
-    } # managed by Certbot
-
-
     listen 80;
     server_name api.EXAMPLE.COM;
-    return 404; # managed by Certbot
-
-
+    if ($host = api.EXAMPLE.COM) {
+        return 301 https://$host$request_uri;
+    }
+    return 404;
 }
 ```
 
@@ -300,11 +318,10 @@ cd TruSpace
 
 ## 📥 Start of the server
 
-If you want to run in production mode, e.g. on your virtual machine:
+For an initial configuration of the application run the startup script. It asks you a lof of configuration questions, if in doubt accept the default settings. You can easily change them later.
 
 ```bash
-cd production
-bash start-prod.sh
+bash start.sh
 ```
 
 If running for the first time you may need to set the correct permissions for the `/volumes` folders, run:
