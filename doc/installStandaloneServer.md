@@ -318,33 +318,19 @@ cd TruSpace
 
 ## 📥 Start of the server
 
-For an initial configuration of the application run the startup script. It asks you a lof of configuration questions, if in doubt accept the default settings. You can easily change them later.
+For an initial configuration of the application run the configuration script. It asks you a couple of configuration questions, if in doubt accept the default settings. You can easily change them later.
+
+```bash
+bash configure.sh
+```
+
+Then start the TruSpace installation with:
 
 ```bash
 bash start.sh
 ```
 
-If running for the first time you may need to set the correct permissions for the `/volumes` folders, run:
-
-```bash
-sudo chown -R 1000:1000 ./volumes
-# or
-sudo chmod -R 744 ./volumes
-# and restart application with
-bash start-prod.sh
-```
-
-```bash
-# To restart environment, e.g. after you change some environmental variables or updating the repo) run again:
-bash start-prod.sh
-```
-
-```bash
-# To STOP environment
-docker compose -f docker-compose.yml -f docker-compose-ai.yml down --remove-orphans
-```
-
-The result should look something like this
+If you check the installation with `docker ps` you should see these containers running:
 
 | IMAGE                                | COMMAND                | STATUS                        | PORTS                                                                                                                      | NAMES              |
 | ------------------------------------ | ---------------------- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------ |
@@ -357,18 +343,13 @@ You can also make sure that everything is correctly running when the status in t
 
 ## Configure AI backend with OI and test
 
+TruSpace downloads the configured AI model automatically if it is not present. If you need to check the respective AI installation do the following steps (optional)
+
 - Login to the subdomain of the [Open Web UI](https://oi.truspace.dev) using the credentials in the `.env` file: `ADMIN_USER_EMAIL` and `ADMIN_USER_PASSWORD`
 - Go to `Administration` and `Connection` and update the connection endpoint of ollama to `http://localhost:11434`. No API key is needed.
 - Download a model by selecting a model and typing the model name (e.g. `gemma3:1b`). Open Web UI should provide an option to download from [ollama.com](ollama.com). Because websockets are disabled in the configuration, the download takes a while until the frontend responds, so be patient.
-- Test with a simple chat, should result in something like this (TODO, insert image)
 
-## Configure TruSpace
+## Test TruSpace
 
-- Access TruSpace and register a user
+- Access TruSpace via `https://example.com/register` and register a user
 - Upload a document and verify that everything works
-
-## Configure access to IPFS
-
-- In volumes, add the IP address and cluster ID in the multicast format to service.json peers
-
-## Developer only: Starting frontend from Node
