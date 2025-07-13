@@ -25,12 +25,26 @@ if [[ ! -f "$TEMPLATE" ]]; then
 fi
 
 #─── GENERATE SECRETS ───────────────────────────────────────────────────────────
-
 warn "Generating secure secrets..."
 SWARM_KEY_SECRET=$(openssl rand -hex 32)
 CLUSTER_SECRET=$(openssl rand -hex 32)
 info "  • SWARM_KEY_SECRET: ${SWARM_KEY_SECRET:0:8}…${SWARM_KEY_SECRET: -8}"
 info "  • CLUSTER_SECRET : ${CLUSTER_SECRET:0:8}…${CLUSTER_SECRET: -8}"
+
+#─── CREATE IPFS SWARM KEY ──────────────────────────────────────────────────────
+IPFS_SWARM_DIR="./volumes/ipfs0"
+IPFS_SWARM_KEY_FILE="$IPFS_SWARM_DIR/swarm.key"
+
+warn "Ensuring IPFS swarm key directory exists at $IPFS_SWARM_DIR"
+mkdir -p "$IPFS_SWARM_DIR"
+
+warn "Writing IPFS swarm key to $IPFS_SWARM_KEY_FILE"
+cat > "$IPFS_SWARM_KEY_FILE" <<EOF
+/key/swarm/psk/1.0.0/
+/base16/
+$SWARM_KEY_SECRET
+EOF
+info "IPFS swarm key generated."
 
 #─── PROMPTS ───────────────────────────────────────────────────────────────────
 echo
