@@ -69,7 +69,7 @@ export const findUserByEmailDb = async (email: string) => {
 export const findUserByTokenDb = async (token: string) => {
   try {
     const user = await db<UserDb>("users")
-      .select("id")
+      .select("id", "email", "username", "status")
       .where({ user_token: token })
       .first();
     return user;
@@ -129,6 +129,17 @@ export const updateUserPassword = async (
   try {
     await db<UserDb>("users")
       .update({ password_hash: passwordHash })
+      .where({ id: userId });
+  } catch (error) {
+    logger.error("Error updating user", error);
+    throw new Error("Error updating user");
+  }
+};
+
+export const updateUserToken = async (userId: number, token: string) => {
+  try {
+    await db<UserDb>("users")
+      .update({ user_token: token })
       .where({ id: userId });
   } catch (error) {
     logger.error("Error updating user", error);
