@@ -58,6 +58,7 @@
       "text": "Please, click the button below to finish your registration",
       "confirmError": "An error occurred, please try again",
       "confirmErrorToken": "Account confirmation error: token is invalid",
+      "confirmErrorTokenExpired": "Account confirmation error: token has expired, new confirmation email has been sent",
       "confirmSuccess": "Success! Account registration finished, you can proceed to login page"
    },
    "forgotPassword": {
@@ -270,6 +271,7 @@
       }
    },
    "chat": {
+      "chat": "Chat",
       "user": "User",
       "messageForVersion": "Related to document version:",
       "reply": "Reply",

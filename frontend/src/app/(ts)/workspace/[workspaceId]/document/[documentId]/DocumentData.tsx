@@ -1,8 +1,11 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-toastify";
+
 import { useTranslations } from "next-intl";
+
 import { FileLock2, Link, Loader2, UserCircle } from "lucide-react";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -64,10 +67,10 @@ export default function DocumentData({
    const linkInput = useRef(null);
 
    const uniqueContributors = documentVersions.reduce((acc, version) => {
-      if (acc.includes(version.meta.creator)) {
+      if (acc.includes(version.meta.creatorUiid)) {
          return acc;
       }
-      return [...acc, version.meta.creator];
+      return [...acc, version.meta.creatorUiid];
    }, []);
 
    const copyLink = () => {
@@ -195,7 +198,11 @@ export default function DocumentData({
                {uniqueContributors.map((contributor, index) => (
                   <Badge key={index}>
                      <UserCircle className="mr-2" />
-                     {contributor}
+                     {
+                        documentVersions.find(
+                           (version) => version.meta.creatorUiid === contributor
+                        ).meta.creator
+                     }
                   </Badge>
                ))}
             </div>

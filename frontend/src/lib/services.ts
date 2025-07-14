@@ -125,7 +125,7 @@ export const createWorkspace = async (formData, errorText) => {
 
 export const updateWorkspaceType = async (
    wUID: string,
-   formData: { email: string; isPublic: boolean },
+   formData: { isPublic: boolean },
    errorText: string
 ) => {
    const options: RequestInit = {
@@ -218,6 +218,7 @@ export const usePerspectives = (cid: string) => {
             text: perspective.meta.data,
             creatorType: perspective.meta.creatorType,
             creator: perspective.meta.creator,
+            creatorUiid: perspective.meta.creatorUiid,
             model: perspective.meta.model,
             prompt: perspective.meta.prompt,
             timestamp: perspective.meta.timestamp
@@ -603,22 +604,28 @@ export const logout = async (): Promise<{
 };
 
 export const confirmRegistration = async (
-   token: string
+   token: string,
+   formData: {
+      lang: string;
+      confirmationLink: string;
+   }
 ): Promise<{
    status: string;
    message: string;
 }> => {
    try {
-      const response = await fetch(
-         `${USERS_ENDPOINT}/confirm-registration?token=${token}`,
-         {
-            method: "GET"
-         }
-      );
-
-      if (!response.ok) {
-         throw new Error("Failed to confirm registration");
-      }
+      const url = `${USERS_ENDPOINT}/confirm-registration?token=${token}`;
+      const options: RequestInit = {
+         method: "POST",
+         headers: {
+            "Content-Type": "application/json"
+         },
+         body: JSON.stringify({
+            lang: formData.lang,
+            confirmationLink: formData.confirmationLink
+         })
+      };
+      const response = await fetch(url, options);
 
       return await response.json();
    } catch (error) {

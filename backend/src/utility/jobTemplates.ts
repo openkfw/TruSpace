@@ -39,6 +39,7 @@ export const addPerspectivesTemplate = () =>
       const docRequest = createDocumentRequest({
         filename: fileDetails.meta.filename,
         creator: fileDetails.meta.creator,
+        creatorUiid: fileDetails.meta.creatorUiid,
         workspaceOrigin: fileDetails.meta.workspaceOrigin,
         size: fileDetails.meta.size,
       });
@@ -92,6 +93,7 @@ export const addTagsTemplate = () =>
       const docRequest = createDocumentRequest({
         filename: fileDetails.meta.filename,
         creator: fileDetails.meta.creator,
+        creatorUiid: fileDetails.meta.creatorUiid,
         workspaceOrigin: fileDetails.meta.workspaceOrigin,
         size: fileDetails.meta.size,
       });
@@ -144,6 +146,7 @@ export const addLanguageDetectionTemplate = () => {
       const docRequest = createDocumentRequest({
         filename: fileDetails.meta.filename,
         creator: fileDetails.meta.creator,
+        creatorUiid: fileDetails.meta.creatorUiid,
         workspaceOrigin: fileDetails.meta.workspaceOrigin,
         size: fileDetails.meta.size,
       });

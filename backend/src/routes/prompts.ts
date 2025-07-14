@@ -27,7 +27,7 @@ router.post(
     const result = await createPromptDb({
       title,
       prompt,
-      created_by: req.user?.name,
+      created_by: req.user?.uiid,
     });
 
     if (result.error) {
@@ -70,7 +70,7 @@ router.put(
   ]),
   async (req: AuthenticatedRequest, res: Response) => {
     const currentTitle = req.params.title;
-    const updateData = { ...req.body, updated_by: req.user?.name };
+    const updateData = { ...req.body, updated_by: req.user?.uiid };
 
     const result = await updatePromptDb(currentTitle, updateData);
 

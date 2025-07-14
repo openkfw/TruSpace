@@ -11,6 +11,7 @@ export interface DocumentMeta {
    timestamp: string;
    version: string;
    creator: string;
+   creatorUiid: string;
    workspaceOrigin: string;
    language: string;
    versionTagName?: string;
@@ -43,6 +44,7 @@ interface WorkspaceMeta {
    workspace_uuid: string;
    type: "workspace";
    creator_id: string;
+   creator_name: string;
    name: string;
    password_hash?: string;
    is_public: boolean;
@@ -72,6 +74,7 @@ interface ChatMessageMeta {
    docId: string;
    timestamp: string;
    creator: string;
+   creatorUiid: string;
 }
 export interface ChatMessageRequest {
    meta: ChatMessageMeta;
