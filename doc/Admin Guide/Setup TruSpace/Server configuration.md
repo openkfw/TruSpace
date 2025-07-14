@@ -4,13 +4,24 @@ To run TruSpace and make it accessible to users and nodes, you need to configure
 
 ## Ports
 
-TruSpace requires the following ports to be open for communication:
+TruSpace requires the following ports to be open for communication. Ensure the correct direction (inbound/outbound) and protocol (TCP/UDP) are configured in your firewall:
 
-- **3000**: The main port for the TruSpace UI
-- **3333**: The port for the Open Web UI service, which provides AI processing capabilities
-- **4001/5001/8080**: IPFS swarm port for peer-to-peer communication
-- **8000**: Backend API port for the TruSpace server
-- **9094/9096/9097**: IPFS cluster ports for managing the IPFS cluster
+| Port(s) | Protocol  | Direction        | Purpose                                 |
+| ------- | --------- | ---------------- | --------------------------------------- |
+| 3000    | TCP       | Inbound/Outbound | TruSpace UI (main web interface)        |
+| 3333    | TCP       | Inbound/Outbound | Open Web UI service (AI processing)     |
+| 4001    | TCP & UDP | Inbound/Outbound | IPFS swarm (peer-to-peer communication) |
+| 5001    | TCP       | Inbound/Outbound | IPFS API                                |
+| 6831    | UDP       | Outbound         | Jaeger agent endpoint (tracing)         |
+| 8000    | TCP       | Inbound/Outbound | TruSpace backend API                    |
+| 8080    | TCP       | Inbound/Outbound | IPFS HTTP Gateway                       |
+| 8888    | TCP       | Outbound         | Prometheus endpoint (metrics)           |
+| 9094    | TCP       | Inbound/Outbound | IPFS cluster management                 |
+| 9095    | TCP       | Inbound/Outbound | IPFS proxy                              |
+| 9096    | TCP & UDP | Inbound/Outbound | IPFS cluster management                 |
+| 9097    | TCP       | Inbound/Outbound | IPFS cluster management                 |
+
+> **Note:** All listed ports use the TCP protocol. If you have a restrictive firewall, ensure both inbound and outbound rules are set for these ports.
 
 ## Firewall Configuration
 
