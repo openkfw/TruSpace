@@ -2,7 +2,7 @@ name: Docker Images CI
 
 on:
   push:
-    branches: ["main", "57-gh-images"]
+    branches: ["main"]
     tags: ["v*"]
 
 env:
