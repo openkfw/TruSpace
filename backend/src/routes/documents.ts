@@ -31,6 +31,7 @@ import {
   tagsPrompt,
 } from "../utility/prompts";
 import { sendNotification } from "../mailing/notifications";
+import { getUserSettingsByUiid } from "../utility/user";
 
 (function () {
   addPerspectivesTemplate();
@@ -461,16 +462,29 @@ router.put(
             },
           };
 
-      const documentCreator = docInfo.documentVersions[0].meta.creator;
-      // const userSettings = getUserSettings(req.user?.email as string);
-      if (documentCreator !== req.user?.name) {
-        sendNotification(
-          documentCreator,
-          "addedToWorkspace",
-          `/workspace/${docInfo.meta.workspaceOrigin}/document/${docId}`,
-          docInfo.meta.filename
-        );
-      }
+      docInfo.documentVersions
+        .map((version) => version.meta.creatorUiid)
+        .reduce((acc: string[], uiid: string) => {
+          if (!acc.includes(uiid)) {
+            acc.push(uiid);
+          }
+          return acc;
+        }, [])
+        .forEach(async (documentCreator: string) => {
+          const userSettings = await getUserSettingsByUiid(documentCreator);
+
+          if (
+            userSettings?.notificationSettings?.documentChanged &&
+            documentCreator !== req.user?.uiid
+          ) {
+            sendNotification(
+              userSettings?.email,
+              "addedToWorkspace",
+              `/workspace/${docInfo.meta.workspaceOrigin}/document/${docId}`,
+              docInfo.meta.filename
+            );
+          }
+        });
 
       const responseMessage =
         "Document updated successfully and AI processing initiated where applicable.";
@@ -504,7 +518,11 @@ router.delete(
     const client = new IpfsClient();
 
     const doc = await client.getDocumentDetailsById(docId);
-    await checkPermissionForWorkspace(req.user?.email as string, res, doc.meta.workspaceOrigin);
+    await checkPermissionForWorkspace(
+      req.user?.email as string,
+      res,
+      doc.meta.workspaceOrigin
+    );
 
     const result = await client.deleteDocument(docId);
     res.json({ result });

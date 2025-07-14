@@ -323,14 +323,10 @@ router.post(
         avatarCid = await client.uploadAvatar(file);
       }
 
-      const addedToWorkspace =
-        req.body.addedToWorkspace === "true";
-      const documentChanged =
-        req.body.documentChanged === "true";
-      const documentChat =
-        req.body.documentChat === "true";
-      const workspaceChange =
-        req.body.workspaceChange === "true";
+      const addedToWorkspace = req.body.notificationAddedToWorkspace === "true";
+      const documentChanged = req.body.notificationDocumentChanged === "true";
+      const documentChat = req.body.notificationDocumentChat === "true";
+      const workspaceChange = req.body.notificationWorkspaceChange === "true";
       const preferedLanguage = req.body.preferedLanguage || "en";
 
       const notificationSettings = {

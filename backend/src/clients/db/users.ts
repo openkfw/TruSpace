@@ -2,7 +2,7 @@ import db from "../../config/database";
 import logger from "../../config/winston";
 import { USER_STATUS } from "../../utility/constants";
 
-interface UserDb {
+export interface UserDb {
   id: number;
   username: string;
   email: string;
@@ -66,6 +66,30 @@ export const findUserByEmailDb = async (email: string) => {
     return user;
   } catch (error) {
     logger.error(`Error finding user ${email}:`, error);
+    return undefined;
+  }
+};
+
+export const findUserByUiidDb = async (uiid: string) => {
+  try {
+    const user = await db<UserDb>("users")
+      .select(
+        "id",
+        "username",
+        "email",
+        "status",
+        "uiid",
+        "password_hash",
+        "avatar_cid",
+        "prefered_language",
+        "notification_settings",
+        "created_at"
+      )
+      .where({ uiid })
+      .first();
+    return user;
+  } catch (error) {
+    logger.error(`Error finding user ${uiid}:`, error);
     return undefined;
   }
 };

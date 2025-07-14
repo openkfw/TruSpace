@@ -69,7 +69,25 @@ const documentChanged: Record<string, Record<string, string>> = {
   },
 };
 
+const documentChat: Record<string, Record<string, string>> = {
+  en: {
+    subject: "TruSpace: New message in document chat",
+    header: "Dear ",
+    text: "You are receiving this e-mail because a new message has been posted in the document chat. Please proceed to the website below to see the message.",
+    link: "Open document chat",
+    footer: "Best regards,",
+  },
+  de: {
+    subject: "TruSpace: Neue Nachricht im Dokumentenchat",
+    header: "Hallo ",
+    text: "Du erhältst diese E-Mail, weil eine neue Nachricht im Dokumentenchat gepostet wurde. Bitte gehe auf die unten stehende Website, um die Nachricht zu sehen.",
+    link: "Dokumentenchat öffnen",
+    footer: "Viele Grüße,",
+  },
+};
+
 export const notifications = {
   addedToWorkspace,
   documentChanged,
+  documentChat,
 };

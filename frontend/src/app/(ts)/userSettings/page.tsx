@@ -21,7 +21,8 @@ import { useUser } from "@/contexts/UserContext";
 import { updateUserSettings } from "@/lib/services";
 
 export default function UserSettings() {
-   const { user, loading, updatePreferedLanguage, updateAvatar } = useUser();
+   const { user, loading, updatePreferedLanguage, updateAvatar, refreshUser } =
+      useUser();
    const [file, setFile] = useState<File>();
    const [selectedLanguage, setSelectedLanguage] = useState<string>();
    const [notificationAddedToWorkspace, setNotificationAddedToWorkspace] =
@@ -102,6 +103,7 @@ export default function UserSettings() {
          );
          updatePreferedLanguage(selectedLanguage);
          await updateUserSettings(formData);
+         refreshUser();
          toast.success(settingsTranslations("updateSuccess"));
          setFile(null);
       } catch (err) {

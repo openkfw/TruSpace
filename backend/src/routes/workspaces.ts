@@ -8,6 +8,7 @@ import {
   createPermissionDb,
   createWorkspacePasswordDb,
   findPermissionsByEmailDb,
+  findUsersInWorkspaceDb,
   removePermissionsForWorkspaceDb,
 } from "../clients/db";
 import { IpfsClient } from "../clients/ipfs-client";
@@ -19,6 +20,8 @@ import validate from "../middlewares/validate";
 import { AuthenticatedRequest } from "../types";
 import { WorkspaceRequest } from "../types/interfaces/index";
 import { USER_PERMISSION_STATUS } from "../utility/constants";
+import { getUserSettings } from "../utility/user";
+import { sendNotification } from "../mailing/notifications";
 
 const router = express.Router();
 
@@ -151,8 +154,27 @@ router.put(
           status: USER_PERMISSION_STATUS.active,
         });
       } else {
+        const usersInWs = await findUsersInWorkspaceDb(wUID);
+        const workspaceDetails = await client.getWorkspaceById(wUID);
+        usersInWs.forEach(async (user) => {
+          const { email } = user;
+          const userSettings = await getUserSettings(email);
+
+          if (
+            userSettings?.notificationSettings?.workspaceChange &&
+            email !== req.user?.email
+          ) {
+            sendNotification(
+              email,
+              "addedToWorkspace",
+              `/workspace/${wUID}`,
+              `${workspaceDetails[0].meta.name}`
+            );
+          }
+        });
         await removePermissionsForWorkspaceDb(wUID);
       }
+
       res.status(200).send({ message: "Workspace updated successfully" });
     } catch (error: any) {
       if (axios.isAxiosError(error) && error.response?.status === 404) {
