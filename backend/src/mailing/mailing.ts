@@ -33,7 +33,7 @@ export async function sendEmail(
       `EMAIL_SENDER is empty. This is probably a mistake, and sending email will fail.`
     );
   }
-  console.log(`Sending email to ${emailAddress} with subject "${subject}"`);
+
   await transporter.sendMail({
     from: emailSender,
     to: emailAddress,

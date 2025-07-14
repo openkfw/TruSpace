@@ -39,17 +39,13 @@ export const sendNotification = async (
         header: texts.header,
         user: email,
         text: texts.text,
-        workspaceUrl: config.frontendUrl + url,
-        workspaceTitle: title,
+        linkUrl: config.frontendUrl + url,
+        linkTitle: title,
         footer: texts.footer,
       };
       const htmlTemplateToSend = template(replacements);
-      logger.info("Sending email done");
-      await sendEmail(
-        email,
-        texts.subject,
-        htmlTemplateToSend
-      );
+
+      await sendEmail(email, texts.subject, htmlTemplateToSend);
     } else {
       logger.info(
         `Notification type ${notificationType} is disabled for user ${email}`

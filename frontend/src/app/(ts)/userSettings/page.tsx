@@ -114,8 +114,6 @@ export default function UserSettings() {
 
    if (loading || !user) return <div>{generalTranslations("loading")}</div>;
 
-   console.log("User settings", user);
-
    return (
       <div className="max-w-md mx-auto mt-16 p-6 space-y-8">
          <div className="flex flex-col items-center gap-3">
