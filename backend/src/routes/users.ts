@@ -26,7 +26,10 @@ import {
 import { authenticateCookie } from "../middlewares/authenticate";
 import validate from "../middlewares/validate";
 import { JwtPayload } from "../types/interfaces";
-import { USER_STATUS } from "../utility/constants";
+import {
+  CONFIRMATION_EMAIL_EXPIRATION,
+  USER_STATUS,
+} from "../utility/constants";
 import { AuthenticatedRequest } from "../types";
 import { IpfsClient } from "../clients/ipfs-client";
 import { UploadedFile } from "express-fileupload";
@@ -56,7 +59,7 @@ router.post(
     const passwordHash = await hashPassword(password);
     const token = config.registerUsersAsInactive
       ? jwt.sign({ email: email }, Buffer.from(config.jwt.secret), {
-          expiresIn: 1200, // 20 minutes
+          expiresIn: CONFIRMATION_EMAIL_EXPIRATION, // 20 minutes
         })
       : "";
     try {
@@ -279,7 +282,7 @@ router.post(
               { email: user.email },
               Buffer.from(config.jwt.secret),
               {
-                expiresIn: 1200, // 20 minutes
+                expiresIn: CONFIRMATION_EMAIL_EXPIRATION, // 20 minutes
               }
             );
             await updateUserToken(user.id, newToken);
