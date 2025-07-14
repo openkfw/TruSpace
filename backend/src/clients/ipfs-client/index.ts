@@ -418,6 +418,35 @@ export class IpfsClient implements IClient {
     return result;
   }
 
+  async updateWorkspaceType(
+    workspaceId: string,
+    updates: { email: string; isPublic: boolean }
+  ): Promise<WorkspaceRequest> {
+    const workspace = await this.getWorkspaceById(workspaceId);
+
+    const updatedWorkspace: WorkspaceRequest = {
+      uuid: workspaceId,
+      ...workspace,
+      meta: {
+        ...workspace[0].meta,
+        is_public: updates.isPublic,
+        type: "workspace",
+      },
+    };
+
+    const pinRequest: WorkspaceRequest = {
+      uuid: workspaceId,
+      meta: {
+        ...updatedWorkspace.meta,
+      },
+    };
+    await this.createWorkspace(pinRequest);
+
+    await this.#clusterAxios.delete(`/pins/${workspace[0].cid}`);
+
+    return updatedWorkspace;
+  }
+
   /**
    *
    * @param doc

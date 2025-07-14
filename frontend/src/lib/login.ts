@@ -2,13 +2,8 @@ import Cookies from "js-cookie";
 
 export const COOKIE_NAME = "login";
 
-export const COOKIE_OPTIONS = {
-   secure: process.env.NODE_ENV === "production",
-   sameSite: "strict" as const
-};
-
-export const setLoginCookie = (data, options) => {
-   Cookies.set(COOKIE_NAME, JSON.stringify(data), options);
+export const setLoginCookie = (data) => {
+   Cookies.set(COOKIE_NAME, JSON.stringify(data));
 };
 
 export const deleteLoginCookie = () => {
@@ -27,8 +22,4 @@ export const isTokenExpired = (token) => {
       console.error("Error checking token expiration:", error);
       return true;
    }
-};
-
-export const redirectToLogin = (router) => {
-   router.push("/login");
 };

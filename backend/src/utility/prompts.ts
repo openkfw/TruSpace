@@ -3,17 +3,7 @@ import * as path from "path";
 import logger from "../config/winston";
 import { Prompt } from "../types/interfaces";
 
-export const examplePrompts = [
-  {
-    title: "Executive Summary",
-    prompt:
-      "You are an expert in development cooperation with 3rd world countries and working for a financial development bank. Use well formatted markdown format. Please provide a brief summary in english of the following text in not more than 5 bullets.",
-  },
-  {
-    title: "Digi TSV - summary",
-    prompt: `You are an expert for digital components in development cooperation projects. Summarize in not more than 5 bullet points in english and indicate if there are many more. Use well formatted markdown format. Which digital components are mentioned in the file`,
-  },
-];
+export const examplePrompts = [];
 
 export const tagsPrompt = {
   title: "tags",
@@ -33,7 +23,7 @@ export const tagsPrompt = {
 export const languagePrompt: Prompt = {
   title: "language",
   prompt:
-    "Detect the primary language of the provided document. Your response must be *only* the name of the language (e.g., English, Spanish, French). If the language cannot be determined, respond *only* with '-'.",
+    'Detect the primary language of the provided document. Your response must be *only* the name of the language in JSON format (e.g., `{ "language": "English" }`, `{ "language": "Spanish" }`, `{ "language": "French" }`).',
 };
 
 /**

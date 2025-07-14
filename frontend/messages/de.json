@@ -24,6 +24,13 @@
       "uploadAvatar": "Klicke auf den Avatar, um ein neues Bild hochzuladen",
       "saveSettings": "Einstellungen speichern"
    },
+   "statistics": {
+      "totalDocuments": "Gesamtdokumente",
+      "collaborators": "Mitwirkende",
+      "peerServers": "Peer-Server",
+      "documents": "Dokumente",
+      "users": "Benutzer"
+   },
    "theme": {
       "light": "Hell",
       "dark": "Dunkel",
@@ -41,15 +48,52 @@
       "subtitle": "Gib unten deine Daten ein, um dich anzumelden",
       "title": "Login",
       "invalidCredentials": "Die eingegebene E-Mail oder das Passwort ist falsch",
+      "activationRequired": "Dein Benutzerkonto muss noch aktiviert werden",
+      "forgotPassword": "Passwort vergessen?"
       "activationRequired": "Benutzerkonto erfordert eine Aktivierung"
    },
    "confirmRegistration": {
-      "confirmButton": "Kontoregistrierung bestätigen",
+      "confirmButton": "Registrierung bestätigen",
       "continueToLogin": "Weiter zur Anmeldung",
-      "title": "Schließ deine Registrierung ab",
-      "text": "Klicke bitte auf die Schaltfläche unten, um deine Registrierung abzuschließen",
-      "confirmError": "Fehler bei der Kontobestätigung: Token ist ungültig",
-      "confirmSuccess": "Erfolg! Die Kontoregistrierung ist abgeschlossen. Du kannst zur Anmeldeseite gehen."
+      "title": "Schließe deine Registrierung ab",
+      "text": "Klick bitte auf den Button unten, um deine Registrierung abzuschließen",
+      "confirmError": "Es ist ein Fehler aufgetreten. Versuch's bitte nochmal.",
+      "confirmErrorToken": "Fehler bei der Bestätigung: Der Link ist ungültig",
+      "confirmSuccess": "Geschafft! Deine Registrierung ist abgeschlossen. Du kannst dich jetzt anmelden."
+   },
+   "forgotPassword": {
+      "title": "Passwort vergessen?",
+      "text": "Gib bitte deine E-Mail-Adresse ein, damit wir dir eine E-Mail mit weiteren Schritten schicken können.",
+      "label": "E-Mail",
+      "placeholder": "z. B. beispiel@example.com",
+      "button": "E-Mail schicken",
+      "backToLogin": "Zurück zur Anmeldung",
+      "emailRequired": "E-Mail wird benötigt",
+      "emailPattern": "Bitte gib eine gültige E-Mail-Adresse ein",
+      "success": "Die E-Mail wurde abgeschickt!",
+      "error": "Es ist ein Fehler aufgetreten. Versuch's bitte nochmal."
+   },
+   "resetPassword": {
+      "title": "Passwort zurücksetzen",
+      "text": "Gib unten dein neues Passwort ein",
+      "password": "Passwort",
+      "confirmPassword": "Passwort bestätigen",
+      "passwordPlaceholder": "Dein neues Passwort",
+      "confirmPasswordPlaceholder": "Nochmal eingeben",
+      "confirmPasswordError": "Die Passwörter stimmen nicht überein",
+      "passwordRequired": "Passwort wird benötigt",
+      "confirmPasswordRequired": "Bitte bestätige dein Passwort",
+      "passwordError": "Dein Passwort entspricht nicht den Anforderungen",
+      "passwordMinLength": "Mindestens 12 Zeichen",
+      "passwordUppercase": "Mindestens ein Großbuchstabe",
+      "passwordNumber": "Mindestens eine Zahl",
+      "passwordPattern": "Mindestens ein Sonderzeichen",
+      "passwordDescription": "Dein Passwort muss diese Anforderungen erfüllen:",
+      "button": "Neues Passwort festlegen",
+      "backToLogin": "Zurück zur Anmeldung",
+      "success": "Dein neues Passwort wurde gespeichert!",
+      "invalidToken": "Der Link ist nicht mehr gültig. Bitte fordere ein neues Passwort an.",
+      "genericError": "Es ist ein Fehler aufgetreten. Versuch's bitte nochmal."
    },
    "register": {
       "title": "Registrieren",
@@ -62,22 +106,22 @@
       "emailPlaceholder": "z.B. Maximiliane@Musterfrau.com",
       "emailAlreadyTaken": "E-Mail-Adresse ist bereits vergeben",
       "passwordPlaceholder": "Gib dein Passwort ein",
-      "confirmPasswordPlaceholder": "Passwort erneut eingeben",
+      "confirmPasswordPlaceholder": "Nochmal eingeben",
       "registerButton": "Registrieren",
-      "confirmPasswordError": "Passwörter stimmen nicht überein",
+      "confirmPasswordError": "Die Passwörter stimmen nicht überein",
       "nameRequired": "Name ist erforderlich",
       "emailRequired": "E-Mail ist erforderlich",
-      "passwordRequired": "Passwort ist erforderlich",
-      "confirmPasswordRequired": "Bitte bestätige dein Passwort",
+      "passwordRequired": "Passwort wird benötigt",
+      "confirmPasswordRequired": "Bitte bestätigen Sie Ihr Passwort",
       "nameMinLength": "Name muss mindestens 3 Zeichen lang sein",
       "namePattern": "Name darf nur Buchstaben, Leerzeichen, Punkte, Apostrophe, Kommas und Bindestriche enthalten",
-      "emailPattern": "Gib eine gültige E-Mail-Adresse ein",
-      "passwordError": "Das Passwort ist fehlerhaft",
+      "emailPattern": "Geben Sie eine gültige E-Mail-Adresse ein",
+      "passwordError": "Dein Passwort entspricht nicht den Anforderungen",
       "passwordMinLength": "Mindestens 12 Zeichen",
       "passwordUppercase": "Mindestens ein Großbuchstabe",
       "passwordNumber": "Mindestens eine Zahl",
       "passwordPattern": "Mindestens ein Sonderzeichen",
-      "passwordDescription": "Dein Passwort muss die folgenden Anforderungen erfüllen:",
+      "passwordDescription": "Dein Passwort muss diese Anforderungen erfüllen:",
       "registerSuccess": "Registrierung erfolgreich",
       "registerError": "Bei der Registrierung ist ein Fehler aufgetreten",
       "backToLogin": "Zurück zur Anmeldung",
@@ -85,7 +129,8 @@
    },
    "settings": {
       "updateSuccess": "Benutzereinstellungen aktualisiert",
-      "updateError": "Beim Aktualisieren der Benutzereinstellungen ist ein Fehler aufgetreten"
+      "updateError": "Beim Aktualisieren der Benutzereinstellungen ist ein Fehler aufgetreten",
+      "nothingToUpload": "Es gibt nichts zum Hochladen"
    },
    "homePage": {
       "documentName": "Name",
@@ -189,6 +234,8 @@
       "aiConfig": "KI Konfiguration",
       "notifications": "Mitteilungen",
       "logOut": "Ausloggen",
+      "switchToPrivate": "Zu privatem wechseln",
+      "switchToPublic": "Zu öffentlichem wechseln",
       "workspaceDialog": {
          "addWorkspace": "Füge einen neuen Arbeitsbereich hinzu",
          "workspaceName": "Name des Arbeitsbereichs",
@@ -210,9 +257,21 @@
          "workspaceDeleted": "Arbeitsbereich erfolgreich gelöscht",
          "workspaceDeletionFailed": "Arbeitsbereich konnte nicht gelöscht werden",
          "deleting": "Löschen..."
+      },
+      "workspaceTypeDialog": {
+         "confirmWorkspaceTypeUpdate": "Ja",
+         "cancelWorkspaceTypeUpdate": "Nein",
+         "updating": "Aktualisieren...",
+         "updatePublicWorkspaceTitle": "Sind Sie sicher, dass Sie diesen Arbeitsbereich öffentlich machen möchten?",
+         "updatePrivateWorkspaceTitle": "Sind Sie sicher, dass Sie diesen Arbeitsbereich privat machen möchten?",
+         "workspaceTypeUpdated": "Arbeitsbereichstyp erfolgreich aktualisiert",
+         "workspaceTypeUpdateError": "Beim Aktualisieren des Arbeitsbereichstyps ist ein Fehler aufgetreten",
+         "publicDialogTitle": "Arbeitsbereich wird öffentlich",
+         "privateDialogTitle": "Arbeitsbereich wird privat"
       }
    },
    "chat": {
+      "chat": "Chatten",
       "user": "Benutzer",
       "messageForVersion": "Bezogen auf die Dokumentversion:",
       "reply": "Antwort",
@@ -262,12 +321,12 @@
       "promptModelDialogTitle": "Modell auswählen",
       "selectPerspective": "Wähle eine Perspektive",
       "title": "Perspektiven",
-      "askCustomPrompt": "Frage die KI mit deinem eigenen Prompt",
+      "askCustomPrompt": "Frag die KI mit Deinem eigenen Prompt",
       "promptTitle": "Prompt-Titel",
-      "promptTitlePlaceHolder": "Gib deinem Prompt einen Namen",
-      "promptBodyPlaceholder": "Gib deinen Prompt ein",
-      "savePrompt": "Speichere deinen Prompt",
-      "saveCustomPromptHint": "Das Speichern deines Prompts hat nicht funktioniert"
+      "promptTitlePlaceHolder": "Gib den Titel Deines Prompts ein",
+      "promptBodyPlaceholder": "Gib Deinen Prompt ein",
+      "savePrompt": "Prompt speichern",
+      "saveCustomPromptHint": "Das Speichern von Prompts funktioniert noch nicht"
    },
    "documentEditable": {
       "cancel": "Abbrechen",

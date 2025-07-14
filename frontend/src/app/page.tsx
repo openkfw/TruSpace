@@ -3,21 +3,28 @@
 import { useEffect } from "react";
 
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 import { useUser } from "@/contexts/UserContext";
-import { redirectToLogin } from "@/lib";
 
 export default function Root() {
    const router = useRouter();
-   const { isLoggedIn } = useUser();
+   const { isLoggedIn, loading } = useUser();
+   const generalTranslations = useTranslations("general");
 
    useEffect(() => {
-      if (isLoggedIn) {
-         router.push("/home");
-      } else {
-         redirectToLogin(router);
+      if (!loading) {
+         if (isLoggedIn) {
+            router.push("/home");
+         } else {
+            router.push("/login");
+         }
       }
-   }, [router]);
+   }, [isLoggedIn, loading, router]);
+
+   if (loading) {
+      return <p>{generalTranslations("loading")}</p>;
+   }
 
    return null;
 }

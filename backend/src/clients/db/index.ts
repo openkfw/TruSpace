@@ -12,6 +12,7 @@ const REQUIRED_TABLES = [
   "workspace_passwords",
   "job_status",
   "prompts",
+  "password_reset_tokens"
 ];
 
 export const getHealthDb = async () => {
