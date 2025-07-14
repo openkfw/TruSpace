@@ -50,7 +50,6 @@
       "invalidCredentials": "Die eingegebene E-Mail oder das Passwort ist falsch",
       "activationRequired": "Dein Benutzerkonto muss noch aktiviert werden",
       "forgotPassword": "Passwort vergessen?"
-      "activationRequired": "Benutzerkonto erfordert eine Aktivierung"
    },
    "confirmRegistration": {
       "confirmButton": "Registrierung bestätigen",
@@ -112,7 +111,7 @@
       "nameRequired": "Name ist erforderlich",
       "emailRequired": "E-Mail ist erforderlich",
       "passwordRequired": "Passwort wird benötigt",
-      "confirmPasswordRequired": "Bitte bestätigen Sie Ihr Passwort",
+      "confirmPasswordRequired": "Bitte bestätige Dein Passwort",
       "nameMinLength": "Name muss mindestens 3 Zeichen lang sein",
       "namePattern": "Name darf nur Buchstaben, Leerzeichen, Punkte, Apostrophe, Kommas und Bindestriche enthalten",
       "emailPattern": "Geben Sie eine gültige E-Mail-Adresse ein",
