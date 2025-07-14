@@ -78,6 +78,7 @@ router.post(
         data: req.body.perspectiveText as string,
         creatorType: "user",
         creator: req.user?.name as string,
+        creatorUiid: req.user?.uiid as string,
         prompt: "",
       },
     };

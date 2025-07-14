@@ -162,6 +162,7 @@ router.post(
       const payload: JwtPayload = {
         name: user.username,
         email: user.email,
+        uiid: user.uiid,
       };
 
       const token = jwt.sign(payload, Buffer.from(config.jwt.secret), {
@@ -187,6 +188,7 @@ router.post(
         user: {
           name: user.username,
           email: user.email,
+          uiid: user.uiid,
           expires: decodedToken.exp,
         },
       });

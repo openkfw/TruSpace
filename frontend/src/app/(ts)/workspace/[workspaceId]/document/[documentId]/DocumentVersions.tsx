@@ -8,6 +8,7 @@ import {
    useReactTable
 } from "@tanstack/react-table";
 import { Dot, MoreVertical } from "lucide-react";
+
 import {
    DropdownMenu,
    DropdownMenuContent,
@@ -120,7 +121,10 @@ export default function DocumentVersions({ documentVersions }) {
          header: translations("versionTagName"),
          cell: ({ row }) => (
             <div className="text-base font-bold">
-               {row.original?.meta?.versionTagName || "-"}
+               {row.original?.meta?.versionTagName === "undefined" ||
+               !row.original?.meta?.versionTagName
+                  ? "-"
+                  : row.original?.meta?.versionTagName}
             </div>
          )
       },

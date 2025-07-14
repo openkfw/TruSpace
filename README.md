@@ -33,7 +33,7 @@ To check how TruSpace works, get to the sandbox installation at https://truspace
 
 ## 📥 Run it locally on my machine
 
-For a very **quick and easy** TruSpace setup (e.g. for demos and first look) on your local machine, run:
+For a very **quick and easy** TruSpace setup (e.g. for demos and first look) on your local machine using `localhost`, run:
 
 ```bash
 git clone git@github.com:openkfw/TruSpace.git
@@ -43,9 +43,13 @@ cd TruSpace
 
 This command creates a simple environment configuration, creates docker volumes and spins up `docker compose` containing backend api and IPFS clusters and additionally NextJS frontend in dev mode. After startup, the frontend is available on `http://localhost:3000`. Register a user, login and create a workspace for documents!
 
-If you plan to use another domain (e.g. on a local raspberry), make sure that the respective domains are updated from `localhost` to your `domain.local` in the `CORS` fields of the `.env` file (`CORS_ORIGIN` and `OI_CORS_ALLOW_ORIGIN`).
+If you plan to use another domain (e.g. on a local raspberry), make sure that the respective domains are updated from `localhost` to your `domain.local` in the `CORS` fields of the `.env` file (`CORS_ORIGIN` and `OI_CORS_ALLOW_ORIGIN`). This can be easily done in the `TruSpace` folder using the example environment:
 
-To enable AI analysis, Truspace downloads a model configured in `.env`, as an example here is `gemma3:1b` and you can see the full list at the [ollama DB](https://ollama.com/library?q=mistral&sort=popular).
+```bash
+sed 's|http://localhost|http://example.com|g' .env.example > .env
+```
+
+To enable AI analysis, TruSpace downloads a model configured in `.env`, as an example here is `gemma3:1b` and you can see the full list at the [ollama DB](https://ollama.com/library?q=mistral&sort=popular).
 
 Once the model is downloaded, AI analysis is executed upon each document upload automatically.
 

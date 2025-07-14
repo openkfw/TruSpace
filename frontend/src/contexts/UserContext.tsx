@@ -31,6 +31,7 @@ const routesWithoutToken = [
 interface User {
    name: string;
    email: string;
+   uiid: string;
    avatar?: string;
    settings?: {
       preferedLanguage: string; // ISO 639-1 code, e.g., "en", "de"

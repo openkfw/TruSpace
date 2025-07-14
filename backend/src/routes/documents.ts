@@ -63,7 +63,11 @@ router.get(
       );
       res.json(result);
     } else {
-      await checkPermissionForWorkspace(req, res, workspace);
+      await checkPermissionForWorkspace(
+        req.user?.email as string,
+        res,
+        workspace
+      );
 
       const documents = await client.getDocumentsByWorkspace(
         workspace as string
@@ -95,7 +99,11 @@ router.get(
     const docId = req.params.docId;
     const client = new IpfsClient();
     const documents = await client.getDocumentDetailsById(docId);
-    await checkPermissionForWorkspace(req, res, documents.meta.workspaceOrigin);
+    await checkPermissionForWorkspace(
+      req.user?.email as string,
+      res,
+      documents.meta.workspaceOrigin
+    );
 
     const result = documents;
     res.json(result);
@@ -116,15 +124,19 @@ router.get(
     const documentDetails = document.documentVersions;
     const documentVersions = documentDetails.reduce(
       (acc: string[], version: Document) => {
-        if (!acc.includes(version.meta.creator)) {
-          acc.push(version.meta.creator);
+        if (!acc.includes(version.meta.creatorUiid)) {
+          acc.push(version.meta.creatorUiid);
         }
         return acc;
       },
       []
     );
 
-    await checkPermissionForWorkspace(req, res, document.meta.workspaceOrigin);
+    await checkPermissionForWorkspace(
+      req.user?.email as string,
+      res,
+      document.meta.workspaceOrigin
+    );
     res.json({
       chatsLength: chats.length,
       uniqueContributorsLength: documentVersions.length,
@@ -177,15 +189,19 @@ router.post(
     }
     try {
       const { workspace } = req.body;
+      const email = req.user?.email as string;
+      const userName = req.user?.name as string;
+      const userUiid = req.user?.uiid as string;
 
-      await checkPermissionForWorkspace(req, res, workspace);
+      await checkPermissionForWorkspace(email, res, workspace);
 
       const file = req.files.file as UploadedFile;
       const filename = decodeFilename(file.name);
 
       const docRequest = createDocumentRequest({
         filename,
-        creator: req.user?.name as string,
+        creator: userName,
+        creatorUiid: userUiid,
         workspaceOrigin: workspace,
         size: file.size,
         mimetype: file.mimetype,
@@ -328,8 +344,11 @@ router.put(
     try {
       const { workspace, versionTagName } = req.body;
       const { docId } = req.params;
+      const email = req.user?.email as string;
+      const userName = req.user?.name as string;
+      const userUiid = req.user?.uiid as string;
 
-      await checkPermissionForWorkspace(req, res, workspace);
+      await checkPermissionForWorkspace(email, res, workspace);
 
       const file = req.files.file as UploadedFile;
       const filename = decodeFilename(file.name);
@@ -341,7 +360,8 @@ router.put(
       const docRequest = createDocumentRequest({
         filename,
         version: (parseInt(latestVersion) + 1).toString(),
-        creator: req.user?.name as string,
+        creator: userName,
+        creatorUiid: userUiid,
         size: file.size,
         mimetype: file.mimetype,
         workspaceOrigin: workspace,
@@ -484,7 +504,7 @@ router.delete(
     const client = new IpfsClient();
 
     const doc = await client.getDocumentDetailsById(docId);
-    await checkPermissionForWorkspace(req, res, doc.meta.workspaceOrigin);
+    await checkPermissionForWorkspace(req.user?.email as string, res, doc.meta.workspaceOrigin);
 
     const result = await client.deleteDocument(docId);
     res.json({ result });

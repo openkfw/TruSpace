@@ -61,7 +61,7 @@ export default function WorkspaceTitle() {
             </div>
             <div className="mt-2 flex items-center text-sm text-gray-500">
                <User className="mr-1.5 size-5 shrink-0 text-gray-500 dark:text-gray-400" />
-               {translations("createdBy")} {workspace?.meta?.creator_id}
+               {translations("createdBy")} {workspace?.meta?.creator_name}
             </div>
             <div className="mt-2 flex items-center text-sm text-gray-500">
                <Users className="mr-1.5 size-5 shrink-0 text-gray-500 dark:text-gray-400" />

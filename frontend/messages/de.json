@@ -24,6 +24,13 @@
       "uploadAvatar": "Klicken Sie auf den Avatar, um ein neues Bild hochzuladen",
       "saveSettings": "Einstellungen speichern"
    },
+   "statistics": {
+      "totalDocuments": "Gesamtdokumente",
+      "collaborators": "Mitwirkende",
+      "peerServers": "Peer-Server",
+      "documents": "Dokumente",
+      "users": "Benutzer"
+   },
    "theme": {
       "light": "Hell",
       "dark": "Dunkel",
@@ -263,6 +270,7 @@
       }
    },
    "chat": {
+      "chat": "Chatten",
       "user": "Benutzer",
       "messageForVersion": "Bezogen auf die Dokumentversion:",
       "reply": "Antwort",
@@ -312,12 +320,12 @@
       "promptModelDialogTitle": "Modell auswählen",
       "selectPerspective": "Wählen Sie eine Perspektive",
       "title": "Perspektiven",
-      "askCustomPrompt": "DE:Ask AI with custom prompt",
-      "promptTitle": "DE:Prompt title",
-      "promptTitlePlaceHolder": "DE:Enter a title of your prompt",
-      "promptBodyPlaceholder": "DE:Enter your prompt",
-      "savePrompt": "DE:Save prompt",
-      "saveCustomPromptHint": "TODO: Saving prompts doesn't work"
+      "askCustomPrompt": "Frag die KI mit Deinem eigenen Prompt",
+      "promptTitle": "Prompt-Titel",
+      "promptTitlePlaceHolder": "Gib den Titel Deines Prompts ein",
+      "promptBodyPlaceholder": "Gib Deinen Prompt ein",
+      "savePrompt": "Prompt speichern",
+      "saveCustomPromptHint": "Das Speichern von Prompts funktioniert noch nicht"
    },
    "documentEditable": {
       "cancel": "Abbrechen",

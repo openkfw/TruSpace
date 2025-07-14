@@ -7,6 +7,7 @@ interface UserDb {
   username: string;
   email: string;
   status: string;
+  uiid: string;
   password_hash: string;
   user_token: string;
   avatar_cid?: string;
@@ -53,6 +54,7 @@ export const findUserByEmailDb = async (email: string) => {
         "username",
         "email",
         "status",
+        "uiid",
         "password_hash",
         "avatar_cid",
         "prefered_language",
