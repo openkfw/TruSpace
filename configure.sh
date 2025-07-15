@@ -79,7 +79,25 @@ cp "$TEMPLATE" "$ENVFILE"
 info "Copied $TEMPLATE → $ENVFILE"
 
 #─── SUBSTITUTE PLACEHOLDERS ───────────────────────────────────────────────────
-sed -i \
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  sed -i '' \
+    -e "s|<SWARM_KEY_SECRET>|${SWARM_KEY_SECRET}|g" \
+    -e "s|<CLUSTER_SECRET>|${CLUSTER_SECRET}|g" \
+    -e "s|<NODE_ENV>|${NODE_ENV}|g" \
+    -e "s|<DOMAIN>|${DOMAIN}|g" \
+    -e "s|<OI_PASSWORD>|${OI_PASSWORD}|g" \
+    -e "s|<API_DOMAIN>|${API_DOMAIN}|g" \
+    "$ENVFILE"
+else
+  sed -i \
+    -e "s|<SWARM_KEY_SECRET>|${SWARM_KEY_SECRET}|g" \
+    -e "s|<CLUSTER_SECRET>|${CLUSTER_SECRET}|g" \
+    -e "s|<NODE_ENV>|${NODE_ENV}|g" \
+    -e "s|<DOMAIN>|${DOMAIN}|g" \
+    -e "s|<OI_PASSWORD>|${OI_PASSWORD}|g" \
+    -e "s|<API_DOMAIN>|${API_DOMAIN}|g" \
+    "$ENVFILE"
+fi
   -e "s|<SWARM_KEY_SECRET>|${SWARM_KEY_SECRET}|g" \
   -e "s|<CLUSTER_SECRET>|${CLUSTER_SECRET}|g" \
   -e "s|<NODE_ENV>|${NODE_ENV}|g" \
