@@ -7,6 +7,7 @@ import path from "path";
 import {
   activateUserDb,
   createUserDb,
+  deleteUserById,
   findUserByEmailDb,
   findUserByTokenDb,
   getTotalRecentlyAddedUsersDb,
@@ -54,7 +55,7 @@ router.post(
   ]),
   async (req: Request, res: Response) => {
     const { name, email, password, confirmationLink, lang } = req.body;
-    const { registerUsersAsInactive } = config;
+    const { registerUsersAsInactive, smtpServer } = config;
 
     const passwordHash = await hashPassword(password);
     const token = config.registerUsersAsInactive
@@ -63,18 +64,25 @@ router.post(
         })
       : "";
     try {
-      const result = await createUserDb(
-        name,
-        email,
-        passwordHash,
-        registerUsersAsInactive ? USER_STATUS.inactive : USER_STATUS.active,
-        token
-      );
-      if (!result) {
-        throw Error("Unknown error");
-      }
-      logger.info("Register user as inactive");
       if (registerUsersAsInactive) {
+        if (!smtpServer.host || !smtpServer.port) {
+          logger.error("SMTP server not set");
+          return res.status(500).json({
+            status: "error",
+            message: "SMTP server not set",
+          });
+        }
+        logger.info("Register user as inactive");
+        const result = await createUserDb(
+          name,
+          email,
+          passwordHash,
+          registerUsersAsInactive ? USER_STATUS.inactive : USER_STATUS.active,
+          token
+        );
+        if (!result) {
+          throw Error("Unknown error");
+        }
         const filePath = path.join(
           process.cwd(),
           "src/mailing/templates/registrationConfirmation.html"
@@ -103,6 +111,17 @@ router.post(
           message: "email sent",
         });
       } else {
+        logger.info("Registering user");
+        const result = await createUserDb(
+          name,
+          email,
+          passwordHash,
+          registerUsersAsInactive ? USER_STATUS.inactive : USER_STATUS.active,
+          token
+        );
+        if (!result) {
+          throw Error("Unknown error");
+        }
         res.json({
           status: "success",
           message: "Your registration request has been processed",
@@ -116,6 +135,10 @@ router.post(
           message: "Email address is already registered",
         });
       } else {
+        const user = await findUserByEmailDb(email);
+        if (user) {
+          await deleteUserById(user.id);
+        }
         res.status(500).json({
           status: "failure",
           message: "Unknown error occurred",
