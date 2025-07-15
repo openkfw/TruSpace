@@ -492,7 +492,11 @@ router.delete(
     const client = new IpfsClient();
 
     const doc = await client.getDocumentDetailsById(docId);
-    await checkPermissionForWorkspace(req.user?.email as string, res, doc.meta.workspaceOrigin);
+    await checkPermissionForWorkspace(
+      req.user?.email as string,
+      res,
+      doc.meta.workspaceOrigin
+    );
 
     const result = await client.deleteDocument(docId);
     res.json({ result });

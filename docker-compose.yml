@@ -44,12 +44,15 @@ services:
     image: ipfs/kubo:release
     restart: unless-stopped
     user: ${LUID}:${LGID}
+    environment:
+      IPFS_NODE_PEERS: ${IPFS_NODE_PEERS}
     ports:
       - "${SWARM_PORT}:${SWARM_PORT}" # ipfs swarm - expose if needed/wanted
       - "${IPFS_API_PORT}:${IPFS_API_PORT}" # ipfs api - expose if needed/wanted
       - "${IPFS_GATEWAY_PORT}:${IPFS_GATEWAY_PORT}" # ipfs gateway - expose if needed/wanted
     volumes:
       - ./volumes/ipfs0:/data/ipfs
+      - ./scripts/init/init_ipfs.sh:/container-init.d/init_ipfs.sh
 
   cluster0:
     container_name: cluster0

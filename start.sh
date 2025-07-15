@@ -46,38 +46,6 @@ add_cluster_peers() {
     echo ""
 }
 
-add_ipfs_nodes_peers() {
-    if [ -z "$IPFS_NODE_PEERS" ]; then
-        echo "No cluster peers configured"
-        return
-    fi
-
-    count=0
-    
-    # Convert comma-separated string to newline-separated and process
-    echo "$IPFS_NODE_PEERS" | tr ',' '\n' | while IFS= read -r peer; do
-        # Trim whitespace
-        peer=$(echo "$peer" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
-        
-        if [ -n "$peer" ]; then
-            count=$((count + 1))
-            curl -X POST "http://localhost:5001/api/v0/bootstrap/add?arg=$peer"
-            echo "[$count] $peer"
-        fi
-    done
-    
-    echo ""
-    echo "Current peers:"
-    curl -X POST "http://localhost:5001/api/v0/bootstrap/list"
-    echo ""
-}
-
-remove_ipfs_nodes_peers() {
-    echo ""
-    echo "Current peers:"
-    curl -X POST "http://localhost:5001/api/v0/bootstrap/rm/all"
-}
-
 # generate env file if it does not exist
 [[ -e .env ]] || cp .env.example .env
 
@@ -143,9 +111,6 @@ until curl -s http://localhost:5001/api/v0/id > /dev/null 2>&1; do
   echo "Waiting for IPFS API..."
   sleep 2
 done
-
-remove_ipfs_nodes_peers
-add_ipfs_nodes_peers
 
 # if frontend is in dev mode, start it
 if [ "$FRONTEND_DEV" = "true" ]; then
