@@ -110,7 +110,22 @@ Here is a step by step guide:
 - On the target node, open the file `/volumes/cluster0/identity.json`. Copy the value in the field `id`, you can do this using `jq` command or simply read it out:
 
 ```bash
-jq -r '.id' ./volumes/cluster0/identity.json
+# Fetch values
+MY_IP="$(curl -s https://api.ipify.org)"
+IPFS_ID="$(jq -r '.Identity.PeerID' ./volumes/ipfs0/config)"
+CLUSTER_ID="$(jq -r '.id' ./volumes/cluster0/identity.json)"
+
+# Print with nice formatting
+printf "\n"
+printf "🖧  My IP Address:\n"
+printf "    %s\n\n" "$MY_IP"
+
+printf "🛰  IPFS PeerID:\n"
+printf "    %s\n\n" "$IPFS_ID"
+
+printf "📡  Cluster PeerID:\n"
+printf "    %s\n\n" "$CLUSTER_ID"
+
 ```
 
 - Use the script `./connectNodes.sh` to modify the respective files for IPFS and Cluster. The script uses the IP address and the respective `id` values and inserts them into the configuration files `./volumes/ipfs0/config` and `./volumes/cluster0/service.json`. If you prefer to do this manually on your installation, open the file `/volumes/cluster0/service.json` and search for the field `peer_addresses`. If you haven't connected to other nodes before, it is `"peer_addresses": []`. Enter the target node IP address and the node `id` that you retrieved before in this field, e.g. `"peer_addresses": []`. IPFS uses the multiaddress format, e.g. it is `"peer_addresses":["/ip4/192.168.1.100/tcp/9096/p2p/target_ID"]`. Do not forget to use `"` around the peer.
