@@ -4,13 +4,31 @@ Starting from an empty Ubuntu VM, follow these detailed steps. In case a chapter
 
 ## Setup basic infrastructure
 
-- Setup the DNS records to reflect the domain (e.g. `EXAMPLE.COM`) together with API endpoint (e.g. `api.EXAMPLE.COM` and Open Web UI endpoint (e.g. `oi.EXAMPLE.COM`) to the respective IP address of the server
+- Setup the DNS records to reflect the domain (e.g. `EXAMPLE.COM`) together with API endpoint (e.g. `api.EXAMPLE.COM` and Open Web UI endpoint (e.g. `oi.EXAMPLE.COM`) to the respective IP address of the server. Your IP address can be found using:
+
+```bash
+   curl ifconfig.me
+```
 
 - Open the firewall ports:
 
+  - 22 inbound for SSH connection, if needed
+  - 80 inbound for http communication for certbot to issue an https certificate
   - 443 inbound for https communication
   - 4001 inbound/outbound for the IPFS swarm connection
   - 9096/9097 inbound/outbound for the IPFS cluster connection
+
+  Do this on the server (e.g. your VM) and the Ubuntu Firewall as follows:
+
+```bash
+  sudo ufw enable
+  sudo ufw allow 22/tcp
+  sudo ufw allow 80/tcp
+  sudo ufw allow 443/tcp
+  sudo ufw allow 4001/tcp
+  sudo ufw allow 9096/tcp
+  sudo ufw allow 9097/tcp
+```
 
 - Update the system
 
@@ -133,7 +151,8 @@ If you like Certbot, please consider supporting our work by:
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ```
 
-- The resulting config in `nano  /etc/nginx/sites-available/EXAMPLE.COM` should be something like the config below. Check that the headers are rewritten using `proxy_set_header` in order for CORS to work correctly.
+- The resulting config in `nano  /etc/nginx/sites-available/EXAMPLE.COM` should be something like the config below.
+  **Make sure that the headers are rewritten using `proxy_set_header` in order for CORS to work correctly; this needs to be done manually and is important!**
 
 ```nginx
 # ──────────────────────────────────────────────────────────────────────────────
@@ -329,6 +348,8 @@ Then start the TruSpace installation with:
 ```bash
 bash start.sh
 ```
+If you get permission errors during the startup-process, use sudo.
+
 
 If you check the installation with `docker ps` you should see these containers running:
 
