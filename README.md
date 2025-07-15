@@ -142,6 +142,8 @@ docker exec ipfs0 ipfs swarm peers
 docker exec cluster0 ipfs-cluster-ctl peers ls
 ```
 
+- Finally if you update a file to a public workspace on any of the nodes, it should be visible "on the other side"
+
 ## Check out architecture, guides, details..
 
 ### Run development environment for coding
