@@ -4,6 +4,48 @@
 # Usage: ./start.sh [--local-frontend]
 # If --local-frontend is passed, it will start the frontend locally
 
+add_cluster_peers() {
+    if [ -z "$CLUSTER_PEERS" ]; then
+        echo "No cluster peers configured"
+        return
+    fi
+
+    PEERSTORE_DIR="./volumes/cluster0"
+    PEERSTORE_FILE="$PEERSTORE_DIR/peerstore"
+    
+    echo "Creating directory: $PEERSTORE_DIR"
+    mkdir -p "$PEERSTORE_DIR"
+    
+    # Clear existing peerstore file
+    echo "Creating cluster peerstore file: $PEERSTORE_FILE"
+    > "$PEERSTORE_FILE"
+    
+    echo "Writing cluster peers to cluster peerstore..."
+    count=0
+    
+    # Convert comma-separated string to newline-separated and process
+    echo "$CLUSTER_PEERS" | tr ',' '\n' | while IFS= read -r peer; do
+        # Trim whitespace
+        peer=$(echo "$peer" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+        
+        if [ -n "$peer" ]; then
+            count=$((count + 1))
+            echo "$peer" >> "$PEERSTORE_FILE"
+            echo "[$count] $peer"
+        fi
+    done
+    
+    echo ""
+    echo "cluster0 peerstore file created successfully!"
+    echo "Location: $PEERSTORE_FILE"
+    echo "Contents:"
+    echo "--------"
+    cat "$PEERSTORE_FILE"
+    echo "--------"
+    echo "Total peers: $(wc -l < "$PEERSTORE_FILE")"
+    echo ""
+}
+
 add_ipfs_nodes_peers() {
     if [ -z "$IPFS_NODE_PEERS" ]; then
         echo "No cluster peers configured"
