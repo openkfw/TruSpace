@@ -8,20 +8,34 @@ TruSpace requires the following ports to be open for communication. Ensure the c
 
 | Port(s) | Protocol  | Direction        | Purpose                                 |
 | ------- | --------- | ---------------- | --------------------------------------- |
-| 3000    | TCP       | Inbound/Outbound | TruSpace UI (main web interface)        |
-| 3333    | TCP       | Inbound/Outbound | Open Web UI service (AI processing)     |
+| 443     | TCP       | Inbound          | HTTPS traffic                           |
 | 4001    | TCP & UDP | Inbound/Outbound | IPFS swarm (peer-to-peer communication) |
-| 5001    | TCP       | Inbound/Outbound | IPFS API                                |
-| 6831    | UDP       | Outbound         | Jaeger agent endpoint (tracing)         |
-| 8000    | TCP       | Inbound/Outbound | TruSpace backend API                    |
-| 8080    | TCP       | Inbound/Outbound | IPFS HTTP Gateway                       |
-| 8888    | TCP       | Outbound         | Prometheus endpoint (metrics)           |
-| 9094    | TCP       | Inbound/Outbound | IPFS cluster management                 |
-| 9095    | TCP       | Inbound/Outbound | IPFS proxy                              |
 | 9096    | TCP & UDP | Inbound/Outbound | IPFS cluster management                 |
-| 9097    | TCP       | Inbound/Outbound | IPFS cluster management                 |
 
-> **Note:** All listed ports use the TCP protocol. If you have a restrictive firewall, ensure both inbound and outbound rules are set for these ports.
+In the beginning, you also need to open port 80 for the initial setup of the HTTPS certificate. After that, you can redirect HTTP traffic to HTTPS and close port 80 if desired (currently, port 80 then redirects to 404 page).
+
+| Port(s) | Protocol | Direction | Purpose      |
+| ------- | -------- | --------- | ------------ |
+| 80      | TCP      | Inbound   | HTTP traffic |
+
+Some ports which are needed for external access are mapped to the subdomains using `nginx`:
+| Port(s) | Protocol | Purpose |
+| ------- | -------- | ----------------------------------- |
+| 3000 | TCP | TruSpace UI (main web interface) |
+| 3333 | TCP | Open Web UI service (AI processing) |
+| 8000 | TCP | API service (backend) |
+
+The other ports are used for internal communication between the TruSpace components and may not need to be exposed externally. However, they should be accessible within your network. They include:
+
+| Port(s) | Protocol | Purpose                         |
+| ------- | -------- | ------------------------------- |
+| 5001    | TCP      | IPFS API                        |
+| 6831    | UDP      | Jaeger agent endpoint (tracing) |
+| 8080    | TCP      | IPFS HTTP Gateway               |
+| 8888    | TCP      | Prometheus endpoint (metrics)   |
+| 9094    | TCP      | IPFS cluster management         |
+| 9095    | TCP      | IPFS cluster management         |
+| 9097    | TCP      | IPFS cluster management         |
 
 ## Firewall Configuration
 
