@@ -127,7 +127,8 @@ printf "    %s\n\n" "$CLUSTER_ID"
 
 ```
 
-- Use the script `./connectNodes.sh` to modify the respective files for IPFS and Cluster. The script uses the IP address and the respective `id` values and inserts them into the configuration files `./volumes/ipfs0/config` and `./volumes/cluster0/service.json`. So it looks somewhat like this:
+- Use the script `./connectPeer.sh` to modify the respective files for IPFS and Cluster. It needs `jq` installed, if you don't have it, install it via `sudo apt-get install jq`.
+  The script uses the IP address and the respective `id` values and inserts them into the configuration files `./volumes/ipfs0/config` and `./volumes/cluster0/service.json`. So it looks somewhat like this:
 
 ```bash
 ./connectPeer.sh 213.154.217.25 12D3Kooi....nD3hQLM 12D3KooW...VisK1T
