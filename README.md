@@ -152,7 +152,7 @@ docker exec cluster0 ipfs-cluster-ctl peers ls
 Also validate that all files have status `PINNED` and no errors are seen:
 
 ```bash
-docker exec cluster0 ipfs-cluster-ctl status
+docker exec cluster0 ipfs-cluster-ctl status | grep PIN_ERROR
 ```
 
 - Finally if you update a file to a public workspace on any of the nodes, it should be visible "on the other side"
