@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 
 import Image from "next/image";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 
 import { LanguageToggle } from "@/components/LanguageToggle";
@@ -22,6 +22,7 @@ import { confirmRegistration } from "@/lib/services";
 export default function ConfirmRegistration({}: React.ComponentPropsWithoutRef<"div">) {
    const translations = useTranslations("confirmRegistration");
    const token = useSearchParams().get("token");
+   const router = useRouter();
 
    const onConfirmClick = async () => {
       const locale = await getUserLocale();
@@ -32,6 +33,7 @@ export default function ConfirmRegistration({}: React.ComponentPropsWithoutRef<"
       const response = await confirmRegistration(token, data);
       if (response.status === "success") {
          toast.success(translations("confirmSuccess"));
+         router.push("/login");
       } else if (response.message === "invalid token") {
          toast.error(translations("confirmErrorToken"));
       } else if (response.message === "expired token") {
