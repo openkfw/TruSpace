@@ -453,9 +453,6 @@ export const registerUser = async (data: Record<string, string>) => {
       credentials: "include"
    };
    const response = await fetch(url, options);
-   if (!response.ok) {
-      throw new Error("Failed to register user");
-   }
    const result = await response.json();
    return result;
 };
