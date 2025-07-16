@@ -1,68 +1,58 @@
 #!/bin/bash
 
-# This script starts the development environment for TruSpace
-# Usage: ./start.sh [--local-frontend]
-# If --local-frontend is passed, it will start the frontend locally
+# This script starts the development environment for TruSpace.
+# Usage: ./start.sh [--local-frontend] [--remove-peers] [--help]
+#   --local-frontend  : start the frontend locally instead of in Docker
+#   --remove-peers    : after IPFS starts, remove default bootstrap peers via the IPFS API
+#   --help, -h        : display this help message and exit
 
-add_cluster_peers() {
-    if [ -z "$CLUSTER_PEERS" ]; then
-        echo "No cluster peers configured"
-        return
-    fi
-
-    PEERSTORE_DIR="./volumes/cluster0"
-    PEERSTORE_FILE="$PEERSTORE_DIR/peerstore"
-    
-    echo "Creating directory: $PEERSTORE_DIR"
-    mkdir -p "$PEERSTORE_DIR"
-    
-    # Clear existing peerstore file
-    echo "Creating peerstore file: $PEERSTORE_FILE"
-    > "$PEERSTORE_FILE"
-    
-    echo "Writing peers to peerstore..."
-    count=0
-    
-    # Convert comma-separated string to newline-separated and process
-    echo "$CLUSTER_PEERS" | tr ',' '\n' | while IFS= read -r peer; do
-        # Trim whitespace
-        peer=$(echo "$peer" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
-        
-        if [ -n "$peer" ]; then
-            count=$((count + 1))
-            echo "$peer" >> "$PEERSTORE_FILE"
-            echo "[$count] $peer"
-        fi
-    done
-    
-    echo ""
-    echo "Peerstore file created successfully!"
-    echo "Location: $PEERSTORE_FILE"
-    echo "Contents:"
-    echo "--------"
-    cat "$PEERSTORE_FILE"
-    echo "--------"
-    echo "Total peers: $(wc -l < "$PEERSTORE_FILE")"
-    echo ""
+# Function to display usage/help
+print_help() {
+  echo "Usage: $0 [OPTIONS]"
+  echo
+  echo "Options:"
+  echo "  --local-frontend    Start the frontend locally instead of in Docker, useful for debugging"
+  echo "  --remove-peers      After IPFS starts, remove default bootstrap peers or any other peers that were added"
+  echo "  -h, --help          Display this help message and exit"
+  exit 0
 }
 
-# generate env file if it does not exist
+# Generate .env file from example if none exists
 [[ -e .env ]] || cp .env.example .env
 
-SCRIPT_DIR=$(dirname -- $0)
-source $SCRIPT_DIR/.env
+SCRIPT_DIR=$(dirname -- "$0")
+source "$SCRIPT_DIR/.env"
 echo "INFO: Current script directory: $SCRIPT_DIR"
 
-# Read param from command line
-if [ "$1" == "--local-frontend" ]; then
-    export FRONTEND_DEV="true"
-    export FRONTEND_DOCKER_COMPOSE_FILE=""
-else
-    export FRONTEND_DEV="false"
-    export FRONTEND_DOCKER_COMPOSE_FILE="-f docker-compose-frontend.yml"
-fi
+# Default flags
+FRONTEND_DEV="false"
+FRONTEND_DOCKER_COMPOSE_FILE="-f docker-compose-frontend.yml"
+REMOVE_PEERS="false"
 
-# check for necessary docker volumes, if they don't exist, generate them
+# Parse command-line arguments
+while [[ "$#" -gt 0 ]]; do
+  case "$1" in
+    --local-frontend)
+      FRONTEND_DEV="true"
+      FRONTEND_DOCKER_COMPOSE_FILE=""
+      shift
+      ;;
+    --remove-peers)
+      REMOVE_PEERS="true"
+      shift
+      ;;
+    -h|--help)
+      print_help
+      ;;
+    *)
+      echo "ERROR: Unknown option: $1"
+      echo "Use -h or --help to see available options."
+      exit 1
+      ;;
+  esac
+done
+
+# Ensure necessary Docker volume directories exist
 dirs=(
   "./volumes"
   "./volumes/db"
@@ -75,48 +65,56 @@ dirs=(
   "./volumes/ollama"
   "./volumes/open-webui"
 )
-
 for d in "${dirs[@]}"; do
   if [ ! -d "$d" ]; then
-    echo "Creating $d"
+    echo "INFO: Creating volume directory $d"
     mkdir -p "$d"
   fi
 done
 
+# INFO: Starting dev environment
 echo "INFO: Starting dev environment"
 
+# Capture current user/group IDs for Docker
 export LUID=$(id -u)
 export LGID=$(id -g)
 
-# remove previous docker instances
+# Remove any previous Docker containers (including orphans)
 docker compose down --remove-orphans
 
-# rebuilds frontend and backend
-docker compose build backend frontend
+# Rebuild backend and frontend images without cache
+docker compose build --no-cache backend frontend
 
-add_cluster_peers
-
-# start new instance of docker network
+# Start Docker services, conditionally including AI components
 if [ "$DISABLE_ALL_AI_FUNCTIONALITY" = "true" ]; then
-    echo "AI functionality is disabled. Starting without 'ollama' and 'webui' service..."
-    docker compose -f docker-compose.yml $FRONTEND_DOCKER_COMPOSE_FILE --env-file $SCRIPT_DIR/.env up -d
+  echo "INFO: AI functionality is disabled. Starting services without 'ollama' and 'webui'..."
+  docker compose -f docker-compose.yml $FRONTEND_DOCKER_COMPOSE_FILE --env-file "$SCRIPT_DIR/.env" up -d
 else
-    # Check if OI has a newer image
-    docker pull ghcr.io/open-webui/open-webui:ollama    
-    docker compose -f docker-compose.yml $FRONTEND_DOCKER_COMPOSE_FILE -f docker-compose-ai.yml --env-file $SCRIPT_DIR/.env up -d
+  echo "INFO: Pulling latest Open-WebUI/Ollama image and starting AI services..."
+  docker pull ghcr.io/open-webui/open-webui:ollama
+  docker compose -f docker-compose.yml $FRONTEND_DOCKER_COMPOSE_FILE -f docker-compose-ai.yml --env-file "$SCRIPT_DIR/.env" up -d
 fi
 
-# Wait until ipfs is ready and then delete bootstrap nodes
+# Wait for IPFS API to be ready
 until curl -s http://localhost:5001/api/v0/id > /dev/null 2>&1; do
-  echo "Waiting for IPFS API..."
+  echo "INFO: Waiting for IPFS API to become available..."
   sleep 2
 done
-curl -X POST "http://localhost:5001/api/v0/bootstrap/rm/all"
 
-# if frontend is in dev mode, start it
+echo "INFO: IPFS API is ready"
+
+# Conditionally remove default IPFS bootstrap peers
+if [ "$REMOVE_PEERS" = "true" ]; then
+  echo "INFO: Removing all IPFS peers (bootstrap and any that were added)"
+  curl -X POST "http://localhost:5001/api/v0/bootstrap/rm/all"
+else
+  echo "INFO: Skipping removal of IPFS bootstrap peers"
+fi
+
+# If frontend was requested in dev mode, start it locally
 if [ "$FRONTEND_DEV" = "true" ]; then
-    echo "INFO: Starting frontend in development mode"
-    cd ./frontend
-    npm i
-    npm run dev
+  echo "INFO: Starting frontend in development mode"
+  cd ./frontend || exit 1
+  npm install
+  npm run dev
 fi

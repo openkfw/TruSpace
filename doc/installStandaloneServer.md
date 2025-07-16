@@ -18,10 +18,9 @@ Starting from an empty Ubuntu VM, follow these detailed steps. In case a chapter
   - 4001 inbound/outbound for the IPFS swarm connection
   - 9096/9097 inbound/outbound for the IPFS cluster connection
 
-  Do this on the server (e.g. your VM) and the Ubuntu Firewall as follows:
+If your server uses the integrated firewall, enable respective ports
 
 ```bash
-  sudo ufw enable
   sudo ufw allow 22/tcp
   sudo ufw allow 80/tcp
   sudo ufw allow 443/tcp
@@ -343,13 +342,11 @@ For an initial configuration of the application run the configuration script. It
 bash configure.sh
 ```
 
-Then start the TruSpace installation with:
+Then start the TruSpace installation with option `--remove-peers`, so that your server doesn't connect to any known boostrap peers in the network. You can add other peers later if you like:
 
 ```bash
-bash start.sh
+bash start.sh --remove-peers
 ```
-If you get permission errors during the startup-process, use sudo.
-
 
 If you check the installation with `docker ps` you should see these containers running:
 
@@ -370,7 +367,8 @@ TruSpace downloads the configured AI model automatically if it is not present. I
 - Go to `Administration` and `Connection` and update the connection endpoint of ollama to `http://localhost:11434`. No API key is needed.
 - Download a model by selecting a model and typing the model name (e.g. `gemma3:1b`). Open Web UI should provide an option to download from [ollama.com](ollama.com). Because websockets are disabled in the configuration, the download takes a while until the frontend responds, so be patient.
 
-## Test TruSpace
+## Test the TruSpace installation
 
 - Access TruSpace via `https://example.com/register` and register a user
+- If the registration does not work, checkout the browser console and the running containers using `docker compose logs -f`
 - Upload a document and verify that everything works
