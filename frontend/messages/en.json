@@ -123,7 +123,7 @@
       "passwordPattern": "At least one special character",
       "registerSuccess": "Registration was successful",
       "passwordDescription": "Your password must meet the following requirements:",
-      "registerError": "An error occurred during registration",
+      "registerError": "An error occurred during registration, please try again",
       "backToLogin": "Back to login",
       "emailSent": "Registration confirmation email has been sent"
    },

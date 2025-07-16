@@ -123,7 +123,7 @@
       "passwordPattern": "Mindestens ein Sonderzeichen",
       "passwordDescription": "Dein Passwort muss diese Anforderungen erfüllen:",
       "registerSuccess": "Registrierung erfolgreich",
-      "registerError": "Bei der Registrierung ist ein Fehler aufgetreten",
+      "registerError": "Bei der Registrierung ist ein Fehler aufgetreten, Bitte versuchen Sie es erneut",
       "backToLogin": "Zurück zur Anmeldung",
       "emailSent": "Die E-Mail zur Registrierungsbestätigung wurde gesendet"
    },

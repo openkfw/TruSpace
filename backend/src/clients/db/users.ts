@@ -146,3 +146,12 @@ export const updateUserToken = async (userId: number, token: string) => {
     throw new Error("Error updating user");
   }
 };
+
+export const deleteUserById = async (userId: number) => {
+  try {
+    await db<UserDb>("users").delete().where({ id: userId });
+  } catch (error) {
+    logger.error("Error deleting user", error);
+    throw new Error("Error deleting user");
+  }
+};
