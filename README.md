@@ -149,6 +149,12 @@ docker exec ipfs0 ipfs swarm peers
 docker exec cluster0 ipfs-cluster-ctl peers ls
 ```
 
+Also validate that all files have status `PINNED` and no errors are seen:
+
+```bash
+docker exec cluster0 ipfs-cluster-ctl status
+```
+
 - Finally if you update a file to a public workspace on any of the nodes, it should be visible "on the other side"
 
 ## Check out architecture, guides, details..
