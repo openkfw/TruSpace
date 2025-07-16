@@ -113,6 +113,7 @@ export default function UserSettings() {
          refreshUser();
          toast.success(settingsTranslations("updateSuccess"));
          setFile(null);
+         setSettingChanged(false);
       } catch (err) {
          console.error("Updating user failed: ", err);
          toast.error(settingsTranslations("updateError"));
