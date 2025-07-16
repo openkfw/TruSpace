@@ -476,7 +476,7 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                         <Plus /> {t("addYourPerspective")}
                      </Button>
 
-                     <div className={isWrapped ? "mt-2" : ""}>
+                     <div>
                         <Button
                            ref={promptButtonRef}
                            variant="outline"
