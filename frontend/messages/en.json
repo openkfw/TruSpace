@@ -130,6 +130,7 @@
       "updateSuccess": "User settings updated successfully",
       "updateError": "Something went wrong while updating user settings",
       "preferedLanguage": "Preferred language",
+      "noChanges": "No changes to save",
       "nothingToUpload": "Nothing to upload",
       "notificationSettings": "Notification settings",
       "notificationSettingsDescription": "Send me e-mail notifications when:",

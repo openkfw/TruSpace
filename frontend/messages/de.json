@@ -129,7 +129,15 @@
    "settings": {
       "updateSuccess": "Benutzereinstellungen aktualisiert",
       "updateError": "Beim Aktualisieren der Benutzereinstellungen ist ein Fehler aufgetreten",
-      "nothingToUpload": "Es gibt nichts zum Hochladen"
+      "preferedLanguage": "Bevorzugte Sprache",
+      "noChanges": "Keine Änderungen vorgenommen",
+      "nothingToUpload": "Es gibt nichts zum Hochladen",
+      "notificationSettings": "Benachrichtigungseinstellungen",
+      "notificationSettingsDescription": "Schicken Sie mir E-Mail-Benachrichtigungen, wenn:",
+      "notificationAddedToWorkspace": "Ich zu einem neuen Arbeitsbereich hinzugefügt werde",
+      "notificationDocumentChanged": "Ein Dokument, an dem ich arbeite, geändert wird",
+      "notificationDocumentChat": "Eine neue Chat-Nachricht zu einem Dokument, an dem ich arbeite, hinzugefügt wird",
+      "notificationWorkspaceChanged": "Die Berechtigungen des Arbeitsbereichs, an dem ich arbeite, geändert werden"
    },
    "homePage": {
       "documentName": "Name",

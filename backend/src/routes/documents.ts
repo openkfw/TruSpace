@@ -479,7 +479,7 @@ router.put(
           ) {
             sendNotification(
               userSettings?.email,
-              "addedToWorkspace",
+              "documentChanged",
               `/workspace/${docInfo.meta.workspaceOrigin}/document/${docId}`,
               docInfo.meta.filename
             );

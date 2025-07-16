@@ -86,8 +86,26 @@ const documentChat: Record<string, Record<string, string>> = {
   },
 };
 
+const workspaceChange: Record<string, Record<string, string>> = {
+  en: {
+    subject: "TruSpace: Workspace permissions have been changed",
+    header: "Dear ",
+    text: "You are receiving this e-mail because permissions of a workspace you are following have been changed. Please proceed to the website below to see the changes.",
+    link: "Open workspace",
+    footer: "Best regards,",
+  },
+  de: {
+    subject: "TruSpace: Arbeitsbereichsberechtigungen wurden geändert",
+    header: "Hallo ",
+    text: "Du erhältst diese E-Mail, weil die Berechtigungen eines Arbeitsbereichs, dem du folgst, geändert wurden. Bitte gehe auf die unten stehende Website, um die Änderungen zu sehen.",
+    link: "Arbeitsbereich öffnen",
+    footer: "Viele Grüße,",
+  },
+};
+
 export const notifications = {
   addedToWorkspace,
   documentChanged,
   documentChat,
+  workspaceChange,
 };

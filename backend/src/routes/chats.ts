@@ -101,18 +101,11 @@ router.post(
       }, [])
       .forEach(async (documentCreator: string) => {
         const userSettings = await getUserSettingsByUiid(documentCreator);
-        console.log(
-          `Document creator: ${documentCreator}, current user: ${req.user?.name}, notification settings: ${JSON.stringify(
-            userSettings?.notificationSettings
-          )}`
-        );
+
         if (
           userSettings?.notificationSettings?.documentChanged &&
           documentCreator !== req.user?.uiid
         ) {
-          console.log(
-            `Sending notification to ${userSettings?.email} about document change`
-          );
           sendNotification(
             userSettings?.email,
             "documentChat",

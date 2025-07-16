@@ -166,7 +166,7 @@ router.put(
           ) {
             sendNotification(
               email,
-              "addedToWorkspace",
+              "workspaceChange",
               `/workspace/${wUID}`,
               `${workspaceDetails[0].meta.name}`
             );

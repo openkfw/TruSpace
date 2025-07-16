@@ -33,6 +33,7 @@ export default function UserSettings() {
       useState<boolean>();
    const [notificationWorkspaceChange, setNotificationWorkspaceChange] =
       useState<boolean>(false);
+   const [settingChanged, setSettingChanged] = useState<boolean>(false);
 
    useEffect(() => {
       if (user) {
@@ -71,14 +72,20 @@ export default function UserSettings() {
          const avatar = URL.createObjectURL(file);
          setFile(file);
          updateAvatar(avatar);
+         setSettingChanged(true);
       }
    };
 
    const handlePreferedLanguageChange = (language) => {
       setSelectedLanguage(language);
+      setSettingChanged(true);
    };
 
    const handleSubmit = async () => {
+      if (!settingChanged) {
+         toast.info(settingsTranslations("noChanges"));
+         return;
+      }
       try {
          const formData = new FormData();
          if (file) {
@@ -174,10 +181,10 @@ export default function UserSettings() {
                   value={selectedLanguage}
                   onValueChange={handlePreferedLanguageChange}
                >
-                  <SelectTrigger className="w-15 bg-slate-50 dark:bg-slate-800 dark:text-white dark:placeholder:text-white">
+                  <SelectTrigger className="w-[50%] bg-slate-50 dark:bg-slate-800 dark:text-white dark:placeholder:text-white">
                      <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="w-15">
+                  <SelectContent>
                      {[
                         { key: "en", label: "English" },
                         { key: "de", label: "Deutsch" }
@@ -190,7 +197,7 @@ export default function UserSettings() {
                </Select>
             </div>
          </div>
-         <div className="space-y-4">
+         <div className="space-y-2">
             <h3>{settingsTranslations("notificationSettings")}</h3>
             <p className="text-xs text-muted-foreground mb-2">
                {settingsTranslations("notificationSettingsDescription")}
@@ -199,10 +206,12 @@ export default function UserSettings() {
                <Checkbox
                   id="notificationAddedToWorkspace"
                   checked={notificationAddedToWorkspace}
-                  onCheckedChange={(checked) =>
-                     setNotificationAddedToWorkspace(!!checked)
-                  }
-               />{" "}
+                  onCheckedChange={(checked) => {
+                     setNotificationAddedToWorkspace(!!checked);
+                     setSettingChanged(true);
+                  }}
+                  className="mr-2"
+               />
                <Label htmlFor="notificationAddedToWorkspace">
                   {settingsTranslations("notificationAddedToWorkspace")}
                </Label>
@@ -211,10 +220,12 @@ export default function UserSettings() {
                <Checkbox
                   id="notificationDocumentChanged"
                   checked={notificationDocumentChanged}
-                  onCheckedChange={(checked) =>
-                     setNotificationDocumentChanged(!!checked)
-                  }
-               />{" "}
+                  onCheckedChange={(checked) => {
+                     setNotificationDocumentChanged(!!checked);
+                     setSettingChanged(true);
+                  }}
+                  className="mr-2"
+               />
                <Label htmlFor="notificationDocumentChanged">
                   {settingsTranslations("notificationDocumentChanged")}
                </Label>
@@ -223,10 +234,12 @@ export default function UserSettings() {
                <Checkbox
                   id="notificationDocumentChat"
                   checked={notificationDocumentChat}
-                  onCheckedChange={(checked) =>
-                     setNotificationDocumentChat(!!checked)
-                  }
-               />{" "}
+                  onCheckedChange={(checked) => {
+                     setNotificationDocumentChat(!!checked);
+                     setSettingChanged(true);
+                  }}
+                  className="mr-2"
+               />
                <Label htmlFor="notificationDocumentChat">
                   {settingsTranslations("notificationDocumentChat")}
                </Label>
@@ -235,10 +248,12 @@ export default function UserSettings() {
                <Checkbox
                   id="notificationWorkspaceChange"
                   checked={notificationWorkspaceChange}
-                  onCheckedChange={(checked) =>
-                     setNotificationWorkspaceChange(!!checked)
-                  }
-               />{" "}
+                  onCheckedChange={(checked) => {
+                     setNotificationWorkspaceChange(!!checked);
+                     setSettingChanged(true);
+                  }}
+                  className="mr-2"
+               />
                <Label htmlFor="notificationWorkspaceChange">
                   {settingsTranslations("notificationWorkspaceChanged")}
                </Label>
