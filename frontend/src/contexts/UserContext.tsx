@@ -37,6 +37,7 @@ interface User {
       preferedLanguage: string; // ISO 639-1 code, e.g., "en", "de"
       notificationSettings?: {
          addedToWorkspace?: boolean;
+         removedFromWorkspace?: boolean;
          documentChanged?: boolean;
          documentChat?: boolean;
          workspaceChange?: boolean;

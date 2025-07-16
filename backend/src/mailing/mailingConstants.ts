@@ -52,6 +52,23 @@ const addedToWorkspace: Record<string, Record<string, string>> = {
   },
 };
 
+const removedFromWorkspace: Record<string, Record<string, string>> = {
+  en: {
+    subject: "TruSpace: You have been removed from a workspace",
+    header: "Dear ",
+    text: "You are receiving this e-mail because you have been removed from a workspace.",
+    link: "Open application",
+    footer: "Best regards,",
+  },
+  de: {
+    subject: "TruSpace: Du wurdest zu einem Arbeitsbereich hinzugefügt",
+    header: "Hallo ",
+    text: "Du erhältst diese E-Mail, weil du zu einem Arbeitsbereich hinzugefügt wurdest. Bitte gehe auf die unten stehende Website, um den Arbeitsbereich zu sehen.",
+    link: "Arbeitsbereich öffnen",
+    footer: "Viele Grüße,",
+  },
+};
+
 const documentChanged: Record<string, Record<string, string>> = {
   en: {
     subject: "TruSpace: Document has been changed",
@@ -105,6 +122,7 @@ const workspaceChange: Record<string, Record<string, string>> = {
 
 export const notifications = {
   addedToWorkspace,
+  removedFromWorkspace,
   documentChanged,
   documentChat,
   workspaceChange,

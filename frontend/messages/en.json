@@ -135,6 +135,7 @@
       "notificationSettings": "Notification settings",
       "notificationSettingsDescription": "Send me e-mail notifications when:",
       "notificationAddedToWorkspace": "I am added to a new workspace",
+      "notificationRemovedFromWorkspace": "I am removed from a workspace",
       "notificationDocumentChanged": "A document I am working on is changed",
       "notificationDocumentChat": "A new chat message is added to a document I am working on",
       "notificationWorkspaceChanged": "Permissions of workspace I am working on changed"

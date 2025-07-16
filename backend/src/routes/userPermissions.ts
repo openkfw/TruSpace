@@ -2,6 +2,7 @@ import express, { Response } from "express";
 import { body } from "express-validator";
 import {
   createPermissionDb,
+  findPermissionByIdDb,
   findUsersInWorkspaceDb,
   removePermissionDb,
 } from "../clients/db";
@@ -87,7 +88,25 @@ router.delete(
   "/users-in-workspace/remove/:permissionId",
   async (req: AuthenticatedRequest, res: Response) => {
     try {
-      await removePermissionDb(req.params.permissionId);
+      const { permissionId } = req.params;
+      const permission = await findPermissionByIdDb(permissionId);
+      if (!permission) {
+        return res.status(404).json({
+          status: "failure",
+          message: "Permission not found",
+        });
+      }
+      await removePermissionDb(permissionId);
+
+      const client = new IpfsClient();
+      const workspaces = await client.getWorkspaceById(permission.workspace_id);
+      // Notify the user about the workspace assignement
+      sendNotification(
+        permission.user_email,
+        "removedFromWorkspace",
+        "/",
+        workspaces[0].meta.name
+      );
       res.json();
     } catch (error) {
       console.error("Removing permissions error:", error);

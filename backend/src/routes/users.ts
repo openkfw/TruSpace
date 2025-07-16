@@ -324,6 +324,8 @@ router.post(
       }
 
       const addedToWorkspace = req.body.notificationAddedToWorkspace === "true";
+      const removedFromWorkspace =
+        req.body.notificationRemovedFromWorkspace === "true";
       const documentChanged = req.body.notificationDocumentChanged === "true";
       const documentChat = req.body.notificationDocumentChat === "true";
       const workspaceChange = req.body.notificationWorkspaceChange === "true";
@@ -331,6 +333,7 @@ router.post(
 
       const notificationSettings = {
         addedToWorkspace,
+        removedFromWorkspace,
         documentChanged,
         documentChat,
         workspaceChange,

@@ -135,6 +135,7 @@
       "notificationSettings": "Benachrichtigungseinstellungen",
       "notificationSettingsDescription": "Schicken Sie mir E-Mail-Benachrichtigungen, wenn:",
       "notificationAddedToWorkspace": "Ich zu einem neuen Arbeitsbereich hinzugefügt werde",
+      "notificationRemovedFromWorkspace": "Ich aus einem Arbeitsbereich entfernt werde",
       "notificationDocumentChanged": "Ein Dokument, an dem ich arbeite, geändert wird",
       "notificationDocumentChat": "Eine neue Chat-Nachricht zu einem Dokument, an dem ich arbeite, hinzugefügt wird",
       "notificationWorkspaceChanged": "Die Berechtigungen des Arbeitsbereichs, an dem ich arbeite, geändert werden"

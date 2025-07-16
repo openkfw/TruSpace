@@ -25,6 +25,7 @@ const createUserSettingsOutput = (
       ? JSON.parse(user.notification_settings)
       : {
           addedToWorkspace: false,
+          removedFromWorkspace: false,
           documentChanged: false,
           documentChat: false,
           workspaceChange: false,

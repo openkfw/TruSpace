@@ -68,6 +68,19 @@ export const findUsersInWorkspaceDb = async (workspaceId: string) => {
   }
 };
 
+export const findPermissionByIdDb = async (permissionId: string) => {
+  try {
+    const permission = await db<UserPermissionDb>("user_permissions")
+      .select("*")
+      .where("id", "=", permissionId)
+      .first();
+    return permission;
+  } catch (error) {
+    logger.error(`Error finding permission by ID ${permissionId}:`, error);
+    return undefined;
+  }
+};
+
 export const removePermissionDb = async (permissionId: string) => {
   try {
     await db<UserPermissionDb>("user_permissions")

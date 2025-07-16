@@ -27,6 +27,10 @@ export default function UserSettings() {
    const [selectedLanguage, setSelectedLanguage] = useState<string>();
    const [notificationAddedToWorkspace, setNotificationAddedToWorkspace] =
       useState<boolean>(false);
+   const [
+      notificationRemovedFromWorkspace,
+      setNotificationRemovedFromWorkspace
+   ] = useState<boolean>(false);
    const [notificationDocumentChanged, setNotificationDocumentChanged] =
       useState<boolean>(false);
    const [notificationDocumentChat, setNotificationDocumentChat] =
@@ -42,6 +46,9 @@ export default function UserSettings() {
          }
          setNotificationAddedToWorkspace(
             user.settings?.notificationSettings?.addedToWorkspace || false
+         );
+         setNotificationRemovedFromWorkspace(
+            user.settings?.notificationSettings?.removedFromWorkspace || false
          );
          setNotificationDocumentChanged(
             user.settings?.notificationSettings?.documentChanged || false
@@ -95,6 +102,10 @@ export default function UserSettings() {
          formData.append(
             "notificationAddedToWorkspace",
             String(notificationAddedToWorkspace)
+         );
+         formData.append(
+            "notificationRemovedFromWorkspace",
+            String(notificationRemovedFromWorkspace)
          );
          formData.append(
             "notificationDocumentChanged",
@@ -215,6 +226,20 @@ export default function UserSettings() {
                />
                <Label htmlFor="notificationAddedToWorkspace">
                   {settingsTranslations("notificationAddedToWorkspace")}
+               </Label>
+            </div>
+            <div>
+               <Checkbox
+                  id="notificationRemovedFromWorkspace"
+                  checked={notificationRemovedFromWorkspace}
+                  onCheckedChange={(checked) => {
+                     setNotificationRemovedFromWorkspace(!!checked);
+                     setSettingChanged(true);
+                  }}
+                  className="mr-2"
+               />
+               <Label htmlFor="notificationRemovedFromWorkspace">
+                  {settingsTranslations("notificationRemovedFromWorkspace")}
                </Label>
             </div>
             <div>
