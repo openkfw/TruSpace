@@ -16,7 +16,6 @@ import {
 import { marked } from "marked";
 import TurndownService from "turndown";
 
-import { formatDate } from "@/lib/formatDate";
 import Editor from "@/components/tiptap-editor/Editor";
 import { Button } from "@/components/ui/button";
 import {
@@ -42,6 +41,7 @@ import {
    TooltipProvider,
    TooltipTrigger
 } from "@/components/ui/tooltip";
+import { formatDate } from "@/lib/formatDate";
 import {
    createPerspective,
    customPerspective,
@@ -476,16 +476,30 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                         <Plus /> {t("addYourPerspective")}
                      </Button>
 
-                     <Button
-                        ref={promptButtonRef}
-                        variant="outline"
-                        onClick={() => {
-                           setCustomPromptDialogOpen(true);
-                        }}
-                        className={`mr-4 ${isPromptWrapped ? "mt-2" : ""}`}
-                     >
-                        <MessageCircleQuestion /> {t("askCustomPrompt")}
-                     </Button>
+                     <div>
+                        <Button
+                           ref={promptButtonRef}
+                           variant="outline"
+                           onClick={() => {
+                              setCustomPromptDialogOpen(true);
+                           }}
+                           className={`mr-4 ${isPromptWrapped ? "mt-2" : ""}`}
+                        >
+                           <MessageCircleQuestion /> {t("askCustomPrompt")}
+                        </Button>
+                        <Button
+                           ref={promptButtonRef}
+                           variant="outline"
+                           onClick={() => {
+                              setPromptText(currentPerspective?.text || "");
+                              setCustomPromptDialogOpen(true);
+                           }}
+                           className={`mr-4 ${isPromptWrapped ? "mt-2" : ""}`}
+                        >
+                           <MessageCircleQuestion />{" "}
+                           {t("generateNewPerspectiveFromPrevious")}
+                        </Button>
+                     </div>
                      <div ref={selectRef} className={isWrapped ? "mt-2" : ""}>
                         <Select
                            value={selectedPerspective}

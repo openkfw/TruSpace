@@ -335,7 +335,8 @@
       "promptTitlePlaceHolder": "Enter a title of your prompt",
       "promptBodyPlaceholder": "Enter your prompt",
       "savePrompt": "Save prompt",
-      "saveCustomPromptHint": "Saving prompts doesn't work"
+      "saveCustomPromptHint": "Saving prompts doesn't work",
+      "generateNewPerspectiveFromPrevious": "Adjust with AI"
    },
    "documentEditable": {
       "cancel": "Cancel",
