@@ -71,16 +71,6 @@ export const WorkspaceProvider = ({ children }: { children: ReactNode }) => {
       }
    }, [pathname, params?.workspaceId, availableWorkspaces]);
 
-   // Poll available workspaces
-   useEffect(() => {
-      const interval = setInterval(async () => {
-         const workspaces = await loadWorkspaces();
-         setAvailableWorkspaces(workspaces);
-      }, 3000);
-
-      return () => clearInterval(interval);
-   }, []);
-
    const refresh = useCallback(
       async (workspaceName: string) => {
          setWorkspacesLoading(true);
