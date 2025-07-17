@@ -58,6 +58,7 @@
       "text": "Please, click the button below to finish your registration",
       "confirmError": "An error occurred, please try again",
       "confirmErrorToken": "Account confirmation error: token is invalid",
+      "confirmErrorTokenExpired": "Account confirmation error: token has expired, new confirmation email has been sent",
       "confirmSuccess": "Success! Account registration finished, you can proceed to login page"
    },
    "forgotPassword": {
@@ -122,7 +123,7 @@
       "passwordPattern": "At least one special character",
       "registerSuccess": "Registration was successful",
       "passwordDescription": "Your password must meet the following requirements:",
-      "registerError": "An error occurred during registration",
+      "registerError": "An error occurred during registration, please try again",
       "backToLogin": "Back to login",
       "emailSent": "Registration confirmation email has been sent"
    },

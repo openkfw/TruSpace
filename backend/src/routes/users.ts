@@ -7,12 +7,14 @@ import path from "path";
 import {
   activateUserDb,
   createUserDb,
+  deleteUserById,
   findUserByEmailDb,
   findUserByTokenDb,
   getTotalRecentlyAddedUsersDb,
   getTotalUsersDb,
   storeUserSettingsDb,
   updateUserPassword,
+  updateUserToken,
 } from "../clients/db";
 import { config } from "../config/config";
 import logger from "../config/winston";
@@ -25,7 +27,10 @@ import {
 import { authenticateCookie } from "../middlewares/authenticate";
 import validate from "../middlewares/validate";
 import { JwtPayload } from "../types/interfaces";
-import { USER_STATUS } from "../utility/constants";
+import {
+  CONFIRMATION_EMAIL_EXPIRATION,
+  USER_STATUS,
+} from "../utility/constants";
 import { AuthenticatedRequest } from "../types";
 import { IpfsClient } from "../clients/ipfs-client";
 import { UploadedFile } from "express-fileupload";
@@ -51,25 +56,34 @@ router.post(
   ]),
   async (req: Request, res: Response) => {
     const { name, email, password, confirmationLink, lang } = req.body;
-    const { registerUsersAsInactive } = config;
+    const { registerUsersAsInactive, smtpServer } = config;
 
     const passwordHash = await hashPassword(password);
-    const token = jwt.sign({ email: email }, Buffer.from(config.jwt.secret), {
-      expiresIn: 1200, // 20 minutes
-    });
+    const token = config.registerUsersAsInactive
+      ? jwt.sign({ email: email }, Buffer.from(config.jwt.secret), {
+          expiresIn: CONFIRMATION_EMAIL_EXPIRATION, // 20 minutes
+        })
+      : "";
     try {
-      const result = await createUserDb(
-        name,
-        email,
-        passwordHash,
-        registerUsersAsInactive ? USER_STATUS.inactive : USER_STATUS.active,
-        token
-      );
-      if (!result) {
-        throw Error("Unknown error");
-      }
-      logger.info("Register user as inactive");
       if (registerUsersAsInactive) {
+        if (!smtpServer.host || !smtpServer.port) {
+          logger.error("SMTP server not set");
+          return res.status(500).json({
+            status: "error",
+            message: "SMTP server not set",
+          });
+        }
+        logger.info("Register user as inactive");
+        const result = await createUserDb(
+          name,
+          email,
+          passwordHash,
+          registerUsersAsInactive ? USER_STATUS.inactive : USER_STATUS.active,
+          token
+        );
+        if (!result) {
+          throw Error("Unknown error");
+        }
         const filePath = path.join(
           process.cwd(),
           "src/mailing/templates/registrationConfirmation.html"
@@ -86,18 +100,29 @@ router.post(
           footer: registrationConfirmation[lang].footer,
         };
         const htmlTemplateToSend = template(replacements);
-        logger.info("Sending email done");
+        logger.info("Sending email");
         await sendEmail(
           email,
           registrationConfirmation[lang].subject,
           htmlTemplateToSend
         );
-        logger.info("Sending email done");
+        logger.info("Email sent");
         res.json({
           status: "success",
           message: "email sent",
         });
       } else {
+        logger.info("Registering user");
+        const result = await createUserDb(
+          name,
+          email,
+          passwordHash,
+          registerUsersAsInactive ? USER_STATUS.inactive : USER_STATUS.active,
+          token
+        );
+        if (!result) {
+          throw Error("Unknown error");
+        }
         res.json({
           status: "success",
           message: "Your registration request has been processed",
@@ -111,6 +136,10 @@ router.post(
           message: "Email address is already registered",
         });
       } else {
+        const user = await findUserByEmailDb(email);
+        if (user) {
+          await deleteUserById(user.id);
+        }
         res.status(500).json({
           status: "failure",
           message: "Unknown error occurred",
@@ -240,16 +269,23 @@ router.get(
   }
 );
 
-router.get(
+router.post(
   "/confirm-registration",
-  validate([query("token").isString().notEmpty()]),
+  validate([
+    query("token").isString().notEmpty(),
+    body("confirmationLink").isString(),
+    body("lang").isString(),
+  ]),
   async (req: Request, res: Response) => {
     const token = req.query.token as string;
-    jwt.verify(token, Buffer.from(config.jwt.secret)) as jwt.JwtPayload;
+    const { lang, confirmationLink } = req.body;
+
     try {
+      jwt.verify(token, Buffer.from(config.jwt.secret)) as jwt.JwtPayload;
       const user = await findUserByTokenDb(token);
       if (user) {
         await activateUserDb(user.id);
+        await updateUserToken(user.id, "");
         res.status(200).json({
           status: "success",
           message: "User activated successfully",
@@ -262,10 +298,58 @@ router.get(
       }
     } catch (error: any) {
       logger.error(error);
-      if (
-        error.message === "jwt expired" ||
-        error.message === "invalid signature"
-      ) {
+      if (error.message === "jwt expired") {
+        try {
+          const user = await findUserByTokenDb(token);
+          if (user) {
+            const newToken = jwt.sign(
+              { email: user.email },
+              Buffer.from(config.jwt.secret),
+              {
+                expiresIn: CONFIRMATION_EMAIL_EXPIRATION, // 20 minutes
+              }
+            );
+            await updateUserToken(user.id, newToken);
+            const filePath = path.join(
+              process.cwd(),
+              "src/mailing/templates/registrationConfirmation.html"
+            );
+            const source = fs.readFileSync(filePath, "utf-8");
+            const template = compile(source);
+            const replacements = {
+              lang: lang,
+              header: registrationConfirmation[lang].header,
+              user: user.username,
+              text: registrationConfirmation[lang].text,
+              confirmRegistrationUrl: `${confirmationLink}?token=${newToken}`,
+              confirmRegistrationTitle: registrationConfirmation[lang].link,
+              footer: registrationConfirmation[lang].footer,
+            };
+            const htmlTemplateToSend = template(replacements);
+            logger.info("Sending email");
+            await sendEmail(
+              user.email,
+              registrationConfirmation[lang].subject,
+              htmlTemplateToSend
+            );
+            logger.info("New confirmation email sent");
+            return res.status(400).json({
+              status: "error",
+              message: "expired token",
+            });
+          }
+          return res.status(500).json({
+            status: "failure",
+            message: "Unknown error occurred",
+          });
+        } catch (err) {
+          logger.error(err);
+          return res.status(500).json({
+            status: "failure",
+            message: "Unknown error occurred",
+          });
+        }
+      } else if (error.message === "invalid signature") {
         res.status(400).json({
           status: "error",
           message: "invalid token",

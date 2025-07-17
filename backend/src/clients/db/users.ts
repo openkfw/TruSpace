@@ -97,7 +97,7 @@ export const findUserByUiidDb = async (uiid: string) => {
 export const findUserByTokenDb = async (token: string) => {
   try {
     const user = await db<UserDb>("users")
-      .select("id")
+      .select("id", "email", "username", "status")
       .where({ user_token: token })
       .first();
     return user;
@@ -176,5 +176,25 @@ export const updateUserPassword = async (
   } catch (error) {
     logger.error("Error updating user", error);
     throw new Error("Error updating user");
+  }
+};
+
+export const updateUserToken = async (userId: number, token: string) => {
+  try {
+    await db<UserDb>("users")
+      .update({ user_token: token })
+      .where({ id: userId });
+  } catch (error) {
+    logger.error("Error updating user", error);
+    throw new Error("Error updating user");
+  }
+};
+
+export const deleteUserById = async (userId: number) => {
+  try {
+    await db<UserDb>("users").delete().where({ id: userId });
+  } catch (error) {
+    logger.error("Error deleting user", error);
+    throw new Error("Error deleting user");
   }
 };

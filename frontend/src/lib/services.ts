@@ -453,9 +453,6 @@ export const registerUser = async (data: Record<string, string>) => {
       credentials: "include"
    };
    const response = await fetch(url, options);
-   if (!response.ok) {
-      throw new Error("Failed to register user");
-   }
    const result = await response.json();
    return result;
 };
@@ -604,22 +601,28 @@ export const logout = async (): Promise<{
 };
 
 export const confirmRegistration = async (
-   token: string
+   token: string,
+   formData: {
+      lang: string;
+      confirmationLink: string;
+   }
 ): Promise<{
    status: string;
    message: string;
 }> => {
    try {
-      const response = await fetch(
-         `${USERS_ENDPOINT}/confirm-registration?token=${token}`,
-         {
-            method: "GET"
-         }
-      );
-
-      if (!response.ok) {
-         throw new Error("Failed to confirm registration");
-      }
+      const url = `${USERS_ENDPOINT}/confirm-registration?token=${token}`;
+      const options: RequestInit = {
+         method: "POST",
+         headers: {
+            "Content-Type": "application/json"
+         },
+         body: JSON.stringify({
+            lang: formData.lang,
+            confirmationLink: formData.confirmationLink
+         })
+      };
+      const response = await fetch(url, options);
 
       return await response.json();
    } catch (error) {

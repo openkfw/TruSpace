@@ -108,6 +108,11 @@ export const config: Config = {
   emailSender: envVars.EMAIL_SENDER,
 };
 
+const baseSMTPConfigError = !config.smtpServer.host || !config.smtpServer.port || !config.emailSender;
+if (config.registerUsersAsInactive && baseSMTPConfigError) {
+  throw new Error("Config validation error: REGISTER_USERS_AS_INACTIVE variable is set to true but SMTP server config is invalid");
+}
+
 if (config.jwt.secret === "super-secret-key") {
   logger.warn(
     "JWT_SECRET defaults to 'super-secret-key'. We strongly urge you to set your own JWT_SECRET!"

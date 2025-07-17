@@ -1,8 +1,33 @@
-# Install brainstorming summary
+# Install TruSpace on a bare server or virtual machine running Linux
 
-Starting from an empty Ubuntu VM, follow these steps. In case a chapter is already done or clear to you, skip it
+Starting from an empty Ubuntu VM, follow these detailed steps. In case a chapter is already done or clear to you, skip it
 
 ## Setup basic infrastructure
+
+- Setup the DNS records to reflect the domain (e.g. `EXAMPLE.COM`) together with API endpoint (e.g. `api.EXAMPLE.COM` and Open Web UI endpoint (e.g. `oi.EXAMPLE.COM`) to the respective IP address of the server. Your IP address can be found using:
+
+```bash
+   curl ifconfig.me
+```
+
+- Open the firewall ports:
+
+  - 22 inbound for SSH connection, if needed
+  - 80 inbound for http communication for certbot to issue an https certificate
+  - 443 inbound for https communication
+  - 4001 inbound/outbound for the IPFS swarm connection
+  - 9096/9097 inbound/outbound for the IPFS cluster connection
+
+If your server uses the integrated firewall, enable respective ports
+
+```bash
+  sudo ufw allow 22/tcp
+  sudo ufw allow 80/tcp
+  sudo ufw allow 443/tcp
+  sudo ufw allow 4001/tcp
+  sudo ufw allow 9096/tcp
+  sudo ufw allow 9097/tcp
+```
 
 - Update the system
 
@@ -16,10 +41,6 @@ Starting from an empty Ubuntu VM, follow these steps. In case a chapter is alrea
 ```bash
 sudo apt install git -y
 ```
-
-- Open the firewall ports:
-  - 443 for https communication
-- Setup the DNS records to reflect the domain (e.g. `EXAMPLE.COM`) together with API endpoint (e.g. `api.EXAMPLE.COM` and Open Web UI endpoint (e.g. `oi.EXAMPLE.COM`)
 
 ## Setup forward proxy nginx with SSL and LetsEncrypt
 
@@ -44,7 +65,7 @@ sudo systemctl start nginx
 sudo nano /etc/nginx/sites-available/EXAMPLE.COM
 ```
 
-- Paste this basic configuration (without SSL yet):
+- Paste this basic configuration and replace EXAMPLE.COM with your domain name. This configuration is without SSL, we'll do this later:
 
 ```nginx
 server {
@@ -72,7 +93,13 @@ server {
 }
 ```
 
-- Enable the config:
+- Test the nginx configuration file using
+
+```bash
+sudo nginx -t
+```
+
+- Enable the config with the respective domain name instead of `EXAMPLE.COM`:
 
 ```bash
 sudo ln -s /etc/nginx/sites-available/EXAMPLE.COM /etc/nginx/sites-enabled/
@@ -123,89 +150,108 @@ If you like Certbot, please consider supporting our work by:
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ```
 
-- The resulting config in `nano  /etc/nginx/sites-available/EXAMPLE.COM` should be something like:
+- The resulting config in `nano  /etc/nginx/sites-available/EXAMPLE.COM` should be something like the config below.
+  **Make sure that the headers are rewritten using `proxy_set_header` in order for CORS to work correctly; this needs to be done manually and is important!**
 
 ```nginx
-# Redirect HTTP to HTTPS globally
+# ──────────────────────────────────────────────────────────────────────────────
+# HTTPS Servers
+# ──────────────────────────────────────────────────────────────────────────────
+
 server {
     server_name EXAMPLE.COM;
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate     /etc/letsencrypt/live/EXAMPLE.COM/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/EXAMPLE.COM/privkey.pem;   # managed by Certbot
+    include             /etc/letsencrypt/options-ssl-nginx.conf;          # managed by Certbot
+    ssl_dhparam         /etc/letsencrypt/ssl-dhparams.pem;               # managed by Certbot
+
     location / {
         proxy_pass http://localhost:3000;
+
+        # preserve original host for Next.js server actions
+        proxy_set_header Host              $host;
+        proxy_set_header X-Forwarded-Host  $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # (optional but recommended)
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
     }
-
-    listen 443 ssl; # managed by Certbot
-    ssl_certificate /etc/letsencrypt/live/EXAMPLE.COM/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/letsencrypt/live/EXAMPLE.COM/privkey.pem; # managed by Certbot
-    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
-    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
-
 }
 
 server {
     server_name oi.EXAMPLE.COM;
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate     /etc/letsencrypt/live/EXAMPLE.COM/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/EXAMPLE.COM/privkey.pem;   # managed by Certbot
+    include             /etc/letsencrypt/options-ssl-nginx.conf;          # managed by Certbot
+    ssl_dhparam         /etc/letsencrypt/ssl-dhparams.pem;               # managed by Certbot
+
     location / {
         proxy_pass http://localhost:3333;
+
+        proxy_set_header Host              $host;
+        proxy_set_header X-Forwarded-Host  $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
     }
-
-    listen 443 ssl; # managed by Certbot
-    ssl_certificate /etc/letsencrypt/live/EXAMPLE.COM/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/letsencrypt/live/EXAMPLE.COM/privkey.pem; # managed by Certbot
-    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
-    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
-
 }
 
 server {
     server_name api.EXAMPLE.COM;
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate     /etc/letsencrypt/live/EXAMPLE.COM/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/EXAMPLE.COM/privkey.pem;   # managed by Certbot
+    include             /etc/letsencrypt/options-ssl-nginx.conf;          # managed by Certbot
+    ssl_dhparam         /etc/letsencrypt/ssl-dhparams.pem;               # managed by Certbot
+
     location / {
         proxy_pass http://localhost:8000;
+
+        proxy_set_header Host              $host;
+        proxy_set_header X-Forwarded-Host  $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
     }
-
-    listen 443 ssl; # managed by Certbot
-    ssl_certificate /etc/letsencrypt/live/EXAMPLE.COM/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/letsencrypt/live/EXAMPLE.COM/privkey.pem; # managed by Certbot
-    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
-    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
-
 }
 
+# ──────────────────────────────────────────────────────────────────────────────
+# HTTP → HTTPS Redirects (managed by Certbot)
+# ──────────────────────────────────────────────────────────────────────────────
+
 server {
-    if ($host = EXAMPLE.COM) {
-        return 301 https://$host$request_uri;
-    } # managed by Certbot
-
-
     listen 80;
     server_name EXAMPLE.COM;
-    return 404; # managed by Certbot
-
-
+    if ($host = EXAMPLE.COM) {
+        return 301 https://$host$request_uri;
+    }
+    return 404;
 }
 
 server {
-    if ($host = oi.EXAMPLE.COM) {
-        return 301 https://$host$request_uri;
-    } # managed by Certbot
-
-
     listen 80;
     server_name oi.EXAMPLE.COM;
-    return 404; # managed by Certbot
-
-
+    if ($host = oi.EXAMPLE.COM) {
+        return 301 https://$host$request_uri;
+    }
+    return 404;
 }
 
 server {
-    if ($host = api.EXAMPLE.COM) {
-        return 301 https://$host$request_uri;
-    } # managed by Certbot
-
-
     listen 80;
     server_name api.EXAMPLE.COM;
-    return 404; # managed by Certbot
-
-
+    if ($host = api.EXAMPLE.COM) {
+        return 301 https://$host$request_uri;
+    }
+    return 404;
 }
 ```
 
@@ -246,10 +292,9 @@ For more examples and ideas, visit:
 
 - Make sure to enable the entire docker functionality in the [post install guide](https://docs.docker.com/engine/install/linux-postinstall/)
 
-To make sure that your installation worked for all non-root users, run
+To make sure that your installation worked for all non-root users and docker is restarted when the server starts, reboot the server and try:
 
 ```bash
-newgrp docker
 docker run hello-world
 ```
 
@@ -282,43 +327,28 @@ For more examples and ideas, visit:
 
 ## Clone and configure the TruSpace repository
 
-- Clone the repository with
+- Clone the repository with anonymous access. If you have the git ssh keys configured you can also use the ssh link.
 
 ```bash
-git clone git@github.com:openkfw/TruSpace.git
-cd truspace
+git clone https://github.com/openkfw/TruSpace.git
+cd TruSpace
 ```
 
 ## 📥 Start of the server
 
-If you want to run in production mode, e.g. on your virtual machine:
+For an initial configuration of the application run the configuration script. It asks you a couple of configuration questions, if in doubt accept the default settings. You can easily change them later.
 
 ```bash
-cd production
-bash start-prod.sh
+bash configure.sh
 ```
 
-If running for the first time you may need to set the correct permissions for the `/volumes` folders, run:
+Then start the TruSpace installation with option `--remove-peers`, so that your server doesn't connect to any known boostrap peers in the network. You can add other peers later if you like:
 
 ```bash
-sudo chown -R 1000:1000 ./volumes
-# or
-sudo chmod -R 744 ./volumes
-# and restart application with
-bash start-prod.sh
+bash start.sh --remove-peers
 ```
 
-```bash
-# To restart environment, e.g. after you change some environmental variables or updating the repo) run again:
-bash start-prod.sh
-```
-
-```bash
-# To STOP environment
-docker compose -f docker-compose.yml -f docker-compose-ai.yml down --remove-orphans
-```
-
-The result should look something like this
+If you check the installation with `docker ps` you should see these containers running:
 
 | IMAGE                                | COMMAND                | STATUS                        | PORTS                                                                                                                      | NAMES              |
 | ------------------------------------ | ---------------------- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------ |
@@ -331,18 +361,14 @@ You can also make sure that everything is correctly running when the status in t
 
 ## Configure AI backend with OI and test
 
+TruSpace downloads the configured AI model automatically if it is not present. If you need to check the respective AI installation do the following steps (optional)
+
 - Login to the subdomain of the [Open Web UI](https://oi.truspace.dev) using the credentials in the `.env` file: `ADMIN_USER_EMAIL` and `ADMIN_USER_PASSWORD`
 - Go to `Administration` and `Connection` and update the connection endpoint of ollama to `http://localhost:11434`. No API key is needed.
 - Download a model by selecting a model and typing the model name (e.g. `gemma3:1b`). Open Web UI should provide an option to download from [ollama.com](ollama.com). Because websockets are disabled in the configuration, the download takes a while until the frontend responds, so be patient.
-- Test with a simple chat, should result in something like this (TODO, insert image)
 
-## Configure TruSpace
+## Test the TruSpace installation
 
-- Access TruSpace and register a user
+- Access TruSpace via `https://example.com/register` and register a user
+- If the registration does not work, checkout the browser console and the running containers using `docker compose logs -f`
 - Upload a document and verify that everything works
-
-## Configure access to IPFS
-
-- In volumes, add the IP address and cluster ID in the multicast format to service.json peers
-
-## Developer only: Starting frontend from Node

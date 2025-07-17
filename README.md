@@ -84,18 +84,78 @@ There's an extensive guide how to install TruSpace on a (virtual) server or a Ra
 
 ## Connect to other TruSpace nodes
 
-You have a TruSpace node running and would like to connect to another (private) network to sync the TruSpace data? The connection requires to
+You have a TruSpace node running and would like to connect to another (private) network to sync the TruSpace data? It's simple - but you need to exchange some configuration values in order to have a secure private connection. The connection requires to
 
-- Retrieve the address of the target node to connect to
-- The **swarm key** to allow the IPFS nodes to connecto to each other
-- The **cluster secret** to allow the IPFS cluster to share the pinning information of the pinned files
+- Retrieve the **IP address(es)** of the target node to connect to
+- The **swarm key** to allow the IPFS nodes to connecto to each other without sharing the connection with anyone else
+- The **IPFS id** identifies the IPFS node in the network
+- The **cluster secret** to allow the IPFS cluster to share the pinning information which files should be shared between the nodes
+- The **cluster id** identifies the cluster in the network
 
 Here is a step by step guide:
 
-- On the target node, open the file `/volumes/cluster0/service.json`. You get a long JSON tree, at the beginning is the field `secret`, e.g `141a2511dae98...e3c47f69d1e12203246f92`. This should be copied in your `.env` file in the variable `CLUSTER_SECRET`. This enables the two cluster nodes to connect to each other.
-- On the target node, open the file `/volumes/cluster0/identity.json`. Copy the value in the field `id`.
-- On your installation, open the file `/volumes/cluster0/service.json` and search for the field `peer_addresses`. If you haven't connected to other nodes before, it is `"peer_addresses": []`. Enter the target node IP address and the node `id` that you retrieved before in this field, e.g. `"peer_addresses": []`. IPFS uses the multiaddress format, e.g. it is `"peer_addresses":["/ip4/192.168.1.100/tcp/9096/p2p/target_ID"]`
-- Restart all containers
+- From the node at which you want to connect to (**target node**), get the file `swarm.key` from the folder `./volumes/ipfs0/swarm.key`. It should look approximately like this
+
+```
+/key/swarm/psk/1.0.0/
+/base16/
+7c2c973709f5a961b.....8926a65b15477cf5
+```
+
+- Copy the file into your `./volumes/ipfs0/` folder and overwrite the existing `swarm.key`, i.e. `./volumes/ipfs0/swarm.key`
+
+- Obtain the cluster secret from the target node you want to connect to. It is the environment variable `CLUSTER_SECRET`, e.g. found in the `./.env` configuration of the target node.
+- This should be copied in your `./.env` file in the variable `CLUSTER_SECRET`. This enables the two cluster nodes to connect to each other.
+
+- On the target node, open the file `/volumes/cluster0/identity.json`. Copy the value in the field `id`, you can do this using `jq` command or simply read out all values using these commands:
+
+```bash
+# Fetch values
+MY_IP="$(curl -s https://api.ipify.org)"
+IPFS_ID="$(jq -r '.Identity.PeerID' ./volumes/ipfs0/config)"
+CLUSTER_ID="$(jq -r '.id' ./volumes/cluster0/identity.json)"
+
+printf "\n"
+printf "🖧  My IP Address:\n"
+printf "    %s\n\n" "$MY_IP"
+
+printf "🛰  IPFS PeerID:\n"
+printf "    %s\n\n" "$IPFS_ID"
+
+printf "📡  Cluster PeerID:\n"
+printf "    %s\n\n" "$CLUSTER_ID"
+
+```
+
+- Use the script `./connectPeer.sh` to modify the respective files for IPFS and Cluster. It needs `jq` installed, if you don't have it, install it via `sudo apt-get install jq`.
+
+  The script uses the IP address and the respective `id` values and inserts them into the configuration files `./volumes/ipfs0/config` and `./volumes/cluster0/service.json`. So it looks somewhat like this:
+
+```bash
+./connectPeer.sh 213.154.217.25 12D3Kooi....nD3hQLM 12D3KooW...VisK1T
+```
+
+If you prefer to do this manually on your installation, open the file `/volumes/cluster0/service.json` and search for the field `peer_addresses`. If you haven't connected to other nodes before, it is `"peer_addresses": []`. Enter the target node IP address and the node `id` that you retrieved before in this field, e.g. `"peer_addresses": []`. IPFS uses the multiaddress format, e.g. it is `"peer_addresses":["/ip4/192.168.1.100/tcp/9096/p2p/target_ID"]`. Do not forget to use `"` around the peer.
+
+- Restart all containers using `./start.sh` script
+
+- Validate that the peers are available for both ipfs and cluster services. Both command should return peers for the IPFS network and the cluster network:
+
+```bash
+docker exec ipfs0 ipfs swarm peers
+```
+
+```bash
+docker exec cluster0 ipfs-cluster-ctl peers ls
+```
+
+Also validate that all files have status `PINNED` and no errors are seen:
+
+```bash
+docker exec cluster0 ipfs-cluster-ctl status | grep PIN_ERROR
+```
+
+- Finally if you update a file to a public workspace on any of the nodes, it should be visible "on the other side"
 
 ## Check out architecture, guides, details..
 
