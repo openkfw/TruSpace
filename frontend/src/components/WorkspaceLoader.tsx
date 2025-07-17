@@ -32,7 +32,9 @@ const WorkspaceLoader = () => {
       if (isLoggedIn) {
          const interval = setInterval(async () => {
             const workspaces = await loadWorkspaces();
-            setAvailableWorkspaces(workspaces);
+            if ((workspaces as { status?: unknown })?.status !== "failure") {
+               setAvailableWorkspaces(workspaces);
+            }
          }, POLL_INTERVAL);
 
          return () => clearInterval(interval);
