@@ -130,7 +130,16 @@
    "settings": {
       "updateSuccess": "User settings updated successfully",
       "updateError": "Something went wrong while updating user settings",
-      "nothingToUpload": "Nothing to upload"
+      "preferedLanguage": "Preferred language",
+      "noChanges": "No changes to save",
+      "nothingToUpload": "Nothing to upload",
+      "notificationSettings": "Notification settings",
+      "notificationSettingsDescription": "Send me e-mail notifications when:",
+      "notificationAddedToWorkspace": "I am added to a new workspace",
+      "notificationRemovedFromWorkspace": "I am removed from a workspace",
+      "notificationDocumentChanged": "A document I am working on is changed",
+      "notificationDocumentChat": "A new chat message is added to a document I am working on",
+      "notificationWorkspaceChanged": "Permissions of workspace I am working on changed"
    },
    "homePage": {
       "documentName": "Document name",

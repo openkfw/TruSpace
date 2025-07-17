@@ -631,20 +631,20 @@ export const confirmRegistration = async (
    }
 };
 
-export const uploadAvatar = async (formData: FormData) => {
+export const updateUserSettings = async (formData: FormData) => {
    try {
-      const res = await fetch(`${USERS_ENDPOINT}/avatar`, {
+      const res = await fetch(`${USERS_ENDPOINT}/user-settings`, {
          method: "POST",
          credentials: "include",
          body: formData
       });
 
       if (!res.ok) {
-         throw new Error("Failed to upload avatar");
+         throw new Error("Failed to update user settings");
       }
       return res.json();
    } catch (error) {
-      console.error("Error uploading avatar:", error);
+      console.error("Error updating user settings:", error);
       throw error;
    }
 };
@@ -668,6 +668,29 @@ export const downloadAvatar = async () => {
       return res;
    } catch (error) {
       console.error("Error downloading avatar:", error);
+      throw error;
+   }
+};
+
+export const downloadUserSettings = async () => {
+   try {
+      const res = await fetch(`${USERS_ENDPOINT}/user-settings`, {
+         method: "GET",
+         credentials: "include"
+      });
+
+      if (res.status === 404) {
+         return {};
+      }
+
+      if (!res.ok) {
+         throw new Error("Failed to download user settings");
+      }
+
+      const result = await res.json();
+      return result;
+   } catch (error) {
+      console.error("Error downloading user settings:", error);
       throw error;
    }
 };

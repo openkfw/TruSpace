@@ -2,7 +2,7 @@ import db from "../../config/database";
 import logger from "../../config/winston";
 import { USER_STATUS } from "../../utility/constants";
 
-interface UserDb {
+export interface UserDb {
   id: number;
   username: string;
   email: string;
@@ -11,6 +11,8 @@ interface UserDb {
   password_hash: string;
   user_token: string;
   avatar_cid?: string;
+  prefered_language?: string; // ISO 639-1 code, e.g., "en", "de"
+  notification_settings?: string; // JSON string
   created_at?: Date;
   updated_at?: Date;
 }
@@ -55,6 +57,8 @@ export const findUserByEmailDb = async (email: string) => {
         "uiid",
         "password_hash",
         "avatar_cid",
+        "prefered_language",
+        "notification_settings",
         "created_at"
       )
       .where({ email })
@@ -62,6 +66,30 @@ export const findUserByEmailDb = async (email: string) => {
     return user;
   } catch (error) {
     logger.error(`Error finding user ${email}:`, error);
+    return undefined;
+  }
+};
+
+export const findUserByUiidDb = async (uiid: string) => {
+  try {
+    const user = await db<UserDb>("users")
+      .select(
+        "id",
+        "username",
+        "email",
+        "status",
+        "uiid",
+        "password_hash",
+        "avatar_cid",
+        "prefered_language",
+        "notification_settings",
+        "created_at"
+      )
+      .where({ uiid })
+      .first();
+    return user;
+  } catch (error) {
+    logger.error(`Error finding user ${uiid}:`, error);
     return undefined;
   }
 };
@@ -111,10 +139,25 @@ export const activateUserDb = async (userId: number): Promise<void> => {
   }
 };
 
-export const storeAvatarCidDb = async (email: string, cid: string) => {
+export const storeUserSettingsDb = async (
+  email: string,
+  {
+    avatarCid,
+    preferedLanguage = "en",
+    notificationSettings,
+  }: {
+    avatarCid?: string;
+    preferedLanguage?: string;
+    notificationSettings?: string;
+  } = {}
+) => {
   try {
     await db<UserDb>("users")
-      .update({ avatar_cid: cid })
+      .update({
+        avatar_cid: avatarCid,
+        prefered_language: preferedLanguage,
+        notification_settings: notificationSettings,
+      })
       .where({ email: email });
   } catch (error) {
     logger.error("Error updating user", error);
