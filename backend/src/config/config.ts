@@ -24,6 +24,7 @@ interface Config {
     expiration: number;
   };
   masterPassword: string;
+  frontendUrl: string;
   corsOrigin: string[];
   contentSecurityPolicy: {
     defaultSrc: string[];
@@ -38,7 +39,7 @@ interface Config {
     host: string;
     port: number;
     secure: boolean;
-    tls:boolean;
+    tls: boolean;
     user: string;
     password: string;
   };
@@ -73,6 +74,7 @@ export const config: Config = {
     expiration: envVars.JWT_MAX_AGE,
   },
   masterPassword: envVars.MASTER_PASSWORD,
+  frontendUrl: envVars.FRONTEND_URL,
   corsOrigin: envVars.CORS_ORIGIN ? envVars.CORS_ORIGIN.split(",") : [],
   contentSecurityPolicy: {
     defaultSrc: envVars.CONTENT_SECURITY_POLICY_DEFAULT_URLS
@@ -99,7 +101,7 @@ export const config: Config = {
     host: envVars.SMTP_HOST,
     port: envVars.SMTP_PORT,
     secure: envVars.SMTP_SSL,
-    tls:envVars.SMTP_TLS,
+    tls: envVars.SMTP_TLS,
     user: envVars.SMTP_USER,
     password: envVars.SMTP_PASSWORD,
   },

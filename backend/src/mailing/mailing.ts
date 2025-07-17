@@ -22,8 +22,8 @@ export async function sendEmail(
     host: smtpServer.host,
     port: smtpServer.port,
     secure: smtpServer.secure,
-               // use STARTTLS, not SSL on connect
-    requireTLS: smtpServer.tls, 
+    // use STARTTLS, not SSL on connect
+    requireTLS: smtpServer.tls,
     auth,
   };
 
@@ -33,6 +33,7 @@ export async function sendEmail(
       `EMAIL_SENDER is empty. This is probably a mistake, and sending email will fail.`
     );
   }
+
   await transporter.sendMail({
     from: emailSender,
     to: emailAddress,

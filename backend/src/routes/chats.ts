@@ -6,6 +6,8 @@ import { IpfsClient } from "../clients/ipfs-client";
 import validate from "../middlewares/validate";
 import { AuthenticatedRequest } from "../types";
 import { ChatMessageRequest } from "../types/interfaces";
+import { getUserSettingsByUiid } from "../utility/user";
+import { sendNotification } from "../mailing/notifications";
 
 const router = express.Router();
 const client = new IpfsClient();
@@ -86,6 +88,32 @@ router.post(
     };
 
     const result = await client.createMessage(chatReq);
+
+    const docInfo = await client.getDocumentDetailsById(docId);
+
+    docInfo.documentVersions
+      .map((version) => version.meta.creatorUiid)
+      .reduce((acc: string[], uiid: string) => {
+        if (!acc.includes(uiid)) {
+          acc.push(uiid);
+        }
+        return acc;
+      }, [])
+      .forEach(async (documentCreator: string) => {
+        const userSettings = await getUserSettingsByUiid(documentCreator);
+
+        if (
+          userSettings?.notificationSettings?.documentChanged &&
+          documentCreator !== req.user?.uiid
+        ) {
+          sendNotification(
+            userSettings?.email,
+            "documentChat",
+            `/workspace/${docInfo.meta.workspaceOrigin}/document/${docId}`,
+            docInfo.meta.filename
+          );
+        }
+      });
     res.json(result);
   }
 );

@@ -43,6 +43,7 @@ export const envVarsSchema = Joi.object({
     .empty("")
     .default(24 * 60 * 60)
     .note("Token validity in seconds"),
+  FRONTEND_URL: Joi.string().default("http://localhost:3000"),
   CORS_ORIGIN: Joi.string()
     .optional()
     .allow("")

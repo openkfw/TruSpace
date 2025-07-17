@@ -59,6 +59,7 @@ export default function DocumentEditable({
       setIsUploading(true);
       const formData = new FormData();
       formData.append("workspace", workspace?.uuid);
+      formData.append("versionTagName", "");
 
       const editorContentBlob = new Blob([editorContent], {
          type: "text/html"

@@ -30,6 +30,8 @@ import {
   readExternalPrompts,
   tagsPrompt,
 } from "../utility/prompts";
+import { sendNotification } from "../mailing/notifications";
+import { getUserSettingsByUiid } from "../utility/user";
 
 (function () {
   addPerspectivesTemplate();
@@ -459,6 +461,30 @@ router.put(
               statusEndpoint: null,
             },
           };
+
+      docInfo.documentVersions
+        .map((version) => version.meta.creatorUiid)
+        .reduce((acc: string[], uiid: string) => {
+          if (!acc.includes(uiid)) {
+            acc.push(uiid);
+          }
+          return acc;
+        }, [])
+        .forEach(async (documentCreator: string) => {
+          const userSettings = await getUserSettingsByUiid(documentCreator);
+
+          if (
+            userSettings?.notificationSettings?.documentChanged &&
+            documentCreator !== req.user?.uiid
+          ) {
+            sendNotification(
+              userSettings?.email,
+              "documentChanged",
+              `/workspace/${docInfo.meta.workspaceOrigin}/document/${docId}`,
+              docInfo.meta.filename
+            );
+          }
+        });
 
       const responseMessage =
         "Document updated successfully and AI processing initiated where applicable.";
