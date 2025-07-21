@@ -83,7 +83,7 @@ export LGID=$(id -g)
 docker compose down --remove-orphans
 
 # Rebuild backend and frontend images without cache
-docker compose build --no-cache backend frontend
+docker compose -f docker-compose.yml $FRONTEND_DOCKER_COMPOSE_FILE build --no-cache backend frontend
 
 # Start Docker services, conditionally including AI components
 if [ "$DISABLE_ALL_AI_FUNCTIONALITY" = "true" ]; then

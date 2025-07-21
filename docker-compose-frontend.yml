@@ -2,9 +2,16 @@ services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
     restart: on-failure
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
     environment:
+      NODE_ENV: ${NODE_ENV}
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+      WATCHPACK_POLLING: true
     ports:
       - ${FRONTEND_PORT}:${FRONTEND_PORT}

@@ -221,7 +221,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       } finally {
          setLoading(false);
       }
-   }, [router, isTokenExpired, setupTokenCheck, fetchUserDetails]);
+   }, [isTokenExpired, setupTokenCheck, router, pathname, fetchUserDetails]);
 
    const refreshUser = useCallback(async () => {
       await initializeUser();
