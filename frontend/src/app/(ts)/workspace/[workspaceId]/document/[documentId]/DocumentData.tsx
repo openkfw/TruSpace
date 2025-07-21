@@ -31,13 +31,21 @@ export default function DocumentData({
    const languageDisplayMap = useMemo(
       () => ({
          English: { flag: "🇬🇧", name: langTranslations("en") },
+         en: { flag: "🇬🇧", name: langTranslations("en") },
          German: { flag: "🇩🇪", name: langTranslations("de") },
+         de: { flag: "🇩🇪", name: langTranslations("de") },
          French: { flag: "🇫🇷", name: langTranslations("fr") },
+         fr: { flag: "🇫🇷", name: langTranslations("fr") },
          Spanish: { flag: "🇪🇸", name: langTranslations("es") },
+         es: { flag: "🇪🇸", name: langTranslations("es") },
          Italian: { flag: "🇮🇹", name: langTranslations("it") },
+         it: { flag: "🇮🇹", name: langTranslations("it") },
          Portuguese: { flag: "🇵🇹", name: langTranslations("pt") },
+         pt: { flag: "🇵🇹", name: langTranslations("pt") },
          Russian: { flag: "🇷🇺", name: langTranslations("ru") },
-         Chinese: { flag: "🇨🇳", name: langTranslations("zh") }
+         ru: { flag: "🇷🇺", name: langTranslations("ru") },
+         Chinese: { flag: "🇨🇳", name: langTranslations("zh") },
+         zh: { flag: "🇨🇳", name: langTranslations("zh") }
       }),
       [langTranslations]
    );
@@ -90,34 +98,40 @@ export default function DocumentData({
    useEffect(() => {
       let langToSet = "-";
       let usedSource = "default (or not found)";
+      let langToProcess: string | undefined = undefined;
 
       // Priority 1: meta.language (from component props)
       if (typeof meta?.language === "string" && meta.language.trim() !== "") {
-         const trimmedLang = meta.language.trim();
-         const normalizedMetaLang =
-            trimmedLang.charAt(0).toUpperCase() +
-            trimmedLang.slice(1).toLowerCase();
-
-         if (languageDisplayMap[normalizedMetaLang]) {
-            langToSet = `${languageDisplayMap[normalizedMetaLang].flag} ${languageDisplayMap[normalizedMetaLang].name}`;
-            usedSource = "meta.language (props)";
-         }
+         langToProcess = meta.language;
+         usedSource = "meta.language (props)";
       }
-
       // Priority 2: documentLanguage (AI-detected)
-      // Only if meta.language was not found or not used.
-      if (
-         usedSource === "default (or not found)" &&
+      else if (
          typeof documentLanguage === "string" &&
          documentLanguage.trim() !== ""
       ) {
-         const normalizedDocLang =
-            documentLanguage.charAt(0).toUpperCase() +
-            documentLanguage.slice(1).toLowerCase();
+         langToProcess = documentLanguage;
+         usedSource = "documentLanguage (AI)";
+      }
 
-         if (languageDisplayMap[normalizedDocLang]) {
-            langToSet = `${languageDisplayMap[normalizedDocLang].flag} ${languageDisplayMap[normalizedDocLang].name}`;
-            usedSource = "documentLanguage (AI)";
+      if (langToProcess) {
+         try {
+            const parsed = JSON.parse(langToProcess);
+            if (parsed && parsed.language) {
+               langToProcess = parsed.language;
+            }
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+         } catch (e) {}
+
+         const trimmedLang = langToProcess.trim();
+         const normalizedLang =
+            trimmedLang.charAt(0).toUpperCase() +
+            trimmedLang.slice(1).toLowerCase();
+
+         if (languageDisplayMap[normalizedLang]) {
+            langToSet = `${languageDisplayMap[normalizedLang].flag} ${languageDisplayMap[normalizedLang].name}`;
+         } else {
+            langToSet = normalizedLang;
          }
       }
 

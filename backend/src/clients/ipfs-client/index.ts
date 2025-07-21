@@ -147,7 +147,20 @@ export class IpfsClient implements IClient {
       );
       if (res.data && res.data.results && res.data.results.length > 0) {
         const languagePin = res.data.results[0].pin;
-        return languagePin.meta.language;
+        let language = languagePin.meta.language;
+
+        try {
+          const parsed = JSON.parse(language);
+          if (parsed && parsed.language) {
+            language = parsed.language;
+          }
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (e) {
+          logger.warn(
+            `Could not parse language metadata for version CID ${versionCid}. Metadata was: "${language}". This might be expected if the language is stored as a plain string.`
+          );
+        }
+        return language;
       }
       return undefined;
     } catch (error) {

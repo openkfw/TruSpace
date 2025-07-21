@@ -42,13 +42,21 @@ export default function DocumentVersions({ documentVersions }) {
    const languageDisplayMap = useMemo(
       () => ({
          English: { flag: "🇬🇧", name: langTranslations("en") },
+         en: { flag: "🇬🇧", name: langTranslations("en") },
          German: { flag: "🇩🇪", name: langTranslations("de") },
+         de: { flag: "🇩🇪", name: langTranslations("de") },
          French: { flag: "🇫🇷", name: langTranslations("fr") },
+         fr: { flag: "🇫🇷", name: langTranslations("fr") },
          Spanish: { flag: "🇪🇸", name: langTranslations("es") },
+         es: { flag: "🇪🇸", name: langTranslations("es") },
          Italian: { flag: "🇮🇹", name: langTranslations("it") },
+         it: { flag: "🇮🇹", name: langTranslations("it") },
          Portuguese: { flag: "🇵🇹", name: langTranslations("pt") },
+         pt: { flag: "🇵🇹", name: langTranslations("pt") },
          Russian: { flag: "🇷🇺", name: langTranslations("ru") },
-         Chinese: { flag: "🇨🇳", name: langTranslations("zh") }
+         ru: { flag: "🇷🇺", name: langTranslations("ru") },
+         Chinese: { flag: "🇨🇳", name: langTranslations("zh") },
+         zh: { flag: "🇨🇳", name: langTranslations("zh") }
       }),
       [langTranslations]
    );
@@ -133,16 +141,28 @@ export default function DocumentVersions({ documentVersions }) {
          header: translations("language"),
          cell: ({ row }) => {
             let langToSet = "-";
-            const metaLanguage = row.original?.meta?.language;
+            let metaLanguage = row.original?.meta?.language;
 
             if (
                typeof metaLanguage === "string" &&
                metaLanguage.trim() !== ""
             ) {
+               try {
+                  // Attempt to parse if it's a JSON string like '{"language":"German"}'
+                  const parsed = JSON.parse(metaLanguage);
+                  if (parsed && parsed.language) {
+                     metaLanguage = parsed.language;
+                  }
+               } catch (e) {
+                  // Not a JSON string, use metaLanguage as is
+               }
+
                const trimmedLang = metaLanguage.trim();
                const normalizedMetaLang =
-                  trimmedLang.charAt(0).toUpperCase() +
-                  trimmedLang.slice(1).toLowerCase();
+                  trimmedLang.length > 2
+                     ? trimmedLang.charAt(0).toUpperCase() +
+                       trimmedLang.slice(1).toLowerCase()
+                     : trimmedLang.toLowerCase();
 
                if (languageDisplayMap[normalizedMetaLang]) {
                   langToSet = `${languageDisplayMap[normalizedMetaLang].flag} ${languageDisplayMap[normalizedMetaLang].name}`;

@@ -35,6 +35,9 @@ services:
       SMTP_SSL: ${SMTP_SSL}
       SMTP_TLS: ${SMTP_TLS}
       EMAIL_SENDER: ${EMAIL_SENDER}
+      LLM_PROVIDER: ${LLM_PROVIDER}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+
     ports:
       - ${API_PORT}:${API_PORT}
     entrypoint: sh ./entrypoint.sh

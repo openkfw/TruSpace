@@ -8,18 +8,39 @@ export const processLanguage = async (
 ) => {
   let language: string = "";
   try {
+    try {
+      const parsed = JSON.parse(textWithJson);
+      if (parsed && parsed.language) {
+        return parsed.language;
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (e) {
+      logger.debug("Initial JSON parsing failed, trying regex.");
+    }
+
     // cut off only part with with JSON between '{"language"' and '}' for cases when LLM is chatty
     const jsonStringMatch = textWithJson.match(/"language"\s*:\s*"([^"]*)"/);
-    if (!jsonStringMatch || !jsonStringMatch[1]) {
-      throw new Error("No language found in response");
+    if (jsonStringMatch && jsonStringMatch[1]) {
+      logger.debug("jsonStringMatch for language");
+      logger.debug(jsonStringMatch[1]);
+      language = jsonStringMatch[1];
+      return language;
     }
-    logger.debug("jsonStringMatch for language");
-    logger.debug(jsonStringMatch[1]);
 
-    language = jsonStringMatch[1];
-    return language;
+    if (!textWithJson.includes("{") && !textWithJson.includes("}")) {
+      const cleanedText = textWithJson.replace(/"/g, "").trim();
+      if (cleanedText.length > 0 && cleanedText.length < 50) {
+        // Basic validation
+        return cleanedText;
+      }
+    }
+
+    throw new Error("No language found in the initial response.");
   } catch (error) {
-    logger.debug("Error parsing language from first prompt", error);
+    logger.debug(
+      "Initial language parsing failed, attempting fallback with direct LLM formatting.",
+      error
+    );
 
     // In case of error, call LLM model again to format the response
     const ollamaFormattingResponse = await chatsModule.completion({
@@ -33,18 +54,42 @@ export const processLanguage = async (
     });
 
     try {
-      // cut off only part with with JSON between '{"language"' and '}' for cases when LLM is chatty
-      const jsonStringMatchSecondAttempt =
-        ollamaFormattingResponse?.choices[0]?.message?.content?.match(
-          /"language"\s*:\s*"([^"]*)"/
-        );
-      if (!jsonStringMatchSecondAttempt || !jsonStringMatchSecondAttempt[1]) {
-        throw new Error("No language found in second response");
+      const responseContent =
+        ollamaFormattingResponse?.choices[0]?.message?.content;
+      if (!responseContent) {
+        throw new Error("No content in second response");
       }
-      logger.debug("jsonStringMatchSecondAttempt for language");
-      logger.debug(jsonStringMatchSecondAttempt[1]);
-      language = jsonStringMatchSecondAttempt[1];
-      return language;
+
+      try {
+        const parsed = JSON.parse(responseContent);
+        if (parsed && parsed.language) {
+          logger.debug(
+            "Successfully parsed language from second attempt JSON object"
+          );
+          return parsed.language;
+        }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (e) {
+        logger.debug(
+          "Second attempt response is not a valid JSON, trying regex."
+        );
+      }
+
+      // Fallback to regex match if parsing fails
+      const jsonStringMatchSecondAttempt = responseContent.match(
+        /"language"\s*:\s*"([^"]*)"/
+      );
+
+      if (jsonStringMatchSecondAttempt && jsonStringMatchSecondAttempt[1]) {
+        logger.debug("jsonStringMatchSecondAttempt for language");
+        logger.debug(jsonStringMatchSecondAttempt[1]);
+        language = jsonStringMatchSecondAttempt[1];
+        return language;
+      }
+
+      throw new Error(
+        "No language found in second response after parsing and regex"
+      );
     } catch (error) {
       // Final fallback: if the response is not in JSON format, log the error and throw
       console.log("Error parsing language", error);

@@ -67,6 +67,12 @@ export const envVarsSchema = Joi.object({
   SMTP_USER: Joi.string().allow("").empty("").default(""),
   SMTP_PASSWORD: Joi.string().allow("").empty("").default(""),
   EMAIL_SENDER: Joi.string().allow("").empty("").default(""),
+  LLM_PROVIDER: Joi.string().valid("openwebui", "openai").default("openwebui"),
+  OPENAI_API_KEY: Joi.string().when("LLM_PROVIDER", {
+    is: "openai",
+    then: Joi.required(),
+    otherwise: Joi.optional().allow(""),
+  }),
   REGISTER_USERS_AS_INACTIVE: Joi.boolean()
     .optional()
     .allow("")
