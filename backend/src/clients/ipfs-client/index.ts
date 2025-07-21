@@ -556,6 +556,20 @@ export class IpfsClient implements IClient {
     return result;
   }
 
+  async getAllMessages(): Promise<ChatMessage[]> {
+    const res = await this.#pinSvcAxios.get(
+      `/pins?limit=1000&meta={"type":"chat"}`
+    );
+
+    const pins: PinningResponse = res.data;
+    const result = pins.results
+      .map((el) => this.#transformPinToChatMessage(el.pin))
+      .sort((a: ChatMessage, b: ChatMessage) => {
+        return Number(a.meta.timestamp) - Number(b.meta.timestamp);
+      });
+    return result;
+  }
+
   async createPerspective(_perspective: PerspectiveRequest): Promise<string> {
     try {
       const json = JSON.stringify(_perspective, null);

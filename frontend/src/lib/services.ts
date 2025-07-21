@@ -579,6 +579,20 @@ export function usePeers() {
    };
 }
 
+export function useRecentChats() {
+   const { data, error, isLoading, isValidating, mutate } = useSWR(
+      `${CHATS_ENDPOINT}/recent`,
+      fetcher
+   );
+   return {
+      chats: data,
+      error,
+      isLoading,
+      isValidating,
+      mutate
+   };
+}
+
 export const logout = async (): Promise<{
    status: string;
    message: string;
