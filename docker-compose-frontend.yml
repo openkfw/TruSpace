@@ -1,13 +1,13 @@
 services:
-   frontend:
-      build:
-         context: ./frontend
-         dockerfile: Dockerfile
-         args:
-            NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
-      restart: on-failure
-      environment:
-         NODE_ENV: production
-         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
-      ports:
-         - ${FRONTEND_PORT}:${FRONTEND_PORT}
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+    restart: on-failure
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+    ports:
+      - ${FRONTEND_PORT}:${FRONTEND_PORT}
