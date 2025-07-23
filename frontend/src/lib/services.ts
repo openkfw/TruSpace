@@ -29,10 +29,11 @@ export const loadDocuments = async (
    workspaceId,
    errorText,
    from = 0,
-   limit = 10
+   limit = 10,
+   searchString = ""
 ) => {
    const query = workspaceId ? `&workspace=${workspaceId}` : "";
-   const url = `${DOCUMENTS_ENDPOINT}?from=${from}&limit=${limit}${query}`;
+   const url = `${DOCUMENTS_ENDPOINT}?from=${from}&limit=${limit}${query}&search=${searchString}`;
    const options: RequestInit = {
       method: "GET",
       credentials: "include"

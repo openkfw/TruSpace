@@ -237,7 +237,12 @@ const DocumentList = ({ workspaceId }) => {
    useEffect(() => {
       const loadDocuments = async () => {
          try {
-            await fetchDocuments(workspaceId, from);
+            await fetchDocuments(
+               workspaceId,
+               from,
+               undefined,
+               debouncedSearchQuery
+            );
          } catch (err) {
             setError(err.message);
          } finally {
@@ -245,18 +250,10 @@ const DocumentList = ({ workspaceId }) => {
          }
       };
       loadDocuments();
-   }, [workspaceId, from]);
+   }, [workspaceId, from, debouncedSearchQuery]);
 
    useEffect(() => {
-      if (debouncedSearchQuery) {
-         const lowercasedQuery = debouncedSearchQuery.toLowerCase();
-         const filtered = documents.filter((doc) =>
-            doc.meta.filename.toLowerCase().includes(lowercasedQuery)
-         );
-         setFilteredDocuments(filtered);
-      } else {
-         setFilteredDocuments(documents);
-      }
+      setFilteredDocuments(documents);
    }, [debouncedSearchQuery, documents]);
 
    const downloadDocument = async (cid: string) => {

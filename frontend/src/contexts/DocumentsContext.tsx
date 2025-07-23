@@ -19,7 +19,12 @@ interface DocumentsContextType {
    document: DocumentWithVersions | null;
    limit: number;
    setDocuments: (documents: Document[]) => void;
-   fetchDocuments: (workspaceId: string, from?: number, limit?: number) => void;
+   fetchDocuments: (
+      workspaceId: string,
+      from?: number,
+      limit?: number,
+      searchString?: string
+   ) => void;
    fetchDocumentDetails: (documentID: string) => void;
    refreshUntilVersionFound: (
       docId: string,
@@ -53,12 +58,13 @@ export const DocumentsProvider = ({ children }: { children: ReactNode }) => {
    const [document, setDocument] = useState<DocumentWithVersions>(null);
    const translations = useTranslations("homePage");
 
-   const fetchDocuments = async (workspaceId, from, limitTo) => {
+   const fetchDocuments = async (workspaceId, from, limitTo, searchString) => {
       const { data, count, limit } = await loadDocuments(
          workspaceId,
          translations("failedToFetch"),
          from,
-         limitTo
+         limitTo,
+         searchString
       );
       setDocuments(data);
       setCount(count);

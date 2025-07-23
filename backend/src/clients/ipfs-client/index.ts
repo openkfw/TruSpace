@@ -515,7 +515,8 @@ export class IpfsClient implements IClient {
   async getDocumentsByWorkspace(
     wId: string,
     from: number,
-    limit: number
+    limit: number,
+    searchString: string = ""
   ): Promise<DocumentsResponse> {
     const pinRes: DocumentPinningResponse = (
       await this.#pinSvcAxios.get(
@@ -524,9 +525,14 @@ export class IpfsClient implements IClient {
     ).data;
 
     const result = this.#pins2Docs(pinRes.results);
+    const filteredResult = result.filter((doc) =>
+      searchString && searchString.length > 0
+        ? doc.meta.filename.toLowerCase().includes(searchString.toLowerCase())
+        : true
+    );
     return {
-      data: result.slice(from, from + limit),
-      count: result.length,
+      data: filteredResult.slice(from, from + limit),
+      count: filteredResult.length,
     };
   }
 

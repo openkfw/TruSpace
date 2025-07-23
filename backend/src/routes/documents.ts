@@ -48,11 +48,13 @@ router.get(
     query("workspace").isUUID(4).optional(),
     query("from").isInt().optional(),
     query("limit").isInt().optional(),
+    query("search").isString().optional(),
   ]),
   async (req: AuthenticatedRequest, res: Response) => {
     const workspace = req.query.workspace as string;
     const from = parseInt(req.query.from as string) || 0;
     const limit = parseInt(req.query.limit as string) || 2;
+    const searchString = req.query.search as string;
     const client = new IpfsClient();
     const publicWorkspaces = await client.getPublicWorkspaces();
 
@@ -63,11 +65,15 @@ router.get(
       ).map((p) => p.workspace_id);
       const result = documents.filter(
         (d) =>
-          allowedWs.includes(d.meta.workspaceOrigin) ||
-          publicWorkspaces.some(
-            (ws) => ws.meta.workspace_uuid === d.meta.workspaceOrigin
-          )
+          (allowedWs.includes(d.meta.workspaceOrigin) ||
+            publicWorkspaces.some(
+              (ws) => ws.meta.workspace_uuid === d.meta.workspaceOrigin
+            )) &&
+          (searchString && searchString.length > 0
+            ? d.meta.filename.toLowerCase().includes(searchString.toLowerCase())
+            : true)
       );
+
       const paginatedResult = result.slice(from, from + limit);
       res.json({
         count: result.length,
@@ -85,7 +91,8 @@ router.get(
       const { data: documents, count } = await client.getDocumentsByWorkspace(
         workspace as string,
         from,
-        limit
+        limit,
+        searchString
       );
       const documentsWithDetails = await Promise.all(
         documents.map(async (doc: Document) => {
