@@ -21,11 +21,7 @@
       "document": "Dokument",
       "workspace": "Arbeitsbereich",
       "userSettings": "Profil-Einstellungen",
-      "uploadAvatar": "Klicke auf den Avatar, um ein neues Bild hochzuladen",
-      "saveSettings": "Einstellungen speichern",
-      "aiSettings": "KI Einstellungen",
-      "aiSettingsGlobal": "Globale KI Einstellungen",
-      "aiSettingsLocal": "Arbeitsbereich KI Einstellungen"
+      "uploadAvatar": "Klicke auf den Avatar, um ein neues Bild hochzuladen"
    },
    "statistics": {
       "totalDocuments": "Gesamtdokumente",

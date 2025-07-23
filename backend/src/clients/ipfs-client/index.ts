@@ -156,9 +156,7 @@ export class IpfsClient implements IClient {
           }
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (e) {
-          logger.warn(
-            `Could not parse language metadata for version CID ${versionCid}. Metadata was: "${language}". This might be expected if the language is stored as a plain string.`
-          );
+          //
         }
         return language;
       }

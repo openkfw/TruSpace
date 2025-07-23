@@ -21,11 +21,7 @@
       "document": "Document",
       "workspace": "Workspace",
       "userSettings": "User settings",
-      "uploadAvatar": "Click avatar to upload new photo",
-      "saveSettings": "Save settings",
-      "aiSettings": "AI settings",
-      "aiSettingsGlobal": "Global AI settings",
-      "aiSettingsLocal": "Workspace AI settings"
+      "uploadAvatar": "Click avatar to upload new photo"
    },
    "statistics": {
       "totalDocuments": "Total documents",

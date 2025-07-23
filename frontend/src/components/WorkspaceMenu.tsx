@@ -17,7 +17,6 @@ import { useUser } from "@/contexts/UserContext";
 import { useWorkspaceContext } from "@/contexts/WorkspaceContext";
 
 import { Separator } from "./ui/separator";
-import AiSettingsDialog from "./AiSettingsDialog";
 import DeleteWorkspaceDialog from "./DeleteWorkspaceDialog";
 import WorkspaceTypeDialog from "./WorkspaceTypeDialog";
 
@@ -33,9 +32,6 @@ function WorkspaceMenu() {
    const [isDialogOpen, setIsDialogOpen] = useState(false);
    const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-
-   const [isGlobalAISettings, setIsGlobalAISettings] = useState(false);
-   const [isAISettingsOpen, setIsAISettingsOpen] = useState(false);
 
    const [isWorkspaceTypeDialogOpen, setIsWorkspaceTypeDialogOpen] =
       useState(false);
@@ -108,39 +104,12 @@ function WorkspaceMenu() {
                   </MenubarItem>
                </MenubarContent>
             </MenubarMenu>
-            <Separator orientation="vertical" />
-            <MenubarMenu>
-               <MenubarTrigger className="hover:bg-blue-500  hover:dark:bg-blue-800 focus:bg-blue-500 focus:dark:bg-blue-800 data-[state=open]:bg-blue-500 data-[state=open]:dark:bg-blue-800 hover:text-white focus:text-white data-[state=open]:text-white">
-                  {generalTranslations("aiSettings")}
-               </MenubarTrigger>
-               <MenubarContent className="bg-blue-200 dark:bg-muted">
-                  <MenubarItem
-                     className="hover:bg-blue-500 hover:dark:bg-blue-800 focus:bg-blue-500 focus:dark:bg-blue-800 data-[state=open]:bg-blue-500 data-[state=open]:dark:bg-blue-800 hover:text-white focus:text-white data-[state=open]:text-white"
-                     onClick={() => {
-                        setIsGlobalAISettings(true);
-                        setIsAISettingsOpen(true);
-                     }}
-                  >
-                     <span>{generalTranslations("aiSettingsGlobal")}</span>
-                  </MenubarItem>
-                  <MenubarItem
-                     className="hover:bg-blue-500 hover:dark:bg-blue-800 focus:bg-blue-500 focus:dark:bg-blue-800 data-[state=open]:bg-blue-500 data-[state=open]:dark:bg-blue-800 hover:text-white focus:text-white data-[state=open]:text-white"
-                     onClick={() => setIsAISettingsOpen(true)}
-                  >
-                     <span>{generalTranslations("aiSettingsLocal")}</span>
-                  </MenubarItem>
-               </MenubarContent>
-            </MenubarMenu>
          </Menubar>
 
          <DocumentUpload open={isDialogOpen} setOpen={setIsDialogOpen} />
          <DocumentCreateDialog
             open={isCreateDialogOpen}
             setOpen={setIsCreateDialogOpen}
-         />
-         <AiSettingsDialog
-            open={isAISettingsOpen}
-            setOpen={setIsAISettingsOpen}
          />
          <DeleteWorkspaceDialog
             open={isDeleteDialogOpen}
