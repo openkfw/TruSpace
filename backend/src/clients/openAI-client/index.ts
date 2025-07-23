@@ -116,7 +116,7 @@ export class OpenAICLient implements BackendLLMClient {
           },
           { role: "user", content: systemPrompt },
         ],
-        model: "gpt-4.1-mini",
+        model: config.openAIModel,
       });
 
       const summary = chatCompletion.choices[0].message.content ?? "";
@@ -167,7 +167,7 @@ export class OpenAICLient implements BackendLLMClient {
           },
           { role: "user", content: systemPrompt },
         ],
-        model: "gpt-4.1-mini",
+        model: config.openAIModel,
       });
 
       const language = chatCompletion.choices[0].message.content?.trim();
@@ -223,7 +223,7 @@ export class OpenAICLient implements BackendLLMClient {
           },
           { role: "user", content: systemPrompt },
         ],
-        model: "gpt-4.1-mini",
+        model: config.openAIModel,
       });
 
       const tagsString = chatCompletion.choices[0].message.content?.trim();
@@ -303,7 +303,7 @@ export class OpenAICLient implements BackendLLMClient {
             creatorUiid: "OpenAI",
             creatorType: "ai",
             prompt: result.prompt,
-            model: "gpt-4.1-mini",
+            model: config.openAIModel,
           },
         };
         await new IpfsClient().createPerspective(perspectiveRequest);

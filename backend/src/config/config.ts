@@ -45,6 +45,7 @@ interface Config {
   };
   emailSender: string;
   llmProvider: string;
+  openAIModel: string;
   openAIApiKey: string;
 }
 
@@ -109,6 +110,7 @@ export const config: Config = {
   },
   emailSender: envVars.EMAIL_SENDER,
   llmProvider: envVars.LLM_PROVIDER,
+  openAIModel: envVars.OPENAI_MODEL,
   openAIApiKey: envVars.OPENAI_API_KEY,
 };
 

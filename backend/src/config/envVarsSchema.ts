@@ -68,6 +68,13 @@ export const envVarsSchema = Joi.object({
   SMTP_PASSWORD: Joi.string().allow("").empty("").default(""),
   EMAIL_SENDER: Joi.string().allow("").empty("").default(""),
   LLM_PROVIDER: Joi.string().valid("openwebui", "openai").default("openwebui"),
+  OPENAI_MODEL: Joi.string()
+    .when("LLM_PROVIDER", {
+      is: "openai",
+      then: Joi.required(),
+      otherwise: Joi.optional().allow(""),
+    })
+    .default("gpt-4.1-mini"),
   OPENAI_API_KEY: Joi.string().when("LLM_PROVIDER", {
     is: "openai",
     then: Joi.required(),
