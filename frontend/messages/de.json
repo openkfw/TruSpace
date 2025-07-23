@@ -181,7 +181,22 @@
       "chooseFiles": "Dateien auswählen",
       "fileSelected": "Datei ausgewählt",
       "filesSelected": "Dateien ausgewählt",
-      "privateWorkspace": "Der Arbeitsbereich ist privat"
+      "privateWorkspace": "Der Arbeitsbereich ist privat",
+      "lastEditedDocument": "Zuletzt bearbeitetes Dokument",
+      "lastChatMessage": "Letzte Chat-Nachricht",
+      "editedOn": "Bearbeitet am",
+      "editedBy": "Bearbeitet von",
+      "sentOn": "Gesendet am",
+      "addedBy": "Hinzugefügt von",
+      "addedOn": "Hinzugefügt am",
+      "document": "Dokument",
+      "unknownCreator": "Unbekannte/r AutorIn",
+      "unknownDocument": "Unbekanntes Dokument",
+      "noDocumentAvailable": "Kein Dokument verfügbar",
+      "noChatMessageAvailable": "Keine Chat-Nachricht verfügbar",
+      "recentlyAddedWorkspace": "Kürzlich hinzugefügte Arbeitsbereiche",
+      "documentActions": "Dokumentaktionen",
+      "workspaceActions": "Arbeitsbereichsaktionen"
    },
    "documentPreview": {
       "preview": "Vorschau",
