@@ -50,6 +50,7 @@ import {
    TooltipProvider,
    TooltipTrigger
 } from "./ui/tooltip";
+import PaginationComponent from "./Pagination";
 
 function getFileExtension(filename: string) {
    if (filename.toLowerCase().endsWith(".editablefile")) {
@@ -63,7 +64,8 @@ const DocumentList = ({ workspaceId }) => {
    const translations = useTranslations("homePage");
    const generalTranslations = useTranslations("general");
    const documentTranslations = useTranslations("document");
-   const { documents, fetchDocuments } = useDocuments();
+   const { count, limit, documents, fetchDocuments } = useDocuments();
+   const [from, setFrom] = useState(0);
 
    const [filteredDocuments, setFilteredDocuments] = useState([]);
    const [loading, setLoading] = useState(true);
@@ -235,7 +237,7 @@ const DocumentList = ({ workspaceId }) => {
    useEffect(() => {
       const loadDocuments = async () => {
          try {
-            await fetchDocuments(workspaceId);
+            await fetchDocuments(workspaceId, from);
          } catch (err) {
             setError(err.message);
          } finally {
@@ -243,7 +245,7 @@ const DocumentList = ({ workspaceId }) => {
          }
       };
       loadDocuments();
-   }, [workspaceId]);
+   }, [workspaceId, from]);
 
    useEffect(() => {
       if (debouncedSearchQuery) {
@@ -359,6 +361,11 @@ const DocumentList = ({ workspaceId }) => {
                   ))}
                </TableBody>
             </Table>
+
+            <PaginationComponent
+               totalPages={Math.ceil(count / limit)}
+               onPageChange={(page) => setFrom((page - 1) * limit)}
+            />
          </div>
       </>
    );

@@ -34,6 +34,7 @@ interface Config {
     workerSrc: string[];
   };
   rateLimitPerMinute: number;
+  maxNumberOfFetchedPins: number;
   registerUsersAsInactive: boolean;
   smtpServer: {
     host: string;
@@ -96,6 +97,9 @@ export const config: Config = {
   rateLimitPerMinute: envVars.RATE_LIMIT_PER_MINUTE
     ? parseInt(envVars.RATE_LIMIT_PER_MINUTE, 10)
     : 200,
+  maxNumberOfFetchedPins: envVars.MAX_NUMBER_OF_FETCHED_PINS
+    ? parseInt(envVars.MAX_NUMBER_OF_FETCHED_PINS, 10)
+    : 1000,
   registerUsersAsInactive: envVars.REGISTER_USERS_AS_INACTIVE,
   smtpServer: {
     host: envVars.SMTP_HOST,

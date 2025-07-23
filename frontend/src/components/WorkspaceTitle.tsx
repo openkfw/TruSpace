@@ -18,13 +18,12 @@ const fmtCreatedOn = (isoString) => {
 
 export default function WorkspaceTitle() {
    const { workspace } = useWorkspaceContext();
-   const { documents } = useDocuments();
+   const { count: documentCount } = useDocuments();
    const [contributors, setContributors] = useState({
       count: 0,
       contributors: []
    });
    const translations = useTranslations("homePage");
-   const documentCount = documents.length;
 
    useEffect(() => {
       const getWorkspaceContributors = async () => {

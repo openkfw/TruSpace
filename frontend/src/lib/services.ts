@@ -25,9 +25,14 @@ const LANGUAGE_ENDPOINT = `${API_URL}/language`;
 
 // Documents api
 
-export const loadDocuments = async (workspaceId, errorText) => {
-   const query = workspaceId ? `?workspace=${workspaceId}` : "";
-   const url = `${DOCUMENTS_ENDPOINT}${query}`;
+export const loadDocuments = async (
+   workspaceId,
+   errorText,
+   from = 0,
+   limit = 3
+) => {
+   const query = workspaceId ? `&workspace=${workspaceId}` : "";
+   const url = `${DOCUMENTS_ENDPOINT}?from=${from}&limit=${limit}${query}`;
    const options: RequestInit = {
       method: "GET",
       credentials: "include"

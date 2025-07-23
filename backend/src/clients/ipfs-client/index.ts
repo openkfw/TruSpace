@@ -21,6 +21,7 @@ import {
   Document,
   DocumentCreateResponse,
   DocumentRequest,
+  DocumentsResponse,
   DocumentWithVersions,
   File,
   GeneralTemplateOfItemInWorkspace,
@@ -37,7 +38,12 @@ import { checkPermissionForWorkspace } from "../../utility/permissions";
 import { deleteMultipleJobStatusesDb } from "../db";
 import { IClient } from "./IClient";
 
-const { ipfsPinningServiceHost, ipfsClusterHost, ipfsGatewayHost } = config;
+const {
+  ipfsPinningServiceHost,
+  ipfsClusterHost,
+  ipfsGatewayHost,
+  maxNumberOfFetchedPins,
+} = config;
 
 const ipfsConfig: IpfsClientConfig = {
   pinSvcBaseUrl: ipfsPinningServiceHost,
@@ -485,24 +491,43 @@ export class IpfsClient implements IClient {
     return { cid: data.cid, uuid: doc.docId };
   }
 
-  async getAllDocuments(): Promise<Document[]> {
-    const pinRes: DocumentPinningResponse = (
-      await this.#pinSvcAxios.get('/pins?limit=1000&meta={"type":"document"}')
-    ).data;
-
-    const result = this.#pins2Docs(pinRes.results);
-    return result;
-  }
-
-  async getDocumentsByWorkspace(wId: string): Promise<Document[]> {
+  async getAllDocuments(
+    from: number = 0,
+    limit: number = 100
+  ): Promise<DocumentsResponse> {
     const pinRes: DocumentPinningResponse = (
       await this.#pinSvcAxios.get(
-        `/pins?limit=1000&meta={"type":"document","workspaceOrigin":"${wId}"}`
+        `/pins?limit=${maxNumberOfFetchedPins}&meta={"type":"document"}`
+      )
+    ).data;
+
+    const count = pinRes.count || 0;
+    const result = this.#pins2Docs(pinRes.results);
+    console.log(`Fetched ${result.length} documents from pinning service.`);
+    return {
+      count,
+      from,
+      limit,
+      data: result.slice(from, from + limit),
+    };
+  }
+
+  async getDocumentsByWorkspace(
+    wId: string,
+    from: number,
+    limit: number
+  ): Promise<DocumentsResponse> {
+    const pinRes: DocumentPinningResponse = (
+      await this.#pinSvcAxios.get(
+        `/pins?limit=${maxNumberOfFetchedPins}&meta={"type":"document","workspaceOrigin":"${wId}"}`
       )
     ).data;
 
     const result = this.#pins2Docs(pinRes.results);
-    return result;
+    return {
+      data: result.slice(from, from + limit),
+      count: result.length,
+    };
   }
 
   /**

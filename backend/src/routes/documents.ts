@@ -44,14 +44,20 @@ const router = express.Router();
 /* GET documents by workspace ID */
 router.get(
   "/",
-  validate([query("workspace").isUUID(4).optional()]),
+  validate([
+    query("workspace").isUUID(4).optional(),
+    query("from").isInt().optional(),
+    query("limit").isInt().optional(),
+  ]),
   async (req: AuthenticatedRequest, res: Response) => {
     const workspace = req.query.workspace as string;
+    const from = parseInt(req.query.from as string) || 0;
+    const limit = parseInt(req.query.limit as string) || 2;
     const client = new IpfsClient();
     const publicWorkspaces = await client.getPublicWorkspaces();
 
     if (!workspace || workspace === "undefined") {
-      const documents = await client.getAllDocuments();
+      const { data: documents } = await client.getAllDocuments();
       const allowedWs = (
         await findPermissionsByEmailDb(req.user?.email as string)
       ).map((p) => p.workspace_id);
@@ -62,7 +68,13 @@ router.get(
             (ws) => ws.meta.workspace_uuid === d.meta.workspaceOrigin
           )
       );
-      res.json(result);
+      const paginatedResult = result.slice(from, from + limit);
+      res.json({
+        count: result.length,
+        from,
+        limit,
+        data: paginatedResult,
+      });
     } else {
       await checkPermissionForWorkspace(
         req.user?.email as string,
@@ -70,8 +82,10 @@ router.get(
         workspace
       );
 
-      const documents = await client.getDocumentsByWorkspace(
-        workspace as string
+      const { data: documents, count } = await client.getDocumentsByWorkspace(
+        workspace as string,
+        from,
+        limit
       );
       const documentsWithDetails = await Promise.all(
         documents.map(async (doc: Document) => {
@@ -88,7 +102,12 @@ router.get(
           };
         })
       );
-      res.json(documentsWithDetails);
+      res.json({
+        count,
+        from,
+        limit,
+        data: documentsWithDetails,
+      });
     }
   }
 );
@@ -159,13 +178,13 @@ router.get(
 router.get("/statistics", async (req: AuthenticatedRequest, res: Response) => {
   try {
     const client = new IpfsClient();
-    const documents = await client.getAllDocuments();
+    const { data: documents, count } = await client.getAllDocuments();
     const recentlyAddedDocuments = documents.filter(
       (doc) =>
         Number(doc.meta.timestamp) > Date.now() - 10 * 24 * 60 * 60 * 1000
     );
     res.json({
-      totalDocuments: documents.length,
+      totalDocuments: count,
       recentlyAddedDocuments: recentlyAddedDocuments.length,
     });
   } catch (err: any) {

@@ -14,10 +14,12 @@ import { Document, DocumentWithVersions } from "@/interfaces";
 import { loadDocumentDetail, loadDocuments } from "@/lib/services";
 
 interface DocumentsContextType {
+   count: number;
    documents: Document[];
    document: DocumentWithVersions | null;
+   limit: number;
    setDocuments: (documents: Document[]) => void;
-   fetchDocuments: (workspaceId: string) => void;
+   fetchDocuments: (workspaceId: string, from?: number, limit?: number) => void;
    fetchDocumentDetails: (documentID: string) => void;
    refreshUntilVersionFound: (
       docId: string,
@@ -26,8 +28,10 @@ interface DocumentsContextType {
 }
 
 export const DocumentsContext = createContext<DocumentsContextType>({
+   count: 0,
    documents: [],
    document: null,
+   limit: 3,
    setDocuments: () => null,
    fetchDocuments: () => null,
    fetchDocumentDetails: () => null,
@@ -44,15 +48,21 @@ export const useDocuments = () => {
 
 export const DocumentsProvider = ({ children }: { children: ReactNode }) => {
    const [documents, setDocuments] = useState<Document[]>([]);
+   const [count, setCount] = useState<number>(0);
+   const [limit, setLimit] = useState<number>(10);
    const [document, setDocument] = useState<DocumentWithVersions>(null);
    const translations = useTranslations("homePage");
 
-   const fetchDocuments = async (workspaceId) => {
-      const data = await loadDocuments(
+   const fetchDocuments = async (workspaceId, from, limitTo) => {
+      const { data, count, limit } = await loadDocuments(
          workspaceId,
-         translations("failedToFetch")
+         translations("failedToFetch"),
+         from,
+         limitTo
       );
       setDocuments(data);
+      setCount(count);
+      setLimit(limit);
    };
 
    const fetchDocumentDetails = useCallback(
@@ -118,8 +128,10 @@ export const DocumentsProvider = ({ children }: { children: ReactNode }) => {
    return (
       <DocumentsContext.Provider
          value={{
+            count,
             document,
             documents,
+            limit,
             setDocuments,
             fetchDocuments,
             fetchDocumentDetails,
