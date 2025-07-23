@@ -195,6 +195,7 @@
       "noDocumentAvailable": "No document available",
       "noChatMessageAvailable": "No chat message available",
       "recentlyAddedWorkspace": "Recently added workspace",
+      "noRecentWorkspaceAvailable": "No recent workspace available",
       "documentActions": "Document actions",
       "workspaceActions": "Workspace actions"
    },

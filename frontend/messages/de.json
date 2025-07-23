@@ -195,6 +195,7 @@
       "noDocumentAvailable": "Kein Dokument verfügbar",
       "noChatMessageAvailable": "Keine Chat-Nachricht verfügbar",
       "recentlyAddedWorkspace": "Kürzlich hinzugefügte Arbeitsbereiche",
+      "noRecentWorkspaceAvailable": "Keine kürzlich hinzugefügten Arbeitsbereiche verfügbar",
       "documentActions": "Dokumentaktionen",
       "workspaceActions": "Arbeitsbereichsaktionen"
    },

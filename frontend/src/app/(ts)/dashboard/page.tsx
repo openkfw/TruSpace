@@ -232,13 +232,7 @@ export default function Dashboard() {
                      </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-2 space-y-2 relative z-10">
-                     {isLoading ? (
-                        <p className="text-muted-foreground">
-                           {generalTranslations("loading")}
-                        </p>
-                     ) : error ? (
-                        <p className="text-red-500">{error}</p>
-                     ) : recentlyAddedWorkspace ? (
+                     {recentlyAddedWorkspace ? (
                         <>
                            <div className="flex items-baseline gap-2">
                               <span className="text-sm text-muted-foreground">
@@ -271,7 +265,7 @@ export default function Dashboard() {
                         </>
                      ) : (
                         <p className="text-muted-foreground">
-                           {homeTranslations("noChatMessageAvailable")}
+                           {homeTranslations("noRecentWorkspaceAvailable")}
                         </p>
                      )}
                   </CardContent>
