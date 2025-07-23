@@ -31,7 +31,7 @@ export const DocumentsContext = createContext<DocumentsContextType>({
    count: 0,
    documents: [],
    document: null,
-   limit: 3,
+   limit: 10,
    setDocuments: () => null,
    fetchDocuments: () => null,
    fetchDocumentDetails: () => null,

@@ -29,7 +29,7 @@ export const loadDocuments = async (
    workspaceId,
    errorText,
    from = 0,
-   limit = 3
+   limit = 10
 ) => {
    const query = workspaceId ? `&workspace=${workspaceId}` : "";
    const url = `${DOCUMENTS_ENDPOINT}?from=${from}&limit=${limit}${query}`;
