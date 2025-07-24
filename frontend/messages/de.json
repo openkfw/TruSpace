@@ -334,7 +334,8 @@
       "promptTitlePlaceHolder": "Gib den Titel Deines Prompts ein",
       "promptBodyPlaceholder": "Gib Deinen Prompt ein",
       "savePrompt": "Prompt speichern",
-      "saveCustomPromptHint": "Das Speichern von Prompts funktioniert noch nicht"
+      "saveCustomPromptHint": "Das Speichern von Prompts funktioniert noch nicht",
+      "generateNewPerspectiveFromPrevious": "Mit KI anpassen"
    },
    "documentEditable": {
       "cancel": "Abbrechen",
