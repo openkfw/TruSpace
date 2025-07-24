@@ -92,7 +92,7 @@ export const processLanguage = async (
       );
     } catch (error) {
       // Final fallback: if the response is not in JSON format, log the error and throw
-      console.log("Error parsing language", error);
+
       logger.error("Error parsing language", error);
       return "-";
     }

@@ -46,7 +46,6 @@ export const processTags = async (
       return tags;
     } catch (error) {
       // Final fallback: if the response is not in JSON format, log the error and throw
-      console.log("Error parsing tags", error);
       logger.error("Error parsing tags", error);
       return [];
     }
