@@ -21,7 +21,8 @@
       "document": "Dokument",
       "workspace": "Arbeitsbereich",
       "userSettings": "Profil-Einstellungen",
-      "uploadAvatar": "Klicke auf den Avatar, um ein neues Bild hochzuladen"
+      "uploadAvatar": "Klicke auf den Avatar, um ein neues Bild hochzuladen",
+      "saveSettings": "Einstellungen speichern"
    },
    "statistics": {
       "totalDocuments": "Gesamtdokumente",
