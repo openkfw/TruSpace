@@ -59,7 +59,8 @@ services:
       IPFS_NODE_PEERS: ${IPFS_NODE_PEERS}
     volumes:
       - ./volumes/ipfs0:/data/ipfs
-      - ../scripts/init/init_ipfs.sh:/container-init.d/init_ipfs.sh
+      ## Uncomment below to attach volume with custom init script
+      # - ../scripts/init/init_ipfs.sh:/container-init.d/init_ipfs.sh
 
   cluster0:
     container_name: cluster0
