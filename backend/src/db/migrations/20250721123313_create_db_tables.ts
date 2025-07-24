@@ -1,14 +1,24 @@
 import { Knex } from "knex";
+import { USER_STATUS } from "../../utility/constants";
 
 /* Please update REQUIRED_TABLES in backend/src/clients/db/index.ts when adding/removing tables */
 
 export async function up(knex: Knex): Promise<void> {
   await knex.schema.createTable("users", (table) => {
     table.increments("id").primary();
-    table.string("username", 50).notNullable().unique();
+    table.string("username", 50).notNullable();
     table.string("email", 100).notNullable().unique();
+    table.uuid("uiid").notNullable().defaultTo(knex.fn.uuid());
     table.string("password_hash", 255).notNullable();
+    table.string("status").notNullable().defaultTo(USER_STATUS.inactive);
+    table.string("user_token");
+    table.string("avatar_cid").nullable();
+    table.string("notification_settings").nullable();
+    table.string("prefered_language").nullable();
     table.timestamps(true, true);
+
+    table.index("user_token");
+    table.index("uiid");
   });
 
   await knex.schema.createTable("user_permissions", (table) => {
@@ -42,10 +52,29 @@ export async function up(knex: Knex): Promise<void> {
     table.json("attributes");
     table.timestamps(true, true);
   });
+
+  await knex.schema.createTable("prompts", (table) => {
+    table.increments("id").primary();
+    table.string("title", 100).notNullable().unique();
+    table.string("prompt").notNullable();
+    table.string("created_by").nullable();
+    table.string("updated_by").nullable();
+    table.timestamps(true, true);
+  });
+
+  await knex.schema.createTable("password_reset_tokens", (table) => {
+    table.increments("id").primary();
+    table.bigInteger("user_id").notNullable();
+    table.binary("token").notNullable().unique();
+    table.index("token");
+    table.index("user_id");
+  });
 }
 
 export async function down(knex: Knex): Promise<void> {
   // Don't forget to drop tables in reverse order to avoid foreign key constraints :-)
+  await knex.schema.dropTableIfExists("password_reset_tokens");
+  await knex.schema.dropTableIfExists("prompts");
   await knex.schema.dropTableIfExists("job_status");
   await knex.schema.dropTableIfExists("workspace_passwords");
   await knex.schema.dropTableIfExists("user_permissions");

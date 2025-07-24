@@ -2,7 +2,7 @@ services:
   backend:
     build:
       context: ./backend
-      target: builder
+      dockerfile: Dockerfile.dev
     restart: on-failure
     volumes:
       - ./backend/src:/app/src

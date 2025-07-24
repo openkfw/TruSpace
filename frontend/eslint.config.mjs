@@ -60,7 +60,7 @@ const eslintConfig = [
          ],
          "simple-import-sort/exports": "warn",
          "import/order": "off",
-         "react-hooks/exhaustive-deps": "off",
+         "react-hooks/exhaustive-deps": "warn",
          "react/jsx-boolean-value": ["warn", "never"],
          "react/self-closing-comp": "warn"
       }
