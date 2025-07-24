@@ -47,6 +47,8 @@ interface Config {
   llmProvider: string;
   openAIModel: string;
   openAIApiKey: string;
+  mistralApiKey: string;
+  mistralModel: string;
 }
 
 const { error, value: envVars } = envVarsSchema.validate(process.env);
@@ -112,6 +114,8 @@ export const config: Config = {
   llmProvider: envVars.LLM_PROVIDER,
   openAIModel: envVars.OPENAI_MODEL,
   openAIApiKey: envVars.OPENAI_API_KEY,
+  mistralApiKey: envVars.MISTRAL_API_KEY,
+  mistralModel: envVars.MISTRAL_MODEL,
 };
 
 const baseSMTPConfigError =

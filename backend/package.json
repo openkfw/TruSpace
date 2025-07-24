@@ -16,6 +16,7 @@
     "seed": "knex seed:run"
   },
   "dependencies": {
+    "@mistralai/mistralai": "^1.7.5",
     "@opendocsg/pdf2md": "^0.2.1",
     "@types/node": "^22.15.29",
     "@types/nodemailer": "^6.4.17",

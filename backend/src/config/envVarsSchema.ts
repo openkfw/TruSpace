@@ -67,7 +67,9 @@ export const envVarsSchema = Joi.object({
   SMTP_USER: Joi.string().allow("").empty("").default(""),
   SMTP_PASSWORD: Joi.string().allow("").empty("").default(""),
   EMAIL_SENDER: Joi.string().allow("").empty("").default(""),
-  LLM_PROVIDER: Joi.string().valid("openwebui", "openai").default("openwebui"),
+  LLM_PROVIDER: Joi.string()
+    .valid("openwebui", "openai", "mistral")
+    .default("openwebui"),
   OPENAI_MODEL: Joi.string()
     .when("LLM_PROVIDER", {
       is: "openai",
@@ -80,6 +82,21 @@ export const envVarsSchema = Joi.object({
     then: Joi.required(),
     otherwise: Joi.optional().allow(""),
   }),
+  MISTRAL_API_KEY: Joi.string()
+    .when("LLM_PROVIDER", {
+      is: "mistral",
+      then: Joi.required(),
+      otherwise: Joi.optional().allow(""),
+    })
+    .default(""),
+
+  MISTRAL_MODEL: Joi.string()
+    .when("LLM_PROVIDER", {
+      is: "mistral",
+      then: Joi.required(),
+      otherwise: Joi.optional().allow(""),
+    })
+    .default("open-mistral-nemo"),
   REGISTER_USERS_AS_INACTIVE: Joi.boolean()
     .optional()
     .allow("")
