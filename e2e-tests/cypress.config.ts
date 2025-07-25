@@ -1,5 +1,7 @@
 import { defineConfig } from "cypress";
 import * as dotenv from "dotenv";
+import * as Database from "better-sqlite3";
+import { execSync } from "child_process";
 dotenv.config();
 
 export default defineConfig({
@@ -7,7 +9,27 @@ export default defineConfig({
     experimentalStudio: true,
     setupNodeEvents(on, config) {
       // implement node event listeners here
-      console.log("setupNodeEvents");
+      on("task", {
+        runSqliteQuery({ dbPath, query, params }) {
+          const db = new Database(dbPath);
+          const stmt = db.prepare(query);
+          const result = stmt.run(...(params || []));
+          db.close();
+          return result;
+        },
+
+        runBashScript(scriptPath) {
+          try {
+            const output = execSync(`bash ${scriptPath}`, {
+              encoding: "utf-8",
+            });
+            return output;
+          } catch (err) {
+            console.error("Script error:", err);
+            throw err;
+          }
+        },
+      });
     },
   },
   env: {

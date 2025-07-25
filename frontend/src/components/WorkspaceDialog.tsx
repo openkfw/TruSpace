@@ -129,6 +129,7 @@ export default function WorkspaceDialog({
                         )}
                         required
                         maxLength={50}
+                        data-test-id="workspace-create-name"
                      />
                      <div className="flex flex-row items-center mt-4">
                         <Checkbox
@@ -137,6 +138,7 @@ export default function WorkspaceDialog({
                               setNewWorkspaceIsPrivate(!newWorkspaceIsPrivate)
                            }
                            className="mr-2"
+                           data-test-id="workspace-create-private"
                         />
                         <span className="mr-2">
                            {translations("workspaceDialog.setPrivate")}
@@ -181,6 +183,7 @@ export default function WorkspaceDialog({
                      disabled={isUploading}
                      type="submit"
                      className="w-1/2 sm:w-auto"
+                     data-test-id="workspace-create-submit"
                   >
                      {isUploading ? (
                         <>
