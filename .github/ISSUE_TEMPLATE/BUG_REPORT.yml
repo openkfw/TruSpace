@@ -11,7 +11,7 @@ body:
       placeholder: "Enter a brief summary of the bug"
       required: true
 
-  - type: input
+  - type: textarea
     id: steps_to_reproduce
     attributes:
       label: Steps to Reproduce
