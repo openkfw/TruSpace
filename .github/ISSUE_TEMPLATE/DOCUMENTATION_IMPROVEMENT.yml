@@ -9,6 +9,7 @@ body:
       label: Summary
       description: A brief summary of the documentation issue or improvement.
       placeholder: "Enter a brief summary of the documentation issue"
+    validations:
       required: true
 
   - type: input
