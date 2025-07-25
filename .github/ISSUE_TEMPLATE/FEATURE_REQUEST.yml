@@ -11,21 +11,21 @@ body:
       placeholder: "Enter a brief summary of the feature"
       required: true
 
-  - type: input
+  - type: textarea
     id: motivation
     attributes:
       label: Motivation
       description: Explain why this feature is needed.
       placeholder: "Why is this feature important?"
 
-  - type: input
+  - type: textarea
     id: proposed_solution
     attributes:
       label: Proposed Solution
       description: Describe how you envision this feature being implemented.
       placeholder: "How do you think this feature should work?"
 
-  - type: input
+  - type: textarea
     id: additional_context
     attributes:
       label: Additional Context
