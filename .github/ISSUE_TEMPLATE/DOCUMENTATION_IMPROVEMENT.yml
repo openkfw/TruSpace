@@ -18,7 +18,7 @@ body:
       description: Provide a link or reference to the current documentation that needs improvement.
       placeholder: "Link to the current documentation"
 
-  - type: input
+  - type: textarea
     id: suggested_improvement
     attributes:
       label: Suggested Improvement
