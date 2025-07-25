@@ -9,6 +9,7 @@ body:
       label: Summary
       description: A brief summary of the bug.
       placeholder: "Enter a brief summary of the bug"
+    validations:
       required: true
 
   - type: textarea
@@ -17,6 +18,7 @@ body:
       label: Steps to Reproduce
       description: List the steps to reproduce the bug.
       placeholder: "Step 1, Step 2, etc."
+    validations:
       required: true
 
   - type: textarea
