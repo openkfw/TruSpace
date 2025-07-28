@@ -60,10 +60,14 @@ router.get("/recent", async (req: AuthenticatedRequest, res: Response) => {
     (ws) => allowedWs.includes(ws.uuid) || ws.meta.is_public
   );
   const result = await client.getAllMessages();
-  const filteredMessages = result.filter((message) => {
-    const workspaceOrigin = message.meta.workspaceOrigin;
-    return allAllowedWs.some((ws) => ws.uuid === workspaceOrigin);
-  });
+  const filteredMessages = result
+    .filter((message) => {
+      const workspaceOrigin = message.meta.workspaceOrigin;
+      return allAllowedWs.some((ws) => ws.uuid === workspaceOrigin);
+    })
+    .sort((a, b) => {
+      return Number(b.meta.timestamp) - Number(a.meta.timestamp);
+    });
   // return only the most recent 10 messages
   res.json(filteredMessages.splice(0, 10));
 });
