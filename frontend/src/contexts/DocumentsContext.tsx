@@ -11,13 +11,19 @@ import {
 import { useTranslations } from "next-intl";
 
 import { Document, DocumentWithVersions } from "@/interfaces";
-import { loadDocumentDetail, loadDocuments } from "@/lib/services";
+import {
+   loadAllDocuments,
+   loadDocumentDetail,
+   loadDocuments
+} from "@/lib/services";
 
 interface DocumentsContextType {
+   allDocuments: Document[];
    documents: Document[];
    document: DocumentWithVersions | null;
    setDocuments: (documents: Document[]) => void;
    fetchDocuments: (workspaceId: string) => void;
+   fetchAllDocuments: () => void;
    fetchDocumentDetails: (documentID: string) => void;
    refreshUntilVersionFound: (
       docId: string,
@@ -26,10 +32,12 @@ interface DocumentsContextType {
 }
 
 export const DocumentsContext = createContext<DocumentsContextType>({
+   allDocuments: [],
    documents: [],
    document: null,
    setDocuments: () => null,
    fetchDocuments: () => null,
+   fetchAllDocuments: () => null,
    fetchDocumentDetails: () => null,
    refreshUntilVersionFound: () => null
 });
@@ -43,9 +51,15 @@ export const useDocuments = () => {
 };
 
 export const DocumentsProvider = ({ children }: { children: ReactNode }) => {
+   const [allDocuments, setAllDocuments] = useState<Document[]>([]);
    const [documents, setDocuments] = useState<Document[]>([]);
    const [document, setDocument] = useState<DocumentWithVersions>(null);
    const translations = useTranslations("homePage");
+
+   const fetchAllDocuments = async () => {
+      const data = await loadAllDocuments(translations("failedToFetch"));
+      setAllDocuments(data);
+   };
 
    const fetchDocuments = async (workspaceId) => {
       const data = await loadDocuments(
@@ -118,10 +132,12 @@ export const DocumentsProvider = ({ children }: { children: ReactNode }) => {
    return (
       <DocumentsContext.Provider
          value={{
+            allDocuments,
             document,
             documents,
             setDocuments,
             fetchDocuments,
+            fetchAllDocuments,
             fetchDocumentDetails,
             refreshUntilVersionFound
          }}
