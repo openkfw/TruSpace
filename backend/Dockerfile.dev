@@ -6,6 +6,7 @@ ENV NODE_ENV=development
 ENV CONTAINER=true
 
 COPY . . 
+COPY openapi ./dist/openapi
 
 RUN npm ci --include=dev  
 RUN npm run build 
