@@ -24,7 +24,6 @@ const PERMISSIONS_ENDPOINT = `${API_URL}/permissions`;
 const LANGUAGE_ENDPOINT = `${API_URL}/language`;
 
 // Documents api
-
 export const loadAllDocuments = async (errorText) => {
    const url = DOCUMENTS_ENDPOINT;
    const options: RequestInit = {
@@ -43,9 +42,15 @@ export const loadAllDocuments = async (errorText) => {
    return data;
 };
 
-export const loadDocuments = async (workspaceId, errorText) => {
-   const query = workspaceId ? `?workspace=${workspaceId}` : "";
-   const url = `${DOCUMENTS_ENDPOINT}${query}`;
+export const loadDocuments = async (
+   workspaceId,
+   errorText,
+   from = 0,
+   limit = 10,
+   searchString = ""
+) => {
+   const query = workspaceId ? `&workspace=${workspaceId}` : "";
+   const url = `${DOCUMENTS_ENDPOINT}?from=${from}&limit=${limit}${query}&search=${searchString}`;
    const options: RequestInit = {
       method: "GET",
       credentials: "include"

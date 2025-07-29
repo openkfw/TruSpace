@@ -18,11 +18,18 @@ import {
 } from "@/lib/services";
 
 interface DocumentsContextType {
+   count: number;
    allDocuments: Document[];
    documents: Document[];
    document: DocumentWithVersions | null;
+   limit: number;
    setDocuments: (documents: Document[]) => void;
-   fetchDocuments: (workspaceId: string) => void;
+   fetchDocuments: (
+      workspaceId: string,
+      from?: number,
+      limit?: number,
+      searchString?: string
+   ) => void;
    fetchAllDocuments: () => void;
    fetchDocumentDetails: (documentID: string) => void;
    refreshUntilVersionFound: (
@@ -32,9 +39,11 @@ interface DocumentsContextType {
 }
 
 export const DocumentsContext = createContext<DocumentsContextType>({
+   count: 0,
    allDocuments: [],
    documents: [],
    document: null,
+   limit: 10,
    setDocuments: () => null,
    fetchDocuments: () => null,
    fetchAllDocuments: () => null,
@@ -53,6 +62,8 @@ export const useDocuments = () => {
 export const DocumentsProvider = ({ children }: { children: ReactNode }) => {
    const [allDocuments, setAllDocuments] = useState<Document[]>([]);
    const [documents, setDocuments] = useState<Document[]>([]);
+   const [count, setCount] = useState<number>(0);
+   const [limit, setLimit] = useState<number>(10);
    const [document, setDocument] = useState<DocumentWithVersions>(null);
    const translations = useTranslations("homePage");
 
@@ -61,12 +72,17 @@ export const DocumentsProvider = ({ children }: { children: ReactNode }) => {
       setAllDocuments(data);
    };
 
-   const fetchDocuments = async (workspaceId) => {
-      const data = await loadDocuments(
+   const fetchDocuments = async (workspaceId, from, limitTo, searchString) => {
+      const { data, count, limit } = await loadDocuments(
          workspaceId,
-         translations("failedToFetch")
+         translations("failedToFetch"),
+         from,
+         limitTo,
+         searchString
       );
       setDocuments(data);
+      setCount(count);
+      setLimit(limit);
    };
 
    const fetchDocumentDetails = useCallback(
@@ -132,9 +148,11 @@ export const DocumentsProvider = ({ children }: { children: ReactNode }) => {
    return (
       <DocumentsContext.Provider
          value={{
+            count,
             allDocuments,
             document,
             documents,
+            limit,
             setDocuments,
             fetchDocuments,
             fetchAllDocuments,

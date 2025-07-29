@@ -6,6 +6,7 @@ import {
   Document,
   DocumentCreateResponse,
   DocumentRequest,
+  DocumentsResponse,
   File,
   Perspective,
   PerspectiveRequest,
@@ -31,7 +32,7 @@ export interface IClient {
     doc: DocumentRequest,
     file: File
   ): Promise<DocumentCreateResponse>;
-  getAllDocuments(): Promise<Document[]>; // remove getAllDocuments when workspaces are fully implemented
+  getAllDocuments(from: number, limit: number): Promise<DocumentsResponse>; // remove getAllDocuments when workspaces are fully implemented
   getDocumentDetailsById(docId: string): Promise<Document>;
   getDocumentVersionDetailsByCid(cid: string): Promise<Document>;
   downloadDocumentVersionByCid(
@@ -39,7 +40,11 @@ export interface IClient {
     res: Response,
     cid: string
   ): Promise<void>;
-  getDocumentsByWorkspace(wId: string): Promise<Document[]>;
+  getDocumentsByWorkspace(
+    wId: string,
+    from: number,
+    limit: number
+  ): Promise<DocumentsResponse>;
 
   // chat messages
   createMessage(message: ChatMessageRequest): Promise<string>;
