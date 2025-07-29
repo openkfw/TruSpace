@@ -3,7 +3,7 @@
       "appName": "TruSpace",
       "appDescription": "Your AI-infused document collaboration helper ",
       "welcomeText": "Welcome to TruSpace",
-      "description": "which among other things allows you to create, share, delete workspaces and after upload documents to those workspaces. List of all operations and features are listed below. You can start by going to Sidebar and click on ",
+      "description": "which, among other things, allows you to create, share, delete workspaces and upload documents to those workspaces. A list of all operations and features are listed below. You can start by going to the Sidebar and click on ",
       "loading": "Loading...",
       "error": "Error",
       "en": "EN",
@@ -477,5 +477,25 @@
    "tour": {
       "workspaceMenuDescription": "👋 Welcome! This is Workspace menu. Here you have all the actions you need for managing your workspace.",
       "confirmButton": "Got it"
+   },
+   "features": {
+      "createWorkspace": "Create a workspace",
+      "shareWorkspace": "Share a workspace",
+      "deleteWorkspace": "Delete a workspace",
+      "uploadDocument": "Upload a document",
+      "createDocument": "Create an editable document",
+      "viewDocument": "Preview a document",
+      "deleteDocument": "Delete a document",
+      "aiSuggestions": "AI suggestions",
+      "collaborate": "Collaborate",
+      "createWorkspaceDescription": "Create your own workspace with multiple documents and manage your documents, assisted by AI views",
+      "shareWorkspaceDescription": "Share your work with other contributors",
+      "deleteWorkspaceDescription": "Remove unwanted workspaces to clear out your space",
+      "uploadDocumentDescription": "Upload multiple documents of different kinds(pdf, docx, png, jpg, etc) and leverage document features that TruSpace offers",
+      "createDocumentDescription": "Create an editable document directly in the workspace and edit it using the editor",
+      "viewDocumentDescription": "Preview your documents in document details to see the content of the document and add notes into it using app enhanced features",
+      "deleteDocumentDescription": "Remove unwanted documents from workspaces to clear out your space",
+      "aiSuggestionsDescription": "Use generative AI to see the aspects of the document that interest you",
+      "collaborateDescription": "Discuss document changes with other collaborators using imbedded chat in document details"
    }
 }

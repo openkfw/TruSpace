@@ -3,7 +3,7 @@
       "appName": "TruSpace",
       "appDescription": "Dein KI-gestützter Helfer für die Zusammenarbeit mit Dokumenten",
       "welcomeText": "Willkommen bei TruSpace",
-      "description": "was unter anderem ermöglicht, Arbeitsbereiche zu erstellen, zu teilen, zu löschen und anschließend Dokumente in diese Arbeitsbereiche hochzuladen. Eine Liste aller Vorgänge und Funktionen ist unten aufgeführt. Du kannst starten, indem du in die Seitenleiste gehst und auf Arbeitsbereich hinzufügen klickst.",
+      "description": "was, unter anderem, ermöglicht, Arbeitsbereiche zu erstellen, zu teilen, zu löschen und Dokumente in diese Arbeitsbereiche hochzuladen. Eine Liste aller Vorgänge und Funktionen ist unten aufgeführt. Zum Starten gehe in die Seitenleiste und klick auf ",
       "loading": "Laden...",
       "error": "Fehler",
       "en": "EN",
@@ -477,5 +477,25 @@
    "tour": {
       "workspaceMenuDescription": "👋 Willkommen! Dies ist das Arbeitsbereich-Menü. Hier findest du alle Aktionen, die du zur Verwaltung deines Arbeitsbereichs benötigst.",
       "confirmButton": "Verstanden"
+   },
+   "features": {
+      "createWorkspace": "Erstelle einen Arbeitsbereich",
+      "shareWorkspace": "Teile einen Arbeitsbereich",
+      "deleteWorkspace": "Lösche einen Arbeitsbereich",
+      "uploadDocument": "Lade ein Dokument hoch",
+      "createDocument": "Erstelle ein bearbeitbares Dokument",
+      "viewDocument": "Vorschau eines Dokuments",
+      "deleteDocument": "Lösche ein Dokument",
+      "aiSuggestions": "KI-Vorschläge",
+      "collaborate": "Zusammenarbeiten",
+      "createWorkspaceDescription": "Erstelle deinen eigenen Arbeitsbereich mit mehreren Dokumenten und verwalte deine Dokumente, unterstützt durch KI-Ansichten",
+      "shareWorkspaceDescription": "Teile deine Arbeit mit anderen Mitwirkenden",
+      "deleteWorkspaceDescription": "Entferne unerwünschte Arbeitsbereiche, um deinen Platz aufzuräumen",
+      "uploadDocumentDescription": "Lade mehrere Dokumente verschiedener Art (pdf, docx, png, jpg, etc.) hoch und nutze die Dokumentenfunktionen, die TruSpace bietet",
+      "createDocumentDescription": "Erstelle ein bearbeitbares Dokument direkt im Arbeitsbereich und bearbeite es mit dem Editor",
+      "viewDocumentDescription": "Sieh dir deine Dokumente in den Dokumentdetails an, um den Inhalt des Dokuments zu sehen und Notizen mit den erweiterten Funktionen der App hinzuzufügen",
+      "deleteDocumentDescription": "Entferne unerwünschte Dokumente aus Arbeitsbereichen, um deinen Platz aufzuräumen",
+      "aiSuggestionsDescription": "Verwende generative KI, um die Aspekte des Dokuments zu sehen, die dich interessieren",
+      "collaborateDescription": "Diskutiere Dokumentänderungen mit anderen Mitwirkenden über den eingebetteten Chat in den Dokumentdetails"
    }
 }
