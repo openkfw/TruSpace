@@ -137,21 +137,36 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  security-scan:
-    needs: [build-backend, build-frontend]
-    if: always() && (needs.build-backend.result == 'success' || needs.build-frontend.result == 'success')
+  security-scan-backend:
+    needs: build-backend
+    if: needs.build-backend.result == 'success' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Run Trivy vulnerability scanner - Backend
-        if: needs.build-backend.result == 'success' && github.event_name != 'pull_request'
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}@${{ needs.build-backend.outputs.image-digest }}
           format: "sarif"
           output: "backend-trivy-results.sarif"
 
+      - name: Upload Trivy scan results to GitHub Security tab
+        if: env.ENABLE_CODE_SCANNING == 'true'
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: backend-trivy-results.sarif
+
+      - name: Upload SARIF as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-trivy-report
+          path: backend-trivy-results.sarif
+
+  security-scan-frontend:
+    needs: build-frontend
+    if: needs.build-frontend.result == 'success' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
       - name: Run Trivy vulnerability scanner - Frontend
-        if: needs.build-frontend.result == 'success' && github.event_name != 'pull_request'
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}@${{ needs.build-frontend.outputs.image-digest }}
@@ -162,12 +177,10 @@ jobs:
         if: env.ENABLE_CODE_SCANNING == 'true'
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: "."
+          sarif_file: frontend-trivy-results.sarif
 
-      - name: Upload Trivy SARIF as artifact
+      - name: Upload SARIF as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: trivy-sarif-reports
-          path: |
-            backend-trivy-results.sarif
-            frontend-trivy-results.sarif
+          name: frontend-trivy-report
+          path: frontend-trivy-results.sarif

@@ -11,10 +11,15 @@ import {
 import { useTranslations } from "next-intl";
 
 import { Document, DocumentWithVersions } from "@/interfaces";
-import { loadDocumentDetail, loadDocuments } from "@/lib/services";
+import {
+   loadAllDocuments,
+   loadDocumentDetail,
+   loadDocuments
+} from "@/lib/services";
 
 interface DocumentsContextType {
    count: number;
+   allDocuments: Document[];
    documents: Document[];
    document: DocumentWithVersions | null;
    limit: number;
@@ -25,6 +30,7 @@ interface DocumentsContextType {
       limit?: number,
       searchString?: string
    ) => void;
+   fetchAllDocuments: () => void;
    fetchDocumentDetails: (documentID: string) => void;
    refreshUntilVersionFound: (
       docId: string,
@@ -34,11 +40,13 @@ interface DocumentsContextType {
 
 export const DocumentsContext = createContext<DocumentsContextType>({
    count: 0,
+   allDocuments: [],
    documents: [],
    document: null,
    limit: 10,
    setDocuments: () => null,
    fetchDocuments: () => null,
+   fetchAllDocuments: () => null,
    fetchDocumentDetails: () => null,
    refreshUntilVersionFound: () => null
 });
@@ -52,11 +60,17 @@ export const useDocuments = () => {
 };
 
 export const DocumentsProvider = ({ children }: { children: ReactNode }) => {
+   const [allDocuments, setAllDocuments] = useState<Document[]>([]);
    const [documents, setDocuments] = useState<Document[]>([]);
    const [count, setCount] = useState<number>(0);
    const [limit, setLimit] = useState<number>(10);
    const [document, setDocument] = useState<DocumentWithVersions>(null);
    const translations = useTranslations("homePage");
+
+   const fetchAllDocuments = async () => {
+      const data = await loadAllDocuments(translations("failedToFetch"));
+      setAllDocuments(data);
+   };
 
    const fetchDocuments = async (workspaceId, from, limitTo, searchString) => {
       const { data, count, limit } = await loadDocuments(
@@ -135,11 +149,13 @@ export const DocumentsProvider = ({ children }: { children: ReactNode }) => {
       <DocumentsContext.Provider
          value={{
             count,
+            allDocuments,
             document,
             documents,
             limit,
             setDocuments,
             fetchDocuments,
+            fetchAllDocuments,
             fetchDocumentDetails,
             refreshUntilVersionFound
          }}

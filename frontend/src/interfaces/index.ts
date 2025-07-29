@@ -72,6 +72,7 @@ interface ChatMessageMeta {
    perspectiveType: string;
    cid: string;
    docId: string;
+   workspaceOrigin: string;
    timestamp: string;
    creator: string;
    creatorUiid: string;

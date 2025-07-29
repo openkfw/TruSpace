@@ -1,6 +1,8 @@
-import { formatDate } from "@/lib/formatDate";
-import { ExternalLink } from "lucide-react";
 import { useTranslations } from "next-intl";
+
+import { ExternalLink } from "lucide-react";
+
+import { formatDate } from "@/lib/formatDate";
 
 import InfoLabel from "./InfoLabel";
 
@@ -38,7 +40,9 @@ export default function ChatMessage({
             </div>
             <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
                {translations("messageForVersion")} {version}
-               {versionTagName ? `, ${versionTagName}` : ""}
+               {versionTagName && versionTagName !== "undefined"
+                  ? `, ${versionTagName}`
+                  : ""}
             </span>
          </div>
       </div>

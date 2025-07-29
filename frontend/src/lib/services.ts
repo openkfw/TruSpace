@@ -24,6 +24,23 @@ const PERMISSIONS_ENDPOINT = `${API_URL}/permissions`;
 const LANGUAGE_ENDPOINT = `${API_URL}/language`;
 
 // Documents api
+export const loadAllDocuments = async (errorText) => {
+   const url = DOCUMENTS_ENDPOINT;
+   const options: RequestInit = {
+      method: "GET",
+      credentials: "include"
+   };
+   const response = await fetch(url, options);
+   if (!response.ok) {
+      if (response.status === 401) {
+         throw new Error("unauthorized");
+      } else {
+         throw new Error(errorText);
+      }
+   }
+   const data = await response.json();
+   return data;
+};
 
 export const loadDocuments = async (
    workspaceId,
@@ -578,6 +595,20 @@ export function usePeers() {
    );
    return {
       peers: data,
+      error,
+      isLoading,
+      isValidating,
+      mutate
+   };
+}
+
+export function useRecentChats() {
+   const { data, error, isLoading, isValidating, mutate } = useSWR(
+      `${CHATS_ENDPOINT}/recent`,
+      fetcher
+   );
+   return {
+      chats: data,
       error,
       isLoading,
       isValidating,
