@@ -503,7 +503,7 @@ export class IpfsClient implements IClient {
 
     const count = pinRes.count || 0;
     const result = this.#pins2Docs(pinRes.results);
-    console.log(`Fetched ${result.length} documents from pinning service.`);
+
     return {
       count,
       from,
