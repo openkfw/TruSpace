@@ -347,6 +347,7 @@ export default function DocumentUpload({
                      }
                      type="submit"
                      className="w-1/2 sm:w-auto"
+                     data-test-id="document-upload-submit-button"
                   >
                      {isUploading ? (
                         <>

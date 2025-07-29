@@ -311,7 +311,7 @@ const DocumentList = ({ workspaceId }) => {
          </div>
 
          <div className="mt-6 rounded-lg overflow-hidden border-none">
-            <Table className="border-r last-of-type:border-none">
+            <Table className="border-r last-of-type:border-none" data-test-id="document-list-table">
                <TableHeader>
                   {table.getHeaderGroups().map((headerGroup) => (
                      <TableRow key={headerGroup.id}>
