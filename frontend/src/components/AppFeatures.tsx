@@ -15,73 +15,67 @@ import {
    Upload
 } from "lucide-react";
 
-const templates = [
-   {
-      title: "Create a workspace",
-      description:
-         "Create your own workspace with multiple documents and manage your documents, assisted by AI views",
-      icon: <Folder className="w-8 h-8" />,
-      color: "bg-blue-500"
-   },
-   {
-      title: "Share a workspace",
-      description: "Share your work with other contributors",
-      icon: <Share2 className="w-8 h-8" />,
-      color: "bg-blue-500"
-   },
-   {
-      title: "Delete a workspace",
-      description: "Remove unwanted workspaces to clear out your space",
-      icon: <Trash2 className="w-8 h-8" />,
-      color: "bg-red-500"
-   },
-   {
-      title: "Create an editable document",
-      description:
-         "Create an editable document directly in the workspace and edit it using the editor",
-      icon: <FilePlus className="w-8 h-8" />,
-      color: "bg-blue-500"
-   },
-   {
-      title: "Upload a document",
-      description:
-         "Upload multiple documents of different kinds(pdf, docx, png, jpg, etc) and leverage document features that TruSpace offers",
-      icon: <Upload className="w-8 h-8" />,
-      color: "bg-green-500"
-   },
-   {
-      title: "Preview a document",
-      description:
-         "Preview your documents in document details to see the content of the document and add notes into it using app enhanced features",
-      icon: <Eye className="w-8 h-8" />,
-      color: "bg-indigo-500"
-   },
-   {
-      title: "Delete a document",
-      description:
-         "Remove unwanted documents from workspaces to clear out your space",
-      icon: <Trash2 className="w-8 h-8" />,
-      color: "bg-red-500"
-   },
-   {
-      title: "AI suggestions",
-      description:
-         "Use generative AI to see the aspects of the document that interest you",
-      icon: <Brain className="w-8 h-8" />,
-      color: "bg-yellow-500"
-   },
-   {
-      title: "Collaborate",
-      description:
-         "Discuss document changes with other collaborators using imbedded chat in document details",
-      icon: <MessagesSquare className="w-8 h-8" />,
-      color: "bg-purple-500"
-   }
-];
-
 export default function AppFeatures() {
    const translations = useTranslations("general");
    const t = useTranslations("navbar");
+   const featureTranslations = useTranslations("features");
+
+   const templates = [
+      {
+         title: featureTranslations("createWorkspace"),
+         description: featureTranslations("createWorkspaceDescription"),
+         icon: <Folder className="w-8 h-8" />,
+         color: "bg-blue-500"
+      },
+      {
+         title: featureTranslations("shareWorkspace"),
+         description: featureTranslations("shareWorkspaceDescription"),
+         icon: <Share2 className="w-8 h-8" />,
+         color: "bg-blue-500"
+      },
+      {
+         title: featureTranslations("deleteWorkspace"),
+         description: featureTranslations("deleteWorkspaceDescription"),
+         icon: <Trash2 className="w-8 h-8" />,
+         color: "bg-red-500"
+      },
+      {
+         title: featureTranslations("createDocument"),
+         description: featureTranslations("createDocumentDescription"),
+         icon: <FilePlus className="w-8 h-8" />,
+         color: "bg-blue-500"
+      },
+      {
+         title: featureTranslations("uploadDocument"),
+         description: featureTranslations("uploadDocumentDescription"),
+         icon: <Upload className="w-8 h-8" />,
+         color: "bg-green-500"
+      },
+      {
+         title: featureTranslations("viewDocument"),
+         description: featureTranslations("viewDocumentDescription"),
+         icon: <Eye className="w-8 h-8" />,
+         color: "bg-indigo-500"
+      },
+      {
+         title: featureTranslations("deleteDocument"),
+         description: featureTranslations("deleteDocumentDescription"),
+         icon: <Trash2 className="w-8 h-8" />,
+         color: "bg-red-500"
+      },
+      {
+         title: featureTranslations("aiSuggestions"),
+         description: featureTranslations("aiSuggestionsDescription"),
+         icon: <Brain className="w-8 h-8" />,
+         color: "bg-yellow-500"
+      },
+      {
+         title: featureTranslations("collaborate"),
+         description: featureTranslations("collaborateDescription"),
+         icon: <MessagesSquare className="w-8 h-8" />,
+         color: "bg-purple-500"
+      }
+   ];
 
    const [flippedCards, setFlippedCards] = useState<number[]>([]);
    const afkTimeout = useRef<NodeJS.Timeout | null>(null);
