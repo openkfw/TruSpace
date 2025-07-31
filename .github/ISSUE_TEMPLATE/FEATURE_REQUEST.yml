@@ -13,18 +13,11 @@ body:
       required: true
 
   - type: textarea
-    id: motivation
+    id: linked_issues
     attributes:
-      label: Motivation
-      description: Explain why this feature is needed.
-      placeholder: "Why is this feature important?"
-
-  - type: textarea
-    id: proposed_solution
-    attributes:
-      label: Proposed Solution
-      description: Describe how you envision this feature being implemented.
-      placeholder: "How do you think this feature should work?"
+      label: Linked Issues
+      description: Reference any related issues or pull requests.
+      placeholder: "Link any related issues or PRs"
 
   - type: textarea
     id: additional_context
