@@ -1,5 +1,5 @@
 import { IpfsClient } from "../clients/ipfs-client";
-import { oiClient } from "../clients/oi-client";
+import { llmClient } from "../clients/llm-client/LlmClientFactory";
 import logger from "../config/winston";
 import { createDocumentRequest } from "../handlers/documents";
 import { Prompt } from "../types/interfaces";
@@ -44,14 +44,14 @@ export const addPerspectivesTemplate = () =>
         size: fileDetails.meta.size,
       });
 
-      const fileData = await oiClient.uploadFile(file);
+      const fileData = await llmClient.uploadFile(file);
 
       if (!fileData || "error" in fileData) {
         logger.error(`Failed to upload file to Ollama:  ${fileData}`);
         throw new Error("Failed to upload file to Ollama");
       }
 
-      return await oiClient.dispatchGeneratePerspectives(
+      return await llmClient.dispatchGeneratePerspectives(
         { ...docRequest, cid },
         fileData,
         requestId,
@@ -98,14 +98,14 @@ export const addTagsTemplate = () =>
         size: fileDetails.meta.size,
       });
 
-      const fileData = await oiClient.uploadFile(file);
+      const fileData = await llmClient.uploadFile(file);
 
       if (!fileData || "error" in fileData) {
         console.error("Failed to upload file to Ollama", fileData);
         throw new Error("Failed to upload file to Ollama");
       }
 
-      return await oiClient.dispatchGenerateTags(
+      return await llmClient.dispatchGenerateTags(
         { ...docRequest, cid },
         fileData,
         requestId,
@@ -151,14 +151,14 @@ export const addLanguageDetectionTemplate = () => {
         size: fileDetails.meta.size,
       });
 
-      const fileData = await oiClient.uploadFile(file);
+      const fileData = await llmClient.uploadFile(file);
 
       if (!fileData || "error" in fileData) {
         console.error("Failed to upload file to Ollama", fileData);
         throw new Error("Failed to upload file to Ollama");
       }
 
-      return await oiClient.dispatchDetectLanguage(
+      return await llmClient.dispatchDetectLanguage(
         { ...docRequest, cid },
         fileData
       );

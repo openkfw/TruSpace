@@ -45,6 +45,11 @@ interface Config {
     password: string;
   };
   emailSender: string;
+  llmProvider: string;
+  openAIModel: string;
+  openAIApiKey: string;
+  mistralApiKey: string;
+  mistralModel: string;
 }
 
 const { error, value: envVars } = envVarsSchema.validate(process.env);
@@ -110,11 +115,19 @@ export const config: Config = {
     password: envVars.SMTP_PASSWORD,
   },
   emailSender: envVars.EMAIL_SENDER,
+  llmProvider: envVars.LLM_PROVIDER,
+  openAIModel: envVars.OPENAI_MODEL,
+  openAIApiKey: envVars.OPENAI_API_KEY,
+  mistralApiKey: envVars.MISTRAL_API_KEY,
+  mistralModel: envVars.MISTRAL_MODEL,
 };
 
-const baseSMTPConfigError = !config.smtpServer.host || !config.smtpServer.port || !config.emailSender;
+const baseSMTPConfigError =
+  !config.smtpServer.host || !config.smtpServer.port || !config.emailSender;
 if (config.registerUsersAsInactive && baseSMTPConfigError) {
-  throw new Error("Config validation error: REGISTER_USERS_AS_INACTIVE variable is set to true but SMTP server config is invalid");
+  throw new Error(
+    "Config validation error: REGISTER_USERS_AS_INACTIVE variable is set to true but SMTP server config is invalid"
+  );
 }
 
 if (config.jwt.secret === "super-secret-key") {
