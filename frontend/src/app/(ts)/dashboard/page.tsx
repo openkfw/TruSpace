@@ -35,30 +35,37 @@ export default function Dashboard() {
       loadAllDocuments();
    }, []);
 
-   const lastChatMessage: ChatMessage = chats?.sort(
-      (
-         a: { meta: { timestamp: string } },
-         b: { meta: { timestamp: string } }
-      ) =>
-         new Date(b.meta?.timestamp).getTime() -
-         new Date(a.meta?.timestamp).getTime()
-   )[0];
+   const lastChatMessage: ChatMessage | undefined = Array.isArray(chats)
+      ? [...chats].sort(
+           (
+              a: { meta: { timestamp: string } },
+              b: { meta: { timestamp: string } }
+           ) =>
+              new Date(b.meta?.timestamp).getTime() -
+              new Date(a.meta?.timestamp).getTime()
+        )[0]
+      : undefined;
 
-   const lastEditedDocument = allDocuments.sort(
-      (a, b) =>
-         new Date(b.meta?.timestamp).getTime() -
-         new Date(a.meta?.timestamp).getTime()
-   )[0];
+   const lastEditedDocument = Array.isArray(allDocuments)
+      ? [...allDocuments].sort(
+           (a, b) =>
+              new Date(b.meta?.timestamp).getTime() -
+              new Date(a.meta?.timestamp).getTime()
+        )[0]
+      : undefined;
 
-   const lastChatMessageDocName = allDocuments.find(
-      (doc) => doc.docId === lastChatMessage?.meta?.docId
-   )?.meta?.filename;
+   const lastChatMessageDocName = Array.isArray(allDocuments)
+      ? allDocuments.find((doc) => doc.docId === lastChatMessage?.meta?.docId)
+           ?.meta?.filename
+      : undefined;
 
-   const recentlyAddedWorkspace = availableWorkspaces?.sort(
-      (a, b) =>
-         new Date(b.meta?.created_at).getTime() -
-         new Date(a.meta?.created_at).getTime()
-   )[0];
+   const recentlyAddedWorkspace = Array.isArray(availableWorkspaces)
+      ? [...availableWorkspaces].sort(
+           (a, b) =>
+              new Date(b.meta?.created_at).getTime() -
+              new Date(a.meta?.created_at).getTime()
+        )[0]
+      : undefined;
 
    const cardBaseStyles = `group relative overflow-hidden bg-white dark:bg-gray-800 hover:scale-[1.02] hover:-translate-y-1 hover:ring-2 hover:ring-blue-400 dark:hover:ring-blue-600
       transition-all duration-300 ease-out cursor-pointer before:absolute before:inset-0 before:bg-gradient-to-br before:from-blue-100 before:to-transparent dark:before:from-blue-900/20
