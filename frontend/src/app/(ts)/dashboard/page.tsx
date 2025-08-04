@@ -80,204 +80,214 @@ export default function Dashboard() {
             <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
                {homeTranslations("documentActions")}
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-               <Card
-                  className={cardBaseStyles}
-                  onClick={() =>
-                     router.push(
-                        `/workspace/${lastEditedDocument?.meta?.workspaceOrigin}/document/${lastEditedDocument?.docId}`
-                     )
-                  }
-               >
-                  <CardHeader className="flex flex-row items-center gap-2 relative z-10">
-                     <FileText className={`text-blue-500 ${iconWrapStyles}`} />
-                     <CardTitle>
-                        {homeTranslations("lastEditedDocument")}
-                     </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-2 space-y-2 relative z-10">
-                     {loading ? (
-                        <p className="text-muted-foreground">
-                           {generalTranslations("loading")}
-                        </p>
-                     ) : err ? (
-                        <p className="text-red-500">{err}</p>
-                     ) : lastEditedDocument ? (
-                        <>
-                           <div className="flex items-baseline gap-2">
-                              <span className="text-sm text-muted-foreground">
-                                 {homeTranslations("document")}:
-                              </span>
-                              <span className="text-base font-semibold truncate">
-                                 {lastEditedDocument.meta.filename ||
-                                    homeTranslations("unknownDocument")}
-                              </span>
-                           </div>
-                           <div className="flex items-baseline gap-2">
-                              <span className="text-sm text-muted-foreground">
-                                 {homeTranslations("editedBy")}:
-                              </span>
-                              <span className="text-base font-semibold truncate">
-                                 {lastEditedDocument.meta.creator ||
-                                    homeTranslations("unknownCreator")}
-                              </span>
-                           </div>
-                           <div className="flex items-baseline gap-2">
-                              <span className="text-sm text-muted-foreground">
-                                 {homeTranslations("editedOn")}:
-                              </span>
-                              <span className="text-base font-semibold truncate">
-                                 {new Date(
-                                    Number(lastEditedDocument.meta.timestamp)
-                                 ).toLocaleString("en-GB", {
-                                    day: "2-digit",
-                                    month: "2-digit",
-                                    year: "numeric",
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                    second: "2-digit",
-                                    hour12: false
-                                 })}
-                              </span>
-                           </div>
-                        </>
-                     ) : (
-                        <p className="text-muted-foreground">
-                           {homeTranslations("noDocumentAvailable")}
-                        </p>
-                     )}
-                  </CardContent>
-               </Card>
-               <Card
-                  className={cardBaseStyles}
-                  onClick={() =>
-                     router.push(
-                        `/workspace/${lastChatMessage?.meta?.workspaceOrigin}/document/${lastChatMessage?.meta?.docId}`
-                     )
-                  }
-               >
-                  <CardHeader className="flex flex-row items-center gap-2 relative z-10">
-                     <MessageCircle
-                        className={`text-blue-500 ${iconWrapStyles}`}
-                     />
-                     <CardTitle>
-                        {homeTranslations("lastChatMessage")}
-                     </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-2 space-y-2 relative z-10">
-                     {isLoading ? (
-                        <p className="text-muted-foreground">
-                           {generalTranslations("loading")}
-                        </p>
-                     ) : error ? (
-                        <p className="text-red-500">{error}</p>
-                     ) : lastChatMessage ? (
-                        <>
-                           <div className="flex items-baseline gap-2">
-                              <span className="text-sm text-muted-foreground">
-                                 {homeTranslations("document")}:
-                              </span>
-                              <span className="text-base font-semibold truncate">
-                                 {lastChatMessageDocName ||
-                                    homeTranslations("unknownDocument")}
-                              </span>
-                           </div>
-                           <div className="flex items-baseline gap-2">
-                              <span className="text-sm text-muted-foreground">
-                                 {homeTranslations("addedBy")}:
-                              </span>
-                              <span className="text-base font-semibold truncate">
-                                 {lastChatMessage.meta.creator ||
-                                    homeTranslations("unknownCreator")}
-                              </span>
-                           </div>
-                           <div className="flex items-baseline gap-2">
-                              <span className="text-sm text-muted-foreground">
-                                 {homeTranslations("sentOn")}:
-                              </span>
-                              <span className="text-base font-semibold truncate">
-                                 {new Date(
-                                    Number(lastChatMessage.meta.timestamp)
-                                 ).toLocaleString("en-GB", {
-                                    day: "2-digit",
-                                    month: "2-digit",
-                                    year: "numeric",
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                    second: "2-digit",
-                                    hour12: false
-                                 })}
-                              </span>
-                           </div>
-                        </>
-                     ) : (
-                        <p className="text-muted-foreground">
-                           {homeTranslations("noChatMessageAvailable")}
-                        </p>
-                     )}
-                  </CardContent>
-               </Card>
-            </div>
+            {!lastChatMessage && !lastEditedDocument ? (
+               <div className="flex items-center justify-center p-6 h-40 border border-dashed rounded-md text-lg text-muted-foreground bg-gray-50 dark:bg-gray-900">
+                  {homeTranslations("noDocumentActions")}
+               </div>
+            ) : (
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {lastEditedDocument && (
+                     <Card
+                        className={cardBaseStyles}
+                        onClick={() =>
+                           router.push(
+                              `/workspace/${lastEditedDocument.meta.workspaceOrigin}/document/${lastEditedDocument.docId}`
+                           )
+                        }
+                     >
+                        <CardHeader className="flex flex-row items-center gap-2 relative z-10">
+                           <FileText
+                              className={`text-blue-500 ${iconWrapStyles}`}
+                           />
+                           <CardTitle>
+                              {homeTranslations("lastEditedDocument")}
+                           </CardTitle>
+                        </CardHeader>
+                        <CardContent className="pt-2 space-y-2 relative z-10">
+                           {loading ? (
+                              <p className="text-muted-foreground">
+                                 {generalTranslations("loading")}
+                              </p>
+                           ) : err ? (
+                              <p className="text-red-500">{err}</p>
+                           ) : (
+                              <>
+                                 <div className="flex items-baseline gap-2">
+                                    <span className="text-sm text-muted-foreground">
+                                       {homeTranslations("document")}:
+                                    </span>
+                                    <span className="text-base font-semibold truncate">
+                                       {lastEditedDocument.meta.filename ||
+                                          homeTranslations("unknownDocument")}
+                                    </span>
+                                 </div>
+                                 <div className="flex items-baseline gap-2">
+                                    <span className="text-sm text-muted-foreground">
+                                       {homeTranslations("editedBy")}:
+                                    </span>
+                                    <span className="text-base font-semibold truncate">
+                                       {lastEditedDocument.meta.creator ||
+                                          homeTranslations("unknownCreator")}
+                                    </span>
+                                 </div>
+                                 <div className="flex items-baseline gap-2">
+                                    <span className="text-sm text-muted-foreground">
+                                       {homeTranslations("editedOn")}:
+                                    </span>
+                                    <span className="text-base font-semibold truncate">
+                                       {new Date(
+                                          Number(
+                                             lastEditedDocument.meta.timestamp
+                                          )
+                                       ).toLocaleString("en-GB", {
+                                          day: "2-digit",
+                                          month: "2-digit",
+                                          year: "numeric",
+                                          hour: "2-digit",
+                                          minute: "2-digit",
+                                          second: "2-digit",
+                                          hour12: false
+                                       })}
+                                    </span>
+                                 </div>
+                              </>
+                           )}
+                        </CardContent>
+                     </Card>
+                  )}
+                  {lastChatMessage && (
+                     <Card
+                        className={cardBaseStyles}
+                        onClick={() =>
+                           router.push(
+                              `/workspace/${lastChatMessage.meta.workspaceOrigin}/document/${lastChatMessage.meta.docId}`
+                           )
+                        }
+                     >
+                        <CardHeader className="flex flex-row items-center gap-2 relative z-10">
+                           <MessageCircle
+                              className={`text-blue-500 ${iconWrapStyles}`}
+                           />
+                           <CardTitle>
+                              {homeTranslations("lastChatMessage")}
+                           </CardTitle>
+                        </CardHeader>
+                        <CardContent className="pt-2 space-y-2 relative z-10">
+                           {isLoading ? (
+                              <p className="text-muted-foreground">
+                                 {generalTranslations("loading")}
+                              </p>
+                           ) : error ? (
+                              <p className="text-red-500">{error}</p>
+                           ) : (
+                              <>
+                                 <div className="flex items-baseline gap-2">
+                                    <span className="text-sm text-muted-foreground">
+                                       {homeTranslations("document")}:
+                                    </span>
+                                    <span className="text-base font-semibold truncate">
+                                       {lastChatMessageDocName ||
+                                          homeTranslations("unknownDocument")}
+                                    </span>
+                                 </div>
+                                 <div className="flex items-baseline gap-2">
+                                    <span className="text-sm text-muted-foreground">
+                                       {homeTranslations("addedBy")}:
+                                    </span>
+                                    <span className="text-base font-semibold truncate">
+                                       {lastChatMessage.meta.creator ||
+                                          homeTranslations("unknownCreator")}
+                                    </span>
+                                 </div>
+                                 <div className="flex items-baseline gap-2">
+                                    <span className="text-sm text-muted-foreground">
+                                       {homeTranslations("sentOn")}:
+                                    </span>
+                                    <span className="text-base font-semibold truncate">
+                                       {new Date(
+                                          Number(lastChatMessage.meta.timestamp)
+                                       ).toLocaleString("en-GB", {
+                                          day: "2-digit",
+                                          month: "2-digit",
+                                          year: "numeric",
+                                          hour: "2-digit",
+                                          minute: "2-digit",
+                                          second: "2-digit",
+                                          hour12: false
+                                       })}
+                                    </span>
+                                 </div>
+                              </>
+                           )}
+                        </CardContent>
+                     </Card>
+                  )}
+               </div>
+            )}
          </div>
          <div className="space-y-4">
             <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
                {homeTranslations("workspaceActions")}
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-               <Card
-                  className={cardBaseStyles}
-                  onClick={() =>
-                     router.push(
-                        `/workspace/${recentlyAddedWorkspace?.meta?.workspace_uuid}`
-                     )
-                  }
-               >
-                  <CardHeader className="flex flex-row items-center gap-2 relative z-10">
-                     <Folder className={`text-blue-500 ${iconWrapStyles}`} />
-                     <CardTitle>
-                        {homeTranslations("recentlyAddedWorkspace")}
-                     </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-2 space-y-2 relative z-10">
-                     {recentlyAddedWorkspace ? (
-                        <>
-                           <div className="flex items-baseline gap-2">
-                              <span className="text-sm text-muted-foreground">
-                                 {generalTranslations("workspace")}:
-                              </span>
-                              <span className="text-base font-semibold truncate">
-                                 {recentlyAddedWorkspace.meta.name ||
-                                    homeTranslations("unknownDocument")}
-                              </span>
-                           </div>
-                           <div className="flex items-baseline gap-2">
-                              <span className="text-sm text-muted-foreground">
-                                 {homeTranslations("addedBy")}:
-                              </span>
-                              <span className="text-base font-semibold truncate">
-                                 {recentlyAddedWorkspace.meta.creator_name ||
-                                    homeTranslations("unknownCreator")}
-                              </span>
-                           </div>
-                           <div className="flex items-baseline gap-2">
-                              <span className="text-sm text-muted-foreground">
-                                 {homeTranslations("addedOn")}:
-                              </span>
-                              <span className="text-base font-semibold truncate">
-                                 {new Date(
-                                    recentlyAddedWorkspace.meta.created_at
-                                 ).toLocaleString()}
-                              </span>
-                           </div>
-                        </>
-                     ) : (
-                        <p className="text-muted-foreground">
-                           {homeTranslations("noRecentWorkspaceAvailable")}
-                        </p>
-                     )}
-                  </CardContent>
-               </Card>
-            </div>
+            {!recentlyAddedWorkspace ? (
+               <div className="flex items-center justify-center p-6 h-40 border border-dashed rounded-md text-lg text-muted-foreground bg-gray-50 dark:bg-gray-900">
+                  {homeTranslations("noWorkspaceActions")}
+               </div>
+            ) : (
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {recentlyAddedWorkspace && (
+                     <Card
+                        className={cardBaseStyles}
+                        onClick={() =>
+                           router.push(
+                              `/workspace/${recentlyAddedWorkspace.meta.workspace_uuid}`
+                           )
+                        }
+                     >
+                        <CardHeader className="flex flex-row items-center gap-2 relative z-10">
+                           <Folder
+                              className={`text-blue-500 ${iconWrapStyles}`}
+                           />
+                           <CardTitle>
+                              {homeTranslations("recentlyAddedWorkspace")}
+                           </CardTitle>
+                        </CardHeader>
+                        <CardContent className="pt-2 space-y-2 relative z-10">
+                           <>
+                              <div className="flex items-baseline gap-2">
+                                 <span className="text-sm text-muted-foreground">
+                                    {generalTranslations("workspace")}:
+                                 </span>
+                                 <span className="text-base font-semibold truncate">
+                                    {recentlyAddedWorkspace.meta.name ||
+                                       homeTranslations("unknownDocument")}
+                                 </span>
+                              </div>
+                              <div className="flex items-baseline gap-2">
+                                 <span className="text-sm text-muted-foreground">
+                                    {homeTranslations("addedBy")}:
+                                 </span>
+                                 <span className="text-base font-semibold truncate">
+                                    {recentlyAddedWorkspace.meta.creator_name ||
+                                       homeTranslations("unknownCreator")}
+                                 </span>
+                              </div>
+                              <div className="flex items-baseline gap-2">
+                                 <span className="text-sm text-muted-foreground">
+                                    {homeTranslations("addedOn")}:
+                                 </span>
+                                 <span className="text-base font-semibold truncate">
+                                    {new Date(
+                                       recentlyAddedWorkspace.meta.created_at
+                                    ).toLocaleString()}
+                                 </span>
+                              </div>
+                           </>
+                        </CardContent>
+                     </Card>
+                  )}
+               </div>
+            )}
          </div>
       </div>
    );

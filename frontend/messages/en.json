@@ -192,10 +192,10 @@
       "document": "Document",
       "unknwownCreator": "Unknown author",
       "unknownDocument": "Unknown document",
-      "noDocumentAvailable": "No document available",
+      "noDocumentActions": "No document actions are present at this time",
       "noChatMessageAvailable": "No chat message available",
       "recentlyAddedWorkspace": "Recently added workspace",
-      "noRecentWorkspaceAvailable": "No recent workspace available",
+      "noWorkspaceActions": "No workspace actions are present at this time",
       "documentActions": "Document actions",
       "workspaceActions": "Workspace actions"
    },
