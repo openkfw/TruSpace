@@ -40,19 +40,21 @@ function WorkspaceMenu() {
       <>
          <Menubar className="bg-blue-200 dark:bg-muted">
             <MenubarMenu>
-               <MenubarTrigger className="hover:bg-blue-500  hover:dark:bg-blue-800 focus:bg-blue-500 focus:dark:bg-blue-800 data-[state=open]:bg-blue-500 data-[state=open]:dark:bg-blue-800 hover:text-white focus:text-white data-[state=open]:text-white">
+               <MenubarTrigger className="hover:bg-blue-500  hover:dark:bg-blue-800 focus:bg-blue-500 focus:dark:bg-blue-800 data-[state=open]:bg-blue-500 data-[state=open]:dark:bg-blue-800 hover:text-white focus:text-white data-[state=open]:text-white" data-test-id="workspace-document-menu-button">
                   {generalTranslations("document")}
                </MenubarTrigger>
                <MenubarContent className="bg-blue-200 dark:bg-muted">
                   <MenubarItem
                      className="hover:bg-blue-500 hover:dark:bg-blue-800 focus:bg-blue-500 focus:dark:bg-blue-800 data-[state=open]:bg-blue-500 data-[state=open]:dark:bg-blue-800 hover:text-white focus:text-white data-[state=open]:text-white"
                      onClick={() => setIsCreateDialogOpen(true)}
+                     data-test-id="workspace-document-create-button"
                   >
                      <span>{homeTranslations("createDocument")}</span>
                   </MenubarItem>
                   <MenubarItem
                      className="hover:bg-blue-500 hover:dark:bg-blue-800 focus:bg-blue-500 focus:dark:bg-blue-800 data-[state=open]:bg-blue-500 data-[state=open]:dark:bg-blue-800 hover:text-white focus:text-white data-[state=open]:text-white"
                      onClick={() => setIsDialogOpen(true)}
+                     data-test-id="workspace-document-upload-button"
                   >
                      <span>{homeTranslations("uploadDocumentTitle")}</span>
                   </MenubarItem>

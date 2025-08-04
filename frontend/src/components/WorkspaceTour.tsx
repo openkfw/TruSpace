@@ -86,7 +86,7 @@ export default function WorkspaceTour() {
             <p className="text-sm text-gray-800 dark:text-white">
                {tourTranslations("workspaceMenuDescription")}
             </p>
-            <Button onClick={handleClose} className="mt-2">
+            <Button onClick={handleClose} className="mt-2" data-test-id="workspace-tour-confirm-button">
                {tourTranslations("confirmButton")}
             </Button>
          </div>

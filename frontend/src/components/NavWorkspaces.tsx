@@ -88,6 +88,7 @@ export function NavWorkspaces({
                      variant="ghost"
                      className="flex justify-start"
                      onClick={() => setIsDialogOpen(true)}
+                     data-test-id="workspace-create-button"
                   >
                      <Plus />
                      {translations("addWorkspace")}

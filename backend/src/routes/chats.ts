@@ -8,6 +8,7 @@ import { AuthenticatedRequest } from "../types";
 import { ChatMessageRequest } from "../types/interfaces";
 import { getUserSettingsByUiid } from "../utility/user";
 import { sendNotification } from "../mailing/notifications";
+import { findPermissionsByEmailDb } from "../clients/db";
 
 const router = express.Router();
 const client = new IpfsClient();
@@ -48,6 +49,27 @@ router.get("/export/:docId", async (req: Request, res: Response) => {
   });
 
   doc.end();
+});
+
+router.get("/recent", async (req: AuthenticatedRequest, res: Response) => {
+  const allWorkspaces = await new IpfsClient().getAllWorkspaces();
+  const allowedWs = (
+    await findPermissionsByEmailDb(req.user?.email as string)
+  ).map((p) => p.workspace_id);
+  const allAllowedWs = allWorkspaces.filter(
+    (ws) => allowedWs.includes(ws.uuid) || ws.meta.is_public
+  );
+  const result = await client.getAllMessages();
+  const filteredMessages = result
+    .filter((message) => {
+      const workspaceOrigin = message.meta.workspaceOrigin;
+      return allAllowedWs.some((ws) => ws.uuid === workspaceOrigin);
+    })
+    .sort((a, b) => {
+      return Number(b.meta.timestamp) - Number(a.meta.timestamp);
+    });
+  // return only the most recent 10 messages
+  res.json(filteredMessages.splice(0, 10));
 });
 
 /* GET chat messages by document ID */

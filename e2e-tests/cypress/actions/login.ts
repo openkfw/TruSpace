@@ -13,7 +13,7 @@ export function login(
 }
 
 export function logout() {
-  cy.get('[data-test-id="sidebar-user-menu-label"]').click();
+  cy.get('[data-test-id="sidebar-user-menu-button"]').click();
   cy.get('[data-test-id="logout-button"]').click();
 
   cy.get('[data-test-id="login-submit"]').should("be.visible");

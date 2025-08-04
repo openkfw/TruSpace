@@ -32,6 +32,13 @@ export interface Document extends DocumentRequest {
   documentVersions?: DocumentVersion[];
 }
 
+export interface DocumentsResponse {
+  count: number;
+  from?: number;
+  limit?: number;
+  data: Document[];
+}
+
 export interface DocumentVersion {
   cid: string;
   meta: DocumentMeta;
