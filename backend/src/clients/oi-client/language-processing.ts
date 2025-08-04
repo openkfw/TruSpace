@@ -13,9 +13,8 @@ export const processLanguage = async (
       if (parsed && parsed.language) {
         return parsed.language;
       }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {
-      logger.debug("Initial JSON parsing failed, trying regex.");
+      logger.error("Initial JSON parsing failed, trying regex:", e);
     }
 
     // cut off only part with with JSON between '{"language"' and '}' for cases when LLM is chatty
@@ -37,7 +36,7 @@ export const processLanguage = async (
 
     throw new Error("No language found in the initial response.");
   } catch (error) {
-    logger.debug(
+    logger.error(
       "Initial language parsing failed, attempting fallback with direct LLM formatting.",
       error
     );
@@ -68,10 +67,10 @@ export const processLanguage = async (
           );
           return parsed.language;
         }
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (e) {
-        logger.debug(
-          "Second attempt response is not a valid JSON, trying regex."
+        logger.error(
+          "Second attempt response is not a valid JSON, trying regex:",
+          e
         );
       }
 

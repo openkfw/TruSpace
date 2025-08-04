@@ -154,9 +154,11 @@ export class IpfsClient implements IClient {
           if (parsed && parsed.language) {
             language = parsed.language;
           }
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (e) {
-          //
+          logger.error(
+            `Error parsing language JSON for version CID ${versionCid}:`,
+            e
+          );
         }
         return language;
       }
