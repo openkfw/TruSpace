@@ -195,9 +195,9 @@
       "noDocumentActions": "Zurzeit sind keine Aktionen für Dokumente vorhanden",
       "noChatMessageAvailable": "Keine Chat-Nachricht verfügbar",
       "recentlyAddedWorkspace": "Kürzlich hinzugefügte Arbeitsbereiche",
-      "noWorkspaceActions": "Zurzeit sind keine Arbeitsbereichsaktionen vorhanden",
+      "noWorkspaceActions": "Zurzeit sind keine Aktionen für Arbeitsbereiche vorhanden",
       "documentActions": "Dokumente",
-      "workspaceActions": "Arbeitsbereichsaktionen"
+      "workspaceActions": "Arbeitsnbereiche"
    },
    "documentPreview": {
       "preview": "Vorschau",
