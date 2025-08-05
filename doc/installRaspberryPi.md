@@ -39,7 +39,7 @@ cd ipfs-cluster
 docker build . -t truspace/ipfs-cluster
 ```
 
-- Replace the image tag in `docker-compose.yml` with the built image `truspace/ipfs-cluster`
+- Replace the image tag `ipfs/ipfs-cluster:latest` in `docker-compose.yml` with the built image `truspace/ipfs-cluster`
 
 # Initial start of TruSpace via docker compose
 
@@ -59,13 +59,8 @@ or
 
 **NOTE**
 
-If you plan to use a custom local domain (e.g. `truspace.local` instead of `localhost`), you have to set the respective environment variable and update CORS settings in the `.env`file, therefore
-
-```bash
-export NEXT_PUBLIC_API_URL=http://truspace.local:8000/api && ./start.sh
-```
-
-and in the `.env` file update the line
+If you plan to use a custom local domain (e.g. `truspace.local` instead of `localhost`), you have to set the respective environment variable and update CORS settings in the `.env`file, therefore in the `.env` file update the lines
+`NEXT_PUBLIC_API_URL=http://truspace.local:8000/api`
 `CORS_ORIGIN=http://truspace.local:3000`
 
 ---
