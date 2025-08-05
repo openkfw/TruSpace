@@ -426,7 +426,7 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                      </div>
                   ) : null}
                   <div className="mb-4 flex flex-wrap items-center justify-between gap-y-2">
-                     <div>
+                     <div className="mr-4">
                         <Select
                            value={actionSelectValue}
                            onValueChange={(value) => {
