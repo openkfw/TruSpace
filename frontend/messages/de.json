@@ -192,11 +192,11 @@
       "document": "Dokument",
       "unknownCreator": "Unbekannte/r AutorIn",
       "unknownDocument": "Unbekanntes Dokument",
-      "noDocumentActions": "Zurzeit sind keine Dokumentaktionen vorhanden",
+      "noDocumentActions": "Zurzeit sind keine Aktionen für Dokumente vorhanden",
       "noChatMessageAvailable": "Keine Chat-Nachricht verfügbar",
       "recentlyAddedWorkspace": "Kürzlich hinzugefügte Arbeitsbereiche",
       "noWorkspaceActions": "Zurzeit sind keine Arbeitsbereichsaktionen vorhanden",
-      "documentActions": "Dokumentenaktionen",
+      "documentActions": "Dokumente",
       "workspaceActions": "Arbeitsbereichsaktionen"
    },
    "documentPreview": {
