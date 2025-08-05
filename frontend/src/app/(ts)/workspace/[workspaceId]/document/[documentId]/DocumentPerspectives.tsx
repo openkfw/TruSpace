@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 import { useTranslations } from "next-intl";
@@ -73,47 +73,11 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
    const [savePromptForWorkspace, setSavePromptForWorkspace] = useState(false);
    const { perspectives, mutate } = usePerspectives(cid);
    const { status: perspectivesStatus } = usePerspectivesStatus(cid);
-   const buttonRef = useRef(null);
-   const promptButtonRef = useRef(null);
-   const selectRef = useRef(null);
-   const [isWrapped, setIsWrapped] = useState(false);
-   const [isPromptWrapped, setIsPromptWrapped] = useState(false);
+   const [actionSelectValue, setActionSelectValue] = useState("");
 
    const [selectedPerspective, setSelectedPerspective] = useState<
       string | undefined
    >(undefined);
-
-   useEffect(() => {
-      const checkSelectWrap = () => {
-         if (buttonRef.current && selectRef.current) {
-            const buttonTopPosition =
-               buttonRef.current.getBoundingClientRect().top;
-            const selectTopPosition =
-               selectRef.current.getBoundingClientRect().top;
-            setIsWrapped(selectTopPosition > buttonTopPosition + 5);
-         }
-      };
-
-      const checkPromptWrap = () => {
-         if (buttonRef.current && promptButtonRef.current) {
-            const buttonTopPosition =
-               buttonRef.current.getBoundingClientRect().top;
-            const promptTopPosition =
-               promptButtonRef.current.getBoundingClientRect().top;
-            setIsPromptWrapped(promptTopPosition > buttonTopPosition + 5);
-         }
-      };
-
-      checkSelectWrap();
-      checkPromptWrap();
-      window.addEventListener("resize", checkSelectWrap);
-      window.addEventListener("resize", checkPromptWrap);
-
-      return () => {
-         window.removeEventListener("resize", checkSelectWrap);
-         window.removeEventListener("resize", checkPromptWrap);
-      };
-   }, []);
 
    const uploadButtonTitle = t("create");
 
@@ -272,7 +236,6 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                </div>
             </DialogContent>
          </Dialog>
-
          <Dialog
             open={newPerspectiveDialogOpen}
             onOpenChange={(open) => setNewPerspectiveDialogOpen(open)}
@@ -353,7 +316,6 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                </form>
             </DialogContent>
          </Dialog>
-
          <Dialog
             open={customPromptDialogOpen}
             onOpenChange={(open) => setCustomPromptDialogOpen(open)}
@@ -452,7 +414,6 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                </form>
             </DialogContent>
          </Dialog>
-
          <div className="flex flex-col">
             <div className="h-full">
                <div className="space-y-4">
@@ -464,43 +425,50 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                            : t("generatingAIPerspectives")}
                      </div>
                   ) : null}
-                  <div className="flex flew-row items-center justify-between flex-wrap">
-                     <Button
-                        ref={buttonRef}
-                        variant="outline"
-                        onClick={() => {
-                           setNewPerspectiveDialogOpen(true);
-                        }}
-                        className="mr-4"
-                     >
-                        <Plus /> {t("addYourPerspective")}
-                     </Button>
-
+                  <div className="mb-4 flex flex-wrap items-center justify-between gap-y-2">
                      <div>
-                        <Button
-                           ref={promptButtonRef}
-                           variant="outline"
-                           onClick={() => {
-                              setCustomPromptDialogOpen(true);
+                        <Select
+                           value={actionSelectValue}
+                           onValueChange={(value) => {
+                              if (value === "add") {
+                                 setNewPerspectiveDialogOpen(true);
+                              } else if (value === "custom") {
+                                 setCustomPromptDialogOpen(true);
+                              } else if (value === "generateFromPrevious") {
+                                 setPromptText(currentPerspective?.text || "");
+                                 setCustomPromptDialogOpen(true);
+                              }
+                              setTimeout(() => setActionSelectValue(""), 100);
                            }}
-                           className={`mr-4 ${isPromptWrapped ? "mt-2" : ""}`}
                         >
-                           <MessageCircleQuestion /> {t("askCustomPrompt")}
-                        </Button>
-                        <Button
-                           ref={promptButtonRef}
-                           variant="outline"
-                           onClick={() => {
-                              setPromptText(currentPerspective?.text || "");
-                              setCustomPromptDialogOpen(true);
-                           }}
-                           className={`mr-4 ${isPromptWrapped ? "mt-2" : ""}`}
-                        >
-                           <MessageCircleQuestion />{" "}
-                           {t("generateNewPerspectiveFromPrevious")}
-                        </Button>
+                           <SelectTrigger className="w-[280px] bg-slate-50 dark:bg-slate-800 dark:text-white">
+                              <SelectValue
+                                 placeholder={t("perspectiveActions")}
+                              />
+                           </SelectTrigger>
+                           <SelectContent>
+                              <SelectItem value="add">
+                                 <div className="flex items-center">
+                                    <Plus className="mr-2 h-4 w-4" />
+                                    {t("addYourPerspective")}
+                                 </div>
+                              </SelectItem>
+                              <SelectItem value="custom">
+                                 <div className="flex items-center">
+                                    <MessageCircleQuestion className="mr-2 h-4 w-4" />
+                                    {t("askCustomPrompt")}
+                                 </div>
+                              </SelectItem>
+                              <SelectItem value="generateFromPrevious">
+                                 <div className="flex items-center">
+                                    <MessageCircleQuestion className="mr-2 h-4 w-4" />
+                                    {t("generateNewPerspectiveFromPrevious")}
+                                 </div>
+                              </SelectItem>
+                           </SelectContent>
+                        </Select>
                      </div>
-                     <div ref={selectRef} className={isWrapped ? "mt-2" : ""}>
+                     <div>
                         <Select
                            value={selectedPerspective}
                            onValueChange={(value) => {
@@ -557,9 +525,7 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                      </div>
                   </div>
                   <div className="text-right" />
-
                   {parse(html as string)}
-
                   {currentPerspective?.creatorType === "user" && (
                      <div className="flex items-center flex-wrap">
                         <div className="bg-blue-100 dark:bg-blue-900 border border-blue-300 dark:border-blue-800 rounded p-2 flex items-center text-sm">
@@ -574,7 +540,6 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                         </div>
                      </div>
                   )}
-
                   {currentPerspective?.creatorType === "ai" && (
                      <div className="flex items-center flex-wrap">
                         <div className="bg-blue-100 dark:bg-blue-900 border border-blue-300 dark:border-blue-800 rounded p-2 flex items-center text-sm">
