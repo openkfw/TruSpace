@@ -352,7 +352,8 @@
       "promptBodyPlaceholder": "Gib Deinen Prompt ein",
       "savePrompt": "Prompt speichern",
       "saveCustomPromptHint": "Das Speichern von Prompts funktioniert noch nicht",
-      "generateNewPerspectiveFromPrevious": "Mit KI anpassen"
+      "generateNewPerspectiveFromPrevious": "Mit KI anpassen",
+      "perspectiveActions": "Perspektivenaktionen"
    },
    "documentEditable": {
       "cancel": "Abbrechen",

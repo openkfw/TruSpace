@@ -352,7 +352,8 @@
       "promptBodyPlaceholder": "Enter your prompt",
       "savePrompt": "Save prompt",
       "saveCustomPromptHint": "Saving prompts doesn't work",
-      "generateNewPerspectiveFromPrevious": "Adjust with AI"
+      "generateNewPerspectiveFromPrevious": "Adjust with AI",
+      "perspectiveActions": "Perspective actions"
    },
    "documentEditable": {
       "cancel": "Cancel",
