@@ -132,7 +132,7 @@ printf "    %s\n\n" "$CLUSTER_ID"
   The script uses the IP address and the respective `id` values and inserts them into the configuration files `./volumes/ipfs0/config` and `./volumes/cluster0/service.json`. So it looks somewhat like this:
 
 ```bash
-./connectPeer.sh 213.154.217.25 12D3Kooi....nD3hQLM 12D3KooW...VisK1T
+./connectPeer.sh 213.154.217.25 <IPFS PeerID> <Cluster PeerID>
 ```
 
 If you prefer to do this manually on your installation, open the file `/volumes/cluster0/service.json` and search for the field `peer_addresses`. If you haven't connected to other nodes before, it is `"peer_addresses": []`. Enter the target node IP address and the node `id` that you retrieved before in this field, e.g. `"peer_addresses": []`. IPFS uses the multiaddress format, e.g. it is `"peer_addresses":["/ip4/192.168.1.100/tcp/9096/p2p/target_ID"]`. Do not forget to use `"` around the peer.
