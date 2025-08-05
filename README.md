@@ -102,12 +102,12 @@ Here is a step by step guide:
 7c2c973709f5a961b.....8926a65b15477cf5
 ```
 
-- Copy the file into your `./volumes/ipfs0/` folder and overwrite the existing `swarm.key`, i.e. `./volumes/ipfs0/swarm.key`
+- Copy the file into your node (**source node**) `./volumes/ipfs0/` folder and overwrite the existing `swarm.key`, i.e. `./volumes/ipfs0/swarm.key`
 
 - Obtain the cluster secret from the target node you want to connect to. It is the environment variable `CLUSTER_SECRET`, e.g. found in the `./.env` configuration of the target node.
-- This should be copied in your `./.env` file in the variable `CLUSTER_SECRET`. This enables the two cluster nodes to connect to each other.
+- This should be copied in your source node  `./.env` file in the variable `CLUSTER_SECRET`. This enables the two cluster nodes to connect to each other.
 
-- On the target node, open the file `/volumes/cluster0/identity.json`. Copy the value in the field `id`, you can do this using `jq` command or simply read out all values using these commands:
+- On the target node, use the following script to obtain relevant identifier values that you need to connect your source node to the target node:
 
 ```bash
 # Fetch values
@@ -127,13 +127,15 @@ printf "    %s\n\n" "$CLUSTER_ID"
 
 ```
 
-- Use the script `./connectPeer.sh` to modify the respective files for IPFS and Cluster. It needs `jq` installed, if you don't have it, install it via `sudo apt-get install jq`.
+- Use the script `./connectPeer.sh` to modify the respective files for IPFS and Cluster. 
 
-  The script uses the IP address and the respective `id` values and inserts them into the configuration files `./volumes/ipfs0/config` and `./volumes/cluster0/service.json`. So it looks somewhat like this:
+  The script uses the IP address and the respective `id` values and inserts them into the configuration files `./volumes/ipfs0/config` and `./volumes/cluster0/service.json`. So it looks somewhat like this, with the respective values from the script above:
 
 ```bash
 ./connectPeer.sh 213.154.217.25 <IPFS PeerID> <Cluster PeerID>
 ```
+
+The script needs `jq` parser installed, if you don't have it, install it via `sudo apt-get install jq`.
 
 If you prefer to do this manually on your installation, open the file `/volumes/cluster0/service.json` and search for the field `peer_addresses`. If you haven't connected to other nodes before, it is `"peer_addresses": []`. Enter the target node IP address and the node `id` that you retrieved before in this field, e.g. `"peer_addresses": []`. IPFS uses the multiaddress format, e.g. it is `"peer_addresses":["/ip4/192.168.1.100/tcp/9096/p2p/target_ID"]`. Do not forget to use `"` around the peer.
 
