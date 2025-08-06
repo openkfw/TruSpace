@@ -82,7 +82,7 @@ router.get("/", async (req: Request, res: Response) => {
 router.get("/peers", async (req: Request, res: Response) => {
   const peers = await new IpfsClient().getPeers();
 
-  res.json(peers.data);
+  res.json(peers);
 });
 
 export default router;

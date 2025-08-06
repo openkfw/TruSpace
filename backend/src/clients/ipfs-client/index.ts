@@ -568,8 +568,8 @@ export class IpfsClient implements IClient {
   }
 
   async getPeers() {
-    const peers = await this.#clusterAxios.get("/peers");
-
+    const response = await this.#clusterAxios.get("/peers");
+    const peers = this.#parseMultipleJSON_Regex(response.data);
     return peers;
   }
 
@@ -934,6 +934,30 @@ export class IpfsClient implements IClient {
         )
         .map((el) => this.#transformPinToDocument(el.pin))
     );
+  }
+
+  #parseMultipleJSON_Regex(jsonString: string) {
+    const objects = [];
+    const regex = /\}\s*\{/g;
+
+    // Split by }{ pattern and reconstruct
+    const parts = jsonString.split(regex);
+
+    for (let i = 0; i < parts.length; i++) {
+      let part = parts[i];
+
+      // Add back the missing braces
+      if (i > 0) part = "{" + part;
+      if (i < parts.length - 1) part = part + "}";
+
+      try {
+        objects.push(JSON.parse(part));
+      } catch (e) {
+        console.error("Error parsing JSON part:", e);
+      }
+    }
+
+    return objects;
   }
 
   /** If `data` field is too large, IPFS pinning service won't return it. It is necessary to get the files themselves */
