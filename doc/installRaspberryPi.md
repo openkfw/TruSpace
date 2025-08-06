@@ -15,6 +15,14 @@ git clone https://github.com/openkfw/TruSpace.git
 
 - Execute configuration script `bash ./configure.sh`. Select `development` as `NODE_ENV`, in case the raspberry runs on a local installation and is not available via DNS. Otherwise the CORS handling might be too strict.
 
+- If the IPFS connection is too slow, you can also execute `docker exec ipfs0 ipfs config profile apply lowpower`, which creates a config file that is optimised for slow servers. However you have to update the `Routing` variable to `dht` again in the config file in `./volumes/ipfs0/config`:
+
+```
+"Routing": {
+    "Type": "dht"
+  },
+```
+
 # OPTIONAL: Configure Large Language Model (LLM)
 
 - LLM is configured in `.env` file
