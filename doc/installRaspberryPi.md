@@ -13,14 +13,7 @@
 git clone https://github.com/openkfw/TruSpace.git
 ```
 
-- Copy `.env.example` into `.env`
-
-```bash
-cd TruSpace
-cp .env.example .env
-```
-
-- Update `.env` with respective host names
+- Execute configuration script `bash ./configure.sh`. Select `development` as `NODE_ENV`, in case the raspberry runs on a local installation and is not available via DNS. Otherwise the CORS handling might be too strict.
 
 # OPTIONAL: Configure Large Language Model (LLM)
 
