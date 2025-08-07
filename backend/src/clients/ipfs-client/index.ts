@@ -328,13 +328,21 @@ export class IpfsClient implements IClient {
    * @returns Workspace[ ]
    */
   async getAllWorkspaces(): Promise<Workspace[]> {
-    const pinRes: PinningResponse = (
-      await this.#pinSvcAxios.get('/pins?limit=1000&meta={"type":"workspace"}')
-    ).data;
+    try {
+      const pinRes: PinningResponse = (
+        await this.#pinSvcAxios.get(
+          '/pins?limit=1000&meta={"type":"workspace"}'
+        )
+      ).data;
 
-    return pinRes.results
-      .sort((a, b) => a.pin.meta.name.localeCompare(b.pin.meta.name))
-      .map((r: PinRequest) => this.#transformPinToWorkspace(r.pin));
+      return pinRes.results
+        .sort((a, b) => a.pin.meta.name.localeCompare(b.pin.meta.name))
+        .map((r: PinRequest) => this.#transformPinToWorkspace(r.pin));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      logger.error(`Error getting workspace pins: ${JSON.stringify(err)}`);
+      return [];
+    }
   }
 
   /**
