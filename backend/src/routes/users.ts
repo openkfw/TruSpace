@@ -13,6 +13,7 @@ import {
   getTotalRecentlyAddedUsersDb,
   getTotalUsersDb,
   storeUserSettingsDb,
+  updateUserFirstSignIn,
   updateUserPassword,
   updateUserToken,
 } from "../clients/db";
@@ -192,6 +193,7 @@ router.post(
         name: user.username,
         email: user.email,
         uiid: user.uiid,
+        firstSignIn: user.first_sign_in === "true",
       };
 
       const token = jwt.sign(payload, Buffer.from(config.jwt.secret), {
@@ -202,6 +204,10 @@ router.post(
         token,
         Buffer.from(config.jwt.secret)
       ) as jwt.JwtPayload;
+
+      if (user.first_sign_in === "true") {
+        await updateUserFirstSignIn(user.id, "false");
+      }
 
       res.cookie("auth_token", token, {
         httpOnly: true,
@@ -218,6 +224,7 @@ router.post(
           name: user.username,
           email: user.email,
           uiid: user.uiid,
+          firstSignIn: user.first_sign_in === "true",
           expires: decodedToken.exp,
         },
       });

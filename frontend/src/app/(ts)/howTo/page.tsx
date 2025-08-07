@@ -1,5 +1,5 @@
 import AppFeatures from "@/components/AppFeatures";
 
-export default function Home() {
+export default function HowTo() {
    return <AppFeatures />;
 }

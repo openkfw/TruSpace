@@ -43,6 +43,7 @@ interface User {
          workspaceChange?: boolean;
       };
    };
+   firstSignIn: boolean;
    loginTime?: string;
    expires: number; // milliseconds since UNIX epoch
    initials: string;

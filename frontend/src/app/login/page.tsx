@@ -38,13 +38,18 @@ export default function Login({}: React.ComponentPropsWithoutRef<"div">) {
 
    const onSubmit = async (data) => {
       const result = await loginUser(data);
-      if (result.status === "success") {
-         setLoginCookie(result.user);
+      const { status, message, user } = result;
+      if (status === "success") {
+         setLoginCookie(user);
          refreshUser();
-         router.push("/home");
+         if (user.firstSignIn) {
+            router.push("/howTo");
+         } else {
+            router.push("/dashboard");
+         }
       }
-      if (result.status === "failure") {
-         if (result.message === "Account inactive") {
+      if (status === "failure") {
+         if (message === "Account inactive") {
             setStatusError(true);
          } else {
             setLoginError(true);
