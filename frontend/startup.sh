@@ -17,4 +17,5 @@ if [ "$REPLACEMENT_COUNT" -eq 0 ]; then
   echo "No placeholders found to replace in /app/.next. This probably means that _NEXT_PUBLIC_API_URL_ has already been replaced with another value. You might need to use a fresh container."
 fi
 
+
 exec "$@"
