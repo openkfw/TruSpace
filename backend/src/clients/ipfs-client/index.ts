@@ -328,13 +328,21 @@ export class IpfsClient implements IClient {
    * @returns Workspace[ ]
    */
   async getAllWorkspaces(): Promise<Workspace[]> {
-    const pinRes: PinningResponse = (
-      await this.#pinSvcAxios.get('/pins?limit=1000&meta={"type":"workspace"}')
-    ).data;
+    try {
+      const pinRes: PinningResponse = (
+        await this.#pinSvcAxios.get(
+          '/pins?limit=1000&meta={"type":"workspace"}'
+        )
+      ).data;
 
-    return pinRes.results
-      .sort((a, b) => a.pin.meta.name.localeCompare(b.pin.meta.name))
-      .map((r: PinRequest) => this.#transformPinToWorkspace(r.pin));
+      return pinRes.results
+        .sort((a, b) => a.pin.meta.name.localeCompare(b.pin.meta.name))
+        .map((r: PinRequest) => this.#transformPinToWorkspace(r.pin));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      logger.error(`Error getting workspace pins: ${JSON.stringify(err)}`);
+      return [];
+    }
   }
 
   /**
@@ -569,7 +577,7 @@ export class IpfsClient implements IClient {
 
   async getPeers() {
     const response = await this.#clusterAxios.get("/peers");
-    const peers = this.#parseMultipleJSON_Regex(response.data);
+    const peers = this.#parseMultipleJSON(response.data);
     return peers;
   }
 
@@ -936,30 +944,28 @@ export class IpfsClient implements IClient {
     );
   }
 
-  #parseMultipleJSON_Regex(jsonString: string) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  #parseMultipleJSON(data: any) {
+    if (!data) return [];
+
+    const str = data.toString();
+
     const objects = [];
-    const regex = /\}\s*\{/g;
+    let depth = 0;
+    let start = 0;
 
-    // Split by }{ pattern and reconstruct
-    const parts = jsonString.split(regex);
+    for (let i = 0; i < str.length; i++) {
+      if (str[i] === "{") depth++;
+      if (str[i] === "}") depth--;
 
-    for (let i = 0; i < parts.length; i++) {
-      let part = parts[i];
-
-      // Add back the missing braces
-      if (i > 0) part = "{" + part;
-      if (i < parts.length - 1) part = part + "}";
-
-      try {
-        objects.push(JSON.parse(part));
-      } catch (e) {
-        console.error("Error parsing JSON part:", e);
+      if (depth === 0 && str[i] === "}") {
+        objects.push(JSON.parse(str.slice(start, i + 1)));
+        start = i + 1;
       }
     }
 
     return objects;
   }
-
   /** If `data` field is too large, IPFS pinning service won't return it. It is necessary to get the files themselves */
   async #fetchPerspectiveFiles(
     perspectives: Perspective[]
