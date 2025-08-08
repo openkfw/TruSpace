@@ -44,7 +44,7 @@ export function BackendHealth() {
    return (
       <Button
          variant="ghost"
-         className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+         className="rounded-full flex justify-between items-center"
          onClick={() => router.push("/app-status")}
       >
          {overallStatus()} <span>{t("appStatus")}</span>
