@@ -58,13 +58,7 @@ export class MistralClient implements BackendLLMClient {
 
       return { title, summary };
     } catch (error) {
-      logger.error(
-        `MistralClient.generateCompletion failed! ${JSON.stringify(
-          error,
-          null,
-          2
-        )}`
-      );
+      logger.error("MistralClient.generateCompletion failed", error);
       throw error;
     }
   }
