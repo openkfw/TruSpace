@@ -1,0 +1,6 @@
+#!/bin/sh
+echo "Pre-commit hook is running" >&2
+git rev-parse HEAD > backend/commit-hash.txt
+git rev-parse HEAD > frontend/public/commit-hash.txt
+git add backend/commit-hash.txt
+git add frontend/public/commit-hash.txt
