@@ -44,10 +44,11 @@ export function BackendHealth() {
    return (
       <Button
          variant="ghost"
-         className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
-         onClick={() => router.push("/app-status")}
+         className="rounded-full flex justify-between items-center"
+         onClick={() => router.push("/appStatus")}
       >
-         {overallStatus()} <span>{t("appStatus")}</span>
+         <span>{overallStatus()}</span>
+         <span>{t("appStatus")}</span>
       </Button>
    );
 }

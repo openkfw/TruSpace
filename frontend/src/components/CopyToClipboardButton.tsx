@@ -36,9 +36,9 @@ export default function CopyToClipboardButton({ value }: { value: string }) {
             <TooltipTrigger asChild>
                <Button variant="ghost" onClick={copyToClipboard}>
                   {copied ? (
-                     <Check className="w-4 h-4 text-green-500" />
+                     <Check className="text-green-500" />
                   ) : (
-                     <Copy className="w-4 h-4 text-gray-500" />
+                     <Copy className="text-gray-500" />
                   )}
                </Button>
             </TooltipTrigger>

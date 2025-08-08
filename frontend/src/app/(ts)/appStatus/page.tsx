@@ -15,6 +15,7 @@ import {
 
 import CopyToClipboardButton from "@/components/CopyToClipboardButton";
 import KPIBox from "@/components/KPIBox";
+import { Button } from "@/components/ui/button";
 import { useHealth, usePeers } from "@/lib/services";
 
 interface PeerNode {
@@ -33,7 +34,6 @@ export default function AppStatus() {
       mutate: refreshHealth
    } = useHealth();
    const { peers, isLoading: peersLoading, mutate: refreshPeers } = usePeers();
-   console.log(peers);
    const handleRefresh = () => {
       refreshHealth();
       refreshPeers();
@@ -63,35 +63,28 @@ export default function AppStatus() {
       <div className="pt-4 space-y-6">
          <div className="flex items-center justify-between">
             <h1 className="text-3xl font-bold">{t("appStatus.title")}</h1>
-            <button
+            <Button
                onClick={handleRefresh}
                disabled={loading}
-               className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors"
+               className="disabled:opacity-50"
             >
-               <RefreshCw
-                  className={`w-4 h-4 ${loading ? "animate-spin" : ""}`}
-               />
+               <RefreshCw className={`${loading ? "animate-spin" : ""}`} />
                {t("appStatus.refresh")}
-            </button>
+            </Button>
          </div>
-
-         {/* Health Overview */}
          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md border">
             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-               <CheckCircle2 className="w-6 h-6 text-green-500" />
+               <CheckCircle2 className="text-green-500" />
                {t("appStatus.systemHealthOverview")}
             </h2>
-
             {healthLoading ? (
-               <div className="flex items-center justify-center py-8">
-                  <RefreshCw className="w-8 h-8 animate-spin text-blue-500" />
-                  <span className="ml-2">
-                     {t("appStatus.loadingHealthStatus")}
-                  </span>
+               <div className="flex items-center justify-center py-8 gap-2">
+                  <RefreshCw className="animate-spin text-blue-500" />
+                  <span>{t("appStatus.loadingHealthStatus")}</span>
                </div>
             ) : health ? (
                <>
-                  <div className="mb-4 p-3 rounded-md bg-gray-50 dark:bg-gray-700">
+                  <div className="mb-4 p-3 rounded-md bg-gray-100 dark:bg-gray-700">
                      <div className="flex items-center gap-2">
                         {getStatusIcon(Boolean(health.status))}
                         <span
@@ -110,7 +103,7 @@ export default function AppStatus() {
                            ([service, status]) => (
                               <div
                                  key={service}
-                                 className="flex items-center justify-between p-3 border rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                                 className="flex items-center justify-between p-3 border rounded-md"
                               >
                                  <span className="font-medium">{service}</span>
                                  <div className="flex items-center gap-2">
@@ -137,41 +130,34 @@ export default function AppStatus() {
                </div>
             )}
          </div>
-
-         {/* Key Information Grid */}
          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <KPIBox
                kpi={t("appStatus.truSpaceVersion")}
                value={health?.version}
                valueLabel=""
-               icon={<Info className="w-16 h-16 text-white" />}
+               icon={<Info className="w-16 h-16 dark:text-white" />}
             />
-
             <KPIBox
                kpi={t("appStatus.ipfsNodeId")}
                value={
                   health?.nodeId ? `${health.nodeId.substring(0, 8)}...` : "N/A"
                }
                valueTooltip={health?.nodeId}
-               icon={<Globe className="w-16 h-16 text-white" />}
+               icon={<Globe className="w-16 h-16 dark:text-white" />}
             />
-
             <KPIBox
                kpi={t("appStatus.connectedNodes")}
                value={connectedNodes.toString()}
                valueLabel={t("appStatus.peers")}
-               icon={<Network className="w-16 h-16 text-white" />}
+               icon={<Network className="w-16 h-16 dark:text-white" />}
             />
-
             <KPIBox
                kpi={t("appStatus.clusterPeers")}
                value={clusterPeers.toString()}
                valueLabel={t("appStatus.nodes")}
-               icon={<Server className="w-16 h-16 text-white" />}
+               icon={<Server className="w-16 h-16 dark:text-white" />}
             />
          </div>
-
-         {/* IPFS Node Details */}
          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md border">
             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
                <Globe className="w-6 h-6 text-purple-500" />
@@ -183,14 +169,14 @@ export default function AppStatus() {
                   <div className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                      {t("appStatus.clusterMultiaddress")}
                   </div>
-                  <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-md font-mono text-sm break-all">
+                  <div className="px-2 py-1 mb-2 bg-gray-100 dark:bg-gray-700 rounded-md font-mono text-sm break-all">
                      {health?.clusterMultiaddress ? (
-                        <>
-                           {health.clusterMultiaddress}{" "}
+                        <span className="flex items-center gap-2">
+                           <span>{health.clusterMultiaddress}</span>
                            <CopyToClipboardButton
                               value={health.clusterMultiaddress}
                            />
-                        </>
+                        </span>
                      ) : (
                         t("appStatus.notAvailable")
                      )}
@@ -198,20 +184,19 @@ export default function AppStatus() {
                   <div className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                      {t("appStatus.nodeMultiaddress")}
                   </div>
-                  <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-md font-mono text-sm break-all">
+                  <div className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-md font-mono text-sm break-all">
                      {health?.nodeMultiaddress ? (
-                        <>
-                           {health.nodeMultiaddress}{" "}
+                        <span className="flex items-center gap-2">
+                           <span>{health.nodeMultiaddress}</span>
                            <CopyToClipboardButton
                               value={health.nodeMultiaddress}
                            />
-                        </>
+                        </span>
                      ) : (
                         t("appStatus.notAvailable")
                      )}
                   </div>
                </div>
-
                {peers && peers.length > 0 && peers[0].addresses && (
                   <div>
                      <div className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -241,27 +226,22 @@ export default function AppStatus() {
                )}
             </div>
          </div>
-
-         {/* Connected Peers */}
          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md border">
             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-               <Users className="w-6 h-6 text-green-500" />
+               <Users className="text-green-500" />
                {t("appStatus.connectedPeers")} ({connectedNodes})
             </h2>
-
             {peersLoading ? (
-               <div className="flex items-center justify-center py-8">
-                  <RefreshCw className="w-8 h-8 animate-spin text-blue-500" />
-                  <span className="ml-2">
-                     {t("appStatus.loadingPeerInformation")}
-                  </span>
+               <div className="flex items-center justify-center py-8 gap-2">
+                  <RefreshCw className="animate-spin text-blue-500" />
+                  <span>{t("appStatus.loadingPeerInformation")}</span>
                </div>
             ) : peers && peers.length > 0 ? (
                <div className="space-y-3">
                   {peers.slice(0, 5).map((peer: PeerNode, index: number) => (
                      <div
                         key={index}
-                        className="p-4 border rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                        className="px-2 py-1 border rounded-md bg-gray-100 dark:bg-gray-700 transition-colors"
                      >
                         <div className="flex items-center justify-between mb-2">
                            <span className="font-medium">
@@ -269,12 +249,12 @@ export default function AppStatus() {
                            </span>
                            {peer.error && peer.error.length > 0 ? (
                               <span className="text-red-500 text-sm flex items-center gap-1">
-                                 <XCircle className="w-4 h-4" />
+                                 <XCircle className=" w-4 h-4" />
                                  {t("appStatus.error")}
                               </span>
                            ) : (
                               <span className="text-green-500 text-sm flex items-center gap-1">
-                                 <CheckCircle2 className="w-4 h-4" />
+                                 <CheckCircle2 className=" w-4 h-4" />
                                  {t("appStatus.connected")}
                               </span>
                            )}

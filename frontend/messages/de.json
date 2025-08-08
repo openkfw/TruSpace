@@ -24,7 +24,8 @@
       "uploadAvatar": "Klicke auf den Avatar, um ein neues Bild hochzuladen",
       "saveSettings": "Einstellungen speichern",
       "copyToClipboard": "In die Zwischenablage kopieren",
-      "copied": "Kopiert"
+      "copied": "Kopiert",
+      "appStatus": "App-Status"
    },
    "statistics": {
       "totalDocuments": "Gesamtdokumente",

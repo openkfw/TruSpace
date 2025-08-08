@@ -24,7 +24,8 @@
       "uploadAvatar": "Click avatar to upload new photo",
       "saveSettings": "Save settings",
       "copyToClipboard": "Copy to clipboard",
-      "copied": "Copied"
+      "copied": "Copied",
+      "appStatus": "App Status"
    },
    "statistics": {
       "totalDocuments": "Total documents",
@@ -504,7 +505,7 @@
       "collaborateDescription": "Discuss document changes with other collaborators using imbedded chat in document details"
    },
    "appStatus": {
-      "title": "App status",
+      "title": "App Status",
       "refresh": "Refresh",
       "systemHealthOverview": "System Health Overview",
       "loadingHealthStatus": "Loading health status...",
