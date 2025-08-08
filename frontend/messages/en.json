@@ -23,7 +23,10 @@
       "workspace": "Workspace",
       "userSettings": "User settings",
       "uploadAvatar": "Click avatar to upload new photo",
-      "saveSettings": "Save settings"
+      "saveSettings": "Save settings",
+      "copyToClipboard": "Copy to clipboard",
+      "copied": "Copied",
+      "appStatus": "App Status"
    },
    "statistics": {
       "totalDocuments": "Total documents",
@@ -408,7 +411,9 @@
       "publicWorkspaceTitle": "Workspace is public, adding users is disabled"
    },
    "backendHealth": {
-      "errors_detected": "Errors detected"
+      "errors_detected": "Errors detected",
+      "viewDetails": "View details",
+      "appStatus": "App Status"
    },
    "languages": {
       "en": "English",
@@ -499,5 +504,41 @@
       "deleteDocumentDescription": "Remove unwanted documents from workspaces to clear out your space",
       "aiSuggestionsDescription": "Use generative AI to see the aspects of the document that interest you",
       "collaborateDescription": "Discuss document changes with other collaborators using imbedded chat in document details"
+   },
+   "appStatus": {
+      "title": "App Status",
+      "refresh": "Refresh",
+      "systemHealthOverview": "System Health Overview",
+      "loadingHealthStatus": "Loading health status...",
+      "overallSystemStatus": "Overall System Status:",
+      "healthy": "Healthy",
+      "issuesDetected": "Issues Detected",
+      "online": "Online",
+      "offline": "Offline",
+      "failedToLoadHealthData": "Failed to load health data",
+      "truSpaceVersion": "TruSpace Version",
+      "ipfsNodeId": "IPFS Node ID",
+      "connectedNodes": "Connected Nodes",
+      "peers": "peers",
+      "clusterPeers": "Cluster Peers",
+      "nodes": "nodes",
+      "ipfsNodeInformation": "IPFS Node Information",
+      "nodeId": "Node ID",
+      "notAvailable": "Not available",
+      "nodeAddresses": "Node Addresses",
+      "total": "total",
+      "andMoreAddresses": "... and {count} more addresses",
+      "connectedPeers": "Connected Peers",
+      "loadingPeerInformation": "Loading peer information...",
+      "peer": "Peer",
+      "connected": "Connected",
+      "clusterPeersCount": "Cluster peers: {count}",
+      "andMorePeers": "... and {count} more peers",
+      "noPeersConnected": "No peers connected",
+      "networkConnectivityIssues": "This might indicate network connectivity issues",
+      "clusterMultiaddress": "Cluster Multiaddress",
+      "nodeMultiaddress": "IPFS Node Multiaddress",
+      "peerError": "There is an error with this peer connection: \"{error}\"",
+      "error": "Error"
    }
 }
