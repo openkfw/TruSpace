@@ -17,6 +17,7 @@ import CopyToClipboardButton from "@/components/CopyToClipboardButton";
 import KPIBox from "@/components/KPIBox";
 import { Button } from "@/components/ui/button";
 import { useHealth, usePeers } from "@/lib/services";
+import { commitInfo } from "@/version";
 
 interface PeerNode {
    id: string;
@@ -133,7 +134,7 @@ export default function AppStatus() {
          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <KPIBox
                kpi={t("appStatus.truSpaceVersion")}
-               value={health?.version}
+               value={commitInfo.shortCommitHash}
                valueLabel=""
                icon={<Info className="w-16 h-16 dark:text-white" />}
             />
