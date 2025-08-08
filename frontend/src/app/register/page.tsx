@@ -378,7 +378,9 @@ export default function Register() {
          <Dialog open={showTerms} onOpenChange={setShowTerms}>
             <DialogContent className="max-h-[80vh] overflow-y-auto">
                <DialogHeader>
-                  <DialogTitle>{translations("termsLink")}</DialogTitle>
+                  <DialogTitle>
+                     {translations("termsAndConditions")}
+                  </DialogTitle>
                </DialogHeader>
                <div className="prose dark:prose-invert max-w-none">
                   <ReactMarkdown>{termsContent}</ReactMarkdown>

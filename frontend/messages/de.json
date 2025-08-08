@@ -129,7 +129,8 @@
       "emailSent": "Die E-Mail zur Registrierungsbestätigung wurde gesendet",
       "termsRequired": "Du musst die Nutzungsbedingungen akzeptieren",
       "termsLink": "Nutzungsbedingungen.",
-      "termsAccept": "Ich akzeptiere die"
+      "termsAccept": "Ich akzeptiere die",
+      "termsAndConditions": "Nutzungsbedingungen"
    },
    "settings": {
       "updateSuccess": "NutzerInnen-Einstellungen aktualisiert",
