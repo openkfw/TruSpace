@@ -604,6 +604,20 @@ export function usePeers() {
    };
 }
 
+export function useHealth() {
+   const { data, error, isLoading, isValidating, mutate } = useSWR(
+      `${HEALTH_ENDPOINT}`,
+      fetcher
+   );
+   return {
+      health: data,
+      error,
+      isLoading,
+      isValidating,
+      mutate
+   };
+}
+
 export function useRecentChats() {
    const { data, error, isLoading, isValidating, mutate } = useSWR(
       `${CHATS_ENDPOINT}/recent`,

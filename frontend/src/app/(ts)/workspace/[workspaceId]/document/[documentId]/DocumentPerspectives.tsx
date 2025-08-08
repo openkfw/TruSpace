@@ -238,7 +238,13 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
          </Dialog>
          <Dialog
             open={newPerspectiveDialogOpen}
-            onOpenChange={(open) => setNewPerspectiveDialogOpen(open)}
+            onOpenChange={(open) => {
+               if (!open) {
+                  setPromptText("");
+                  setEditorHasError(false);
+               }
+               setNewPerspectiveDialogOpen(open);
+            }}
          >
             <DialogContent
                className="sm:max-w-2xl overflow-auto max-h-screen"
@@ -267,6 +273,7 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                         <Editor
                            onChange={onChangePerspectiveText}
                            isRequired
+                           content={promptText}
                            hasError={editorHasError}
                            errorMessage={t("editorEmptyError")}
                            stickyToolbarTopMargin="[-30px]"
@@ -293,7 +300,6 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                         variant="destructive"
                         onClick={() => {
                            setNewPerspectiveDialogOpen(false);
-                           setEditorHasError(false);
                         }}
                      >
                         {t("cancel")}
@@ -318,7 +324,13 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
          </Dialog>
          <Dialog
             open={customPromptDialogOpen}
-            onOpenChange={(open) => setCustomPromptDialogOpen(open)}
+            onOpenChange={(open) => {
+               if (!open) {
+                  setPromptTitle("");
+                  setPromptText("");
+               }
+               setCustomPromptDialogOpen(open);
+            }}
          >
             <DialogContent
                className="sm:max-w-2xl overflow-auto max-h-screen"
@@ -391,7 +403,6 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                         variant="destructive"
                         onClick={() => {
                            setCustomPromptDialogOpen(false);
-                           setEditorHasError(false); //
                         }}
                      >
                         {t("cancel")}
@@ -432,6 +443,9 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                            onValueChange={(value) => {
                               if (value === "add") {
                                  setNewPerspectiveDialogOpen(true);
+                              } else if (value === "addFromPrevious") {
+                                 setPromptText(currentPerspective?.text || "");
+                                 setNewPerspectiveDialogOpen(true);
                               } else if (value === "custom") {
                                  setCustomPromptDialogOpen(true);
                               } else if (value === "generateFromPrevious") {
@@ -451,6 +465,12 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                                  <div className="flex items-center">
                                     <Plus className="mr-2 h-4 w-4" />
                                     {t("addYourPerspective")}
+                                 </div>
+                              </SelectItem>
+                              <SelectItem value="addFromPrevious">
+                                 <div className="flex items-center">
+                                    <Plus className="mr-2 h-4 w-4" />
+                                    {t("createNewPerspectiveFromPrevious")}
                                  </div>
                               </SelectItem>
                               <SelectItem value="custom">
