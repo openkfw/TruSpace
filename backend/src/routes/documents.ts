@@ -55,14 +55,21 @@ router.get(
     const from = parseInt(req.query.from as string) || 0;
     const limit = parseInt(req.query.limit as string) || 2;
     const searchString = req.query.search as string;
+
     const client = new IpfsClient();
-    const publicWorkspaces = await client.getPublicWorkspaces();
+
+    const publicWorkspacesPromise = client.getPublicWorkspaces();
 
     if (!workspace || workspace === "undefined") {
-      const { data: documents } = await client.getAllDocuments();
-      const allowedWs = (
-        await findPermissionsByEmailDb(req.user?.email as string)
-      ).map((p) => p.workspace_id);
+      const [publicWorkspaces, { data: documents }, allowedWs] =
+        await Promise.all([
+          publicWorkspacesPromise,
+          client.getAllDocuments(),
+          findPermissionsByEmailDb(req.user?.email as string).then(
+            (permissions) => permissions.map((p) => p.workspace_id)
+          ),
+        ]);
+
       const result = documents.filter(
         (d) =>
           (allowedWs.includes(d.meta.workspaceOrigin) ||
@@ -82,25 +89,34 @@ router.get(
         data: paginatedResult,
       });
     } else {
-      await checkPermissionForWorkspace(
-        req.user?.email as string,
-        res,
-        workspace
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const [_permissionResult, { data: documents, count }] = await Promise.all(
+        [
+          checkPermissionForWorkspace(
+            req.user?.email as string,
+            res,
+            workspace
+          ),
+          client.getDocumentsByWorkspace(
+            workspace as string,
+            from,
+            limit,
+            searchString
+          ),
+        ]
       );
 
-      const { data: documents, count } = await client.getDocumentsByWorkspace(
-        workspace as string,
-        from,
-        limit,
-        searchString
-      );
       const documentsWithDetails = await Promise.all(
         documents.map(async (doc: Document) => {
-          const chats = await client.getMessagesByDocumentId(doc.docId);
-          const documentVersions = (
-            await client.getDocumentDetailsById(doc.docId)
-          ).documentVersions as Document[];
-          const docContributors = await getContributorsDocument(doc.docId);
+          const [chats, documentDetails, docContributors] = await Promise.all([
+            client.getMessagesByDocumentId(doc.docId),
+            client.getDocumentDetailsById(doc.docId),
+            getContributorsDocument(doc.docId),
+          ]);
+
+          const documentVersions =
+            documentDetails.documentVersions as Document[];
+
           return {
             ...doc,
             chatsLength: chats.length,
@@ -109,6 +125,7 @@ router.get(
           };
         })
       );
+
       res.json({
         count,
         from,

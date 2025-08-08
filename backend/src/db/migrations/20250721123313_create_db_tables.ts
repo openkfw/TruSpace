@@ -12,6 +12,7 @@ export async function up(knex: Knex): Promise<void> {
     table.string("password_hash", 255).notNullable();
     table.string("status").notNullable().defaultTo(USER_STATUS.inactive);
     table.string("user_token");
+    table.string("first_sign_in").notNullable().defaultTo(true);
     table.string("avatar_cid").nullable();
     table.string("notification_settings").nullable();
     table.string("prefered_language").nullable();

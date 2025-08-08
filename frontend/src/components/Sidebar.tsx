@@ -20,6 +20,7 @@ import { useWorkspaceContext } from "@/contexts/WorkspaceContext";
 import { Workspace } from "@/interfaces";
 
 import { NavDashboard } from "./NavDashboard";
+import { NavHowTo } from "./NavHowTo";
 import { NavStatistics } from "./NavStatistics";
 import { NavWorkspaces } from "./NavWorkspaces";
 
@@ -55,7 +56,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                <Image
                   className="cursor-pointer ml-1"
                   src="/images/Logo.svg"
-                  onClick={() => router.push("/home")}
+                  onClick={() => router.push("/dashboard")}
                   alt="Logo"
                   width={120}
                   height={80}
@@ -65,7 +66,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                <Image
                   className="cursor-pointer truncate"
                   src="/images/LogoRocket.svg"
-                  onClick={() => router.push("/home")}
+                  onClick={() => router.push("/dashboard")}
                   alt="Logo Rocket"
                   width={80}
                   height={80}
@@ -77,6 +78,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarGroup>
                <NavDashboard activePath={pathname} />
                <NavStatistics activePath={pathname} />
+               <NavHowTo activePath={pathname} />
             </SidebarGroup>
             <NavWorkspaces
                activePath={pathname}
