@@ -442,11 +442,13 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                            value={actionSelectValue}
                            onValueChange={(value) => {
                               if (value === "add") {
+                                 setPromptText("");
                                  setNewPerspectiveDialogOpen(true);
                               } else if (value === "addFromPrevious") {
                                  setPromptText(currentPerspective?.text || "");
                                  setNewPerspectiveDialogOpen(true);
                               } else if (value === "custom") {
+                                 setPromptText("");
                                  setCustomPromptDialogOpen(true);
                               } else if (value === "generateFromPrevious") {
                                  setPromptText(currentPerspective?.text || "");
