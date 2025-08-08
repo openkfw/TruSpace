@@ -1,16 +1,9 @@
 import { useEffect, useState } from "react";
 
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 
-import { CheckCircle, XCircle } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
-import {
-   Tooltip,
-   TooltipContent,
-   TooltipProvider,
-   TooltipTrigger
-} from "@/components/ui/tooltip";
 import { getHealth } from "@/lib/services";
 
 const READY = "🟢";
@@ -23,6 +16,7 @@ const defaultState = {
 };
 
 export function BackendHealth() {
+   const router = useRouter();
    const t = useTranslations("backendHealth");
    const [health, setHealth] = useState(defaultState);
 
@@ -48,38 +42,12 @@ export function BackendHealth() {
    };
 
    return (
-      <TooltipProvider>
-         <Tooltip>
-            <TooltipTrigger asChild>
-               <Button size="icon" variant="ghost" className="rounded-full">
-                  {overallStatus()}
-               </Button>
-            </TooltipTrigger>
-            <TooltipContent className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 p-2 rounded-md shadow-md">
-               <ul className="list-none space-y-1">
-                  {health.services ? (
-                     Object.entries(health.services).map(([k, v]) => (
-                        <li key={k} className="flex justify-between gap-2">
-                           <span className="font-medium">{k}:</span>
-                           <span className="text-gray-600 dark:text-gray-400">
-                              {v === true ? (
-                                 <CheckCircle className="text-green-500 w-4 h-4" />
-                              ) : (
-                                 <XCircle className="text-red-400 w-4 h-4" />
-                              )}
-                           </span>
-                        </li>
-                     ))
-                  ) : (
-                     <li className="flex justify-between gap-2">
-                        <span className="font-medium">
-                           {t("errors_detected")}
-                        </span>
-                     </li>
-                  )}
-               </ul>
-            </TooltipContent>
-         </Tooltip>
-      </TooltipProvider>
+      <Button
+         variant="ghost"
+         className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+         onClick={() => router.push("/app-status")}
+      >
+         {overallStatus()} <span>{t("appStatus")}</span>
+      </Button>
    );
 }

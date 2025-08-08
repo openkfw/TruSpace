@@ -1,7 +1,16 @@
+import {
+   Tooltip,
+   TooltipContent,
+   TooltipProvider,
+   TooltipTrigger
+} from "./ui/tooltip";
+import CopyToClipboardButton from "./CopyToClipboardButton";
+
 export default function KPIBox({
    kpi,
    value,
    valueLabel,
+   valueTooltip,
    delta,
    deltaColor = "green-400",
    icon,
@@ -11,6 +20,7 @@ export default function KPIBox({
    kpi: string;
    value: string;
    valueLabel?: string;
+   valueTooltip?: string;
    delta?: string | React.ReactNode;
    deltaColor?: string;
    icon?: React.ReactNode;
@@ -38,8 +48,28 @@ export default function KPIBox({
                {delta}
             </div>
             <div className="col-span-2 mt-3">
-               <span className="text-4xl font-bold ">{value}</span>{" "}
-               <span>{valueLabel}</span>
+               <div className="flex items-center gap-2">
+                  {valueTooltip ? (
+                     <>
+                        <TooltipProvider>
+                           <Tooltip>
+                              <TooltipTrigger>
+                                 <span className="text-4xl font-bold ">
+                                    {value}
+                                 </span>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                 <span>{valueTooltip}</span>
+                              </TooltipContent>
+                           </Tooltip>
+                        </TooltipProvider>
+                        <CopyToClipboardButton value={valueTooltip} />
+                     </>
+                  ) : (
+                     <span className="text-4xl font-bold ">{value}</span>
+                  )}{" "}
+                  <span>{valueLabel}</span>
+               </div>
             </div>
          </div>
       </div>

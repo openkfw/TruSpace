@@ -22,7 +22,9 @@
       "workspace": "Arbeitsbereich",
       "userSettings": "Profil-Einstellungen",
       "uploadAvatar": "Klicke auf den Avatar, um ein neues Bild hochzuladen",
-      "saveSettings": "Einstellungen speichern"
+      "saveSettings": "Einstellungen speichern",
+      "copyToClipboard": "In die Zwischenablage kopieren",
+      "copied": "Kopiert"
    },
    "statistics": {
       "totalDocuments": "Gesamtdokumente",
@@ -407,7 +409,9 @@
       "publicWorkspaceTitle": "Der Arbeitsbereich ist öffentlich, das Hinzufügen von BenutzernInnen ist deaktiviert"
    },
    "backendHealth": {
-      "errors_detected": "Fehler erkannt"
+      "errors_detected": "Fehler erkannt",
+      "viewDetails": "Details anzeigen",
+      "appStatus": "App-Status"
    },
    "languages": {
       "en": "Englisch",
@@ -498,5 +502,41 @@
       "deleteDocumentDescription": "Entferne unerwünschte Dokumente aus Arbeitsbereichen, um deinen Platz aufzuräumen",
       "aiSuggestionsDescription": "Verwende generative KI, um die Aspekte des Dokuments zu sehen, die dich interessieren",
       "collaborateDescription": "Diskutiere Dokumentänderungen mit anderen Mitwirkenden über den eingebetteten Chat in den Dokumentdetails"
+   },
+   "appStatus": {
+      "title": "App-Status",
+      "refresh": "Aktualisieren",
+      "systemHealthOverview": "System-Gesundheitsübersicht",
+      "loadingHealthStatus": "Lade Gesundheitsstatus...",
+      "overallSystemStatus": "Gesamtsystemstatus:",
+      "healthy": "Gesund",
+      "issuesDetected": "Probleme erkannt",
+      "online": "Online",
+      "offline": "Offline",
+      "failedToLoadHealthData": "Gesundheitsdaten konnten nicht geladen werden",
+      "truSpaceVersion": "TruSpace Version",
+      "ipfsNodeId": "IPFS-Knoten-ID",
+      "connectedNodes": "Verbundene Knoten",
+      "peers": "Peers",
+      "clusterPeers": "Cluster-Peers",
+      "nodes": "Knoten",
+      "ipfsNodeInformation": "IPFS-Knoten-Informationen",
+      "nodeId": "Knoten-ID",
+      "notAvailable": "Nicht verfügbar",
+      "nodeAddresses": "Knoten-Adressen",
+      "total": "gesamt",
+      "andMoreAddresses": "... und {count} weitere Adressen",
+      "connectedPeers": "Verbundene Peers",
+      "loadingPeerInformation": "Lade Peer-Informationen...",
+      "peer": "Peer",
+      "connected": "Verbunden",
+      "clusterPeersCount": "Cluster-Peers: {count}",
+      "andMorePeers": "... und {count} weitere Peers",
+      "noPeersConnected": "Keine Peers verbunden",
+      "networkConnectivityIssues": "Dies könnte auf Netzwerk-Verbindungsprobleme hinweisen",
+      "clusterMultiaddress": "Cluster-Multiadresse",
+      "nodeMultiaddress": "IPFS-Knoten-Multiadresse",
+      "peerError": "Es gibt einen Fehler mit dieser Peer-Verbindung: \"{error}\"",
+      "error": "Fehler"
    }
 }

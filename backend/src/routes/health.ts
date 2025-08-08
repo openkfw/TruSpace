@@ -14,6 +14,8 @@ router.get("/", async (req: Request, res: Response) => {
     oiStatus,
     ollamaStatus,
     dbStatus,
+    clusterId,
+    ipifyResponse,
   ] = await Promise.all([
     (async () => {
       try {
@@ -61,6 +63,35 @@ router.get("/", async (req: Request, res: Response) => {
         return false;
       }
     })(),
+    (async () => {
+      try {
+        return await new IpfsClient().clusterId();
+      } catch {
+        return {
+          id: "",
+          addresses: [],
+          cluster_peers: [],
+          cluster_peers_addresses: [],
+          version: "",
+          commit: "",
+          rpc_protocol_version: "",
+          error: "",
+          ipfs: { id: "", addresses: [], error: "" },
+          peername: "",
+        };
+      }
+    })(),
+    (async () => {
+      try {
+        const response = await fetch("https://api.ipify.org?format=json");
+        if (!response.ok) {
+          return { ip: "" };
+        }
+        return await response.json();
+      } catch {
+        return { ip: "" };
+      }
+    })(),
   ]);
 
   const result = {
@@ -75,6 +106,10 @@ router.get("/", async (req: Request, res: Response) => {
       "Open WebUI": oiStatus,
       Ollama: ollamaStatus,
     },
+    version: config.version,
+    nodeId: clusterId?.ipfs?.id || "",
+    clusterMultiaddress: `/ip4/${ipifyResponse?.ip}/tcp/9096/p2p/${clusterId?.id}`,
+    nodeMultiaddress: `/ip4/${ipifyResponse?.ip}/tcp/4001/p2p/${clusterId?.ipfs?.id}`,
   };
   res.json(result);
 });
