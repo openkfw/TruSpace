@@ -24,8 +24,6 @@ export const buildInfo: BuildInfo = {
   shortCommitHash: SHORT_COMMIT_HASH,
   buildDate: BUILD_DATE,
 };
-
-export const getVersionString = (): string => SHORT_COMMIT_HASH;
 EOF
 
 git add frontend/src/version.ts
@@ -51,8 +49,6 @@ export const buildInfo: BuildInfo = {
   shortCommitHash: SHORT_COMMIT_HASH,
   buildDate: BUILD_DATE,
 };
-
-export const getVersionString = (): string => SHORT_COMMIT_HASH;
 EOF
 
 git add backend/src/version.ts
