@@ -1,8 +1,8 @@
+import { Separator } from "./ui/separator";
+import { SidebarTrigger } from "./ui/sidebar";
 import { BackendHealth } from "./BackendHealth";
 import { LanguageToggle } from "./LanguageToggle";
 import { ModeToggle } from "./ModeToggle";
-import { Separator } from "./ui/separator";
-import { SidebarTrigger } from "./ui/sidebar";
 
 export function Header() {
    return (

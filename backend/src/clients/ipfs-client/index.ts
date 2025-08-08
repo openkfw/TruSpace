@@ -144,6 +144,26 @@ export class IpfsClient implements IClient {
     return clusterSvcStatus.status === 204;
   }
 
+  async clusterId(): Promise<{
+    id: string;
+    addresses: string[];
+    cluster_peers: string[];
+    cluster_peers_addresses: string[];
+    version: string;
+    commit: string;
+    rpc_protocol_version: string;
+    error: string;
+    ipfs: {
+      id: string;
+      addresses: string[];
+      error: string;
+    };
+    peername: string;
+  }> {
+    const clusterId = (await this.#clusterAxios.get("/id")).data;
+    return clusterId;
+  }
+
   async #getLanguageForVersion(
     versionCid: string
   ): Promise<string | undefined> {
