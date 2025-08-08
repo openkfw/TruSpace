@@ -59,6 +59,7 @@ export const findUserByEmailDb = async (email: string) => {
         "avatar_cid",
         "prefered_language",
         "notification_settings",
+        "first_sign_in",
         "created_at"
       )
       .where({ email })
@@ -193,6 +194,20 @@ export const updateUserToken = async (userId: number, token: string) => {
 export const deleteUserById = async (userId: number) => {
   try {
     await db<UserDb>("users").delete().where({ id: userId });
+  } catch (error) {
+    logger.error("Error deleting user", error);
+    throw new Error("Error deleting user");
+  }
+};
+
+export const updateUserFirstSignIn = async (
+  userId: number,
+  firstSignIn: string
+) => {
+  try {
+    await db<UserDb>("users")
+      .update("first_sign_in", firstSignIn)
+      .where({ id: userId });
   } catch (error) {
     logger.error("Error deleting user", error);
     throw new Error("Error deleting user");
