@@ -20,7 +20,7 @@ export default function Breadcrumbs() {
    const { workspace } = useWorkspaceContext();
    const [breadcrumbPaths, setBreadcrumbPaths] = useState([]);
    const staticPaths = [
-      "dashboard",
+      "howTo",
       "statistics",
       "share",
       "userSettings",
@@ -30,10 +30,7 @@ export default function Breadcrumbs() {
    const isVisibleBreadcrumb = (step) => {
       const { label } = step;
       return (
-         label !== "document" &&
-         label !== "workspace" &&
-         label !== "home" &&
-         label !== "appStatus"
+         label !== "document" && label !== "workspace" && label !== "dashboard"
       );
    };
 
@@ -77,14 +74,14 @@ export default function Breadcrumbs() {
       <Breadcrumb className="mt-4 mx-4 max-[1200px]:mx-0 px-4">
          <BreadcrumbList>
             <BreadcrumbItem
-               key="home"
+               key="dashboard"
                className="hidden md:block font-semibold text-sm dark:text-gray-300"
             >
                <Link
                   className="transition-colors hover:text-foreground"
-                  href="/home"
+                  href="/dashboard"
                >
-                  {translations("homePage")}
+                  {translations("dashboard")}
                </Link>
             </BreadcrumbItem>
             <BreadcrumbSeparator className="hidden md:block" />
