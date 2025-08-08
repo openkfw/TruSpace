@@ -1,11 +1,12 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import ReactMarkdown from "react-markdown";
 import { toast } from "react-toastify";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 import { CheckCircle, Eye, EyeOff, XCircle } from "lucide-react";
 
@@ -17,6 +18,12 @@ import {
    CardHeader,
    CardTitle
 } from "@/components/ui/card";
+import {
+   Dialog,
+   DialogContent,
+   DialogHeader,
+   DialogTitle
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -28,9 +35,13 @@ import { getUserLocale } from "@/i18n/service";
 import { registerUser } from "@/lib/services";
 import { validateEmail } from "@/lib/validateEmail";
 
+import deTerms from "./terms/terms-de.md";
+import enTerms from "./terms/terms-en.md";
+
 export default function Register() {
    const translations = useTranslations("register");
    const router = useRouter();
+   const locale = useLocale();
    const {
       register,
       handleSubmit,
@@ -41,6 +52,8 @@ export default function Register() {
    const [showPassword, setShowPassword] = useState(false);
    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
    const [emailTaken, setEmailTaken] = useState(false);
+   const [showTerms, setShowTerms] = useState(false);
+   const [termsContent, setTermsContent] = useState("");
 
    const passwordChecks = [
       {
@@ -88,6 +101,7 @@ export default function Register() {
    };
 
    const password = watch("password", "");
+   const terms = watch("terms", false);
 
    const nameValidation = register("name", {
       required: translations("nameRequired"),
@@ -126,6 +140,18 @@ export default function Register() {
          value === password || translations("confirmPasswordError"),
       setValueAs: (value) => value.trim()
    });
+
+   useEffect(() => {
+      const setTerms = () => {
+         if (locale === "de") {
+            setTermsContent(deTerms);
+         } else {
+            setTermsContent(enTerms);
+         }
+      };
+
+      setTerms();
+   }, [locale]);
 
    return (
       <div className="flex min-h-svh w-full items-center justify-center p-4 md:p-10">
@@ -292,10 +318,46 @@ export default function Register() {
                                  </p>
                               )}
                            </div>
+
+                           <div className="flex flex-col gap-1.5 border border-gray-200 dark:border-gray-700 p-3 rounded-md">
+                              <div className="flex items-start gap-3">
+                                 <Input
+                                    type="checkbox"
+                                    id="terms"
+                                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:bg-slate-800 dark:border-slate-600 mt-0.5"
+                                    {...register("terms", {
+                                       required: translations("termsRequired")
+                                    })}
+                                 />
+                                 <div className="grid gap-1.5 leading-none">
+                                    <Label
+                                       htmlFor="terms"
+                                       className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                                    >
+                                       {translations("termsAccept")}{" "}
+                                       <Button
+                                          type="button"
+                                          variant="link"
+                                          className="text-blue-600 hover:underline p-0 h-auto"
+                                          onClick={() => setShowTerms(true)}
+                                       >
+                                          {translations("termsLink")}
+                                       </Button>
+                                    </Label>
+                                 </div>
+                              </div>
+                              {errors.terms?.message && (
+                                 <p className="text-red-500 text-sm">
+                                    {String(errors.terms.message)}
+                                 </p>
+                              )}
+                           </div>
+
                            <Button
                               type="submit"
                               className="w-full"
                               data-test-id="register-submit"
+                              disabled={!terms}
                            >
                               {translations("registerButton")}
                            </Button>
@@ -313,6 +375,16 @@ export default function Register() {
                </Card>
             </div>
          </div>
+         <Dialog open={showTerms} onOpenChange={setShowTerms}>
+            <DialogContent className="max-h-[80vh] overflow-y-auto">
+               <DialogHeader>
+                  <DialogTitle>{translations("termsLink")}</DialogTitle>
+               </DialogHeader>
+               <div className="prose dark:prose-invert max-w-none">
+                  <ReactMarkdown>{termsContent}</ReactMarkdown>
+               </div>
+            </DialogContent>
+         </Dialog>
       </div>
    );
 }

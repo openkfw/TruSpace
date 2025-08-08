@@ -125,7 +125,10 @@
       "passwordDescription": "Your password must meet the following requirements:",
       "registerError": "An error occurred during registration, please try again",
       "backToLogin": "Back to login",
-      "emailSent": "Registration confirmation email has been sent"
+      "emailSent": "Registration confirmation email has been sent",
+      "termsRequired": "You must accept the terms and conditions",
+      "termsLink": "terms and conditions.",
+      "termsAccept": "I accept the"
    },
    "settings": {
       "updateSuccess": "User settings updated successfully",

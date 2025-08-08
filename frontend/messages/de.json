@@ -125,7 +125,10 @@
       "registerSuccess": "Registrierung erfolgreich",
       "registerError": "Bei der Registrierung ist ein Fehler aufgetreten, bitte versuche es erneut",
       "backToLogin": "Zurück zur Anmeldung",
-      "emailSent": "Die E-Mail zur Registrierungsbestätigung wurde gesendet"
+      "emailSent": "Die E-Mail zur Registrierungsbestätigung wurde gesendet",
+      "termsRequired": "Du musst die Nutzungsbedingungen akzeptieren",
+      "termsLink": "Nutzungsbedingungen.",
+      "termsAccept": "Ich akzeptiere die"
    },
    "settings": {
       "updateSuccess": "NutzerInnen-Einstellungen aktualisiert",
