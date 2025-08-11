@@ -133,7 +133,8 @@
       "termsRequired": "Du musst die Nutzungsbedingungen akzeptieren",
       "termsLink": "Nutzungsbedingungen.",
       "termsAccept": "Ich akzeptiere die",
-      "termsAndConditions": "Nutzungsbedingungen"
+      "termsAndConditions": "Nutzungsbedingungen",
+      "termsLoadError": "Konnte Nutzungsbedingungen nicht laden."
    },
    "settings": {
       "updateSuccess": "NutzerInnen-Einstellungen aktualisiert",

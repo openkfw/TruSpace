@@ -150,7 +150,7 @@ export default function Register() {
             setTermsContent(markdown);
          } catch (error) {
             console.error("Failed to fetch terms:", error);
-            setTermsContent("Could not load terms and conditions.");
+            setTermsContent(translations("termsLoadError"));
          }
       };
 
