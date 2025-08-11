@@ -26,7 +26,7 @@
       "saveSettings": "Einstellungen speichern",
       "copyToClipboard": "In die Zwischenablage kopieren",
       "copied": "Kopiert",
-      "appStatus": "App-Status"
+      "appStatus": "Status"
    },
    "statistics": {
       "totalDocuments": "Gesamtdokumente",
@@ -418,7 +418,7 @@
    "backendHealth": {
       "errors_detected": "Fehler erkannt",
       "viewDetails": "Details anzeigen",
-      "appStatus": "App-Status"
+      "appStatus": "Status"
    },
    "languages": {
       "en": "Englisch",
