@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 
+import { getVersionInfo } from "./src/version";
+
 const withNextIntl = createNextIntlPlugin();
 
 const nextConfig: NextConfig = {
@@ -14,7 +16,10 @@ const nextConfig: NextConfig = {
          }
       }
    },
-   output: "standalone"
+   output: "standalone",
+   env: {
+      NEXT_PUBLIC_SHORT_COMMIT_HASH: getVersionInfo().shortCommitHash
+   }
 };
 
 export default withNextIntl(nextConfig);
