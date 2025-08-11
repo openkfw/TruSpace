@@ -1,43 +1,126 @@
-# Allgemeine Geschäftsbedingungen für TruSpace
+# Allgemeine Geschäftsbedingungen (AGB) für TruSpace
 
-**Gültig ab: 8. August 2025**
+**Gültig ab:** 8. August 2025
 
-Willkommen bei TruSpace. Diese Allgemeinen Geschäftsbedingungen ("Bedingungen") regeln Ihren Zugriff auf und die Nutzung unserer KI-gestützten Dokumentenmanagement-Software und -Dienste (zusammen der "Service"). Bitte lesen Sie sie sorgfältig. Durch das Erstellen eines Kontos oder die Nutzung unseres Service erklären Sie sich mit diesen Bedingungen einverstanden.
+Willkommen bei TruSpace. Diese Allgemeinen Geschäftsbedingungen („AGB“) regeln Ihren Zugang zu sowie die Nutzung unserer KI-gestützten Dokumentenmanagement-Software und -Dienstleistungen (zusammenfassend „Dienst“). Durch das Erstellen eines Kontos oder die Nutzung unseres Dienstes erklären Sie sich mit diesen AGB einverstanden.
 
-## 1. Nutzergenerierte Inhalte und Lizenz
+---
 
-Sie behalten das volle Eigentum an den Dokumenten, Daten und anderen Inhalten, die Sie in den Service hochladen ("Nutzerinhalte").
-Um uns die Bereitstellung des Service zu ermöglichen, gewähren Sie TruSpace eine weltweite, nicht-exklusive, lizenzgebührenfreie Lizenz, Ihre Nutzerinhalte zu hosten, zu speichern, zu verarbeiten, zu analysieren und anzuzeigen. Diese Lizenz dient ausschließlich dem Betrieb, der Bereitstellung, der Sicherung und der Verbesserung des Service, einschließlich seiner KI-Funktionen. Diese Lizenz endet, wenn Sie Ihre Nutzerinhalte oder Ihr Konto löschen.
+## 1. Teilnahmeberechtigung
 
-## 2. Richtlinie für zulässige Nutzung
+Sie müssen mindestens 18 Jahre alt oder volljährig in Ihrer jeweiligen Rechtsordnung sein, um ein Konto zu erstellen und den Dienst zu nutzen. Mit der Registrierung versichern und garantieren Sie, dass Sie diese Voraussetzung erfüllen.
 
-Für Ihr Verhalten und Ihre Nutzerinhalte sind Sie allein verantwortlich. Sie verpflichten sich, den Service nicht zu missbrauchen oder anderen dabei zu helfen. Insbesondere verpflichten Sie sich, keine Inhalte hochzuladen, zu teilen oder zu speichern, die:
+---
 
-- rechtswidrig, belästigend, verleumderisch, obszön, betrügerisch oder anderweitig anstößig sind ("Unzulässige Inhalte");
-- die Rechte des geistigen Eigentums anderer verletzen;
-- Viren, Malware oder anderen schädlichen Code enthalten.
-  Wir behalten uns das Recht vor, sind jedoch nicht verpflichtet, Inhalte zu überprüfen, um festzustellen, ob es sich um Unzulässige Inhalte handelt, und Inhalte zu entfernen, die gegen diese Bedingungen verstoßen.
+## 2. Nutzerinhalte und Lizenz
 
-## 3. Haftungsausschlüsse für KI-Funktionen
+Sie behalten sämtliche Eigentumsrechte an den Dokumenten, Daten und anderen Inhalten, die Sie in den Dienst hochladen („Nutzerinhalte“).
 
-Unser Service nutzt künstliche Intelligenz ("KI-Funktionen"), um Zusammenfassungen, Analysen und weitere Einblicke bereitzustellen. Die durch diese KI-Funktionen generierten Ausgaben dienen ausschließlich Informationszwecken.
+Um uns die Bereitstellung des Dienstes zu ermöglichen, gewähren Sie TruSpace eine weltweite, nicht-exklusive, gebührenfreie Lizenz zur Speicherung, Verarbeitung, Analyse und Anzeige Ihrer Nutzerinhalte zum Zweck des Betriebs, der Bereitstellung, Sicherung und Verbesserung des Dienstes, einschließlich seiner KI-Funktionen. Diese Lizenz endet, sobald Sie Ihre Nutzerinhalte oder Ihr Konto löschen, ausgenommen hiervon sind Restkopien, die für einen begrenzten Zeitraum in Sicherungssystemen verbleiben können.
 
-- **Keine Gewähr für Richtigkeit:** KI-generierte Inhalte können Ungenauigkeiten oder Fehler enthalten. Sie sollten sich nicht ausschließlich darauf verlassen oder sie als alleinige Grundlage für rechtliche, finanzielle oder sonstige fachliche Beratung heranziehen.
-- **Verantwortung der Nutzer:** Sie sind dafür verantwortlich, jede Ausgabe unserer KI-Funktionen vor der Verwendung oder bevor Sie sich darauf verlassen, zu überprüfen und zu validieren.
-  TruSpace lehnt jede Haftung für Schäden ab, die aus Ihrer Nutzung der KI-Funktionen oder dem Vertrauen darauf entstehen.
+---
 
-## 4. Geistiges Eigentum
+## 3. Zulässige Nutzung & Verbotene Nutzungen
 
-Sämtliche Rechte, Titel und Rechtsansprüche am Service (ausgenommen Nutzerinhalte) stehen und verbleiben ausschließlich TruSpace und seinen Lizenzgebern. Dies umfasst unsere Software, unser Branding, unsere Logos und sämtliches sonstiges geistiges Eigentum.
+Sie sind allein für Ihr Verhalten und Ihre Nutzerinhalte verantwortlich. Sie verpflichten sich, den Dienst nicht zu missbrauchen oder andere hierbei zu unterstützen. Verbotene Nutzungen umfassen insbesondere, aber nicht ausschließlich:
 
-## 5. Haftungsbeschränkung
+### 3.1 Rechtswidrige oder schädliche Aktivitäten
 
-Im größtmöglichen, gesetzlich zulässigen Umfang haften TruSpace, seine verbundenen Unternehmen, Führungskräfte und Mitarbeitenden in keinem Fall für indirekte, zufällige, besondere, Folge- oder Strafschäden oder für entgangene Gewinne oder Einnahmen, gleich ob direkt oder indirekt entstanden, oder für Datenverlust, Nutzungsausfall, Verlust von Goodwill oder andere immaterielle Verluste, die aus Ihrer Nutzung des Service resultieren.
+- Hochladen, Teilen oder Speichern von Inhalten, die rechtswidrig, belästigend, verleumderisch, obszön, bedrohend, hasserfüllt oder anderweitig anstößig sind („unzulässige Inhalte“).
+- Verstoß gegen geltende Gesetze, Vorschriften oder gerichtliche Anordnungen.
+- Betrügerische oder irreführende Praktiken.
 
-## 6. Freistellung
+### 3.2 Verletzungen geistiger Eigentumsrechte
 
-Sie verpflichten sich, TruSpace sowie seine verbundenen Unternehmen, Führungskräfte, Beauftragten und Mitarbeitenden von sämtlichen Ansprüchen, Verbindlichkeiten, Schäden, Verlusten und Aufwendungen, einschließlich angemessener Anwaltskosten, freizustellen und schadlos zu halten, die aus oder im Zusammenhang mit Ihrem Zugriff auf oder Ihrer Nutzung des Service oder Ihrem Verstoß gegen diese Bedingungen entstehen.
+- Hochladen oder Teilen von Inhalten, die geistige Eigentumsrechte Dritter verletzen.
+- Umgehung, Entfernung oder Veränderung von Urheberrechts-, Marken- oder Eigentumshinweisen.
 
-## 7. Beendigung
+### 3.3 Sicherheitsverletzungen
 
-Sie können die Nutzung unseres Service jederzeit einstellen. Wir behalten uns außerdem das Recht vor, Ihren Zugriff auf den Service unter Benachrichtigung zu sperren oder zu beenden, wenn Sie gegen diese Bedingungen verstoßen oder wenn Ihre Nutzung des Service ein reales Risiko von Schaden oder Verlust für uns oder andere Nutzer darstellt.
+- Versuch, ohne Autorisierung auf Konten, Systeme oder Netzwerke zuzugreifen.
+- Verbreitung von Viren, Malware, Ransomware oder anderem bösartigen Code.
+- Durchführung von Penetrationstests oder Sicherheitsscans ohne unsere schriftliche Zustimmung.
+
+### 3.4 Missbrauch des Dienstes
+
+- Störung oder Beeinträchtigung der Integrität oder Leistungsfähigkeit des Dienstes.
+- Nutzung automatisierter Systeme oder Bots, um in einem Umfang auf den Dienst zuzugreifen, der ein menschliches Maß übersteigt.
+- Überlastung unserer Infrastruktur oder Nutzung des Dienstes in einer Weise, die andere Nutzer beeinträchtigt.
+
+### 3.5 Sonstige unzulässige Verhaltensweisen
+
+- Nutzung des Dienstes für Spam, Phishing oder Kettenbriefe.
+- Sammlung personenbezogener Daten anderer Nutzer ohne deren Einwilligung.
+- Nutzung des Dienstes zur Förderung von Gewalt, Selbstverletzung oder gefährlichen Aktivitäten.
+
+Wir behalten uns das Recht vor, sind jedoch nicht verpflichtet, Inhalte oder Konten, die gegen diese AGB verstoßen, zu prüfen, zu entfernen oder zu sperren. TruSpace übernimmt keine Verantwortung und lehnt jegliche Haftung für Nutzerinhalte oder Nutzeraktivitäten ab.
+
+---
+
+## 4. Haftungsausschlüsse zu KI-Funktionen
+
+Unser Dienst nutzt künstliche Intelligenz („KI-Funktionen“) zur Bereitstellung von Zusammenfassungen, Analysen und weiteren Auswertungen. Die Ausgaben dienen ausschließlich Informationszwecken.
+
+- **Keine Garantie auf Genauigkeit**: KI-generierte Inhalte können Fehler enthalten.
+- **Verantwortung des Nutzers**: Sie sind verpflichtet, KI-Ausgaben vor deren Verwendung zu überprüfen und zu verifizieren.
+- **Haftungsausschluss**: TruSpace haftet nicht für Schäden, die aus der Nutzung oder dem Vertrauen auf KI-Ausgaben entstehen.
+
+---
+
+## 5. Kontosicherheit
+
+Sie sind für die Sicherheit Ihrer Zugangsdaten verantwortlich. Sie müssen uns unverzüglich informieren, wenn Sie eine unbefugte Nutzung Ihres Kontos vermuten. TruSpace haftet nicht für Verluste, die durch kompromittierte Konten entstehen.
+
+---
+
+## 6. Geistiges Eigentum
+
+Alle Rechte, Titel und Interessen am Dienst (mit Ausnahme der Nutzerinhalte) verbleiben ausschließlich bei TruSpace und seinen Lizenzgebern.
+
+---
+
+## 7. Urheberrechtsbeschwerden (DMCA-Policy)
+
+Wenn Sie der Ansicht sind, dass Ihr urheberrechtlich geschütztes Werk ohne Genehmigung hochgeladen wurde, kontaktieren Sie uns bitte mit einer DMCA-konformen Mitteilung. TruSpace behält sich das Recht vor, mutmaßlich rechtsverletzendes Material zu entfernen und Konten von Wiederholungstätern zu kündigen.
+
+---
+
+## 8. Keine Gewährleistung
+
+Der Dienst wird „wie besehen“ und „wie verfügbar“ bereitgestellt, ohne ausdrückliche oder stillschweigende Garantien jeglicher Art, einschließlich, aber nicht beschränkt auf Eignung für einen bestimmten Zweck, Nichtverletzung von Rechten oder Verfügbarkeit.
+
+---
+
+## 9. Haftungsbeschränkung
+
+Soweit gesetzlich zulässig, haftet TruSpace in keinem Fall für indirekte, zufällige, besondere, Folge- oder Strafschäden sowie für entgangenen Gewinn, Datenverluste, Goodwill oder andere immaterielle Verluste, gleich aus welchem Rechtsgrund.
+
+---
+
+## 10. Freistellung
+
+Sie verpflichten sich, TruSpace von sämtlichen Ansprüchen, Haftungen, Schäden oder Ausgaben freizustellen, die aus Ihrer Nutzung des Dienstes oder einem Verstoß gegen diese AGB entstehen.
+
+---
+
+## 11. Änderungen
+
+Wir können diese AGB jederzeit ändern. Wir werden über wesentliche Änderungen informieren; die fortgesetzte Nutzung des Dienstes gilt als Zustimmung zu den geänderten AGB.
+
+---
+
+## 12. Kündigung
+
+Wir können Ihr Konto sperren oder kündigen, wenn Sie gegen diese AGB verstoßen oder Ihre Nutzung ein Risiko für uns oder andere Nutzer darstellt.
+
+---
+
+## 13. Anwendbares Recht & Gerichtsstand
+
+Diese AGB unterliegen dem Recht der Bundesrepublik Deutschland unter Ausschluss seiner kollisionsrechtlichen Bestimmungen. Ausschließlicher Gerichtsstand ist Frankfurt am Main, Deutschland.
+
+---
+
+## 14. Höhere Gewalt
+
+TruSpace haftet nicht für Verzögerungen oder die Nichterfüllung von Verpflichtungen, die auf Ursachen zurückzuführen sind, die außerhalb unseres zumutbaren Einflussbereichs liegen, einschließlich, aber nicht beschränkt auf Naturkatastrophen, Internetausfälle oder gesetzliche Beschränkungen.
