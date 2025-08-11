@@ -38,7 +38,6 @@ export default function Statistics() {
                }
                deltaColor="green-400"
                icon={<ChartColumn className="w-16 h-16" />}
-               iconBgColor="blue-600"
             />
             <KPIBox
                kpi={statisticsTranslations("collaborators")}
@@ -57,14 +56,12 @@ export default function Statistics() {
                }
                deltaColor="green-400"
                icon={<Users className="w-16 h-16" />}
-               iconBgColor="blue-600"
             />
             <KPIBox
                kpi={statisticsTranslations("peerServers")}
-               value={peers?.cluster_peers?.length || "-"}
+               value={peers?.length || "-"}
                deltaColor="red-600"
                icon={<Server className="w-16 h-16" />}
-               iconBgColor="blue-600"
             />
          </div>
       </div>

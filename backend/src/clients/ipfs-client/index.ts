@@ -144,6 +144,26 @@ export class IpfsClient implements IClient {
     return clusterSvcStatus.status === 204;
   }
 
+  async clusterId(): Promise<{
+    id: string;
+    addresses: string[];
+    cluster_peers: string[];
+    cluster_peers_addresses: string[];
+    version: string;
+    commit: string;
+    rpc_protocol_version: string;
+    error: string;
+    ipfs: {
+      id: string;
+      addresses: string[];
+      error: string;
+    };
+    peername: string;
+  }> {
+    const clusterId = (await this.#clusterAxios.get("/id")).data;
+    return clusterId;
+  }
+
   async #getLanguageForVersion(
     versionCid: string
   ): Promise<string | undefined> {
@@ -341,13 +361,21 @@ export class IpfsClient implements IClient {
    * @returns Workspace[ ]
    */
   async getAllWorkspaces(): Promise<Workspace[]> {
-    const pinRes: PinningResponse = (
-      await this.#pinSvcAxios.get('/pins?limit=1000&meta={"type":"workspace"}')
-    ).data;
+    try {
+      const pinRes: PinningResponse = (
+        await this.#pinSvcAxios.get(
+          '/pins?limit=1000&meta={"type":"workspace"}'
+        )
+      ).data;
 
-    return pinRes.results
-      .sort((a, b) => a.pin.meta.name.localeCompare(b.pin.meta.name))
-      .map((r: PinRequest) => this.#transformPinToWorkspace(r.pin));
+      return pinRes.results
+        .sort((a, b) => a.pin.meta.name.localeCompare(b.pin.meta.name))
+        .map((r: PinRequest) => this.#transformPinToWorkspace(r.pin));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      logger.error(`Error getting workspace pins: ${JSON.stringify(err)}`);
+      return [];
+    }
   }
 
   /**
@@ -581,8 +609,8 @@ export class IpfsClient implements IClient {
   }
 
   async getPeers() {
-    const peers = await this.#clusterAxios.get("/peers");
-
+    const response = await this.#clusterAxios.get("/peers");
+    const peers = this.#parseMultipleJSON(response.data);
     return peers;
   }
 
@@ -949,6 +977,28 @@ export class IpfsClient implements IClient {
     );
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  #parseMultipleJSON(data: any) {
+    if (!data) return [];
+
+    const str = data.toString();
+
+    const objects = [];
+    let depth = 0;
+    let start = 0;
+
+    for (let i = 0; i < str.length; i++) {
+      if (str[i] === "{") depth++;
+      if (str[i] === "}") depth--;
+
+      if (depth === 0 && str[i] === "}") {
+        objects.push(JSON.parse(str.slice(start, i + 1)));
+        start = i + 1;
+      }
+    }
+
+    return objects;
+  }
   /** If `data` field is too large, IPFS pinning service won't return it. It is necessary to get the files themselves */
   async #fetchPerspectiveFiles(
     perspectives: Perspective[]

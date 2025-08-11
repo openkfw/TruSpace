@@ -1,9 +1,16 @@
 import { envVarsSchema } from "./envVarsSchema";
 import logger from "./winston";
+import fs from 'fs';
+
+// Read the content of package.json
+const packageJsonContent = fs.readFileSync('./package.json', 'utf8');
+const packageInfo = JSON.parse(packageJsonContent);
+const version = packageInfo.version;
 
 interface Config {
   env: string;
   port: number;
+  version: string;
   ipfsPinningServiceHost: string;
   ipfsClusterHost: string;
   ipfsGatewayHost: string;
@@ -60,6 +67,7 @@ if (error) {
 export const config: Config = {
   env: envVars.NODE_ENV,
   port: envVars.PORT,
+  version: version,
   ipfsPinningServiceHost: envVars.IPFS_PINSVC_HOST,
   ipfsClusterHost: envVars.IPFS_CLUSTER_HOST,
   ipfsGatewayHost: envVars.IPFS_GATEWAY_HOST,

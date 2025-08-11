@@ -108,7 +108,7 @@ fi
 
 info ".env file has been created and all placeholders replaced!"
 echo
-echo -e "${GREEN}Next steps:${NC}"
+echo  "${GREEN}Next steps:${NC}"
 echo " • Review and adjust any CONTENT_SECURITY_POLICY_* entries in $ENVFILE"
 echo " • For a more detailed configuration (e.g. email server), have a look at the configuration in $ENVFILE"
 echo " • Start TruSpace with ./start.sh"

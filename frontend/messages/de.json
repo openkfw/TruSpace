@@ -15,6 +15,7 @@
       "yesterday": "Gestern",
       "homePage": "Startseite",
       "dashboard": "Dashboard",
+      "howTo": "Wie geht",
       "noDocuments": "Keine Dokumente",
       "noDocumentDescription": "Neues Dokument hinzufügen, indem du auf die Schaltfläche Dokument erstellen oder Dokument hochladen klickst",
       "share": "Teilen",
@@ -22,7 +23,10 @@
       "workspace": "Arbeitsbereich",
       "userSettings": "Profil-Einstellungen",
       "uploadAvatar": "Klicke auf den Avatar, um ein neues Bild hochzuladen",
-      "saveSettings": "Einstellungen speichern"
+      "saveSettings": "Einstellungen speichern",
+      "copyToClipboard": "In die Zwischenablage kopieren",
+      "copied": "Kopiert",
+      "appStatus": "App-Status"
    },
    "statistics": {
       "totalDocuments": "Gesamtdokumente",
@@ -192,12 +196,12 @@
       "document": "Dokument",
       "unknownCreator": "Unbekannte/r AutorIn",
       "unknownDocument": "Unbekanntes Dokument",
-      "noDocumentAvailable": "Kein Dokument verfügbar",
+      "noDocumentActions": "Zurzeit sind keine Aktionen für Dokumente vorhanden",
       "noChatMessageAvailable": "Keine Chat-Nachricht verfügbar",
       "recentlyAddedWorkspace": "Kürzlich hinzugefügte Arbeitsbereiche",
-      "noRecentWorkspaceAvailable": "Keine kürzlich hinzugefügten Arbeitsbereiche verfügbar",
-      "documentActions": "Dokumentenaktionen",
-      "workspaceActions": "Arbeitsbereichsaktionen"
+      "noWorkspaceActions": "Zurzeit sind keine Aktionen für Arbeitsbereiche vorhanden",
+      "documentActions": "Dokumente",
+      "workspaceActions": "Arbeitsbereiche"
    },
    "documentPreview": {
       "preview": "Vorschau",
@@ -352,7 +356,9 @@
       "promptBodyPlaceholder": "Gib Deinen Prompt ein",
       "savePrompt": "Prompt speichern",
       "saveCustomPromptHint": "Das Speichern von Prompts funktioniert noch nicht",
-      "generateNewPerspectiveFromPrevious": "Mit KI anpassen"
+      "generateNewPerspectiveFromPrevious": "Mit KI anpassen",
+      "perspectiveActions": "Perspektivenaktionen",
+      "createNewPerspectiveFromPrevious": "Neue Perspektive aus aktueller erstellen"
    },
    "documentEditable": {
       "cancel": "Abbrechen",
@@ -406,7 +412,9 @@
       "publicWorkspaceTitle": "Der Arbeitsbereich ist öffentlich, das Hinzufügen von BenutzernInnen ist deaktiviert"
    },
    "backendHealth": {
-      "errors_detected": "Fehler erkannt"
+      "errors_detected": "Fehler erkannt",
+      "viewDetails": "Details anzeigen",
+      "appStatus": "App-Status"
    },
    "languages": {
       "en": "Englisch",
@@ -497,5 +505,41 @@
       "deleteDocumentDescription": "Entferne unerwünschte Dokumente aus Arbeitsbereichen, um deinen Platz aufzuräumen",
       "aiSuggestionsDescription": "Verwende generative KI, um die Aspekte des Dokuments zu sehen, die dich interessieren",
       "collaborateDescription": "Diskutiere Dokumentänderungen mit anderen Mitwirkenden über den eingebetteten Chat in den Dokumentdetails"
+   },
+   "appStatus": {
+      "title": "App-Status",
+      "refresh": "Aktualisieren",
+      "systemHealthOverview": "System-Gesundheitsübersicht",
+      "loadingHealthStatus": "Lade Gesundheitsstatus...",
+      "overallSystemStatus": "Gesamtsystemstatus:",
+      "healthy": "Gesund",
+      "issuesDetected": "Probleme erkannt",
+      "online": "Online",
+      "offline": "Offline",
+      "failedToLoadHealthData": "Gesundheitsdaten konnten nicht geladen werden",
+      "truSpaceVersion": "TruSpace Version",
+      "ipfsNodeId": "IPFS-Knoten-ID",
+      "connectedNodes": "Verbundene Knoten",
+      "peers": "Peers",
+      "clusterPeers": "Cluster-Peers",
+      "nodes": "Knoten",
+      "ipfsNodeInformation": "IPFS-Knoten-Informationen",
+      "nodeId": "Knoten-ID",
+      "notAvailable": "Nicht verfügbar",
+      "nodeAddresses": "Knoten-Adressen",
+      "total": "gesamt",
+      "andMoreAddresses": "... und {count} weitere Adressen",
+      "connectedPeers": "Verbundene Peers",
+      "loadingPeerInformation": "Lade Peer-Informationen...",
+      "peer": "Peer",
+      "connected": "Verbunden",
+      "clusterPeersCount": "Cluster-Peers: {count}",
+      "andMorePeers": "... und {count} weitere Peers",
+      "noPeersConnected": "Keine Peers verbunden",
+      "networkConnectivityIssues": "Dies könnte auf Netzwerk-Verbindungsprobleme hinweisen",
+      "clusterMultiaddress": "Cluster-Multiadresse",
+      "nodeMultiaddress": "IPFS-Knoten-Multiadresse",
+      "peerError": "Es gibt einen Fehler mit dieser Peer-Verbindung: \"{error}\"",
+      "error": "Fehler"
    }
 }

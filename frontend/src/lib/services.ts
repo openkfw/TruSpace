@@ -24,8 +24,10 @@ const PERMISSIONS_ENDPOINT = `${API_URL}/permissions`;
 const LANGUAGE_ENDPOINT = `${API_URL}/language`;
 
 // Documents api
-export const loadAllDocuments = async (errorText) => {
-   const url = DOCUMENTS_ENDPOINT;
+export const loadAllDocuments = async (errorText: string) => {
+   const from = 0;
+   const limit = 100;
+   const url = `${DOCUMENTS_ENDPOINT}?from=${from}&limit=${limit}`;
    const options: RequestInit = {
       method: "GET",
       credentials: "include"
@@ -595,6 +597,20 @@ export function usePeers() {
    );
    return {
       peers: data,
+      error,
+      isLoading,
+      isValidating,
+      mutate
+   };
+}
+
+export function useHealth() {
+   const { data, error, isLoading, isValidating, mutate } = useSWR(
+      `${HEALTH_ENDPOINT}`,
+      fetcher
+   );
+   return {
+      health: data,
       error,
       isLoading,
       isValidating,

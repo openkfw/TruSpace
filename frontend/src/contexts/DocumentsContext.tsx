@@ -68,7 +68,7 @@ export const DocumentsProvider = ({ children }: { children: ReactNode }) => {
    const translations = useTranslations("homePage");
 
    const fetchAllDocuments = async () => {
-      const data = await loadAllDocuments(translations("failedToFetch"));
+      const { data } = await loadAllDocuments(translations("failedToFetch"));
       setAllDocuments(data);
    };
 

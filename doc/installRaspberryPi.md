@@ -13,14 +13,15 @@
 git clone https://github.com/openkfw/TruSpace.git
 ```
 
-- Copy `.env.example` into `.env`
+- Execute configuration script `bash ./configure.sh`. Select `development` as `NODE_ENV`, in case the raspberry runs on a local installation and is not available via DNS. Otherwise the CORS handling might be too strict.
 
-```bash
-cd TruSpace
-cp .env.example .env
+- If the IPFS connection is too slow, you can also execute `docker exec ipfs0 ipfs config profile apply lowpower`, which creates a config file that is optimised for slow servers. However you have to update the `Routing` variable to `dht` again in the config file in `./volumes/ipfs0/config`:
+
 ```
-
-- Update `.env` with respective host names
+"Routing": {
+    "Type": "dht"
+  },
+```
 
 # OPTIONAL: Configure Large Language Model (LLM)
 
@@ -39,7 +40,7 @@ cd ipfs-cluster
 docker build . -t truspace/ipfs-cluster
 ```
 
-- Replace the image tag in `docker-compose.yml` with the built image `truspace/ipfs-cluster`
+- Replace the image tag `ipfs/ipfs-cluster:latest` in `docker-compose.yml` with the built image `truspace/ipfs-cluster`
 
 # Initial start of TruSpace via docker compose
 
@@ -59,13 +60,8 @@ or
 
 **NOTE**
 
-If you plan to use a custom local domain (e.g. `truspace.local` instead of `localhost`), you have to set the respective environment variable and update CORS settings in the `.env`file, therefore
-
-```bash
-export NEXT_PUBLIC_API_URL=http://truspace.local:8000/api && ./start.sh
-```
-
-and in the `.env` file update the line
+If you plan to use a custom local domain (e.g. `truspace.local` instead of `localhost`), you have to set the respective environment variable and update CORS settings in the `.env`file, therefore in the `.env` file update the lines
+`NEXT_PUBLIC_API_URL=http://truspace.local:8000/api`
 `CORS_ORIGIN=http://truspace.local:3000`
 
 ---

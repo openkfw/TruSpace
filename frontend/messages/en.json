@@ -15,6 +15,7 @@
       "yesterday": "Yesterday",
       "homePage": "Home",
       "dashboard": "Dashboard",
+      "howTo": "How To",
       "noDocuments": "No documents",
       "noDocumentDescription": "Add new document by clicking on the Create document or Upload document button",
       "share": "Share",
@@ -22,7 +23,10 @@
       "workspace": "Workspace",
       "userSettings": "User settings",
       "uploadAvatar": "Click avatar to upload new photo",
-      "saveSettings": "Save settings"
+      "saveSettings": "Save settings",
+      "copyToClipboard": "Copy to clipboard",
+      "copied": "Copied",
+      "appStatus": "App Status"
    },
    "statistics": {
       "totalDocuments": "Total documents",
@@ -192,12 +196,12 @@
       "document": "Document",
       "unknwownCreator": "Unknown author",
       "unknownDocument": "Unknown document",
-      "noDocumentAvailable": "No document available",
+      "noDocumentActions": "No document actions are present at this time",
       "noChatMessageAvailable": "No chat message available",
       "recentlyAddedWorkspace": "Recently added workspace",
-      "noRecentWorkspaceAvailable": "No recent workspace available",
-      "documentActions": "Document actions",
-      "workspaceActions": "Workspace actions"
+      "noWorkspaceActions": "No workspace actions are present at this time",
+      "documentActions": "Documents",
+      "workspaceActions": "Workspaces"
    },
    "documentPreview": {
       "preview": "Preview",
@@ -352,7 +356,9 @@
       "promptBodyPlaceholder": "Enter your prompt",
       "savePrompt": "Save prompt",
       "saveCustomPromptHint": "Saving prompts doesn't work",
-      "generateNewPerspectiveFromPrevious": "Adjust with AI"
+      "generateNewPerspectiveFromPrevious": "Adjust with AI",
+      "perspectiveActions": "Perspective actions",
+      "createNewPerspectiveFromPrevious": "Create new perspective from current"
    },
    "documentEditable": {
       "cancel": "Cancel",
@@ -406,7 +412,9 @@
       "publicWorkspaceTitle": "Workspace is public, adding users is disabled"
    },
    "backendHealth": {
-      "errors_detected": "Errors detected"
+      "errors_detected": "Errors detected",
+      "viewDetails": "View details",
+      "appStatus": "App Status"
    },
    "languages": {
       "en": "English",
@@ -497,5 +505,41 @@
       "deleteDocumentDescription": "Remove unwanted documents from workspaces to clear out your space",
       "aiSuggestionsDescription": "Use generative AI to see the aspects of the document that interest you",
       "collaborateDescription": "Discuss document changes with other collaborators using imbedded chat in document details"
+   },
+   "appStatus": {
+      "title": "App Status",
+      "refresh": "Refresh",
+      "systemHealthOverview": "System Health Overview",
+      "loadingHealthStatus": "Loading health status...",
+      "overallSystemStatus": "Overall System Status:",
+      "healthy": "Healthy",
+      "issuesDetected": "Issues Detected",
+      "online": "Online",
+      "offline": "Offline",
+      "failedToLoadHealthData": "Failed to load health data",
+      "truSpaceVersion": "TruSpace Version",
+      "ipfsNodeId": "IPFS Node ID",
+      "connectedNodes": "Connected Nodes",
+      "peers": "peers",
+      "clusterPeers": "Cluster Peers",
+      "nodes": "nodes",
+      "ipfsNodeInformation": "IPFS Node Information",
+      "nodeId": "Node ID",
+      "notAvailable": "Not available",
+      "nodeAddresses": "Node Addresses",
+      "total": "total",
+      "andMoreAddresses": "... and {count} more addresses",
+      "connectedPeers": "Connected Peers",
+      "loadingPeerInformation": "Loading peer information...",
+      "peer": "Peer",
+      "connected": "Connected",
+      "clusterPeersCount": "Cluster peers: {count}",
+      "andMorePeers": "... and {count} more peers",
+      "noPeersConnected": "No peers connected",
+      "networkConnectivityIssues": "This might indicate network connectivity issues",
+      "clusterMultiaddress": "Cluster Multiaddress",
+      "nodeMultiaddress": "IPFS Node Multiaddress",
+      "peerError": "There is an error with this peer connection: \"{error}\"",
+      "error": "Error"
    }
 }
