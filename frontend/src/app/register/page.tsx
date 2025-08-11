@@ -35,9 +35,6 @@ import { getUserLocale } from "@/i18n/service";
 import { registerUser } from "@/lib/services";
 import { validateEmail } from "@/lib/validateEmail";
 
-import deTerms from "./terms/terms-de.md";
-import enTerms from "./terms/terms-en.md";
-
 export default function Register() {
    const translations = useTranslations("register");
    const router = useRouter();
@@ -142,15 +139,22 @@ export default function Register() {
    });
 
    useEffect(() => {
-      const setTerms = () => {
-         if (locale === "de") {
-            setTermsContent(deTerms);
-         } else {
-            setTermsContent(enTerms);
+      const fetchTerms = async () => {
+         const termsFile = `/terms/terms-${locale}.md`;
+         try {
+            const response = await fetch(termsFile);
+            if (!response.ok) {
+               throw new Error("Network response was not ok");
+            }
+            const markdown = await response.text();
+            setTermsContent(markdown);
+         } catch (error) {
+            console.error("Failed to fetch terms:", error);
+            setTermsContent("Could not load terms and conditions.");
          }
       };
 
-      setTerms();
+      fetchTerms();
    }, [locale]);
 
    return (

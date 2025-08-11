@@ -11,23 +11,10 @@ const nextConfig: NextConfig = {
       turbo: {
          resolveAlias: {
             canvas: "./empty-module.ts"
-         },
-         rules: {
-            "**/*.md": {
-               loaders: ["raw-loader"],
-               as: "*.js"
-            }
          }
       }
    },
-   output: "standalone",
-   webpack: (config) => {
-      config.module.rules.push({
-         test: /\.md$/,
-         use: "raw-loader"
-      });
-      return config;
-   }
+   output: "standalone"
 };
 
 export default withNextIntl(nextConfig);
