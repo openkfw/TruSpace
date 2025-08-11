@@ -29,7 +29,7 @@ export default function KPIBox({
       <div
          className={`p-4 rounded-md shadow-md border w-full${bgColor ? ` bg-${bgColor}` : ""}`}
       >
-         <div className="grid grid-cols-3 gap-4">
+         <div className="grid grid-cols-4 gap-4">
             {icon && (
                <div className="col-span-4 w-full text-xl flex items-center justify-center">
                   <div className="rounded-full flex items-center justify-center">
