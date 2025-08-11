@@ -1,9 +1,17 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 
-import { getVersionInfo } from "./src/version";
+import { execSync } from "child_process";
 
 const withNextIntl = createNextIntlPlugin();
+
+function getCommitHash() {
+   try {
+      return execSync("git rev-parse --short HEAD").toString().trim();
+   } catch {
+      return "unknown";
+   }
+}
 
 const nextConfig: NextConfig = {
    devIndicators: {
@@ -18,7 +26,7 @@ const nextConfig: NextConfig = {
    },
    output: "standalone",
    env: {
-      NEXT_PUBLIC_SHORT_COMMIT_HASH: getVersionInfo().shortCommitHash
+      NEXT_PUBLIC_SHORT_COMMIT_HASH: getCommitHash()
    }
 };
 
