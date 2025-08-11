@@ -200,6 +200,11 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
       }
    }, [isGenerating, perspectives, selectedPerspective]);
 
+   const addFromPrevious = async () => {
+      setPromptText(await marked.parse(currentPerspective?.text || ""));
+      setNewPerspectiveDialogOpen(true);
+   };
+
    return (
       <>
          <Dialog
@@ -444,8 +449,7 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                               if (value === "add") {
                                  setNewPerspectiveDialogOpen(true);
                               } else if (value === "addFromPrevious") {
-                                 setPromptText(currentPerspective?.text || "");
-                                 setNewPerspectiveDialogOpen(true);
+                                 addFromPrevious();
                               } else if (value === "custom") {
                                  setCustomPromptDialogOpen(true);
                               } else if (value === "generateFromPrevious") {
