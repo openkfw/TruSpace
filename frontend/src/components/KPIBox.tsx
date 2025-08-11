@@ -38,7 +38,9 @@ export default function KPIBox({
                </div>
             )}
 
-            <div className="col-span-4 lg:col-span-2">{kpi}</div>
+            <div className="col-span-4 lg:col-span-2 whitespace-nowrap">
+               {kpi}
+            </div>
 
             <div
                className={`flex text-center col-span-4 lg:col-span-1 text-${deltaColor}`}
@@ -46,7 +48,7 @@ export default function KPIBox({
                {delta}
             </div>
 
-            <div className="col-span-3 mt-3">
+            <div className="col-span-4 mt-3">
                <div className="flex items-center gap-2 flex-nowrap w-full">
                   {valueTooltip ? (
                      <>
