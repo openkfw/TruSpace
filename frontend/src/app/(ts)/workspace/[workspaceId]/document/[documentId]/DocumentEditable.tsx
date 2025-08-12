@@ -130,6 +130,7 @@ export default function DocumentEditable({
                   </DialogContent>
                </Dialog>
             </div>
+            <div className="h-24" />
          </div>
       )
    );
