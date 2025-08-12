@@ -52,10 +52,11 @@ export default function AppStatus() {
    };
 
    const connectedNodes = peers?.length || 0;
-   const clusterPeers =
-      peers?.reduce((count: number, peer: PeerNode) => {
-         return count + (peer.cluster_peers?.length || 0);
-      }, 0) || 0;
+   const clusterPeers = Array.isArray(peers)
+      ? peers.reduce((count: number, peer: PeerNode) => {
+           return count + (peer.cluster_peers?.length || 0);
+        }, 0)
+      : 0;
 
    const loading = healthLoading || peersLoading;
 
