@@ -69,8 +69,26 @@ export default function FloatingChat({
       };
    }, [isOpen]);
 
+   const chatButtonRef = useRef<HTMLDivElement>(null);
+
+   useEffect(() => {
+      if (!chatButtonRef.current) return;
+
+      const updateOffset = () => {
+         const height = chatButtonRef.current?.offsetHeight || 0;
+         document.documentElement.style.setProperty(
+            "--chat-offset",
+            `${height + 30}px`
+         );
+      };
+
+      updateOffset();
+      window.addEventListener("resize", updateOffset);
+      return () => window.removeEventListener("resize", updateOffset);
+   }, []);
+
    return (
-      <div className="fixed bottom-6 right-6 z-50">
+      <div ref={chatButtonRef} className="fixed bottom-6 right-6 z-50">
          {!isOpen && (
             <Button
                onClick={() => setIsOpen((prev) => !prev)}
