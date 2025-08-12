@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 
 import { Loader2 } from "lucide-react";
 
+import IPFSLoader from "@/components/IPFSLoader";
 import Editor from "@/components/tiptap-editor/Editor";
 import { Button } from "@/components/ui/button";
 import {
@@ -77,60 +78,58 @@ export default function DocumentEditable({
       }
    };
 
-   return (
-      loadedEditorContent && (
-         <div>
-            <Editor
-               content={loadedEditorContent}
-               onChange={(editor) => setEditorContent(editor.getHTML())}
-               stickyToolbarTopMargin="12"
-            />
-            <div className="flex justify-end items-center mt-4">
-               <Dialog open={open} onOpenChange={(open) => setOpen(open)}>
-                  <DialogTrigger asChild>
-                     <Button>{translations("save")}</Button>
-                  </DialogTrigger>
-                  <DialogContent
-                     className="sm:max-w-lg"
-                     onEscapeKeyDown={(e) => e.preventDefault()}
-                     onInteractOutside={(e) => e.preventDefault()}
-                  >
-                     <DialogHeader>
-                        <DialogTitle>
-                           {translations("saveNewVersion")}
-                        </DialogTitle>
-                     </DialogHeader>
-                     <DialogDescription />
-                     <form onSubmit={handleSubmit}>
-                        <DialogFooter className="flex flex-row justify-between space-x-4">
-                           <Button
-                              className="w-1/2 sm:w-auto"
-                              type="button"
-                              variant="destructive"
-                              onClick={() => setOpen(false)}
-                           >
-                              {translations("cancel")}
-                           </Button>
-                           <Button
-                              disabled={isUploading}
-                              type="submit"
-                              className="w-1/2 sm:w-auto"
-                           >
-                              {isUploading ? (
-                                 <>
-                                    <Loader2 className="animate-spin" />
-                                    {translations("uploading")}
-                                 </>
-                              ) : (
-                                 translations("save")
-                              )}
-                           </Button>
-                        </DialogFooter>
-                     </form>
-                  </DialogContent>
-               </Dialog>
-            </div>
+   return loadedEditorContent ? (
+      <div>
+         <Editor
+            content={loadedEditorContent}
+            onChange={(editor) => setEditorContent(editor.getHTML())}
+            stickyToolbarTopMargin="12"
+         />
+         <div className="flex justify-end items-center mt-4">
+            <Dialog open={open} onOpenChange={(open) => setOpen(open)}>
+               <DialogTrigger asChild>
+                  <Button>{translations("save")}</Button>
+               </DialogTrigger>
+               <DialogContent
+                  className="sm:max-w-lg"
+                  onEscapeKeyDown={(e) => e.preventDefault()}
+                  onInteractOutside={(e) => e.preventDefault()}
+               >
+                  <DialogHeader>
+                     <DialogTitle>{translations("saveNewVersion")}</DialogTitle>
+                  </DialogHeader>
+                  <DialogDescription />
+                  <form onSubmit={handleSubmit}>
+                     <DialogFooter className="flex flex-row justify-between space-x-4">
+                        <Button
+                           className="w-1/2 sm:w-auto"
+                           type="button"
+                           variant="destructive"
+                           onClick={() => setOpen(false)}
+                        >
+                           {translations("cancel")}
+                        </Button>
+                        <Button
+                           disabled={isUploading}
+                           type="submit"
+                           className="w-1/2 sm:w-auto"
+                        >
+                           {isUploading ? (
+                              <>
+                                 <Loader2 className="animate-spin" />
+                                 {translations("uploading")}
+                              </>
+                           ) : (
+                              translations("save")
+                           )}
+                        </Button>
+                     </DialogFooter>
+                  </form>
+               </DialogContent>
+            </Dialog>
          </div>
-      )
+      </div>
+   ) : (
+      <IPFSLoader />
    );
 }
