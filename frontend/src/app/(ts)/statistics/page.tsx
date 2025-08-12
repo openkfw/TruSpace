@@ -1,4 +1,5 @@
 "use client";
+
 import { useTranslations } from "next-intl";
 
 import { ChartColumn, ChevronUp, Server, Users } from "lucide-react";
