@@ -54,14 +54,14 @@ const IPFSLoader: React.FC<IPFSLoaderProps> = ({
    }, [duration, statusMessages, onComplete]);
 
    return (
-      <Card className="text-center max-w-2xl mx-auto my-12 border-cyan-400/40 shadow-[0_0_20px_rgba(0,255,200,0.3),inset_0_0_10px_rgba(0,255,200,0.1)] backdrop-blur-lg font-mono text-cyan-300">
+      <Card className="text-center max-w-2xl mx-auto my-12 border shadow-[0_0_20px_hsl(var(--primary)/0.3),inset_0_0_10px_hsl(var(--primary)/0.1)] backdrop-blur-lg font-mono text-primary">
          <CardContent className="px-8 py-5">
-            <div className="text-xl min-h-[1.5em] text-cyan-900 dark:text-cyan-300 drop-shadow-[0_0_8px_rgba(0,255,195,0.7)] mb-5 animate-[fadeIn_0.6s_ease]">
+            <div className="text-xl min-h-[1.5em] text-primary drop-shadow-[0_0_8px_rgba(0,255,195,0.7)] mb-5 animate-[fadeIn_0.6s_ease]">
                {currentMessage}
             </div>
-            <div className="relative w-full h-3 bg-emerald-900/60 rounded-md overflow-hidden border border-cyan-400/40">
+            <div className="relative w-full h-3 bg-accent rounded-md overflow-hidden border border-cyan-400/40">
                <div
-                  className="h-full transition-all duration-500 ease-out shadow-[0_0_10px_#00ffc3] bg-gradient-to-r from-cyan-300 to-blue-400"
+                  className="h-full transition-all duration-500 ease-out shadow-[0_0_10px_hsl(var(--primary))] bg-gradient-to-r from-cyan-300 to-blue-400"
                   style={{ width: `${progress}%` }}
                />
                <div className="absolute top-0 -left-[30%] w-[30%] h-full bg-white/30 animate-[scan_1.5s_linear_infinite]" />
