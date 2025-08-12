@@ -26,7 +26,14 @@
       "saveSettings": "Save settings",
       "copyToClipboard": "Copy to clipboard",
       "copied": "Copied",
-      "appStatus": "App Status"
+      "appStatus": "App Status",
+      "loaderInitializing": "Initializing...",
+      "loaderContacting": "🔭 Contacting planetary system...",
+      "loaderAligning": "🪐 Aligning interstellar coordinates...",
+      "loaderNegotiating": "👽 Negotiating with alien nodes...",
+      "loaderEstablishing": "📡 Establishing cosmic handshake...",
+      "loaderRetrieving": "🚀 Retrieving file from deep space...",
+      "loaderAlmostDone": "☄️ Almost done... dodging asteroids..."
    },
    "statistics": {
       "totalDocuments": "Total documents",

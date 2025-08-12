@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import * as docxPreview from "docx-preview";
 
+import IPFSLoader from "@/components/IPFSLoader";
 import { loadDocumentBlob } from "@/lib/services";
 
 export default function DocumentPreviewDOCX({ cid }) {
@@ -28,6 +29,10 @@ export default function DocumentPreviewDOCX({ cid }) {
          className: "max-w-xl"
       });
    }, [docx]);
+
+   if (!docx) {
+      return <IPFSLoader />;
+   }
 
    return (
       <div className="h-[90vh] overflow-auto">

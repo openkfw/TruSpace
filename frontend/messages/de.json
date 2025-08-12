@@ -26,7 +26,14 @@
       "saveSettings": "Einstellungen speichern",
       "copyToClipboard": "In die Zwischenablage kopieren",
       "copied": "Kopiert",
-      "appStatus": "Status"
+      "appStatus": "Status",
+      "loaderInitializing": "Initialisiere...",
+      "loaderContacting": "🔭 Kontaktiere planetarisches System...",
+      "loaderAligning": "🪐 Richte interstellare Koordinaten aus...",
+      "loaderNegotiating": "👽 Verhandle mit alien Knoten...",
+      "loaderEstablishing": "📡 Stelle kosmischen Handschlag her...",
+      "loaderRetrieving": "🚀 Hole Datei aus dem tiefen Raum...",
+      "loaderAlmostDone": "☄️ Fast fertig... weiche Asteroiden aus..."
    },
    "statistics": {
       "totalDocuments": "Gesamtdokumente",
