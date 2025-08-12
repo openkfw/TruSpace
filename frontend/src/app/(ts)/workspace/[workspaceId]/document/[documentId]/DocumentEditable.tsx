@@ -79,7 +79,7 @@ export default function DocumentEditable({
 
    return (
       loadedEditorContent && (
-         <div>
+         <div className="pb-[var(--chat-offset)]">
             <Editor
                content={loadedEditorContent}
                onChange={(editor) => setEditorContent(editor.getHTML())}
@@ -130,7 +130,6 @@ export default function DocumentEditable({
                   </DialogContent>
                </Dialog>
             </div>
-            <div className="h-24" />
          </div>
       )
    );
