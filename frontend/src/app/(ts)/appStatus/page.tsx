@@ -16,8 +16,8 @@ import {
 import CopyToClipboardButton from "@/components/CopyToClipboardButton";
 import KPIBox from "@/components/KPIBox";
 import { Button } from "@/components/ui/button";
+import { useCommitHash } from "@/hooks/useCommitHash";
 import { useHealth, usePeers } from "@/lib/services";
-
 interface PeerNode {
    id: string;
    peername?: string;
@@ -38,6 +38,7 @@ export default function AppStatus() {
       refreshHealth();
       refreshPeers();
    };
+   const commit = useCommitHash();
 
    const getStatusIcon = (status: boolean) => {
       return status ? (
@@ -52,10 +53,11 @@ export default function AppStatus() {
    };
 
    const connectedNodes = peers?.length || 0;
-   const clusterPeers =
-      peers?.reduce((count: number, peer: PeerNode) => {
-         return count + (peer.cluster_peers?.length || 0);
-      }, 0) || 0;
+   const clusterPeers = Array.isArray(peers)
+      ? peers.reduce((count: number, peer: PeerNode) => {
+           return count + (peer.cluster_peers?.length || 0);
+        }, 0)
+      : 0;
 
    const loading = healthLoading || peersLoading;
 
@@ -133,7 +135,7 @@ export default function AppStatus() {
          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <KPIBox
                kpi={t("appStatus.truSpaceVersion")}
-               value={health?.version}
+               value={commit}
                valueLabel=""
                icon={<Info className="w-16 h-16 dark:text-white" />}
             />
