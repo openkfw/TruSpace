@@ -130,6 +130,15 @@ if [ ! -f "$SCRIPT_DIR/.env" ]; then
 fi
 source "$SCRIPT_DIR/.env"
 
+# Set LIBP2P_TCP_MUX based on START_PRIVATE_NETWORK setting
+if [ "$START_PRIVATE_NETWORK" = "true" ]; then
+    export LIBP2P_TCP_MUX=false
+    echo "🔧 Setting LIBP2P_TCP_MUX=false for private network configuration"
+else
+    export LIBP2P_TCP_MUX=true
+    echo "🔧 Setting LIBP2P_TCP_MUX=true for public network configuration"
+fi
+
 if [ "$START_PRIVATE_NETWORK" = "true" ] && ! [ "${#SWARM_KEY_SECRET}" -eq 64 ]; then
     echo "❌ Error: SWARM_KEY_SECRET must be a 64-character hexadecimal string."
     echo "Please set a valid SWARM_KEY_SECRET in the .env file."
