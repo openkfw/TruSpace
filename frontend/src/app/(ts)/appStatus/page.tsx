@@ -53,7 +53,6 @@ export default function AppStatus() {
    };
 
    const connectedNodes = peers?.length || 0;
-   const clusterPeers = peers?.length || 0;
    const loading = healthLoading || peersLoading;
 
    return (
@@ -150,7 +149,7 @@ export default function AppStatus() {
             />
             <KPIBox
                kpi={t("appStatus.clusterPeers")}
-               value={clusterPeers.toString()}
+               value={connectedNodes.toString()}
                valueLabel={t("appStatus.nodes")}
                icon={<Server className="w-16 h-16 dark:text-white" />}
             />
