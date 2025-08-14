@@ -32,6 +32,7 @@ function WorkspaceMenu() {
    const [isDialogOpen, setIsDialogOpen] = useState(false);
    const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
    const [isWorkspaceTypeDialogOpen, setIsWorkspaceTypeDialogOpen] =
       useState(false);
 
@@ -106,6 +107,7 @@ function WorkspaceMenu() {
                </MenubarContent>
             </MenubarMenu>
          </Menubar>
+
          <DocumentUpload open={isDialogOpen} setOpen={setIsDialogOpen} />
          <DocumentCreateDialog
             open={isCreateDialogOpen}
