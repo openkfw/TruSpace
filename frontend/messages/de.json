@@ -329,7 +329,8 @@
       "secondaryMessage": "Chat-Nachricht wird mit Punkt im Dokument verknüpft",
       "messagePlaceholder": "Gib eine Nachricht ein...",
       "downloadChatMessages": "Chat-Nachrichten herunterladen",
-      "send": "Senden"
+      "send": "Senden",
+      "sending": "Wird gesendet..."
    },
    "perspectives": {
       "addYourPerspective": "Füge deine Perspektive hinzu",

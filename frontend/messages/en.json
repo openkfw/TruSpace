@@ -329,7 +329,8 @@
       "secondaryMessage": "Chat message will be linked to point in document",
       "messagePlaceholder": "Type a message...",
       "downloadChatMessages": "Download chat messages",
-      "send": "Send"
+      "send": "Send",
+      "sending": "Sending..."
    },
    "perspectives": {
       "addYourPerspective": "Add your perspective",
