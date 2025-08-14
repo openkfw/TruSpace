@@ -165,7 +165,8 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
             setCustomPromptDialogOpen(false);
             setPromptTitle("");
             setPromptText("");
-            setEditorHasError(false); //
+            setEditorHasError(false);
+            toast.success(t("customPerspectiveCreated"));
          } catch (err) {
             console.error(err);
          } finally {
