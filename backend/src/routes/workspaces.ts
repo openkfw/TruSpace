@@ -147,12 +147,20 @@ router.put(
     try {
       await client.updateWorkspaceType(wUID, isPublic);
       if (isPublic === false) {
-        await createPermissionDb({
-          workspaceId: wUID,
-          email: req.user?.email as string,
-          role: "owner",
-          status: USER_PERMISSION_STATUS.active,
-        });
+        const currentPermissions = await findUsersInWorkspaceDb(wUID);
+        const currentUserPermissions = currentPermissions.find(
+          (perm) => perm.email === req.user?.email
+        );
+
+        // Only create permission if it doesn't exist
+        if (!currentUserPermissions) {
+          await createPermissionDb({
+            workspaceId: wUID,
+            email: req.user?.email as string,
+            role: "owner",
+            status: USER_PERMISSION_STATUS.active,
+          });
+        }
       } else {
         const usersInWs = await findUsersInWorkspaceDb(wUID);
         const workspaceDetails = await client.getWorkspaceById(wUID);
