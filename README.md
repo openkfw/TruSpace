@@ -252,3 +252,4 @@ This project is licensed under the **GNU General Public License v3.0**. See the 
 - Admin guide: [Admin Guide](./doc/Admin%20Guide/README.md)
 - Discussions: [GitHub Discussions](https://github.com/openkfw/TruSpace/discussions)
 - Report issues: [GitHub Issues](https://github.com/openkfw/TruSpace/issues)
+- Intro Story to get what it's about: [Medium Blog](https://medium.com/@angryarchitect/your-place-or-my-place-a-tale-of-decentralization-and-sovereignty-c775dafbadbb)
