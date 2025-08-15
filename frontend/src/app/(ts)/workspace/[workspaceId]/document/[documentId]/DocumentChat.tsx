@@ -32,6 +32,7 @@ export default function DocumentChat({
    displayNote
 }) {
    const [loading, setLoading] = useState(true);
+   const [sending, setSending] = useState(false);
    const [error, setError] = useState(null);
    const [chats, setChats] = useState<Chat[] | null>(null);
    const [message, setMessage] = useState("");
@@ -66,6 +67,7 @@ export default function DocumentChat({
 
    const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
+      setSending(true);
       if (message === "") {
          setEmptyMessageError(true);
          return;
@@ -99,6 +101,7 @@ export default function DocumentChat({
       } finally {
          setNewNoteVisible(false);
          setTimeout(fetchChats, 1000);
+         setSending(false);
       }
    };
 
@@ -223,7 +226,9 @@ export default function DocumentChat({
                         </TooltipContent>
                      </Tooltip>
                   </TooltipProvider>
-                  <Button type="submit">{translations("send")}</Button>
+                  <Button type="submit" disabled={sending}>
+                     {sending ? translations("sending") : translations("send")}
+                  </Button>
                </div>
             </form>
          </div>
