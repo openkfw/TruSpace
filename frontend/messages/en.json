@@ -371,7 +371,8 @@
       "saveCustomPromptHint": "Saving prompts doesn't work",
       "generateNewPerspectiveFromPrevious": "Adjust with AI",
       "perspectiveActions": "Perspective actions",
-      "createNewPerspectiveFromPrevious": "Create new perspective from current"
+      "createNewPerspectiveFromPrevious": "Create new perspective from current",
+      "customPerspectiveCreated": "Custom perspective being created. It might take several minutes."
    },
    "documentEditable": {
       "cancel": "Cancel",
