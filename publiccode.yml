@@ -1,0 +1,48 @@
+# This repository adheres to the publiccode.yml standard by including this
+# metadata file that makes public software easily discoverable.
+# More info at https://github.com/italia/publiccode.yml
+
+publiccodeYmlVersion: "0.2"
+name: TruSpace
+url: "https://github.com/openkfw/TruSpace"
+landingURL: "https://web.truspace.dev"
+releaseDate: "2025-08-17"
+softwareVersion: v.0.9
+developmentStatus: beta
+softwareType: standalone/iot
+platforms:
+  - web
+  - linux
+categories:
+  - collaboration
+  - web-collaboration
+  - content-management
+maintenance:
+  type: internal
+  contacts:
+    - name: Jure Zakotnik
+      email: jure@zakotnik.de
+legal:
+  license: GPL-3.0-or-later
+  repoOwner: openKfW
+  mainCopyrightOwner: openKfW
+localisation:
+  localisationReady: true
+  availableLanguages:
+    - de
+    - gb
+description:
+  it:
+    genericName: TruSpace
+    documentation: "https://github.com/openkfw/TruSpace/tree/main/doc/User%20Guide"
+    apiDocumentation: "https://github.com/openkfw/TruSpace/blob/main/backend/openapi/openapi.yaml"
+    shortDescription: "An AI-infused, collaborative and decentralized file management solution."
+    longDescription: "The purpose of TruSpace is to make collaboration on documents between several stakeholders more efficient while making the respective data sovereign to all participants. It uses AI to support document interpretation and decentralization to stay in control of your data.\n\n**Collaborative, decentralized document sharing and editing platform** built with **Next.js**, **Express.js**, **SQLite**, and **IPFS Cluster**. Enhanced with local LLM capabilities via **Ollama**, **Open Web UI** and a nice web-interface.\n\n## **✨ Key Features**\n\n- \U0001F193 100% open-source, sovereign and self-hostable - no cloud provider needed\n- \U0001F504 Fully decentralized storage using IPFS Cluster: Automatic sync of data between trusted IPFS cluster nodes/partners (private or public setup)\n- \U0001F9E0 Local AI interpretation of documents using Ollama + Open Web UI using customisable pre-defined prompts\n- \U0001F5C2️ Workspace-based organization of content and participants\n"
+    features:
+      - Decentralized file management
+      - Sovereign Articifial Intelligence
+    screenshots:
+      - >-
+        https://github.com/openkfw/TruSpace/blob/main/doc/screenshot_dashboard.png
+    videos:
+      - "https://www.youtube.com/watch?v=dpo_D3NJpqE"
