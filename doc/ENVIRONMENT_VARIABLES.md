@@ -37,6 +37,18 @@ This document provides a detailed overview of the environment variables used to 
 
 ---
 
+## AI / LLM Settings
+
+| Variable          | Description                                                                            | Default Value     | Required                          |
+| ----------------- | -------------------------------------------------------------------------------------- | ----------------- | --------------------------------- |
+| `LLM_PROVIDER`    | Which AI Provider to use, choose between openwebui, openai, mistral                    | openwebui         | true                              |
+| `OPENAI_MODEL`    | Which OpenAI Model to use, check <https://platform.openai.com/docs/models>             | gpt-4.1           | true when LLM_PROVIDER is openai  |
+| `OPENAI_API_KEY`  | OpenAI API Key from <https://platform.openai.com>                                      | /                 | true when LLM_PROVIDER is openai  |
+| `MISTRAL_MODEL`   | Mistral API Key from <https://docs.mistral.ai/getting-started/models/models_overview/> | open-mistral-nemo | true when LLM_PROVIDER is mistral |
+| `MISTRAL_API_KEY` | Mistral API Key from <https://console.mistral.ai/home>                                 | /                 | true when LLM_PROVIDER is mistral |
+
+---
+
 ## 🔗 IPFS & Cluster Configuration
 
 ### General
