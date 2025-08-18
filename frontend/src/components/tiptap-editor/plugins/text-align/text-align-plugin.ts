@@ -16,6 +16,8 @@ declare module "@tiptap/core" {
           * Unset the text alignment
           */
          unsetTextAlign: () => ReturnType;
+
+         toggleTextAlign: (alignment: string) => ReturnType;
       };
    }
 }

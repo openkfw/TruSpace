@@ -210,12 +210,16 @@ const DocumentList = ({ workspaceId }) => {
                            </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                           onClick={() => downloadDocument(row.original.cid)}
+                           onClick={(e: React.MouseEvent<HTMLElement>) =>
+                              downloadDocument(e, row.original.cid)
+                           }
                         >
                            {translations("download")}
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                           onClick={() => removeDocument(row.original.docId)}
+                           onClick={(e: React.MouseEvent<HTMLElement>) =>
+                              removeDocument(e, row.original.docId)
+                           }
                         >
                            {translations("delete")}
                         </DropdownMenuItem>
@@ -256,11 +260,19 @@ const DocumentList = ({ workspaceId }) => {
       setFilteredDocuments(documents);
    }, [debouncedSearchQuery, documents]);
 
-   const downloadDocument = async (cid: string) => {
+   const downloadDocument = async (
+      event: React.MouseEvent<HTMLElement>,
+      cid: string
+   ) => {
+      event.stopPropagation();
       window.open(`${DOCUMENTS_ENDPOINT}/version/${cid}`);
    };
 
-   const removeDocument = async (docId: string) => {
+   const removeDocument = async (
+      event: React.MouseEvent<HTMLElement>,
+      docId: string
+   ) => {
+      event.stopPropagation();
       try {
          await deleteDocument(docId, translations("failedToDelete"));
          setTimeout(() => fetchDocuments(workspaceId), 1000);
@@ -311,7 +323,10 @@ const DocumentList = ({ workspaceId }) => {
          </div>
 
          <div className="mt-6 rounded-lg overflow-hidden border-none">
-            <Table className="border-r last-of-type:border-none" data-test-id="document-list-table">
+            <Table
+               className="border-r last-of-type:border-none"
+               data-test-id="document-list-table"
+            >
                <TableHeader>
                   {table.getHeaderGroups().map((headerGroup) => (
                      <TableRow key={headerGroup.id}>

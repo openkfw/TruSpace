@@ -26,7 +26,14 @@
       "saveSettings": "Einstellungen speichern",
       "copyToClipboard": "In die Zwischenablage kopieren",
       "copied": "Kopiert",
-      "appStatus": "App-Status"
+      "appStatus": "Status",
+      "loaderInitializing": "Initialisiere...",
+      "loaderContacting": "🔭 Kontaktiere planetarisches System...",
+      "loaderAligning": "🪐 Richte interstellare Koordinaten aus...",
+      "loaderNegotiating": "👽 Verhandle mit alien Knoten...",
+      "loaderEstablishing": "📡 Stelle kosmischen Handschlag her...",
+      "loaderRetrieving": "🚀 Hole Datei aus dem tiefen Raum...",
+      "loaderAlmostDone": "☄️ Fast fertig... weiche Asteroiden aus..."
    },
    "statistics": {
       "totalDocuments": "Gesamtdokumente",
@@ -129,7 +136,12 @@
       "registerSuccess": "Registrierung erfolgreich",
       "registerError": "Bei der Registrierung ist ein Fehler aufgetreten, bitte versuche es erneut",
       "backToLogin": "Zurück zur Anmeldung",
-      "emailSent": "Die E-Mail zur Registrierungsbestätigung wurde gesendet"
+      "emailSent": "Die E-Mail zur Registrierungsbestätigung wurde gesendet",
+      "termsRequired": "Du musst die Nutzungsbedingungen akzeptieren",
+      "termsLink": "Nutzungsbedingungen.",
+      "termsAccept": "Ich akzeptiere die",
+      "termsAndConditions": "Nutzungsbedingungen",
+      "termsLoadError": "Konnte Nutzungsbedingungen nicht laden."
    },
    "settings": {
       "updateSuccess": "NutzerInnen-Einstellungen aktualisiert",
@@ -317,7 +329,8 @@
       "secondaryMessage": "Chat-Nachricht wird mit Punkt im Dokument verknüpft",
       "messagePlaceholder": "Gib eine Nachricht ein...",
       "downloadChatMessages": "Chat-Nachrichten herunterladen",
-      "send": "Senden"
+      "send": "Senden",
+      "sending": "Wird gesendet..."
    },
    "perspectives": {
       "addYourPerspective": "Füge deine Perspektive hinzu",
@@ -358,7 +371,8 @@
       "saveCustomPromptHint": "Das Speichern von Prompts funktioniert noch nicht",
       "generateNewPerspectiveFromPrevious": "Mit KI anpassen",
       "perspectiveActions": "Perspektivenaktionen",
-      "createNewPerspectiveFromPrevious": "Neue Perspektive aus aktueller erstellen"
+      "createNewPerspectiveFromPrevious": "Neue Perspektive aus aktueller erstellen",
+      "customPerspectiveCreated": "Benutzerdefinierte Perspektive wird erstellt. Dies kann mehrere Minuten dauern."
    },
    "documentEditable": {
       "cancel": "Abbrechen",
@@ -414,7 +428,7 @@
    "backendHealth": {
       "errors_detected": "Fehler erkannt",
       "viewDetails": "Details anzeigen",
-      "appStatus": "App-Status"
+      "appStatus": "Status"
    },
    "languages": {
       "en": "Englisch",

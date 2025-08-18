@@ -26,7 +26,14 @@
       "saveSettings": "Save settings",
       "copyToClipboard": "Copy to clipboard",
       "copied": "Copied",
-      "appStatus": "App Status"
+      "appStatus": "App Status",
+      "loaderInitializing": "Initializing...",
+      "loaderContacting": "🔭 Contacting planetary system...",
+      "loaderAligning": "🪐 Aligning interstellar coordinates...",
+      "loaderNegotiating": "👽 Negotiating with alien nodes...",
+      "loaderEstablishing": "📡 Establishing cosmic handshake...",
+      "loaderRetrieving": "🚀 Retrieving file from deep space...",
+      "loaderAlmostDone": "☄️ Almost done... dodging asteroids..."
    },
    "statistics": {
       "totalDocuments": "Total documents",
@@ -129,7 +136,12 @@
       "passwordDescription": "Your password must meet the following requirements:",
       "registerError": "An error occurred during registration, please try again",
       "backToLogin": "Back to login",
-      "emailSent": "Registration confirmation email has been sent"
+      "emailSent": "Registration confirmation email has been sent",
+      "termsRequired": "You must accept the terms and conditions",
+      "termsLink": "terms and conditions.",
+      "termsAccept": "I accept the",
+      "termsAndConditions": "Terms and Conditions",
+      "termsLoadError": "Could not load terms and conditions."
    },
    "settings": {
       "updateSuccess": "User settings updated successfully",
@@ -317,7 +329,8 @@
       "secondaryMessage": "Chat message will be linked to point in document",
       "messagePlaceholder": "Type a message...",
       "downloadChatMessages": "Download chat messages",
-      "send": "Send"
+      "send": "Send",
+      "sending": "Sending..."
    },
    "perspectives": {
       "addYourPerspective": "Add your perspective",
@@ -358,7 +371,8 @@
       "saveCustomPromptHint": "Saving prompts doesn't work",
       "generateNewPerspectiveFromPrevious": "Adjust with AI",
       "perspectiveActions": "Perspective actions",
-      "createNewPerspectiveFromPrevious": "Create new perspective from current"
+      "createNewPerspectiveFromPrevious": "Create new perspective from current",
+      "customPerspectiveCreated": "Custom perspective being created. It might take several minutes."
    },
    "documentEditable": {
       "cancel": "Cancel",

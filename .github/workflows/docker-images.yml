@@ -4,6 +4,8 @@ on:
   push:
     branches: ["main"]
     tags: ["v*"]
+  release:
+    types: [published]
 
 env:
   REGISTRY: docker.io
@@ -74,10 +76,13 @@ jobs:
           tags: |
             type=ref,event=branch
             type=ref,event=pr
+            type=ref,event=tag
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
-            type=sha,prefix={{branch}}-
+            type=semver,pattern={{major}}
+            type=sha,prefix=sha-
             type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=stable,enable=${{ github.event_name == 'release' }}
 
       - name: Build and push
         id: build
@@ -120,10 +125,13 @@ jobs:
           tags: |
             type=ref,event=branch
             type=ref,event=pr
+            type=ref,event=tag
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
-            type=sha,prefix={{branch}}-
+            type=semver,pattern={{major}}
+            type=sha,prefix=sha-
             type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=stable,enable=${{ github.event_name == 'release' }}
 
       - name: Build and push
         id: build

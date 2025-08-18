@@ -165,7 +165,8 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
             setCustomPromptDialogOpen(false);
             setPromptTitle("");
             setPromptText("");
-            setEditorHasError(false); //
+            setEditorHasError(false);
+            toast.success(t("customPerspectiveCreated"));
          } catch (err) {
             console.error(err);
          } finally {
@@ -199,6 +200,11 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
          changeCurrentPerspective(first);
       }
    }, [isGenerating, perspectives, selectedPerspective]);
+
+   const addFromPrevious = async () => {
+      setPromptText(await marked.parse(currentPerspective?.text || ""));
+      setNewPerspectiveDialogOpen(true);
+   };
 
    return (
       <>
@@ -445,8 +451,7 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                                  setPromptText("");
                                  setNewPerspectiveDialogOpen(true);
                               } else if (value === "addFromPrevious") {
-                                 setPromptText(currentPerspective?.text || "");
-                                 setNewPerspectiveDialogOpen(true);
+                                 addFromPrevious();
                               } else if (value === "custom") {
                                  setPromptText("");
                                  setCustomPromptDialogOpen(true);

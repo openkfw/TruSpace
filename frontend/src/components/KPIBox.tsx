@@ -29,7 +29,7 @@ export default function KPIBox({
       <div
          className={`p-4 rounded-md shadow-md border w-full${bgColor ? ` bg-${bgColor}` : ""}`}
       >
-         <div className="grid grid-cols-3 gap-4">
+         <div className="grid grid-cols-4 gap-4">
             {icon && (
                <div className="col-span-4 w-full text-xl flex items-center justify-center">
                   <div className="rounded-full flex items-center justify-center">
@@ -38,7 +38,9 @@ export default function KPIBox({
                </div>
             )}
 
-            <div className="col-span-4 lg:col-span-2">{kpi}</div>
+            <div className="col-span-4 lg:col-span-2 whitespace-nowrap">
+               {kpi}
+            </div>
 
             <div
                className={`flex text-center col-span-4 lg:col-span-1 text-${deltaColor}`}
@@ -46,7 +48,7 @@ export default function KPIBox({
                {delta}
             </div>
 
-            <div className="col-span-3 mt-3">
+            <div className="col-span-4 mt-3">
                <div className="flex items-center gap-2 flex-nowrap w-full">
                   {valueTooltip ? (
                      <>
