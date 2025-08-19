@@ -56,13 +56,16 @@ To get started with Docker, you need to install it on your machine. You can foll
 - [Docker Desktop for Windows](https://docs.docker.com/desktop/install/windows-install/)
 - [Docker Engine on Linux](https://docs.docker.com/engine/install/)
 
-Once Docker is installed, you can verify the installation by running the following command:
+> [!NOTE]
+> If you are not allowed to use Docker e.g. in your enterprise environment (have to have licenses, etc.), you can install [Podman](https://podman.io/docs/installation) on all systems instead. The docker commands can be used interchangeably with podman commands. For more information on using Podman, please refer to the [Podman documentation](https://podman.io/docs/). Usually, all commands should work interchangeably, without any issues (see [Managing Docker compatibility](https://podman-desktop.io/docs/migrating-from-docker/managing-docker-compatibility)). However, should there be issues regarding the docker commands, you can either change docker in the CLI to a podman alias i.e. `alias docker=podman` or change the word `docker` in all commands to `podman`.
+
+Once Docker/Podman is installed, you can verify the installation by running the following command:
 
 ```bash
-docker --version
+docker --version # if not working, try: podman --version
 ```
 
-This should display the installed version of Docker.
+This should display the installed version of Docker/Podman.
 
 ## Node.js & npm
 
