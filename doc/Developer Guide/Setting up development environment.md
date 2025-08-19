@@ -133,6 +133,18 @@ To run the application **quick and easy**, you can setup the installation using 
 
 This command creates a simple environment configuration, creates docker volumes and spins up docker compose containing backend api and IPFS clusters and additionally NextJS frontend in dev mode. After startup, the frontend is available on http://localhost:3000. Register a user, login and create a workspace for documents!
 
+However when developing the frontend, **we recommend to start the frontend locally, not in Docker**:
+
+```bash
+# Start all containers besides frontend
+./start.sh --local-frontend
+
+# Start frontend locally
+cd frontend
+npm i
+npm run dev
+```
+
 If you plan to use another domain (e.g. on a local raspberry), make sure that the respective domains are updated from `localhost` to your `domain.local` in the `CORS` fields of the `.env` file (`CORS_ORIGIN` and `OI_CORS_ALLOW_ORIGIN`). This can be easily done in the `TruSpace` folder using the example environment:
 
 ```bash
