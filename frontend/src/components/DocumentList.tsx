@@ -341,7 +341,6 @@ const DocumentList = ({ workspaceId }) => {
             }
          }
 
-         // upload
          const formData = new FormData();
          formData.append("workspace", workspace?.uuid || workspaceId);
          formData.append("file", file, file.name);
@@ -387,7 +386,18 @@ const DocumentList = ({ workspaceId }) => {
    }
 
    if (documents.length === 0) {
-      return <EmptyWorkspace />;
+      return (
+         <div
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            className={`mt-6 rounded-lg overflow-hidden relative transition-colors ${
+               isDragging ? "border-2 border-blue-500" : "border-none"
+            }`}
+         >
+            <EmptyWorkspace />
+         </div>
+      );
    }
 
    return (
