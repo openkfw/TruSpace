@@ -2,16 +2,16 @@ import { Request, Response, Router } from "express";
 import { UploadedFile } from "express-fileupload";
 import { param } from "express-validator";
 import { IpfsClient } from "../clients/ipfs-client";
-import { oiClient } from "../clients/oi-client";
 import validate from "../middlewares/validate";
 import taskQueue from "../utility/jobQueue";
+import { llmClient } from "../clients/llm-client/LlmClientFactory";
 
 const router = Router();
 
 router.post("/", async (req, res) => {
   const file = req.files?.file as UploadedFile;
   const document = req.body.document;
-  const fileData = await oiClient.uploadFile(file);
+  const fileData = await llmClient.uploadFile(file);
 
   if (!fileData || "error" in fileData) {
     return res
@@ -19,7 +19,7 @@ router.post("/", async (req, res) => {
       .json({ error: fileData?.error || "File upload failed" });
   }
 
-  const result = await oiClient.dispatchDetectLanguage(document, fileData);
+  const result = await llmClient.dispatchDetectLanguage(document, fileData);
   res.json(result);
 });
 
