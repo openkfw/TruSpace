@@ -87,6 +87,7 @@ server {
 server {
     listen 80;
     server_name api.EXAMPLE.COM;
+    client_max_body_size 100M;
     location / {
         proxy_pass http://localhost:8000;
     }
@@ -204,6 +205,7 @@ server {
 
 server {
     server_name api.EXAMPLE.COM;
+    client_max_body_size 100M;
 
     listen 443 ssl; # managed by Certbot
     ssl_certificate     /etc/letsencrypt/live/EXAMPLE.COM/fullchain.pem; # managed by Certbot
