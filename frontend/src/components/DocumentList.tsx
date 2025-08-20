@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { DragEvent, useEffect, useMemo, useState } from "react";
 import { defaultStyles, FileIcon } from "react-file-icon";
 import { toast } from "react-toastify";
 
@@ -20,6 +20,7 @@ import {
    MessageSquareText,
    MoreVertical
 } from "lucide-react";
+import * as pdfjs from "pdfjs-dist";
 
 import EmptyWorkspace from "@/app/(ts)/workspace/EmptyWorkspace";
 import SearchBar from "@/components/SearchBar";
@@ -39,9 +40,15 @@ import {
    TableRow
 } from "@/components/ui/table";
 import { useDocuments } from "@/contexts/DocumentsContext";
+import { useWorkspaceContext } from "@/contexts/WorkspaceContext";
 import { useDebounce } from "@/hooks/useDebounce";
 import { formatDate, formatDateDays } from "@/lib/formatDate";
-import { deleteDocument, DOCUMENTS_ENDPOINT } from "@/lib/services";
+import {
+   deleteDocument,
+   DOCUMENTS_ENDPOINT,
+   documentUpload
+} from "@/lib/services";
+import { isPdfBlank } from "@/lib/utils";
 
 import { Badge } from "./ui/badge";
 import {
@@ -51,6 +58,13 @@ import {
    TooltipTrigger
 } from "./ui/tooltip";
 import PaginationComponent from "./Pagination";
+
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+   "pdfjs-dist/build/pdf.worker.min.mjs",
+   import.meta.url
+).toString();
+
+const MAX_FILE_SIZE_MB = 110;
 
 function getFileExtension(filename: string) {
    if (filename.toLowerCase().endsWith(".editablefile")) {
@@ -73,6 +87,9 @@ const DocumentList = ({ workspaceId }) => {
    const [searchQuery, setSearchQuery] = useState("");
 
    const debouncedSearchQuery = useDebounce(searchQuery, 250);
+
+   const { workspace } = useWorkspaceContext();
+   const [isDragging, setIsDragging] = useState(false);
 
    const columns = useMemo(
       () => [
@@ -283,6 +300,67 @@ const DocumentList = ({ workspaceId }) => {
       }
    };
 
+   const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      if (!isDragging) setIsDragging(true);
+   };
+
+   const handleDragLeave = (e: DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      setIsDragging(false);
+   };
+
+   const handleDrop = async (e: DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      setIsDragging(false);
+
+      const files = Array.from(e.dataTransfer.files);
+      if (files.length === 0) return;
+
+      for (const file of files) {
+         if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+            toast.error(
+               `${file.name}: ${documentTranslations("documentTooLargeError")}`
+            );
+            continue;
+         }
+
+         const ext = file.name.split(".").pop()?.toLowerCase();
+         if (ext === "pdf") {
+            try {
+               const isBlank = await isPdfBlank(file, pdfjs);
+               if (isBlank) {
+                  toast.error(
+                     `${file.name}: ${documentTranslations("blankPdfError")}`
+                  );
+                  continue;
+               }
+            } catch (err) {
+               console.error("PDF check failed:", err);
+               toast.error(documentTranslations("documentUploadError"));
+            }
+         }
+
+         // upload
+         const formData = new FormData();
+         formData.append("workspace", workspace?.uuid || workspaceId);
+         formData.append("file", file, file.name);
+
+         try {
+            await documentUpload(
+               formData,
+               undefined,
+               translations("uploadError")
+            );
+            await fetchDocuments(workspace?.uuid || workspaceId);
+            toast.success(documentTranslations("documentUploaded"));
+         } catch (err) {
+            console.error(err);
+            toast.error(documentTranslations("documentUploadError"));
+         }
+      }
+   };
+
    if (loading) {
       return (
          <p className="text-center text-gray-500">
@@ -322,7 +400,14 @@ const DocumentList = ({ workspaceId }) => {
             />
          </div>
 
-         <div className="mt-6 rounded-lg overflow-hidden border-none">
+         <div
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            className={`mt-6 rounded-lg overflow-hidden relative transition-colors ${
+               isDragging ? "border-2 border-blue-500" : "border-none"
+            }`}
+         >
             <Table
                className="border-r last-of-type:border-none"
                data-test-id="document-list-table"
