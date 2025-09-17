@@ -133,17 +133,14 @@ To run the application **quick and easy**, you can setup the installation using 
 
 This command creates a simple environment configuration, creates docker volumes and spins up docker compose containing backend api and IPFS clusters and additionally NextJS frontend in dev mode. After startup, the frontend is available on http://localhost:3000. Register a user, login and create a workspace for documents!
 
-However when developing the frontend, **we recommend to start the frontend locally, not in Docker**:
+However when developing the frontend, **we recommend to start the frontend locally, not in a container**:
 
 ```bash
-# Start all containers besides frontend
+# Start all services as containers but only frontend locally
 ./start.sh --local-frontend
-
-# Start frontend locally
-cd frontend
-npm i
-npm run dev
 ```
+
+---
 
 If you plan to use another domain (e.g. on a local raspberry), make sure that the respective domains are updated from `localhost` to your `domain.local` in the `CORS` fields of the `.env` file (`CORS_ORIGIN` and `OI_CORS_ALLOW_ORIGIN`). This can be easily done in the `TruSpace` folder using the example environment:
 
@@ -151,8 +148,21 @@ If you plan to use another domain (e.g. on a local raspberry), make sure that th
 sed 's|http://localhost|http://example.com|g' .env.example > .env
 ```
 
+---
+
 To enable AI analysis, TruSpace downloads a model configured in `.env`, as an example here is `gemma3:1b` and you can see the full list at the [ollama DB](https://ollama.com/library?q=mistral&sort=popular).
 
 Once the model is downloaded, AI analysis is executed upon each document upload automatically.
 
+---
+
 For a more detailed guide or setup on other systems such as a standalone server or Raspberry Pi, you can follow the [Admin Installation Guides](../Admin%20Guide/Setup%20TruSpace/Installation.md).
+
+## Troubleshooting when starting to run TruSpace
+
+The following are some troubleshooting hacks we have used in the past for different problems (e.g. when pulling a new TruSpace version):
+
+- Delete existing file `volumes/db/truspace.db` (if it exists) to **reset the database** (e.g. migration scripts that once existed and thus also in the db no longer exist, thus the database should be reset and built from scratch)
+- Make sure that **`npm` is up to date** for the backend and frontend with `cd backend/frontend npm install`
+
+If you come across any other troubleshooting hacks, feel free to add them to this list!
