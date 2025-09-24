@@ -166,12 +166,13 @@ export default function DocumentUpload({
             );
             return;
          }
-         const formData = new FormData();
-         formData.append("workspace", workspace?.uuid);
-         formData.append("versionTagName", versionTagName);
-         formData.append("author", author);
-         formData.append("file", file, file.name);
          try {
+            const formData = new FormData();
+            formData.append("workspace", workspace?.uuid);
+            formData.append("versionTagName", versionTagName);
+            formData.append("author", author);
+            formData.append("file", file, file.name);
+
             const res = await documentUpload(
                formData,
                docId,
