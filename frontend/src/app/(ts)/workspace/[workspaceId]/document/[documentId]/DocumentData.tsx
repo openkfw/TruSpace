@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 
 import { useTranslations } from "next-intl";
 
-import { FileLock2, Link, Loader2, UserCircle } from "lucide-react";
+import { FileLock2, Link, Loader2, Share2, UserCircle } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -44,6 +44,8 @@ export default function DocumentData({
 
    const [copyButtonTooltipText, setCopyButtonTooltipText] =
       useState<string>("");
+   const [shareButtonTooltipText, setShareButtonTooltipText] =
+      useState<string>("");
 
    const { status: languageStatus } = useLanguageStatus(cId);
 
@@ -82,6 +84,17 @@ export default function DocumentData({
       setCopyButtonTooltipText(translations("linkCopied"));
       setTimeout(() => setCopyButtonTooltipText(""), 2000);
    };
+
+   const shareLink = () => {
+      const url = `${window.location.origin}/workspace/${workspaceOrigin}/document/${docId}`;
+      const emailSubject = `${translations("shareLinkEmailSubject")} ${meta?.filename.replace("TruSpace - ", "")}`;
+      const emailBody = `\n-----\n${meta?.filename.replace("TruSpace - ", "")}\n\n${translations("shareLinkEmailBody1")}\n${url}\n\n${translations("shareLinkEmailBody2")}\n-----\n`;
+
+      window.location.href = `mailto:?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+
+      setShareButtonTooltipText(translations("linkShared"));
+      setTimeout(() => setShareButtonTooltipText(""), 2000);
+  };
 
    const isRichTextDocument = meta?.filename?.endsWith(".editableFile");
 
@@ -169,7 +182,7 @@ export default function DocumentData({
                )}
             </div>
             <div className="font-bold">{translations("docLink")}</div>
-            <div className="break-words">
+            <div className="break-words flex gap-2 mr-2">
                <Input
                   type="text"
                   value={`${window.location.origin}/workspace/${workspaceOrigin}/document/${docId}`}
@@ -185,13 +198,28 @@ export default function DocumentData({
                            className="text-left"
                            onClick={copyLink}
                         >
-                           <Link className="mr-2" />
+                           <Link />
                            {translations("copyLink")}
                         </Button>
                      </TooltipTrigger>
                      <TooltipContent>{copyButtonTooltipText}</TooltipContent>
                   </Tooltip>
                </TooltipProvider>
+               <TooltipProvider>
+                 <Tooltip open={shareButtonTooltipText !== ""}>
+                   <TooltipTrigger asChild>
+                     <Button
+                        variant="secondary"
+                        className="text-left"
+                        onClick={shareLink}
+                     >
+                       <Share2 />
+                       {translations("shareLink")}
+                     </Button>
+                   </TooltipTrigger>
+                   <TooltipContent>{shareButtonTooltipText}</TooltipContent>
+                 </Tooltip>
+                </TooltipProvider>
             </div>
             <div className="font-bold">{translations("contributors")}</div>
             <div className="flex flex-wrap gap-2">
