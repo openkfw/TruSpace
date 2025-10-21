@@ -44,6 +44,8 @@ services:
     image: ipfs/kubo:release
     restart: unless-stopped
     user: ${LUID}:${LGID}
+    environment:
+      IPFS_PROFILE: autoconf-off # applies on first init only
     ports:
       - "${SWARM_PORT}:${SWARM_PORT}" # ipfs swarm - expose if needed/wanted
       - "${IPFS_API_PORT}:${IPFS_API_PORT}" # ipfs api - expose if needed/wanted
@@ -60,13 +62,11 @@ services:
       - ipfs0
     environment:
       CLUSTER_PEERNAME: ${CLUSTER_PEERNAME_0}
-      CLUSTER_SECRET: ${CLUSTER_SECRET}
       CLUSTER_IPFSHTTP_NODEMULTIADDRESS: ${CLUSTER_IPFSHTTP_NODEMULTIADDRESS_0}
       CLUSTER_CRDT_TRUSTEDPEERS: ${CLUSTER_CRDT_TRUSTEDPEERS_0} # Trust all peers in Cluster
       CLUSTER_RESTAPI_HTTPLISTENMULTIADDRESS: ${CLUSTER_RESTAPI_HTTPLISTENMULTIADDRESS} # Expose API
       CLUSTER_PINSVCAPI_HTTPLISTENMULTIADDRESS: ${CLUSTER_PINSVCAPI_HTTPLISTENMULTIADDRESS} # Exposes Pinning Service API
       CLUSTER_MONITORPINGINTERVAL: ${CLUSTER_MONITORPINGINTERVAL} # Speed up peer discovery
-      CLUSTER_PEERS: ${CLUSTER_PEERS}
     ports:
       # Open API port (allows ipfs-cluster-ctl usage on host)
       - "${OPEN_API_PORT}:${OPEN_API_PORT}"
