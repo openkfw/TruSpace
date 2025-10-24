@@ -53,7 +53,7 @@ services:
     volumes:
       - ./volumes/ipfs0:/data/ipfs
       - ./init-ipfs-config.sh:/init-ipfs-config.sh:ro
-    entrypoint: ["/bin/sh", "/init-ipfs-config.sh"] # Custom entrypoint to setup private network settings
+    entrypoint: ["/init-ipfs-config.sh", "${SWARM_PORT}", "${IPFS_API_PORT}", "${IPFS_GATEWAY_PORT}"] # Custom entrypoint to setup private network settings
 
   cluster0:
     container_name: cluster0
