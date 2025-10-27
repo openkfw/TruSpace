@@ -105,29 +105,40 @@ Here is a step by step guide:
 - Copy the file into your node (**source node**) `./volumes/ipfs0/` folder and overwrite the existing `swarm.key`, i.e. `./volumes/ipfs0/swarm.key`
 
 - Obtain the cluster secret from the target node you want to connect to. It is the environment variable `CLUSTER_SECRET`, e.g. found in the `./.env` configuration of the target node.
-- This should be copied in your source node  `./.env` file in the variable `CLUSTER_SECRET`. This enables the two cluster nodes to connect to each other.
+- This should be copied in your source node `./.env` file in the variable `CLUSTER_SECRET`. This enables the two cluster nodes to connect to each other.
 
 - On the target node, use the following script to obtain relevant identifier values that you need to connect your source node to the target node:
 
 ```bash
-# Fetch values
-MY_IP="$(curl -s https://api.ipify.org)"
-IPFS_ID="$(jq -r '.Identity.PeerID' ./volumes/ipfs0/config)"
-CLUSTER_ID="$(jq -r '.id' ./volumes/cluster0/identity.json)"
+#!/usr/bin/env bash
+set -euo pipefail
 
-printf "\n"
-printf "🖧  My IP Address:\n"
-printf "    %s\n\n" "$MY_IP"
+# --- Config paths ---
+IPFS_CONFIG="./volumes/ipfs0/config"
+CLUSTER_IDENTITY="./volumes/cluster0/identity.json"
 
-printf "🛰  IPFS PeerID:\n"
-printf "    %s\n\n" "$IPFS_ID"
+# --- Fetch values ---
+MY_IP="$(curl -fsS https://api.ipify.org)"
+IPFS_ID="$(jq -r '.Identity.PeerID' "$IPFS_CONFIG")"
+CLUSTER_ID="$(jq -r '.id' "$CLUSTER_IDENTITY")"
 
-printf "📡  Cluster PeerID:\n"
-printf "    %s\n\n" "$CLUSTER_ID"
+# --- Output ---
+printf '\n'
+printf '🖧  My IP Address:\n'
+printf '    %s\n\n' "$MY_IP"
+
+printf '🛰  IPFS PeerID:\n'
+printf '    %s\n\n' "$IPFS_ID"
+
+printf '📡  Cluster PeerID:\n'
+printf '    %s\n\n' "$CLUSTER_ID"
+
+printf '🔗  Connect Peer:\n'
+printf '    sh ./connectPeer.sh %s %s %s\n\n' "$MY_IP" "$IPFS_ID" "$CLUSTER_ID"
 
 ```
 
-- Use the script `./connectPeer.sh` to modify the respective files for IPFS and Cluster. 
+- Use the script `./connectPeer.sh` to modify the respective files for IPFS and Cluster.
 
   The script uses the IP address and the respective `id` values and inserts them into the configuration files `./volumes/ipfs0/config` and `./volumes/cluster0/service.json`. So it looks somewhat like this, with the respective values from the script above:
 
