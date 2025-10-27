@@ -44,16 +44,12 @@ services:
     image: ipfs/kubo:release
     restart: unless-stopped
     user: ${LUID}:${LGID}
-    environment:
-      LIBP2P_FORCE_PNET: "1" # Enable private network
     ports:
       - "${SWARM_PORT}:${SWARM_PORT}" # ipfs swarm - expose if needed/wanted
       - "${IPFS_API_PORT}:${IPFS_API_PORT}" # ipfs api - expose if needed/wanted
       - "${IPFS_GATEWAY_PORT}:${IPFS_GATEWAY_PORT}" # ipfs gateway - expose if needed/wanted
     volumes:
       - ./volumes/ipfs0:/data/ipfs
-      - ./init-ipfs-config.sh:/init-ipfs-config.sh:ro
-    entrypoint: ["/init-ipfs-config.sh", "${SWARM_PORT}", "${IPFS_API_PORT}", "${IPFS_GATEWAY_PORT}"] # Custom entrypoint to setup private network settings
 
   cluster0:
     container_name: cluster0
