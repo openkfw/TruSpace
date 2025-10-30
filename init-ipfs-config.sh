@@ -6,9 +6,12 @@ SWARM_PORT=$1
 IPFS_API_PORT=$2
 IPFS_GATEWAY_PORT=$3
 
+FIRST_RUN=false
+
 if [ ! -f /data/ipfs/config ]; then
     echo "Initializing IPFS repository..."
     ipfs init
+    FIRST_RUN=true
 fi
 
 # Generate a random swarm.key if it doesn't exist
@@ -41,9 +44,13 @@ ipfs config --json DNS.Resolvers '{}'
 ipfs config --json Routing.DelegatedRouters '[]'
 ipfs config --json Ipns.DelegatedPublishers '[]'
 
-# Remove all bootstrap addresses
-echo "Clearing bootstrap addresses..."
-ipfs bootstrap rm --all
+# Only clear bootstrap addresses on the first run
+if [ "$FIRST_RUN" = true ]; then
+    echo "First run detected — clearing bootstrap addresses..."
+    ipfs bootstrap rm --all
+else
+    echo "Existing IPFS config detected — keeping bootstrap addresses."
+fi
 
 # Bind the API and Gateway to the ports specified in the environment variables
 echo "Binding API to 0.0.0.0:${IPFS_API_PORT}"
