@@ -49,7 +49,9 @@ services:
       - "${IPFS_API_PORT}:${IPFS_API_PORT}" # ipfs api - expose if needed/wanted
       - "${IPFS_GATEWAY_PORT}:${IPFS_GATEWAY_PORT}" # ipfs gateway - expose if needed/wanted
     volumes:
-      - ./volumes/ipfs0:/data/ipfs
+        - ./volumes/ipfs0:/data/ipfs
+        - ./init-ipfs-config.sh:/init-ipfs-config.sh:ro
+    entrypoint: ["/init-ipfs-config.sh", "${SWARM_PORT}", "${IPFS_API_PORT}", "${IPFS_GATEWAY_PORT}"] # Custom entrypoint to setup network settings with no bootstrapping
 
   cluster0:
     container_name: cluster0
@@ -60,13 +62,11 @@ services:
       - ipfs0
     environment:
       CLUSTER_PEERNAME: ${CLUSTER_PEERNAME_0}
-      CLUSTER_SECRET: ${CLUSTER_SECRET}
       CLUSTER_IPFSHTTP_NODEMULTIADDRESS: ${CLUSTER_IPFSHTTP_NODEMULTIADDRESS_0}
       CLUSTER_CRDT_TRUSTEDPEERS: ${CLUSTER_CRDT_TRUSTEDPEERS_0} # Trust all peers in Cluster
       CLUSTER_RESTAPI_HTTPLISTENMULTIADDRESS: ${CLUSTER_RESTAPI_HTTPLISTENMULTIADDRESS} # Expose API
       CLUSTER_PINSVCAPI_HTTPLISTENMULTIADDRESS: ${CLUSTER_PINSVCAPI_HTTPLISTENMULTIADDRESS} # Exposes Pinning Service API
       CLUSTER_MONITORPINGINTERVAL: ${CLUSTER_MONITORPINGINTERVAL} # Speed up peer discovery
-      CLUSTER_PEERS: ${CLUSTER_PEERS}
     ports:
       # Open API port (allows ipfs-cluster-ctl usage on host)
       - "${OPEN_API_PORT}:${OPEN_API_PORT}"
