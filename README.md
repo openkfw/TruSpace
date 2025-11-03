@@ -1,39 +1,34 @@
-# 🌐 TruSpace - an ai-infused, decentralized and sovereign document workspace
+<div align="center">
+    <img src="./doc/Admin Guide/TruSpaceLogo.svg" height=250>
+</div>
 
-The purpose of TruSpace is to make collaboration on documents between several stakeholders more efficient while making the respective data sovereign to all participants. It uses AI to support document interpretation and decentralization to stay in control of your data.
+# TruSpace - an AI-infused, decentralized and sovereign document workspace
 
-**Collaborative, decentralized document sharing and editing platform** built with **Next.js**, **Express.js**, **SQLite**, and **IPFS Cluster**. Enhanced with local LLM capabilities via **Ollama**, **Open Web UI** and a nice web-interface for a nice user experience.
+The purpose of TruSpace is to make collaboration on documents between several stakeholders more efficient while making the respective data **sovereign to all** participants. It uses AI to support document interpretation and decentralization to stay in control of your data.
 
----
+[![IPFS](https://img.shields.io/badge/IPFS-000000?style=for-the-badge&logo=ipfs&logoColor=white)](https://ipfs.tech) [![IPFS Cluster](https://img.shields.io/badge/IPFS%20Cluster-262626?style=for-the-badge)](https://ipfscluster.io) [![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/) [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org) [![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org) [![Ollama](https://img.shields.io/badge/Ollama-2563EB?style=for-the-badge)](https://ollama.com) [![Open Web UI](https://img.shields.io/badge/Open%20Web%20UI-111827?style=for-the-badge)](https://openwebui.com) [![GPL v3](https://img.shields.io/badge/GPL--3.0-red?style=for-the-badge)](./LICENSE)
 
 ## ✨ Key Features
 
 - 🆓 100% open-source, sovereign and self-hostable - no cloud provider needed
-- 🔄 Fully decentralized storage using IPFS Cluster: Automatic sync of data between trusted IPFS cluster nodes/partners (private or public setup)
+- 🔄 Fully decentralized storage using IPFS: Automatic sync of data between trusted IPFS nodes/partners (private or public setup)
 - 🧠 Local AI interpretation of documents using Ollama + Open Web UI using customisable pre-defined prompts
 - 🗂️ Workspace-based organization of content and participants
-
----
 
 ## Quick start, I want to..
 
 - 🧪 [Play around in a sandbox demo environment](#play-around-in-an-online-sandbox-demo-environment)
-- 💻 [Run it locally on my machine](#-run-it-locally-on-my-machine)
-- 🛠️ [Install a standalone server](#install-a-standalone-server)
+- 💻 [Install TruSpace locally](#install-truspace-locally)
 - 🌐 [Connect to other TruSpace nodes](#connect-to-other-truspace-nodes)
 - 📚 [Check out architecture, guides, details](#check-out-architecture-guides-details)
 
----
-
-## Play around in an online sandbox demo environment
+## 🧪 Play around in an online sandbox demo environment
 
 To check how TruSpace works, get to the sandbox installation at https://truspace.dev, register a new user, login and start playing with private and public workspaces! It's an experiment-sandbox, so your data might get deleted occasionally.
 
----
+## 💻 Install TruSpace locally
 
-## 📥 Run it locally on my machine
-
-For a very **quick and easy** TruSpace setup (e.g. for demos and first look) on your local machine using `localhost`, run:
+For a very **quick and easy** TruSpace setup on your local machine using `localhost`, run:
 
 ```bash
 git clone git@github.com:openkfw/TruSpace.git
@@ -41,29 +36,19 @@ cd TruSpace
 ./start.sh
 ```
 
-This command creates a simple environment configuration, creates docker volumes and spins up `docker compose` containing backend api and IPFS clusters and additionally NextJS frontend in dev mode. After startup, the frontend is available on `http://localhost:3000`. Register a user, login and create a workspace for documents!
+### What should I expect?
 
-If you plan to use another domain (e.g. on a local raspberry), make sure that the respective domains are updated from `localhost` to your `domain.local` in the `CORS` fields of the `.env` file (`CORS_ORIGIN` and `OI_CORS_ALLOW_ORIGIN`). This can be easily done in the `TruSpace` folder using the example environment:
+<details>
+<summary>Please open to see the expected results with screenshots</summary>
 
-```bash
-sed 's|http://localhost|http://example.com|g' .env.example > .env
-```
+1. Open frontend in your browser at [http://localhost:3000](http://localhost:3000) to see the login screen:
+   ![Screenshot of login screen](./doc/screenshot_login.png)
 
-To enable AI analysis, TruSpace downloads a model configured in `.env`, as an example here is `gemma3:1b` and you can see the full list at the [ollama DB](https://ollama.com/library?q=mistral&sort=popular).
+2. Click on "Register" to create a new user account. Fill out the required fields. The user account is local, your data is not going anywhere.
+   ![Screenshot of register screen](./doc/screenshot_register.png)
 
-Once the model is downloaded, AI analysis is executed upon each document upload automatically.
-
-**You made it and should see this**
-
-![Screenshot of login screen](./doc/screenshot_login.png)
-
-There'se an option to change the app langugae, too. Go ahead and _Sign up_ a new user.
-
-![Screenshot of register screen](./doc/screenshot_register.png)
-
-Fill out the required fields. The user account is local, your data is not going anywhere. After the submission, the app takes you back to the login screen, and from there to the dashboard.
-
-![Screenshot of dashboard](./doc/screenshot_dashboard.png)
+3. After the submission, the app takes you back to the login screen, and from there to the dashboard.
+   ![Screenshot of dashboard](./doc/screenshot_dashboard.png)
 
 If something doesn't work, check that all containers are running with `docker ps`. They should show these containers:
 | CONTAINER ID | IMAGE | COMMAND | CREATED | STATUS | PORTS | NAMES |
@@ -74,107 +59,65 @@ If something doesn't work, check that all containers are running with `docker ps
 | 783... |truspace-frontend | "sh startup.sh" | 26 minutes ago | Up 26 minutes (healthy) | 0.0.0.0:3000->3000/tcp, :::3000->3000/tcp | truspace-frontend-1|
 | 590... | ipfs/kubo:release | "/sbin/tini -- /usr/…" | 26 minutes ago | Up 26 minutes (healthy) | 0.0.0.0:4001->4001/tcp, 0.0.0.0:5001->5001/tcp, 4001/udp, 0.0.0.0:8080->8080/tcp, 8081/tcp | ipfs0 |
 
----
+</details>
 
-## Install a standalone server
+<br>
 
-There's an extensive guide how to install TruSpace on a (virtual) server or a Raspberry Pi. It includes steps how to install surrounding architecture like docker, a reverse proxy `nginx`, certificates via `LetsEncrypt` and all the other administrative steps. Have a look [here](./doc/installStandaloneServer.md) for a standalone server or [here](./doc/installRaspberryPi.md) for a setup on Raspberry Pi.
+> [!NOTE]
+> For more details on the local installation, feel free to check out one of the insallation guides [here](./doc/Admin%20Guide/Setup%20TruSpace/Installation.md). There are guides for a local dev setup, standalone server and raspberry pi.
 
----
+### FAQ - Local Installation
 
-## Connect to other TruSpace nodes
+<details>
+<summary>What happens beneath the hood?</summary>
 
-You have a TruSpace node running and would like to connect to another (private) network to sync the TruSpace data? It's simple - but you need to exchange some configuration values in order to have a secure private connection. The connection requires to
+The `start.sh` script creates a simple `.env` configuration, docker volumes and spins up `docker compose` containing backend api and IPFS and additionally NextJS frontend in dev mode. After startup, the frontend is available on `http://localhost:3000`. Register a user, login and create a workspace for documents!
 
-- Retrieve the **IP address(es)** of the target node to connect to
-- The **swarm key** to allow the IPFS nodes to connecto to each other without sharing the connection with anyone else
-- The **IPFS id** identifies the IPFS node in the network
-- The **cluster secret** to allow the IPFS cluster to share the pinning information which files should be shared between the nodes
-- The **cluster id** identifies the cluster in the network
+To enable AI analysis, TruSpace downloads a model configured in `.env`, as an example here is `gemma3:1b` and you can see the full list at the [ollama DB](https://ollama.com/library?q=mistral&sort=popular).
 
-Here is a step by step guide:
+Once the model is downloaded, AI analysis is executed upon each document upload automatically.
 
-- From the node at which you want to connect to (**target node**), get the file `swarm.key` from the folder `./volumes/ipfs0/swarm.key`. It should look approximately like this
+</details>
 
-```
-/key/swarm/psk/1.0.0/
-/base16/
-7c2c973709f5a961b.....8926a65b15477cf5
-```
+<details>
+<summary>How do I customize the domain?</summary>
 
-- Copy the file into your node (**source node**) `./volumes/ipfs0/` folder and overwrite the existing `swarm.key`, i.e. `./volumes/ipfs0/swarm.key`
-
-- Obtain the cluster secret from the target node you want to connect to. It is the environment variable `CLUSTER_SECRET`, e.g. found in the `./.env` configuration of the target node.
-- This should be copied in your source node `./.env` file in the variable `CLUSTER_SECRET`. This enables the two cluster nodes to connect to each other.
-
-- On the target node, use the following script to obtain relevant identifier values that you need to connect your source node to the target node:
+If you plan on using another domain (e.g. on a local raspberry), make sure that the respective domains are updated from `localhost` to your `domain.local` in the `CORS` fields of the `.env` file (`CORS_ORIGIN` and `OI_CORS_ALLOW_ORIGIN`). This can be easily done in the `TruSpace` folder using the example environment:
 
 ```bash
-#!/usr/bin/env bash
-set -euo pipefail
-
-# --- Config paths ---
-IPFS_CONFIG="./volumes/ipfs0/config"
-CLUSTER_IDENTITY="./volumes/cluster0/identity.json"
-
-# --- Fetch values ---
-MY_IP="$(curl -fsS https://api.ipify.org)"
-IPFS_ID="$(jq -r '.Identity.PeerID' "$IPFS_CONFIG")"
-CLUSTER_ID="$(jq -r '.id' "$CLUSTER_IDENTITY")"
-
-# --- Output ---
-printf '\n'
-printf '🖧  My IP Address:\n'
-printf '    %s\n\n' "$MY_IP"
-
-printf '🛰  IPFS PeerID:\n'
-printf '    %s\n\n' "$IPFS_ID"
-
-printf '📡  Cluster PeerID:\n'
-printf '    %s\n\n' "$CLUSTER_ID"
-
-printf '🔗  Connect Peer:\n'
-printf '    sh ./connectPeer.sh %s %s %s\n\n' "$MY_IP" "$IPFS_ID" "$CLUSTER_ID"
-
+sed 's|http://localhost|http://example.com|g' .env.example > .env
 ```
 
-- Use the script `./connectPeer.sh` to modify the respective files for IPFS and Cluster.
+</details>
 
-  The script uses the IP address and the respective `id` values and inserts them into the configuration files `./volumes/ipfs0/config` and `./volumes/cluster0/service.json`. So it looks somewhat like this, with the respective values from the script above:
+## 🌐 Connect to other TruSpace nodes
+
+You have a TruSpace node running and would like to connect to another (private) network to sync the TruSpace data? It's simple - but you need to exchange some configuration values in order to have a secure private connection.
+
+We have created a script `connectPeer.sh` that automates the process of connecting to another node. Execute the following command with your correct variables to configure the connection:
 
 ```bash
-./connectPeer.sh 213.154.217.25 <IPFS PeerID> <Cluster PeerID>
+./connectPeer.sh <peer_ip> <ipfs_peer_id> <cluster_peer_id> <ipfs_container_id> <cluster_container_id> [swarm_key_path] [cluster_secret_path]
 ```
 
-The script needs `jq` parser installed, if you don't have it, install it via `sudo apt-get install jq`.
+If provided parameters are correct, the script modifies the respective configuration files and automatically restarts the containers to apply the changes. Reload the frontend in your browser, and you should see the data from the connected node.
 
-If you prefer to do this manually on your installation, open the file `/volumes/cluster0/service.json` and search for the field `peer_addresses`. If you haven't connected to other nodes before, it is `"peer_addresses": []`. Enter the target node IP address and the node `id` that you retrieved before in this field, e.g. `"peer_addresses": []`. IPFS uses the multiaddress format, e.g. it is `"peer_addresses":["/ip4/192.168.1.100/tcp/9096/p2p/target_ID"]`. Do not forget to use `"` around the peer.
+> [!NOTE]
+> For more details on the how the connection to other IPFS nodes works, please read the detailed guide [here](./doc/Admin%20Guide/Setup%20TruSpace/Connecting%20to%20other%20nodes.md).
 
-- Restart all containers using `./start.sh` script
+## 📚 Check out architecture, guides, details...
 
-- Validate that the peers are available for both ipfs and cluster services. Both command should return peers for the IPFS network and the cluster network:
+### 🧑‍💻 User Guide
 
-```bash
-docker exec ipfs0 ipfs swarm peers
-```
+An extensive user guide with screenshots is available in the folder [User Guide](./doc/User%20Guide/). You can also check out our demo video on [YouTube](https://www.youtube.com/watch?v=dpo_D3NJpqE)!
 
-```bash
-docker exec cluster0 ipfs-cluster-ctl peers ls
-```
+### ⚗️ Developer Guide
 
-Also validate that all files have status `PINNED` and no errors are seen:
+For a guide on how to set up a development environment, contribute code, report issues and submit pull requests, please refer to the [Developer Guide](./doc/Developer%20Guide/README.md).
 
-```bash
-docker exec cluster0 ipfs-cluster-ctl status | grep PIN_ERROR
-```
+### 🛠️ Admin Guide
 
-- Finally if you update a file to a public workspace on any of the nodes, it should be visible "on the other side"
-
-## Check out architecture, guides, details..
-
-### Run development environment for coding
-
-For an installation guide in a development setup, please see [Installation and running of local environment](./doc/DEV_INSTALLATION.md)
+An extensive admin guide with screenshots is available in the folder [Admin Guide](./doc/Admin%20Guide/)
 
 ### ⚙️ Environment Variables
 
@@ -183,32 +126,21 @@ This project uses a set of environment variables to configure its frontend, back
 For a complete reference and description of all variables, see  
 ➡️ [ENVIRONMENT_VARIABLES.md](./doc/ENVIRONMENT_VARIABLES.md)
 
-### 🧑‍💻 User Guide
+### 🧰 Tech Stack and Architecture overview
 
-An extensive user guide with screenshots is available in the folder [User Guide](./doc/User%20Guide/)
-
-### 🛠️ Admin Guide
-
-An extensive admin guide with screenshots is available in the folder [Admin Guide](./doc/Admin%20Guide/)
-
-### Tech Architecture overview
+| Layer                 | Technologies                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Frontend              | [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org) [![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org) [![Radix UI](https://img.shields.io/badge/Radix%20UI-0F172A?style=for-the-badge)](https://www.radix-ui.com/) |
+| Backend               | [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Express.js](https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com)                                                                                                                                                                                                                                   |
+| Decentralized storage | [![IPFS](https://img.shields.io/badge/IPFS-000000?style=for-the-badge&logo=ipfs&logoColor=white)](https://ipfs.tech) [![IPFS Cluster](https://img.shields.io/badge/IPFS%20Cluster-262626?style=for-the-badge)](https://ipfscluster.io)                                                                                                                                                                                                                                                                                      |
+| User Database         | [![SQLite](https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://sqlite.org)                                                                                                                                                                                                                                                                                                                                                                                                 |
+| LLM Engine            | [![Ollama](https://img.shields.io/badge/Ollama-2563EB?style=for-the-badge)](https://ollama.com)                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| AI API and RAG        | [![Open Web UI](https://img.shields.io/badge/Open%20Web%20UI-111827?style=for-the-badge)](https://openwebui.com)                                                                                                                                                                                                                                                                                                                                                                                                            |
+| Containerization      | [![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)                                                                                                                                                                                                                                                                                                                                                                                            |
 
 In the overview, you can see how the components work together. The UI and API is part of this repository and provides the interface and the translation to other services. Once you start TruSpace, it pulls and connects to containers from Open Web UI (for AI processing) and IPFS/IPFS-Cluster to persist the data. The respective ports are outlined in the image.
 
-For the connection to other nodes, ports 4001 (IPFS swarm) and 9096/9097 (IPFS cluster) need to be opened.
-
 ![Architecture](./doc/tech-arch-diagram.PNG "Tech Architecture overview")
-
-### 🧰 Tech Stack
-
-| Layer          | Technology                                                          |
-| -------------- | ------------------------------------------------------------------- |
-| Frontend       | [Next.js](), [Radix UI](https://www.radix-ui.com/)                  |
-| Backend        | [Express.js](https://expressjs.com/)                                |
-| Database       | [SQLite](https://sqlite.org/)                                       |
-| Decentralized  | [IPFS](https://ipfs.tech/), [IPFS Cluster](https://ipfscluster.io/) |
-| LLM Engine     | [Ollama](https://ollama.com/)                                       |
-| AI API and RAG | [Open Web UI](https://openwebui.com/)                               |
 
 ### Data model for workspaces in IPFS
 
@@ -216,15 +148,14 @@ The data model has a hierarchical structure of workspaces, documents and metadat
 
 The specific fields are described in [backend/src/types/interfaces/truspace.ts](backend/src/types/interfaces/truspace.ts)
 
-### 🔄 IPFS Sync for the decentralization of data
+### IPFS Sync for the decentralization of data
 
-- Each organization runs its own node
+- Ideally, each organization runs its own node
 - Nodes automatically replicate documents and metadata (e.g. chats, versions, AI perspectives) within the network
-- Fault-tolerant and censorship-resistant
+- Pinning is orchestrated via IPFS Cluster to ensure data availability
+- Fault-tolerant and censorship-resistant architecture
 
-TODO
-
-### 🔐 Security & Data Privacy
+### Security & Data Privacy
 
 - Sensitive data (e.g. login credentials) is stored encrypted in **SQLite** on the local node
 - Documents are synced only to **trusted IPFS peers**, IPFS can be configured as private network by default
@@ -233,33 +164,20 @@ TODO
 
 ## 🤝 Contribution Guide
 
-We welcome contributions! Please read the [CONTRIBUTING.md](CONTRIBUTING.md) for:
+We welcome contributions! Please read the [CONTRIBUTING.md](CONTRIBUTING.md) and the [Developer Guide](./doc/Developer%20Guide/README.md) for:
 
 - Setting up a development environment
 - Reporting issues and submitting pull requests
 - Code style guidelines
 
----
-
-## 🛣 Roadmap
-
-- [ ] Real-time collaboration with CRDTs
-- [ ] Role-based access controls
-- [ ] Federated identity system
-- [ ] Mobile-friendly UI
-- [ ] Plugin system for document types and AI models
-
----
-
 ## 📜 License
 
 This project is licensed under the **GNU General Public License v3.0**. See the [LICENSE](./LICENSE) file for details.
 
----
-
 ## 💬 Community & Support
 
 - User guide: [User Guide](./doc/User%20Guide/README.md)
+- Developer guide: [Developer Guide](./doc/Developer%20Guide/README.md)
 - Admin guide: [Admin Guide](./doc/Admin%20Guide/README.md)
 - Discussions: [GitHub Discussions](https://github.com/openkfw/TruSpace/discussions)
 - Report issues: [GitHub Issues](https://github.com/openkfw/TruSpace/issues)
