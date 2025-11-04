@@ -105,7 +105,7 @@ docker exec ipfs0 ipfs swarm peers
 For the IPFS cluster:
 
 ```bash
- ipfs-cluster-ctl peers ls
+docker exec cluster0 ipfs-cluster-ctl peers ls
 ```
 
 You should see the newly added peer in both lists.
