@@ -69,7 +69,7 @@ printf '    %s\n\n' "$CLUSTER_ID"
   ```
   /ip4/<peer_ip>/tcp/4001/p2p/<ipfs_peer_id>
   ```
-- If you have a custom swarm key for your private IPFS network, add the swarm key to the `/volumes/ipfs0/swarm.key` file. This is optional; if no swarm key is provided, the default public IPFS network will be used. You can optionally provide the path of your swarm key file in the script command so it can be copied automatically. The swarm key should look something like this:
+- If you have a custom swarm key for your private IPFS network, add the swarm key to the `/volumes/ipfs0/swarm.key` file. This is optional; if no swarm key is provided, the default public IPFS network will be used. You can optionally provide the path of your swarm key file in the script command so the file can be copied into the `/volumes/ipfs0/` directory automatically. The swarm key should look something like this:
   ```
   /key/swarm/psk/1.0.0/
   /base16/
@@ -83,7 +83,10 @@ printf '    %s\n\n' "$CLUSTER_ID"
   ```
   /ip4/<peer_ip>/tcp/9096/p2p/<cluster_peer_id>
   ```
-- If you have a custom cluster secret for your private IPFS Cluster network, add the secret to the `/volumes/cluster0/service.json` file in the `secret` field. This is optional; if no secret is provided, the default public IPFS Cluster network will be used. You can optionally provide the path of your cluster secret file in the script command so it can be copied automatically.
+- If you have a custom cluster secret for your private IPFS Cluster network, add the secret to the `/volumes/cluster0/service.json` file in the `secret` field. This is optional; if no secret is provided, the default public IPFS Cluster network will be used. You can optionally provide the path of your cluster secret file (e.g. stored as a .txt file) in the script command so the value can be copied into the `service.json` file automatically. The cluster secret should look something like this:
+  ```
+  my_super_secret_cluster_key_12345
+  ```
 
 In our script, all configurations and ideally the keys are adapted automatically. Also, both the IPFS and IPFS cluster containers are restarted automatically to apply the changes. If you were to make the changes manually, make sure to restart both containers after making the changes.
 
