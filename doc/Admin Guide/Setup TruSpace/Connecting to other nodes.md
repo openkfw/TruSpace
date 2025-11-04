@@ -25,6 +25,12 @@ This script adapts the configuration in a few places to setup the IPFS and IPFS 
 | swarm_key_path | (Optional) Path to a swarm.key file for private IPFS networking. |
 | cluster_secret_path | (Optional) Path to a file containing the cluster secret.
 
+The command could look like this:
+
+```bash
+./connectPeer.sh 217.0.0.1 QmX...abc QmY...def ipfs0 cluster0 ./swarm.key ./my_cluster_secret.txt
+```
+
 <br>
 <details>
 <summary>To get the peer ip and peer ids, you can use this script</summary>
