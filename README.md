@@ -17,16 +17,16 @@ The purpose of TruSpace is to make collaboration on documents between several st
 
 ## Quick start, I want to..
 
-- 🧪 [Play around in a sandbox demo environment](#🧪-play-around-in-an-online-sandbox-demo-environment)
-- 💻 [Install TruSpace locally](#💻-install-truspace-locally)
-- 🌐 [Connect to other TruSpace nodes](#🌐-connect-to-other-truspace-nodes)
-- 📚 [Check out architecture, guides, details](#📚-check-out-architecture-guides-details)
+- 🧪 [Play around in a sandbox demo environment](#play-around-in-an-online-sandbox-demo-environment)
+- 💻 [Install TruSpace locally](#install-truspace-locally)
+- 🌐 [Connect to other TruSpace nodes](#connect-to-other-truspace-nodes)
+- 📚 [Check out architecture, guides, details](#check-out-architecture-guides-details)
 
-## 🧪 Play around in an online sandbox demo environment
+## Play around in an online sandbox demo environment
 
 To check how TruSpace works, get to the sandbox installation at https://truspace.dev, register a new user, login and start playing with private and public workspaces! It's an experiment-sandbox, so your data might get deleted occasionally.
 
-## 💻 Install TruSpace locally
+## Install TruSpace locally
 
 For a very **quick and easy** TruSpace setup on your local machine using `localhost`, run:
 
@@ -90,7 +90,7 @@ sed 's|http://localhost|http://example.com|g' .env.example > .env
 
 </details>
 
-## 🌐 Connect to other TruSpace nodes
+## Connect to other TruSpace nodes
 
 You have a TruSpace node running and would like to connect to another (private) network to sync the TruSpace data? It's simple - but you need to exchange some configuration values in order to have a secure private connection.
 
@@ -105,7 +105,7 @@ If provided parameters are correct, the script modifies the respective configura
 > [!NOTE]
 > For more details on the how the connection to other IPFS nodes works, please read the detailed guide [here](./doc/Admin%20Guide/Setup%20TruSpace/Connecting%20to%20other%20nodes.md).
 
-## 📚 Check out architecture, guides, details...
+## Check out architecture, guides, details...
 
 ### 🧑‍💻 User Guide
 
