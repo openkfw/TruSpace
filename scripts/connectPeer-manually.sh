@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #
-# connectPeer.sh
+# connectPeer-manually.sh
 #
 # Usage:
-#   connectPeer.sh <peer_ip> <ipfs_peer_id> <cluster_peer_id> <ipfs:container_id> <cluster_container_id> [swarm_key_path] [cluster_secret_path]
+#   connectPeer-manually.sh <peer_ip> <ipfs_peer_id> <cluster_peer_id> <ipfs:container_id> <cluster_container_id> [swarm_key_path] [cluster_secret_path]
 #
 # Description:
 #   Connects the local IPFS & Cluster nodes to a remote peer in a private network.
@@ -32,7 +32,7 @@ How to find your container ID:
   Then use either the "CONTAINER ID" or the "NAME" in this script.
 
 Example:
-  ./connectPeer.sh 10.0.0.2 QmPeer123 QmCluster456 ipfs0 cluster0 ./swarm.key ./cluster_secret.txt
+  ./connectPeer-manually.sh 10.0.0.2 QmPeer123 QmCluster456 ipfs0 cluster0 ./swarm.key ./cluster_secret.txt
 
 This script will:
   1. Optionally copy a swarm.key into ./volumes/ipfs0/.

@@ -94,10 +94,10 @@ sed 's|http://localhost|http://example.com|g' .env.example > .env
 
 You have a TruSpace node running and would like to connect to another (private) network to sync the TruSpace data? It's simple - but you need to exchange some configuration values in order to have a secure private connection.
 
-We have created a script `connectPeer.sh` that automates the process of connecting to another node. Execute the following command with your correct variables to configure the connection:
+We have created a script `scripts/connectPeer-manually.sh` that automates the process of connecting to another node. Execute the following command with your correct variables to configure the connection:
 
 ```bash
-./connectPeer.sh <peer_ip> <ipfs_peer_id> <cluster_peer_id> <ipfs_container_id> <cluster_container_id> [swarm_key_path] [cluster_secret_path]
+./connectPeer-manually.sh <peer_ip> <ipfs_peer_id> <cluster_peer_id> <ipfs_container_id> <cluster_container_id> [swarm_key_path] [cluster_secret_path]
 ```
 
 If provided parameters are correct, the script modifies the respective configuration files and automatically restarts the containers to apply the changes. Reload the frontend in your browser, and you should see the data from the connected node.
@@ -123,8 +123,7 @@ An extensive admin guide with screenshots is available in the folder [Admin Guid
 
 This project uses a set of environment variables to configure its frontend, backend, IPFS, and AI components.
 
-For a complete reference and description of all variables, see  
-➡️ [ENVIRONMENT_VARIABLES.md](./doc/ENVIRONMENT_VARIABLES.md)
+For a complete reference and description of all variables, see [ENVIRONMENT_VARIABLES.md](./doc/ENVIRONMENT_VARIABLES.md)
 
 ### 🧰 Tech Stack and Architecture overview
 

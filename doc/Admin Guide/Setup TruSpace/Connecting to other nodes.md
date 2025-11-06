@@ -8,10 +8,10 @@ To connect TruSpace to other IPFS nodes, you need to ensure that the IPFS cluste
 - The **cluster secret** to allow the IPFS cluster to share the pinning information which files should be shared between the nodes
 - The **cluster id** identifies the cluster in the network
 
-We have created a script `connectPeer.sh` that automates the process of connecting to another node (find the script [here](../../../connectPeer.sh)):
+We have created a script `scripts/connectPeer-manually.sh` that automates the process of connecting to another node (find the script [here](../../../connectPeer.sh)):
 
 ```bash
-./connectPeer.sh <peer_ip> <ipfs_peer_id> <cluster_peer_id> <ipfs_container_id> <cluster_container_id> [swarm_key_path] [cluster_secret_path]
+./connectPeer-manually.sh <peer_ip> <ipfs_peer_id> <cluster_peer_id> <ipfs_container_id> <cluster_container_id> [swarm_key_path] [cluster_secret_path]
 ```
 
 This script adapts the configuration in a few places to setup the IPFS and IPFS Cluster connection. The input arguments are as follows:
@@ -28,7 +28,7 @@ This script adapts the configuration in a few places to setup the IPFS and IPFS 
 The command could look like this:
 
 ```bash
-./connectPeer.sh 217.0.0.1 QmX...abc QmY...def ipfs0 cluster0 ./swarm.key ./my_cluster_secret.txt
+./connectPeer-manually.sh 217.0.0.1 QmX...abc QmY...def ipfs0 cluster0 ./swarm.key ./my_cluster_secret.txt
 ```
 
 <br>
