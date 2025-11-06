@@ -17,10 +17,10 @@ The purpose of TruSpace is to make collaboration on documents between several st
 
 ## Quick start, I want to..
 
-- 🧪 [Play around in a sandbox demo environment](#play-around-in-an-online-sandbox-demo-environment)
-- 💻 [Install TruSpace locally](#install-truspace-locally)
-- 🌐 [Connect to other TruSpace nodes](#connect-to-other-truspace-nodes)
-- 📚 [Check out architecture, guides, details](#check-out-architecture-guides-details)
+- 🧪 [Play around in a sandbox demo environment](#🧪-play-around-in-an-online-sandbox-demo-environment)
+- 💻 [Install TruSpace locally](#💻-install-truspace-locally)
+- 🌐 [Connect to other TruSpace nodes](#🌐-connect-to-other-truspace-nodes)
+- 📚 [Check out architecture, guides, details](#📚-check-out-architecture-guides-details)
 
 ## 🧪 Play around in an online sandbox demo environment
 
@@ -97,7 +97,7 @@ You have a TruSpace node running and would like to connect to another (private) 
 We have created a script `scripts/connectPeer-manually.sh` that automates the process of connecting to another node. Execute the following command with your correct variables to configure the connection:
 
 ```bash
-./connectPeer-manually.sh <peer_ip> <ipfs_peer_id> <cluster_peer_id> <ipfs_container_id> <cluster_container_id> [swarm_key_path] [cluster_secret_path]
+./scripts/connectPeer-manually.sh <peer_ip> <ipfs_peer_id> <cluster_peer_id> <ipfs_container_id> <cluster_container_id> [swarm_key_path] [cluster_secret_path]
 ```
 
 If provided parameters are correct, the script modifies the respective configuration files and automatically restarts the containers to apply the changes. Reload the frontend in your browser, and you should see the data from the connected node.
