@@ -10,8 +10,8 @@ warn(){ echo -e "${YELLOW}➜ $*${NC}"; }
 err(){ echo -e "${RED}✖ $*${NC}"; }
 
 #─── PATHS ────────────────────────────────────────────────────────────────────
-TEMPLATE="./.env.template"
-ENVFILE=".env"
+TEMPLATE="./../.env.template"
+ENVFILE="./../.env"
 
 #─── PRE-CHECK ─────────────────────────────────────────────────────────────────
 if [[ -f "$ENVFILE" ]]; then

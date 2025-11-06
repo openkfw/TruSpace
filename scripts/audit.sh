@@ -1,5 +1,5 @@
 echo "NPM auditing frontend dependencies"
-cd frontend
+cd ../frontend
 npm audit
 
 echo "NPM auditing backend dependencies"

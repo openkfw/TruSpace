@@ -65,9 +65,9 @@ CLUSTER_CONTAINER_ID="$5"
 SWARM_KEY_PATH="${6:-}"
 CLUSTER_SECRET_PATH="${7:-}"
 
-IPFS_CONFIG="./volumes/ipfs0/config"
-IPFS_SWARM_KEY="./volumes/ipfs0/swarm.key"
-CLUSTER_CONFIG="./volumes/cluster0/service.json"
+IPFS_CONFIG="./../volumes/ipfs0/config"
+IPFS_SWARM_KEY="./../volumes/ipfs0/swarm.key"
+CLUSTER_CONFIG="./../volumes/cluster0/service.json"
 
 # Validate files exist
 if [[ ! -f "$IPFS_CONFIG" ]]; then
