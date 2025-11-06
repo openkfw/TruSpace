@@ -110,7 +110,7 @@ tsc --version
 
 In order to run TruSpace, you need to setup a few environment variables. A list of all variables and whether they are required or not can be found [here](../ENVIRONMENT_VARIABLES.md).
 
-Further, we have created an exemplary `.env.example` file in the repository, which you can copy to `.env` and modify according to your needs. You can also use `configure.sh` to assist with the setup.
+Further, we have created an exemplary `.env.example` file in the repository, which you can copy to `.env` and modify according to your needs. You can also use `scripts/configure.sh` to assist with the setup.
 
 ## IDE
 

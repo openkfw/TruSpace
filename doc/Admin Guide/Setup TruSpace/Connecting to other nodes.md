@@ -1,43 +1,123 @@
 # Connecting to other IPFS nodes
 
-To connect TruSpace to other IPFS nodes, you need to ensure that the IPFS cluster is properly configured and that the necessary ports are open for communication. This allows TruSpace to sync data with other nodes in the network.
+To connect TruSpace to other IPFS nodes, you need to ensure that the IPFS cluster is properly configured and that the necessary ports are open for communication. This allows TruSpace to sync data with other nodes in the network. The connection requires
 
-To connect another node, it needs to be added to the cluster:
+- The **IP address(es)** of the target node to connect to
+- The **swarm key** to allow the IPFS nodes to connecto to each other without sharing the connection with anyone else
+- The **IPFS id** identifies the IPFS node in the network
+- The **cluster secret** to allow the IPFS cluster to share the pinning information which files should be shared between the nodes
+- The **cluster id** identifies the cluster in the network
 
-1. Ensure that the IPFS cluster is running and accessible.
-2. Enter the configuration file for the cluster node:
-   ```bash
-   nano ~/truspace/volumes/cluster0/service.json
-   ```
-3. In the `/volumes/cluster0/service.json` file **of your target node**, locate the `secret` field and copy this into your `.env` file as the variable `CLUSTER_SECRET`:
-   ```json
-   {
-     "secret": "141a2511dae98...e3c47f69d1e12203246f92"
-   }
-   ```
-4. In the `/volumes/cluster0/identity.json` file **of your target node**, copy the value into the field `id`
-5. In the `/volumes/cluster0/service.json` file **of your installation**, locate the `peer_addresses` field and add the address of the peer node you want to connect to (if you haven't connected to others, it will be empty). Enter the target node IP address and the node `id` that you retrieved from the target node's `/volumes/cluster0/service.json` file. The format should be:
-   ```json
-   {
-     "peer_addresses": ["/ip4/192.168.1.100/tcp/9096/p2p/target_ID"]
-   }
-   ```
-
----
-
-6. Save the changes and exit the editor.
-7. Restart the cluster container to apply the changes:
-   ```bash
-   docker-compose restart cluster0
-   ```
-8. Log in to the cluster container using:
-   ```bash
-   docker exec -it cluster0 sh
-   ```
-9. Execute the following command to check if the peer has been added successfully:
+We have created a script `scripts/connectPeer-manually.sh` that automates the process of connecting to another node (find the script [here](../../../connectPeer.sh)):
 
 ```bash
- ipfs-cluster-ctl peers ls
+./connectPeer-manually.sh <peer_ip> <ipfs_peer_id> <cluster_peer_id> <ipfs_container_id> <cluster_container_id> [swarm_key_path] [cluster_secret_path]
 ```
 
-The output should show the cluster0 peer and indicate that it sees _1_ other peer, confirming that the connection was successful.
+This script adapts the configuration in a few places to setup the IPFS and IPFS Cluster connection. The input arguments are as follows:
+| Argument | Description |
+|-----------------------|--------------------------------------------------------------|
+| peer_ip | IP address of the peer you want to connect to. |
+| ipfs_peer_id | The libp2p Peer ID of the target IPFS node. |
+| cluster_peer_id | The libp2p Peer ID of the target IPFS-Cluster node. |
+| ipfs_container_id | Docker container ID or name for the local IPFS node. |
+| cluster_container_id | Docker container ID or name for the IPFS cluster. |
+| swarm_key_path | (Optional) Path to a swarm.key file for private IPFS networking. |
+| cluster_secret_path | (Optional) Path to a file containing the cluster secret.
+
+The command could look like this:
+
+```bash
+./connectPeer-manually.sh 217.0.0.1 QmX...abc QmY...def ipfs0 cluster0 ./swarm.key ./my_cluster_secret.txt
+```
+
+<br>
+<details>
+<summary>To get the peer ip and peer ids, you can use this script</summary>
+On the target node, use the following script to obtain relevant identifier values that you need to connect your source node to the target node:
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+# --- Config paths ---
+IPFS_CONFIG="./volumes/ipfs0/config"
+CLUSTER_IDENTITY="./volumes/cluster0/identity.json"
+
+# --- Fetch values ---
+MY_IP="$(curl -fsS https://api.ipify.org)"
+IPFS_ID="$(jq -r '.Identity.PeerID' "$IPFS_CONFIG")"
+CLUSTER_ID="$(jq -r '.id' "$CLUSTER_IDENTITY")"
+
+# --- Output ---
+printf '\n'
+printf '🖧  My IP Address:\n'
+printf '    %s\n\n' "$MY_IP"
+
+printf '🛰  My IPFS ID:\n'
+printf '    %s\n\n' "$IPFS_ID"
+
+printf '📡  My Cluster ID:\n'
+printf '    %s\n\n' "$CLUSTER_ID"
+```
+
+</details>
+
+### IPFS network connection
+
+- Add IPFS address of target node as bootstrap address. This enables the IPFS node to find and connect to the target node. It is added automatically by the script in the `/volumes/ipfs0/config` file in the `Bootstrap` section. The address looks like this:
+  ```
+  /ip4/<peer_ip>/tcp/4001/p2p/<ipfs_peer_id>
+  ```
+- If you have a custom swarm key for your private IPFS network, add the swarm key to the `/volumes/ipfs0/swarm.key` file. This is optional; if no swarm key is provided, the default public IPFS network will be used. You can optionally provide the path of your swarm key file in the script command so the file can be copied into the `/volumes/ipfs0/` directory automatically. The swarm key should look something like this:
+  ```
+  /key/swarm/psk/1.0.0/
+  /base16/
+  7c2c973709f5a961b.....8926a65b15477cf5
+  ```
+- In our script, we also adapt some settings in order for the private networking to work properly.
+
+### IPFS cluster connection
+
+- Add the cluster address of the target node in the `/volumes/cluster0/service.json` file in the `peer_addresses` section (automized in our script). This enables the IPFS Cluster to find and connect to the target node. The address looks like this:
+  ```
+  /ip4/<peer_ip>/tcp/9096/p2p/<cluster_peer_id>
+  ```
+- If you have a custom cluster secret for your private IPFS Cluster network, add the secret to the `/volumes/cluster0/service.json` file in the `secret` field. This is optional; if no secret is provided, the default public IPFS Cluster network will be used. You can optionally provide the path of your cluster secret file (e.g. stored as a .txt file) in the script command so the value can be copied into the `service.json` file automatically. The cluster secret should look something like this:
+  ```
+  my_super_secret_cluster_key_12345
+  ```
+
+In our script, all configurations and ideally the keys are adapted automatically. Also, both the IPFS and IPFS cluster containers are restarted automatically to apply the changes. If you were to make the changes manually, make sure to restart both containers after making the changes.
+
+### Verification
+
+To verify that the connection was successful, here are some scripts:
+
+#### Find added peer
+
+For the IPFS node:
+
+```bash
+docker exec ipfs0 ipfs swarm peers
+```
+
+For the IPFS cluster:
+
+```bash
+docker exec cluster0 ipfs-cluster-ctl peers ls
+```
+
+You should see the newly added peer in both lists.
+
+#### Check pinned items
+
+Validate that all files have status `PINNED` and no errors are seen:
+
+```bash
+docker exec cluster0 ipfs-cluster-ctl status | grep PIN_ERROR
+```
+
+#### Practical check
+
+Finally, if you update a file to a public workspace on any of the nodes, it should be visible "on the other side".

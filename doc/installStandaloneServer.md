@@ -341,7 +341,7 @@ cd TruSpace
 For an initial configuration of the application run the configuration script. It asks you a couple of configuration questions, if in doubt accept the default settings. You can easily change them later.
 
 ```bash
-bash configure.sh
+bash scripts/configure.sh
 ```
 
 Then start the TruSpace installation with option `--remove-peers`, so that your server doesn't connect to any known boostrap peers in the network. You can add other peers later if you like:

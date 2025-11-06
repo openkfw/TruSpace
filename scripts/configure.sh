@@ -10,8 +10,8 @@ warn(){ echo -e "${YELLOW}➜ $*${NC}"; }
 err(){ echo -e "${RED}✖ $*${NC}"; }
 
 #─── PATHS ────────────────────────────────────────────────────────────────────
-TEMPLATE="./.env.template"
-ENVFILE=".env"
+TEMPLATE="./../.env.template"
+ENVFILE="./../.env"
 
 #─── PRE-CHECK ─────────────────────────────────────────────────────────────────
 if [[ -f "$ENVFILE" ]]; then
@@ -23,28 +23,6 @@ if [[ ! -f "$TEMPLATE" ]]; then
   err "Template file '$TEMPLATE' not found in $(pwd). Please place your template there."
   exit 1
 fi
-
-#─── GENERATE SECRETS ───────────────────────────────────────────────────────────
-warn "Generating secure secrets..."
-SWARM_KEY_SECRET=$(openssl rand -hex 32)
-CLUSTER_SECRET=$(openssl rand -hex 32)
-info "  • SWARM_KEY_SECRET: ${SWARM_KEY_SECRET:0:8}…${SWARM_KEY_SECRET: -8}"
-info "  • CLUSTER_SECRET : ${CLUSTER_SECRET:0:8}…${CLUSTER_SECRET: -8}"
-
-#─── CREATE IPFS SWARM KEY ──────────────────────────────────────────────────────
-IPFS_SWARM_DIR="./volumes/ipfs0"
-IPFS_SWARM_KEY_FILE="$IPFS_SWARM_DIR/swarm.key"
-
-warn "Ensuring IPFS swarm key directory exists at $IPFS_SWARM_DIR"
-mkdir -p "$IPFS_SWARM_DIR"
-
-warn "Writing IPFS swarm key to $IPFS_SWARM_KEY_FILE"
-cat > "$IPFS_SWARM_KEY_FILE" <<EOF
-/key/swarm/psk/1.0.0/
-/base16/
-$SWARM_KEY_SECRET
-EOF
-info "IPFS swarm key generated."
 
 #─── PROMPTS ───────────────────────────────────────────────────────────────────
 echo
@@ -81,8 +59,6 @@ info "Copied $TEMPLATE → $ENVFILE"
 #─── SUBSTITUTE PLACEHOLDERS ───────────────────────────────────────────────────
 if [[ "$OSTYPE" == "darwin"* ]]; then
   sed -i '' \
-    -e "s|<SWARM_KEY_SECRET>|${SWARM_KEY_SECRET}|g" \
-    -e "s|<CLUSTER_SECRET>|${CLUSTER_SECRET}|g" \
     -e "s|<NODE_ENV>|${NODE_ENV}|g" \
     -e "s|<DOMAIN>|${DOMAIN}|g" \
     -e "s|<OI_PASSWORD>|${OI_PASSWORD}|g" \
@@ -90,16 +66,12 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     "$ENVFILE"
 else
   sed -i \
-    -e "s|<SWARM_KEY_SECRET>|${SWARM_KEY_SECRET}|g" \
-    -e "s|<CLUSTER_SECRET>|${CLUSTER_SECRET}|g" \
     -e "s|<NODE_ENV>|${NODE_ENV}|g" \
     -e "s|<DOMAIN>|${DOMAIN}|g" \
     -e "s|<OI_PASSWORD>|${OI_PASSWORD}|g" \
     -e "s|<API_DOMAIN>|${API_DOMAIN}|g" \
     "$ENVFILE"
 fi
-  -e "s|<SWARM_KEY_SECRET>|${SWARM_KEY_SECRET}|g" \
-  -e "s|<CLUSTER_SECRET>|${CLUSTER_SECRET}|g" \
   -e "s|<NODE_ENV>|${NODE_ENV}|g" \
   -e "s|<DOMAIN>|${DOMAIN}|g" \
   -e "s|<OI_PASSWORD>|${OI_PASSWORD}|g" \
