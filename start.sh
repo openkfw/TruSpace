@@ -186,8 +186,6 @@ if [ ${#skip_containers[@]} -gt 0 ]; then
   done
 fi
 
-exit 0
-
 # Remove any previous Docker containers (including orphans) if in dev mode
 if [ "$DEV" = "true" ]; then
   echo
