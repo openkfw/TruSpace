@@ -1,13 +1,9 @@
 services:
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-      args:
-        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+    container_name: truspace-frontend
+    # build or pull image determined by env variable BUILD_OR_PULL_IMAGES or --dev flag in start.sh
     restart: on-failure
     environment:
-      NODE_ENV: ${NODE_ENV}
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
     ports:
       - ${FRONTEND_PORT}:${FRONTEND_PORT}

@@ -1,0 +1,22 @@
+# This docker-compose file is used when BUILD_OR_PULL_IMAGES=build
+# All relevant containers are built in dev mode with relevant source code mounted as volumes
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/index.ts:/app/index.ts
+      - ./backend/nodemon.json:/app/nodemon.json
+      - ./backend/prompts:/app/prompts
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+    environment:
+      NODE_ENV: ${NODE_ENV}
