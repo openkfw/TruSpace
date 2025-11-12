@@ -69,40 +69,14 @@ This script adapts the configuration in a few places to setup the IPFS and IPFS 
 The command could look like this:
 
 ```bash
-./connectPeer-manually.sh 217.0.0.1 QmX...abc QmY...def ipfs0 cluster0 ./swarm.key ./my_cluster_secret.txt
+./scripts/connectPeer-manually.sh 217.0.0.1 QmX...abc QmY...def ipfs0 cluster0 ./swarm.key ./my_cluster_secret.txt
 ```
 
-<br>
-<details>
-<summary>To get the peer ip and peer ids, you can use this script</summary>
-On the target node, use the following script to obtain relevant identifier values that you need to connect your source node to the target node:
+To get the connection details, you can run this script on the target node:
 
 ```bash
-#!/usr/bin/env bash
-set -euo pipefail
-
-# --- Config paths ---
-IPFS_CONFIG="./volumes/ipfs0/config"
-CLUSTER_IDENTITY="./volumes/cluster0/identity.json"
-
-# --- Fetch values ---
-MY_IP="$(curl -fsS https://api.ipify.org)"
-IPFS_ID="$(jq -r '.Identity.PeerID' "$IPFS_CONFIG")"
-CLUSTER_ID="$(jq -r '.id' "$CLUSTER_IDENTITY")"
-
-# --- Output ---
-printf '\n'
-printf '🖧  My IP Address:\n'
-printf '    %s\n\n' "$MY_IP"
-
-printf '🛰  My IPFS ID:\n'
-printf '    %s\n\n' "$IPFS_ID"
-
-printf '📡  My Cluster ID:\n'
-printf '    %s\n\n' "$CLUSTER_ID"
+./scripts/fetch_connection.sh
 ```
-
-</details>
 
 ### IPFS network connection
 
