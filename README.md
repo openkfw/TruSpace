@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="./doc/Admin Guide/TruSpaceLogo.svg" height=125>
+    <img src="./doc/Admin Guide/TruSpaceLogo.svg" height=250>
 </div>
 
 # TruSpace - an AI-infused, decentralized and sovereign document workspace
@@ -7,17 +7,17 @@
 <p align="center" style="display: flex; flex-direction: column; gap: 10px;">
 
   <!-- Row 1 -->
-  <div style="display: flex; justify-content: center; gap: 6px;">
-    <img src="./doc/images/login.png" alt="Log In" style="width: 32%; aspect-ratio: 17 / 9; object-fit: cover; border-radius: 5px;">
-    <img src="./doc/images/welcome.png" alt="Welcome" style="width: 32%; aspect-ratio: 17 / 9; object-fit: cover; border-radius: 5px;">
-    <img src="./doc/images/app_status.png" alt="App Status" style="width: 32%; aspect-ratio: 17 / 9; object-fit: cover; border-radius: 5px;">
+  <div style="display: flex; justify-content: center; gap: 10px;">
+    <img src="./doc/images/login.png" alt="Log In" style="width: 32%; border-radius: 2px;">
+    <img src="./doc/images/welcome.png" alt="Welcome" style="width: 32%; border-radius: 2px;">
+    <img src="./doc/images/app_status.png" alt="App Status" style="width: 32%; border-radius: 2px;">
   </div>
 
   <!-- Row 2 -->
-  <div style="display: flex; justify-content: center; gap: 6px; margin-top: 6px;">
-    <img src="./doc/images/workspace.png" alt="Workspace" style="width: 32%; aspect-ratio: 17 / 9; object-fit: cover; border-radius: 5px;">
-    <img src="./doc/images/workspace_darkmode.png" alt="Workspace Dark Mode" style="width: 32%; aspect-ratio: 17 / 9; object-fit: cover; border-radius: 5px;">
-    <img src="./doc/images/document_overview.png" alt="Document Overview" style="width: 32%; aspect-ratio: 17 / 9; object-fit: cover; border-radius: 5px;">
+  <div style="display: flex; justify-content: center; gap: 10px; margin-top: 10px;">
+    <img src="./doc/images/workspace.png" alt="Workspace" style="width: 32%; border-radius: 2px;">
+    <img src="./doc/images/workspace_darkmode.png" alt="Workspace Dark Mode" style="width: 32%; border-radius: 2px;">
+    <img src="./doc/images/document_overview.png" alt="Document Overview" style="width: 32%; border-radius: 2px;">
   </div>
 
 </p>
