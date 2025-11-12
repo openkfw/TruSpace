@@ -69,6 +69,20 @@ If something doesn't work, check that all containers are running with `docker ps
 ### FAQ - Local Installation
 
 <details>
+<summary>Can I configure how I start the application?</summary>
+
+You have multiple options to configure the TruSpace installation before starting it. You can either edit the `.env` file directly (after copying it from `.env.example`). You can find a detailed description of all environment variables in [ENVIRONMENT_VARIABLES.md](./doc/ENVIRONMENT_VARIABLES.md).
+
+Alternatively, you can set flags in `start.sh` to enable certain behaviors:
+
+- `--dev` : starts the application in development mode (always build backend and frontend instead of pulling docker images (identical to `BUILD_OR_PULL_IMAGES=build`))
+- `--local-frontend`: start the frontend locally instead of in Docker
+- `--no-ai`: disable AI functionality (Ollama and Open-WebUI) when starting the application (identical to `DISABLE_ALL_AI_FUNCTIONALITY=true`)
+- `--remove-peers`: after IPFS starts, remove default bootstrap peers via the IPFS API
+
+</details>
+
+<details>
 <summary>What happens beneath the hood?</summary>
 
 The `start.sh` script creates a simple `.env` configuration, docker volumes and spins up `docker compose` containing backend api and IPFS and additionally NextJS frontend in dev mode. After startup, the frontend is available on `http://localhost:3000`. Register a user, login and create a workspace for documents!
@@ -86,6 +100,12 @@ If you plan on using another domain (e.g. on a local raspberry), make sure that 
 
 ```bash
 sed 's|http://localhost|http://example.com|g' .env.example > .env
+```
+
+You can also use the `scripts/configure-env.sh` to configure your domains and some other settings interactively:
+
+```bash
+./scripts/configure-env.sh
 ```
 
 </details>
