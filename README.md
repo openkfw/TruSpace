@@ -6,33 +6,18 @@
 
 <p align="center" style="display: flex; flex-direction: column; gap: 10px;">
 
-  <style>
-    .image-row {
-      display: flex;
-      justify-content: center;
-      gap: 6px;
-    }
-
-    .image-row img {
-      width: 32%;
-      aspect-ratio: 17 / 9; /* gleiches Seitenverhältnis für alle */
-      object-fit: cover;    /* füllt das Bild proportional aus */
-      border-radius: 5px;
-    }
-  </style>
-
   <!-- Row 1 -->
-  <div class="image-row">
-    <img src="./doc/images/login.png" alt="Log In">
-    <img src="./doc/images/welcome.png" alt="Welcome">
-    <img src="./doc/images/app_status.png" alt="App Status">
+  <div style="display: flex; justify-content: center; gap: 6px;">
+    <img src="./doc/images/login.png" alt="Log In" style="width: 32%; aspect-ratio: 17 / 9; object-fit: cover; border-radius: 5px;">
+    <img src="./doc/images/welcome.png" alt="Welcome" style="width: 32%; aspect-ratio: 17 / 9; object-fit: cover; border-radius: 5px;">
+    <img src="./doc/images/app_status.png" alt="App Status" style="width: 32%; aspect-ratio: 17 / 9; object-fit: cover; border-radius: 5px;">
   </div>
 
   <!-- Row 2 -->
-  <div class="image-row" style="margin-top: 6px;">
-    <img src="./doc/images/workspace.png" alt="Workspace">
-    <img src="./doc/images/workspace_darkmode.png" alt="Workspace Dark Mode">
-    <img src="./doc/images/document_overview.png" alt="Document Overview">
+  <div style="display: flex; justify-content: center; gap: 6px; margin-top: 6px;">
+    <img src="./doc/images/workspace.png" alt="Workspace" style="width: 32%; aspect-ratio: 17 / 9; object-fit: cover; border-radius: 5px;">
+    <img src="./doc/images/workspace_darkmode.png" alt="Workspace Dark Mode" style="width: 32%; aspect-ratio: 17 / 9; object-fit: cover; border-radius: 5px;">
+    <img src="./doc/images/document_overview.png" alt="Document Overview" style="width: 32%; aspect-ratio: 17 / 9; object-fit: cover; border-radius: 5px;">
   </div>
 
 </p>
