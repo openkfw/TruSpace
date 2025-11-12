@@ -94,13 +94,26 @@ sed 's|http://localhost|http://example.com|g' .env.example > .env
 
 You have a TruSpace node running and would like to connect to another (private) network to sync the TruSpace data? It's simple - but you need to exchange some configuration values in order to have a secure private connection.
 
-We have created a script `scripts/connectPeer-manually.sh` that automates the process of connecting to another node. Execute the following command with your correct variables to configure the connection:
+We have created an **automated** way to connect your TruSpace IPFS node to another TruSpace IPFS node using 2 scripts:
+
+- `scripts/fetch_connection.sh`: This script fetches the necessary connection details from the target node ([find the script here](../../../scripts/fetch_connection.sh))
+- `scripts/connectPeer-automatic.sh`: This script connects your local TruSpace IPFS node to the target node using the fetched details ([find the script here](../../../scripts/connectPeer-automatic.sh))
+
+In an ideal environment, these commands are all you need to connect to another TruSpace node:
+
+```bash
+# On you target node, run and send the emails with encrypted connection details:
+./scripts/fetch_connection.sh anakin@starrider.com
+
+# On your local node, store the received .connection and .connection.password files in the root TruSpace directory, then run:
+./scripts/connectPeer-automatic.sh .connection .connection.password
+```
+
+For more **manual** control, we also provide a manual setup option further with `scripts/connectPeer-manually.sh`
 
 ```bash
 ./scripts/connectPeer-manually.sh <peer_ip> <ipfs_peer_id> <cluster_peer_id> <ipfs_container_id> <cluster_container_id> [swarm_key_path] [cluster_secret_path]
 ```
-
-If provided parameters are correct, the script modifies the respective configuration files and automatically restarts the containers to apply the changes. Reload the frontend in your browser, and you should see the data from the connected node.
 
 > [!NOTE]
 > For more details on the how the connection to other IPFS nodes works, please read the detailed guide [here](./doc/Admin%20Guide/Setup%20TruSpace/Connecting%20to%20other%20nodes.md).
