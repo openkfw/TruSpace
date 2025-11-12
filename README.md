@@ -4,6 +4,24 @@
 
 # TruSpace - an AI-infused, decentralized and sovereign document workspace
 
+<p align="center" style="display: flex; flex-direction: column; gap: 10px;">
+
+  <!-- Row 1 -->
+  <div style="display: flex; justify-content: center; gap: 10px;">
+    <img src="./doc/images/login.png" alt="Log In" style="width: 32%; border-radius: 2px;">
+    <img src="./doc/images/welcome.png" alt="Welcome" style="width: 32%; border-radius: 2px;">
+    <img src="./doc/images/app_status.png" alt="App Status" style="width: 32%; border-radius: 2px;">
+  </div>
+
+  <!-- Row 2 -->
+  <div style="display: flex; justify-content: center; gap: 10px; margin-top: 10px;">
+    <img src="./doc/images/workspace.png" alt="Workspace" style="width: 32%; border-radius: 2px;">
+    <img src="./doc/images/workspace_darkmode.png" alt="Workspace Dark Mode" style="width: 32%; border-radius: 2px;">
+    <img src="./doc/images/document_overview.png" alt="Document Overview" style="width: 32%; border-radius: 2px;">
+  </div>
+
+</p>
+
 The purpose of TruSpace is to make collaboration on documents between several stakeholders more efficient while making the respective data **sovereign to all** participants. It uses AI to support document interpretation and decentralization to stay in control of your data.
 
 [![IPFS](https://img.shields.io/badge/IPFS-000000?style=for-the-badge&logo=ipfs&logoColor=white)](https://ipfs.tech) [![IPFS Cluster](https://img.shields.io/badge/IPFS%20Cluster-262626?style=for-the-badge)](https://ipfscluster.io) [![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/) [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org) [![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org) [![Ollama](https://img.shields.io/badge/Ollama-2563EB?style=for-the-badge)](https://ollama.com) [![Open Web UI](https://img.shields.io/badge/Open%20Web%20UI-111827?style=for-the-badge)](https://openwebui.com) [![GPL v3](https://img.shields.io/badge/GPL--3.0-red?style=for-the-badge)](./LICENSE)
