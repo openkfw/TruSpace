@@ -6,19 +6,23 @@ Thank you for considering contributing to our project! Your help improves our co
 
 ## Table of Contents
 
-- [Getting Started](#getting-started)
-- [How to Contribute](#how-to-contribute)
-  - [Reporting Issues](#reporting-issues)
-  - [Suggesting Enhancements](#suggesting-enhancements)
-  - [Submitting Pull Requests](#submitting-pull-requests)
-- [Code Standards and Best Practices](#code-standards-and-best-practices)
-  - [Coding Style](#coding-style)
-  - [Commit Messages](#commit-messages)
-  - [Documentation](#documentation)
-- [Communication](#communication)
-- [License](#license)
-- [Code of Conduct](#code-of-conduct)
-- [Acknowledgement](#acknowledgement)
+- [Contributing](#contributing)
+- [Contributing to TruSpace](#contributing-to-truspace)
+  - [Table of Contents](#table-of-contents)
+  - [Getting Started](#getting-started)
+  - [How to Contribute](#how-to-contribute)
+    - [Reporting Issues](#reporting-issues)
+    - [Suggesting Enhancements](#suggesting-enhancements)
+    - [Submitting Pull Requests](#submitting-pull-requests)
+  - [Code Standards and Best Practices](#code-standards-and-best-practices)
+    - [Coding Style](#coding-style)
+    - [Commit Messages](#commit-messages)
+    - [Documentation](#documentation)
+  - [Communication](#communication)
+  - [License](#license)
+  - [Code of Conduct](#code-of-conduct)
+  - [Acknowledgement](#acknowledgement)
+  - [Installation](#installation)
 
 ---
 
@@ -106,7 +110,4 @@ Happy coding!
 
 ## Installation
 
-For installation steps, please refer to the [Dev Installation](./DEV_INSTALLATION.md) manual.
-
-
-
+For installation steps, please refer to [this guide](./doc/Developer%20Guide/Setting%20up%20development%20environment.md).

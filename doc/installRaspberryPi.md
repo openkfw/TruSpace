@@ -13,7 +13,7 @@
 git clone https://github.com/openkfw/TruSpace.git
 ```
 
-- Execute configuration script `bash ./scripts/configure.sh`. Select `development` as `NODE_ENV`, in case the raspberry runs on a local installation and is not available via DNS. Otherwise the CORS handling might be too strict.
+- Execute configuration script `bash ./scripts/configure-env.sh`. Select `development` as `NODE_ENV`, in case the raspberry runs on a local installation and is not available via DNS. Otherwise the CORS handling might be too strict.
 
 - If the IPFS connection is too slow, you can also execute `docker exec ipfs0 ipfs config profile apply lowpower`, which creates a config file that is optimised for slow servers. However you have to update the `Routing` variable to `dht` again in the config file in `./volumes/ipfs0/config`:
 
@@ -56,6 +56,13 @@ or
 ./start.sh
 ```
 
+Alternatively, you can set flags in `start.sh` to enable certain behaviors:
+
+- `--dev` : starts the application in development mode (always build backend and frontend instead of pulling docker images (identical to `BUILD_OR_PULL_IMAGES=build`))
+- `--local-frontend`: start the frontend locally instead of in Docker
+- `--no-ai`: disable AI functionality (Ollama and Open-WebUI) when starting the application (identical to `DISABLE_ALL_AI_FUNCTIONALITY=true`)
+- `--remove-peers`: after IPFS starts, remove default bootstrap peers via the IPFS API
+
 ---
 
 **NOTE**
@@ -75,10 +82,7 @@ If you plan to use a custom local domain (e.g. `truspace.local` instead of `loca
 
 # Connect IPFS node
 
-- To connect another node, it needs to be added to the cluster
-- Enter `~/truspace/volumes/cluster0/service.json` and enter the peer node in field `peer_addresses`
-- Restart cluster container
-- Login to cluster0 with `docker exec -it cluster0 sh` and execute `ipfs-cluster-ctl peers ls`. The top line should say `cluster0 | Sees *1* other peers`
+Please refer to [this guide](./Admin%20Guide/Setup%20TruSpace/Connecting%20to%20other%20nodes.md) to connect your Raspberry Pi IPFS node to other nodes in the network.
 
 ---
 

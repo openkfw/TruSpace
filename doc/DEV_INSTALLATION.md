@@ -8,11 +8,11 @@ If you are running on Windows, use [WSL](https://learn.microsoft.com/en-us/windo
 
 ## Starting dev environment
 
-- Start dev environment by running `sh start.sh` It will create `.env` file from default `.env.example` file if it doesn't exist. As a next step the script spins up docker compose containing backend api and IPFS cluster, AI functionality Ollama and Open WebUI. As the last step the script installs npm packages and runs NextJS frontend in dev mode.
+- Start dev environment by running `sh start.sh --dev` It will create `.env` file from default `.env.example` file if it doesn't exist. As a next step the script spins up docker compose containing backend api and IPFS cluster, AI functionality Ollama and Open WebUI. As the last step the script installs npm packages and runs NextJS frontend in dev mode.
 - TruSpace UI can be found on <http://localhost:3000/>
 - Open WebUI can be found on <http://localhost:3333/>
 
-There is an option to run local environment without AI functionality (Ollama and Open WebUI), by setting `DISABLE_ALL_AI_FUNCTIONALITY=true` in `.env` file in the root folder prior to running of `sh start.sh`.
+There is an option to run local environment without AI functionality (Ollama and Open WebUI), by setting `DISABLE_ALL_AI_FUNCTIONALITY=true` in `.env` file in the root folder prior to running of `sh start.sh`, or directly running `sh start.sh --dev --no-ai`.
 
 For development purposes and testing of email notifications you can use some dockerised mail catcher like Mailhog. You can simply start it in docker using following command `docker run -p 8025:8025 -p 1025:1025 --name="mailhog" -e MH_HOSTNAME='mailhog.local' mailhog/mailhog`.
 Afterwards you can find mailbox UI at <http://localhost:8025/>
@@ -28,7 +28,7 @@ These port changes are required to avoid conflicts with Windows services and err
 
 After these changes, run the following:
 
-- To start the dev environment run `sh start.sh`. It will create `.env` file from default `.env.example` file if it doesn't exist. As a next step the script spins up docker compose containing backend api and IPFS cluster, AI functionality Ollama and Open WebUI. As the last step the script installs npm packages and runs NextJS frontend in dev mode.
+- To start the dev environment run `sh start.sh --dev`. It will create `.env` file from default `.env.example` file if it doesn't exist. As a next step the script spins up docker compose containing backend api and IPFS cluster, AI functionality Ollama and Open WebUI. As the last step the script installs npm packages and runs NextJS frontend in dev mode.
 
 After it has spun up, stop the dev environment by killing the terminal and run the following in the root directory:
 
@@ -45,6 +45,6 @@ And the very last step:
 - Input the model name and download the model specified in your `.env` file, or one of the models found in the [Ollama Model Library](https://ollama.com/library)
   - If the model download fails, try again. If it keeps failing, make sure the connection can be made to the ollama container by checking the instructions above.
 
-There is an option to run local environment without AI functionality (Ollama and Open WebUI), by setting `DISABLE_ALL_AI_FUNCTIONALITY=true` in `.env` file in the root folder prior to running of `sh start.sh`.
+There is an option to run local environment without AI functionality (Ollama and Open WebUI), by setting `DISABLE_ALL_AI_FUNCTIONALITY=true` in `.env` file in the root folder prior to running of `sh start.sh`, or directly running `sh start.sh --dev --no-ai`.
 
 With these adjustments made, you can start developing on Windows. Thank you for your contribution!

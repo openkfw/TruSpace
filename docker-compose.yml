@@ -1,15 +1,12 @@
 services:
+  ##################################################################################
+  ## Application backend ###########################################################
+  ##################################################################################
+
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile.dev
+    container_name: truspace-backend
+    # build or pull image determined by env variable BUILD_OR_PULL_IMAGES or --dev flag in start.sh
     restart: on-failure
-    volumes:
-      - ./backend/src:/app/src
-      - ./backend/index.ts:/app/index.ts
-      - ./backend/nodemon.json:/app/nodemon.json
-      - ./backend/prompts:/app/prompts
-      - ./volumes/db:/app/data
     environment:
       NODE_ENV: ${NODE_ENV}
       PORT: ${API_PORT}
@@ -38,6 +35,12 @@ services:
     ports:
       - ${API_PORT}:${API_PORT}
     entrypoint: sh ./entrypoint.sh
+    volumes:
+      - ./volumes/db:/app/data
+
+  ##################################################################################
+  ## IPFS & Cluster PEER 0 #########################################################
+  ##################################################################################
 
   ipfs0:
     container_name: ipfs0
@@ -72,10 +75,7 @@ services:
       - "${OPEN_API_PORT}:${OPEN_API_PORT}"
       # IPFS pinning service api
       - "${PINNING_SERVICE_PORT}:${PINNING_SERVICE_PORT}"
-      # The cluster swarm port would need  to be exposed if this container
-      # was to connect to cluster peers on other hosts.
-      # But this is just a testing cluster.
-      # - "9095:9095" # Cluster IPFS Proxy endpoint
-      - "${CLUSTER_SWARM_PORT}:${CLUSTER_SWARM_PORT}" # Cluster swarm endpoint
+      # Cluster swarm endpoint
+      - "${CLUSTER_SWARM_PORT}:${CLUSTER_SWARM_PORT}"
     volumes:
       - ./volumes/cluster0:/data/ipfs-cluster

@@ -341,7 +341,7 @@ cd TruSpace
 For an initial configuration of the application run the configuration script. It asks you a couple of configuration questions, if in doubt accept the default settings. You can easily change them later.
 
 ```bash
-bash scripts/configure.sh
+bash scripts/configure-env.sh
 ```
 
 Then start the TruSpace installation with option `--remove-peers`, so that your server doesn't connect to any known boostrap peers in the network. You can add other peers later if you like:
@@ -360,6 +360,13 @@ If you check the installation with `docker ps` you should see these containers r
 | ipfs/kubo:release                    | "/sbin/tini -- /usr/…" | Up 14 minutes (healthy)       | 0.0.0.0:4001->4001/tcp, [::]:4001->4001/tcp, 0.0.0.0:5001->5001/tcp, [::]:5001->5001/tcp, 4001/udp, 0.0.0.0:8080->8080/tcp |
 
 You can also make sure that everything is correctly running when the status in the top right corner are all green (can take a few minutes for th OI bubble).
+
+Alternatively, you can set flags in `start.sh` to enable certain behaviors:
+
+- `--dev` : starts the application in development mode (always build backend and frontend instead of pulling docker images (identical to `BUILD_OR_PULL_IMAGES=build`))
+- `--local-frontend`: start the frontend locally instead of in Docker
+- `--no-ai`: disable AI functionality (Ollama and Open-WebUI) when starting the application (identical to `DISABLE_ALL_AI_FUNCTIONALITY=true`)
+- `--remove-peers`: after IPFS starts, remove default bootstrap peers via the IPFS API
 
 ## Configure AI backend with OI and test
 
