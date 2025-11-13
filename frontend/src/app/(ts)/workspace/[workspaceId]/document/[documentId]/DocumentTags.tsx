@@ -134,7 +134,7 @@ export default function DocumentTags({ cid, workspaceOrigin, docId, status }) {
    return (
       <div className="flex flex-col">
          <div className="h-full">
-            <div className="space-y-4">
+            <div className="space-y-4 mb-2">
                {isGenerating ? (
                   <div className="flex flex-col items-center justify-center">
                      <Loader2 className="animate-spin h-10 w-10 mb-2" />
@@ -149,7 +149,7 @@ export default function DocumentTags({ cid, workspaceOrigin, docId, status }) {
                         <Badge
                            key={tag.id}
                            variant="default"
-                           className={`mr-1 pr-1 mt-4 min-h-[30px] ${tag.color} ${getBadgeTextColor(tag.color)}`}
+                           className={`mr-1 pr-1 mt-2 min-h-[30px] ${tag.color} ${getBadgeTextColor(tag.color)}`}
                         >
                            {tag?.name.replace(/"/g, "")}
                            {tag?.creatorType === "ai" && (
@@ -176,7 +176,7 @@ export default function DocumentTags({ cid, workspaceOrigin, docId, status }) {
                      ))}
                   {!isAdding && !isGenerating && (
                      <Button
-                        className="h-6 mt-4 min-h-[30px]"
+                        className="h-6 mt-2 min-h-[30px]"
                         onClick={() => setIsAdding(true)}
                      >
                         <Plus />
