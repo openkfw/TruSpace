@@ -54,6 +54,8 @@ cd TruSpace
 ./start.sh
 ```
 
+<video src="./doc/videos/install_basic_2x.mp4"></video>
+
 ### What should I expect?
 
 <details>
@@ -146,6 +148,8 @@ In an ideal environment, these commands are all you need to connect to another T
 # On your local node, store the received .connection and .connection.password files in the root TruSpace directory, then run:
 ./scripts/connectPeer-automatic.sh .connection .connection.password
 ```
+
+<video src="./doc/videos/connect_automatic_2x.mp4"></video>
 
 For more **manual** control, we also provide a manual setup option further with `scripts/connectPeer-manually.sh`
 
