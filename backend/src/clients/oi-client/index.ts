@@ -32,6 +32,7 @@ import {
 } from "./interfaces";
 import { processLanguage } from "./language-processing";
 import { processTags } from "./tags-processing";
+import { BackendLLMClient } from "../llm-client/llmClientMapping";
 
 export interface DocumentModel {
   id: string;
@@ -54,7 +55,7 @@ export interface DocumentModel {
   updated_at: number;
 }
 
-export class OpenWebUIClient {
+export class OpenWebUIClient implements BackendLLMClient {
   public readonly ollama: IOllamaModule;
   public readonly chats: IChatsModule;
   public readonly files: IFilesModule;
@@ -288,7 +289,7 @@ export class OpenWebUIClient {
     }
   }
 
-  async #generateCompletion(
+  async generateCompletion(
     fileData: FileData,
     prompt: string,
     title: string
@@ -440,7 +441,7 @@ export class OpenWebUIClient {
     try {
       const results = [];
       for (const prompt of prompts) {
-        const ollamaResponse = await this.#generateCompletion(
+        const ollamaResponse = await this.generateCompletion(
           fileData,
           prompt.prompt,
           prompt.title
@@ -498,7 +499,7 @@ export class OpenWebUIClient {
     prompt: Prompt;
   }): Promise<void> => {
     try {
-      const ollamaResponse = await this.#generateCompletion(
+      const ollamaResponse = await this.generateCompletion(
         fileData,
         prompt.prompt,
         prompt.title
@@ -597,7 +598,7 @@ export class OpenWebUIClient {
       await TaskQueue.updateJobStatus(requestId, "processing");
 
       // run LLM
-      const { summary } = await this.#generateCompletion(
+      const { summary } = await this.generateCompletion(
         fileData,
         prompt.prompt,
         prompt.title
