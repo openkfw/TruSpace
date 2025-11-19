@@ -1,0 +1,22 @@
+# For release branch, configure certain behaviors
+
+name: Protect PRs to `release`
+
+on:
+  pull_request:
+    branches:
+      - release
+
+jobs:
+  restrict_pr:
+    name: Ensure PRs to `release` come from `main`
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if PR is from main
+        run: |
+          if [ "${{ github.head_ref }}" != "main" ]; then
+            echo "❌ Pull requests to `release` must come from `main` only."
+            exit 1
+          else
+            echo "✅ PR is from `main`."
+          fi
