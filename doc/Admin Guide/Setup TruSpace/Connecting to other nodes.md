@@ -6,7 +6,7 @@ We prioritize ease of use and streamlined setup for TruSpace users. Therefore, w
 
 We have created 2 scripts to help you connect your TruSpace IPFS node to another TruSpace IPFS node easily:
 
-- `scripts/fetch_connection.sh`: This script fetches the necessary connection details (IP address, IPFS Peer ID, Cluster Peer ID) from the target node ([find the script here](../../../scripts/fetch_connection.sh))
+- `scripts/-.sh`: This script fetches the necessary connection details (IP address, IPFS Peer ID, Cluster Peer ID) from the target node ([find the script here](../../../scripts/fetch-connection.sh))
 - `scripts/connectPeer-automatic.sh`: This script connects your local TruSpace IPFS node to the target node using the fetched details ([find the script here](../../../scripts/connectPeer-automatic.sh))
 
 ### How does this work in practice?
@@ -16,7 +16,7 @@ We have created 2 scripts to help you connect your TruSpace IPFS node to another
    **Unencrypted mode**:
 
    ```bash
-   ./scripts/fetch_connection.sh
+   ./scripts/fetch-connection.sh
    ```
 
    This will output the connection details to a `.connection` file (not encrypted). You can glance at the file and share it (however, not encrypted, so we recommend the next option).
@@ -24,14 +24,14 @@ We have created 2 scripts to help you connect your TruSpace IPFS node to another
    **Encrypted mode**:
 
    ```bash
-   ./scripts/fetch_connection.sh anakin@starrider.com
+   ./scripts/fetch-connection.sh -e
    ```
 
-   Add the **email address** of the user you want to connect to. This will output the connection details to a `.connection` file (encrypted with a password in `.connection.password`). This automatically opens 2 email drafts to send both files separately to the target user. The target user can then use these files to connect back to you.
+   Add the flag `-e` or `--encrypted`. This will output the connection details to a `.connection` file (encrypted with a password in `.connection.password`). The target user can then use these files to connect back to you.
 
-1. On your local node, store the received `.connection` and `.connection.password` files in the root TruSpace directory.
+2. On your local node, store the received `.connection` and `.connection.password` files in the root TruSpace directory.
 
-1. Run the connection script:
+3. Run the connection script:
 
 ```bash
 ./scripts/connectPeer-automatic.sh .connection .connection.password
@@ -75,7 +75,8 @@ The command could look like this:
 To get the connection details, you can run this script on the target node:
 
 ```bash
-./scripts/fetch_connection.sh
+# Add flag -e or --encrypted creates encrypted files for secure transfer
+./scripts/fetch-connection.sh
 ```
 
 ### IPFS network connection

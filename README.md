@@ -136,14 +136,15 @@ You have a TruSpace node running and would like to connect to another (private) 
 
 We have created an **automated** way to connect your TruSpace IPFS node to another TruSpace IPFS node using 2 scripts:
 
-- `scripts/fetch_connection.sh`: This script fetches the necessary connection details from the target node ([find the script here](../../../scripts/fetch_connection.sh))
+- `scripts/fetch-connection.sh`: This script fetches the necessary connection details from the target node ([find the script here](../../../scripts/fetch-connection.sh))
 - `scripts/connectPeer-automatic.sh`: This script connects your local TruSpace IPFS node to the target node using the fetched details ([find the script here](../../../scripts/connectPeer-automatic.sh))
 
 In an ideal environment, these commands are all you need to connect to another TruSpace node:
 
 ```bash
-# On you target node, run and send the emails with encrypted connection details:
-./scripts/fetch_connection.sh anakin@starrider.com
+# On you target node, run and create encrypted connection details:
+# Flag -e or --encrypted creates encrypted files for secure transfer
+./scripts/fetch-connection.sh -e
 
 # On your local node, store the received .connection and .connection.password files in the root TruSpace directory, then run:
 ./scripts/connectPeer-automatic.sh .connection .connection.password
