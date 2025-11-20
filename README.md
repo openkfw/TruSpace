@@ -143,10 +143,9 @@ In an ideal environment, these commands are all you need to connect to another T
 
 ```bash
 # On you target node, run and create encrypted connection details:
-# Flag -e or --encrypted creates encrypted files for secure transfer
 ./scripts/fetch-connection.sh -e
 
-# On your local node, store the received .connection and .connection.password files in the root TruSpace directory, then run:
+# On your local node, store the received connection files in the root TruSpace directory, then run:
 ./scripts/connectPeer-automatic.sh .connection .connection.password
 ```
 

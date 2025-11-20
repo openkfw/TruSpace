@@ -6,7 +6,7 @@ We prioritize ease of use and streamlined setup for TruSpace users. Therefore, w
 
 We have created 2 scripts to help you connect your TruSpace IPFS node to another TruSpace IPFS node easily:
 
-- `scripts/-.sh`: This script fetches the necessary connection details (IP address, IPFS Peer ID, Cluster Peer ID) from the target node ([find the script here](../../../scripts/fetch-connection.sh))
+- `scripts/fetch-connection.sh`: This script fetches the necessary connection details (IP address, IPFS Peer ID, Cluster Peer ID) from the target node ([find the script here](../../../scripts/fetch-connection.sh))
 - `scripts/connectPeer-automatic.sh`: This script connects your local TruSpace IPFS node to the target node using the fetched details ([find the script here](../../../scripts/connectPeer-automatic.sh))
 
 ### How does this work in practice?
@@ -29,15 +29,23 @@ We have created 2 scripts to help you connect your TruSpace IPFS node to another
 
    Add the flag `-e` or `--encrypted`. This will output the connection details to a `.connection` file (encrypted with a password in `.connection.password`). The target user can then use these files to connect back to you.
 
-2. On your local node, store the received `.connection` and `.connection.password` files in the root TruSpace directory.
+2. On your local node, store the received `.connection` (and `.connection.password`) file(s) in the root TruSpace directory.
 
 3. Run the connection script:
 
-```bash
-./scripts/connectPeer-automatic.sh .connection .connection.password
-```
+   **Unencrypted mode**:
 
-This will decrypt the connection details and set up the connection to the target node and restart the containers automatically.
+   ```bash
+   ./scripts/connectPeer-automatic.sh .connection
+   ```
+
+   **Encrypted mode**:
+
+   ```bash
+   ./scripts/connectPeer-automatic.sh .connection .connection.password
+   ```
+
+   This will decrypt the connection details and set up the connection to the target node and restart the containers automatically.
 
 ## Technical details and manual setup
 
