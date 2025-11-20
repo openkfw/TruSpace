@@ -26,6 +26,7 @@ bash ./start.sh
 ```
 
 - If the raspberry is too slow, apply a low power IPFS configuration `docker exec ipfs0 ipfs config profile apply lowpower`
+- Also increase the `swap` file size if the raspberry runs out of memory
 
 # OPTIONAL: Configure Large Language Model (LLM)
 
