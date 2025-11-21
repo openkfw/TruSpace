@@ -10,8 +10,9 @@ warn(){ echo -e "${YELLOW}➜ $*${NC}"; }
 err(){ echo -e "${RED}✖ $*${NC}"; }
 
 #─── PATHS ────────────────────────────────────────────────────────────────────
-TEMPLATE="./../.env.template"
-ENVFILE="./../.env"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+TEMPLATE="${SCRIPT_DIR}/../.env.example"
+ENVFILE="${SCRIPT_DIR}/../.env"
 
 #─── PRE-CHECK ─────────────────────────────────────────────────────────────────
 if [[ -f "$ENVFILE" ]]; then
@@ -27,6 +28,8 @@ fi
 #─── PROMPTS ───────────────────────────────────────────────────────────────────
 echo
 echo -e "${YELLOW}Let’s fill in the remaining values:${NC}"
+
+# NODE_ENV
 read -rp "1) NODE_ENV (e.g. development/production) [production]: " NODE_ENV
 NODE_ENV=${NODE_ENV:-production}
 
@@ -37,19 +40,19 @@ while :; do
   warn "   ▶ Domain must be at least 5 characters (letters, numbers, dots)."
 done
 
-# ADMIN OI UI PASSWORD
+# NEXT_PUBLIC_API_URL domain
 while :; do
-  read -rsp "3) OpenWebUI ADMIN_USER_PASSWORD (min 8 chars): " OI_PASSWORD
+  read -rp "3) API_DOMAIN for frontend (e.g. api.example.com): " API_DOMAIN
+  if [[ ${#API_DOMAIN} -ge 5 ]]; then break; fi
+  warn "   ▶ Must be at least 5 characters."
+done
+
+# ADMIN_USER_PASSWORD
+while :; do
+  read -rsp "4) OpenWebUI ADMIN_USER_PASSWORD (min 8 chars): " OI_PASSWORD
   echo
   if [[ ${#OI_PASSWORD} -ge 8 ]]; then break; fi
   warn "   ▶ Password too short; needs ≥8 characters."
-done
-
-# NEXT_PUBLIC_API_URL domain
-while :; do
-  read -rp "4) API_DOMAIN for frontend (e.g. api.example.com): " API_DOMAIN
-  if [[ ${#API_DOMAIN} -ge 5 ]]; then break; fi
-  warn "   ▶ Must be at least 5 characters."
 done
 
 #─── CREATE .env FROM TEMPLATE ─────────────────────────────────────────────────
@@ -59,24 +62,27 @@ info "Copied $TEMPLATE → $ENVFILE"
 #─── SUBSTITUTE PLACEHOLDERS ───────────────────────────────────────────────────
 if [[ "$OSTYPE" == "darwin"* ]]; then
   sed -i '' \
-    -e "s|<NODE_ENV>|${NODE_ENV}|g" \
-    -e "s|<DOMAIN>|${DOMAIN}|g" \
-    -e "s|<OI_PASSWORD>|${OI_PASSWORD}|g" \
-    -e "s|<API_DOMAIN>|${API_DOMAIN}|g" \
+    -e "s|NODE_ENV=development|NODE_ENV=${NODE_ENV}|g" \
+    -e "s|CORS_ORIGIN=http://localhost:3000,https://example.com|CORS_ORIGIN=http://localhost:3000,https://${DOMAIN},https://${API_DOMAIN}/api|g" \
+    -e "s|NEXT_PUBLIC_API_URL=http://localhost:8000/api|NEXT_PUBLIC_API_URL=https://${API_DOMAIN}/api|g" \
+    -e "s|EMAIL_SENDER=\"TruSpace <truspace@truspace.com>\"|EMAIL_SENDER=\"TruSpace <truspace@${DOMAIN}>\"|g" \
+    -e "s|ADMIN_USER_EMAIL=admin@example.com|ADMIN_USER_EMAIL=admin@${DOMAIN}|g" \
+    -e "s|OI_CORS_ALLOW_ORIGIN=\"http://localhost:3000;http://localhost:3333;http://localhost:8000;http://backend:8000;http://127.0.0.1:3333\"|OI_CORS_ALLOW_ORIGIN=\"http://${DOMAIN}:3000;http://${DOMAIN}:3333;http://${DOMAIN}:8000;https://${DOMAIN}:3000;https://${DOMAIN};https://${DOMAIN}:8000;http://backend:8000;http://127.0.0.1:3333\"|g" \
+    -e "s|ADMIN_USER_PASSWORD=admin|ADMIN_USER_PASSWORD=${OI_PASSWORD}|g" \
     "$ENVFILE"
+
 else
   sed -i \
-    -e "s|<NODE_ENV>|${NODE_ENV}|g" \
-    -e "s|<DOMAIN>|${DOMAIN}|g" \
-    -e "s|<OI_PASSWORD>|${OI_PASSWORD}|g" \
-    -e "s|<API_DOMAIN>|${API_DOMAIN}|g" \
+    -e "s|NODE_ENV=development|NODE_ENV=${NODE_ENV}|g" \
+    -e "s|CORS_ORIGIN=http://localhost:3000,https://example.com|CORS_ORIGIN=http://localhost:3000,https://${DOMAIN},https://${API_DOMAIN}/api|g" \
+    -e "s|NEXT_PUBLIC_API_URL=http://localhost:8000/api|NEXT_PUBLIC_API_URL=https://${API_DOMAIN}/api|g" \
+    -e "s|EMAIL_SENDER=\"TruSpace <truspace@truspace.com>\"|EMAIL_SENDER=\"TruSpace <truspace@${DOMAIN}>\"|g" \
+    -e "s|ADMIN_USER_EMAIL=admin@example.com|ADMIN_USER_EMAIL=admin@${DOMAIN}|g" \
+    -e "s|OI_CORS_ALLOW_ORIGIN=\"http://localhost:3000;http://localhost:3333;http://localhost:8000;http://backend:8000;http://127.0.0.1:3333\"|OI_CORS_ALLOW_ORIGIN=\"http://${DOMAIN}:3000;http://${DOMAIN}:3333;http://${DOMAIN}:8000;https://${DOMAIN}:3000;https://${DOMAIN};https://${DOMAIN}:8000;http://backend:8000;http://127.0.0.1:3333\"|g" \
+    -e "s|ADMIN_USER_PASSWORD=admin|ADMIN_USER_PASSWORD=${OI_PASSWORD}|g" \
     "$ENVFILE"
+
 fi
-  -e "s|<NODE_ENV>|${NODE_ENV}|g" \
-  -e "s|<DOMAIN>|${DOMAIN}|g" \
-  -e "s|<OI_PASSWORD>|${OI_PASSWORD}|g" \
-  -e "s|<API_DOMAIN>|${API_DOMAIN}|g" \
-  "$ENVFILE"
 
 info ".env file has been created and all placeholders replaced!"
 echo
@@ -84,3 +90,4 @@ echo  "${GREEN}Next steps:${NC}"
 echo " • Review and adjust any CONTENT_SECURITY_POLICY_* entries in $ENVFILE"
 echo " • For a more detailed configuration (e.g. email server), have a look at the configuration in $ENVFILE"
 echo " • Start TruSpace with ./start.sh"
+echo " • Connect to other TruSpace nodes with ./scripts/connectPeer-automatic.sh or ...-manual.sh"

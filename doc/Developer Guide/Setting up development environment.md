@@ -110,7 +110,7 @@ tsc --version
 
 In order to run TruSpace, you need to setup a few environment variables. A list of all variables and whether they are required or not can be found [here](../ENVIRONMENT_VARIABLES.md).
 
-Further, we have created an exemplary `.env.example` file in the repository, which you can copy to `.env` and modify according to your needs. You can also use `scripts/configure.sh` to assist with the setup.
+Further, we have created an exemplary `.env.example` file in the repository, which you can copy to `.env` and modify according to your needs. You can also use `scripts/configure-env.sh` to assist with the setup.
 
 ## IDE
 
@@ -139,6 +139,13 @@ However when developing the frontend, **we recommend to start the frontend local
 # Start all services as containers but only frontend locally
 ./start.sh --local-frontend
 ```
+
+Alternatively, you can set flags in `start.sh` to enable certain behaviors:
+
+- `--dev` : starts the application in development mode (always build backend and frontend instead of pulling docker images (identical to `BUILD_OR_PULL_IMAGES=build`))
+- `--local-frontend`: start the frontend locally instead of in Docker
+- `--no-ai`: disable AI functionality (Ollama and Open-WebUI) when starting the application (identical to `DISABLE_ALL_AI_FUNCTIONALITY=true`)
+- `--remove-peers`: after IPFS starts, remove default bootstrap peers via the IPFS API
 
 ---
 

@@ -4,6 +4,24 @@
 
 # TruSpace - an AI-infused, decentralized and sovereign document workspace
 
+<p align="center" style="display: flex; flex-direction: column; gap: 10px;">
+
+  <!-- Row 1 -->
+  <div style="display: flex; justify-content: center; gap: 10px;">
+    <img src="./doc/images/login.png" alt="Log In" style="width: 32%; border-radius: 2px;">
+    <img src="./doc/images/welcome.png" alt="Welcome" style="width: 32%; border-radius: 2px;">
+    <img src="./doc/images/app_status.png" alt="App Status" style="width: 32%; border-radius: 2px;">
+  </div>
+
+  <!-- Row 2 -->
+  <div style="display: flex; justify-content: center; gap: 10px; margin-top: 10px;">
+    <img src="./doc/images/workspace.png" alt="Workspace" style="width: 32%; border-radius: 2px;">
+    <img src="./doc/images/workspace_darkmode.png" alt="Workspace Dark Mode" style="width: 32%; border-radius: 2px;">
+    <img src="./doc/images/document_overview.png" alt="Document Overview" style="width: 32%; border-radius: 2px;">
+  </div>
+
+</p>
+
 The purpose of TruSpace is to make collaboration on documents between several stakeholders more efficient while making the respective data **sovereign to all** participants. It uses AI to support document interpretation and decentralization to stay in control of your data.
 
 [![IPFS](https://img.shields.io/badge/IPFS-000000?style=for-the-badge&logo=ipfs&logoColor=white)](https://ipfs.tech) [![IPFS Cluster](https://img.shields.io/badge/IPFS%20Cluster-262626?style=for-the-badge)](https://ipfscluster.io) [![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/) [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org) [![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org) [![Ollama](https://img.shields.io/badge/Ollama-2563EB?style=for-the-badge)](https://ollama.com) [![Open Web UI](https://img.shields.io/badge/Open%20Web%20UI-111827?style=for-the-badge)](https://openwebui.com) [![GPL v3](https://img.shields.io/badge/GPL--3.0-red?style=for-the-badge)](./LICENSE)
@@ -35,6 +53,8 @@ git clone git@github.com:openkfw/TruSpace.git
 cd TruSpace
 ./start.sh
 ```
+
+<video src="https://github.com/user-attachments/assets/d75b27a5-3556-466f-80fc-d3fdea68917c" title="TruSpace Installation Demo"></video>
 
 ### What should I expect?
 
@@ -69,6 +89,20 @@ If something doesn't work, check that all containers are running with `docker ps
 ### FAQ - Local Installation
 
 <details>
+<summary>Can I configure how I start the application?</summary>
+
+You have multiple options to configure the TruSpace installation before starting it. You can either edit the `.env` file directly (after copying it from `.env.example`). You can find a detailed description of all environment variables in [ENVIRONMENT_VARIABLES.md](./doc/ENVIRONMENT_VARIABLES.md).
+
+Alternatively, you can set flags in `start.sh` to enable certain behaviors:
+
+- `--dev` : starts the application in development mode (always build backend and frontend instead of pulling docker images (identical to `BUILD_OR_PULL_IMAGES=build`))
+- `--local-frontend`: start the frontend locally instead of in Docker
+- `--no-ai`: disable AI functionality (Ollama and Open-WebUI) when starting the application (identical to `DISABLE_ALL_AI_FUNCTIONALITY=true`)
+- `--remove-peers`: after IPFS starts, remove default bootstrap peers via the IPFS API
+
+</details>
+
+<details>
 <summary>What happens beneath the hood?</summary>
 
 The `start.sh` script creates a simple `.env` configuration, docker volumes and spins up `docker compose` containing backend api and IPFS and additionally NextJS frontend in dev mode. After startup, the frontend is available on `http://localhost:3000`. Register a user, login and create a workspace for documents!
@@ -88,19 +122,40 @@ If you plan on using another domain (e.g. on a local raspberry), make sure that 
 sed 's|http://localhost|http://example.com|g' .env.example > .env
 ```
 
+You can also use the `scripts/configure-env.sh` to configure your domains and some other settings interactively:
+
+```bash
+./scripts/configure-env.sh
+```
+
 </details>
 
 ## Connect to other TruSpace nodes
 
 You have a TruSpace node running and would like to connect to another (private) network to sync the TruSpace data? It's simple - but you need to exchange some configuration values in order to have a secure private connection.
 
-We have created a script `scripts/connectPeer-manually.sh` that automates the process of connecting to another node. Execute the following command with your correct variables to configure the connection:
+We have created an **automated** way to connect your TruSpace IPFS node to another TruSpace IPFS node using 2 scripts:
+
+- `scripts/fetch-connection.sh`: This script fetches the necessary connection details from the target node ([find the script here](../../../scripts/fetch-connection.sh))
+- `scripts/connectPeer-automatic.sh`: This script connects your local TruSpace IPFS node to the target node using the fetched details ([find the script here](../../../scripts/connectPeer-automatic.sh))
+
+In an ideal environment, these commands are all you need to connect to another TruSpace node:
+
+```bash
+# On you target node, run and create encrypted connection details:
+./scripts/fetch-connection.sh -e
+
+# On your local node, store the received connection files in the root TruSpace directory, then run:
+./scripts/connectPeer-automatic.sh .connection .connection.password
+```
+
+<video src="https://github.com/user-attachments/assets/3d670619-b047-4d63-a736-f2ac94a7d0ad" title="TruSpace Connection Demo"></video>
+
+For more **manual** control, we also provide a manual setup option further with `scripts/connectPeer-manually.sh`
 
 ```bash
 ./scripts/connectPeer-manually.sh <peer_ip> <ipfs_peer_id> <cluster_peer_id> <ipfs_container_id> <cluster_container_id> [swarm_key_path] [cluster_secret_path]
 ```
-
-If provided parameters are correct, the script modifies the respective configuration files and automatically restarts the containers to apply the changes. Reload the frontend in your browser, and you should see the data from the connected node.
 
 > [!NOTE]
 > For more details on the how the connection to other IPFS nodes works, please read the detailed guide [here](./doc/Admin%20Guide/Setup%20TruSpace/Connecting%20to%20other%20nodes.md).

@@ -5,50 +5,102 @@ set -euo pipefail
 # connectPeer-automatic.sh
 # -------------------------------------------------------
 # Usage:
-#   ./connectPeer-automatic.sh path/to/.connection path/to/.connection.password
+#   ./connectPeer-automatic.sh <path/to/.connection> [path/to/.connection.password]
 #
-# 1. Decrypts the encrypted .connection file using the password file.
-# 2. Sources the decrypted variables into the current shell environment.
+# 1. If a password file is inputted, decypts the encrypted .connection file using the password file.
+# 2. Sources the variables into the current shell environment.
 # 3. Prints them for confirmation.
 #
 # Dependencies: openssl, jq (optional)
 # -------------------------------------------------------
 
-# --- Input arguments ---
-if [[ $# -ne 2 ]]; then
-  echo "Usage: $0 path/to/.connection path/to/.connection.password"
+print_help() {
+  cat <<EOF
+Usage: $(basename "$0") [OPTIONS] <path/to/.connection> [path/to/.connection.password]
+
+Arguments:
+    <path/to/.connection>               Path to the .connection file (encrypted or plaintext).
+    [path/to/.connection.password]      Optional: path to the password file for decrypting the .connection file.
+
+Example:
+  ./$(basename "$0") -e
+
+This script will:
+  1. If a password file is inputted, decypts the encrypted .connection file using the password file.
+  2. Sources the variables into the current shell environment.
+  3. Prints them for confirmation.
+EOF
+}
+
+echo
+echo "████████╗██████╗ ██╗   ██╗███████╗██████╗  █████╗  ██████╗███████╗ "
+echo "╚══██╔══╝██╔══██╗██║   ██║██╔════╝██╔══██╗██╔══██╗██╔════╝██╔════╝ "
+echo "   ██║   ██████╔╝██║   ██║███████╗██████╔╝███████║██║     █████╗   "
+echo "   ██║   ██╔══██╗██║   ██║╚════██║██╔═══╝ ██╔══██║██║     ██╔══╝   "
+echo "   ██║   ██║  ██║╚██████╔╝███████║██║     ██║  ██║╚██████╗███████╗ "
+echo "   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝     ╚═╝  ╚═╝ ╚═════╝╚══════╝ "
+echo "                                                                   "
+echo "Reading connection data and configuring IPFS and Cluster..."
+echo
+
+# Show help
+if [[ "${1:-}" =~ ^(-h|--help)$ ]]; then
+  print_help
+  exit 0
+fi
+
+# Check arguments (1 required, 2 optional)
+if [[ $# -lt 1 || $# -gt 2 ]]; then
+  echo "❌ Error: Wrong number of arguments." >&2
+  print_help >&2
   exit 1
 fi
 
 CONNECTION_FILE="$1"
-PASSWORD_FILE="$2"
+PASSWORD_FILE="${2:-}"
 
 [[ -f "$CONNECTION_FILE" ]] || { echo "Error: $CONNECTION_FILE not found"; exit 1; }
-[[ -f "$PASSWORD_FILE" ]] || { echo "Error: $PASSWORD_FILE not found"; exit 1; }
 
 # --- Check dependencies ---
 command -v openssl >/dev/null 2>&1 || { echo "Error: openssl not found"; exit 1; }
 
-# --- Read password ---
-PASSWORD="$(<"$PASSWORD_FILE")"
+if [[ -n "$PASSWORD_FILE" ]]; then
+  [[ -f "$PASSWORD_FILE" ]] || { echo "Error: Password file $PASSWORD_FILE not found"; exit 1; }
 
-# --- Decrypt to temporary file ---
-TMP_DECRYPTED="$(mktemp /tmp/connection_decrypted.XXXXXX)"
-trap 'rm -f "$TMP_DECRYPTED"' EXIT
+    echo "🔐 Decrypting $CONNECTION_FILE using password from $PASSWORD_FILE ..."
 
-# Attempt decryption with PBKDF2 + iterations (used by make_connection.sh)
-if openssl enc -d -aes-256-cbc -pbkdf2 -iter 100000 -in "$CONNECTION_FILE" -out "$TMP_DECRYPTED" -pass pass:"$PASSWORD" 2>/dev/null; then
-  :
+    # --- Read password ---
+    PASSWORD="$(<"$PASSWORD_FILE")"
+
+    # --- Decrypt to temporary file ---
+    TMP_DECRYPTED="$(mktemp /tmp/connection_decrypted.XXXXXX)"
+    trap 'rm -f "$TMP_DECRYPTED"' EXIT
+
+    # Attempt decryption with PBKDF2 + iterations (used by make_connection.sh)
+    if openssl enc -d -aes-256-cbc -pbkdf2 -iter 100000 -in "$CONNECTION_FILE" -out "$TMP_DECRYPTED" -pass pass:"$PASSWORD" 2>/dev/null; then
+    :
+    else
+    echo "⚠️  PBKDF2 decryption failed — trying fallback (older format)..."
+    openssl enc -d -aes-256-cbc -in "$CONNECTION_FILE" -out "$TMP_DECRYPTED" -pass pass:"$PASSWORD"
+    fi
+
+    # --- Load variables ---
+    set -a
+    # shellcheck disable=SC1090
+    source "$TMP_DECRYPTED"
+    set +a
+
+    # Remove temporary decrypted file
+    rm -f "$TMP_DECRYPTED"
+
 else
-  echo "⚠️  PBKDF2 decryption failed — trying fallback (older format)..."
-  openssl enc -d -aes-256-cbc -in "$CONNECTION_FILE" -out "$TMP_DECRYPTED" -pass pass:"$PASSWORD"
+    echo "ℹ️ No password file provided — assuming $CONNECTION_FILE is plaintext."
+    # --- Load variables directly ---
+    set -a
+    # shellcheck disable=SC1090
+    source "$CONNECTION_FILE"
+    set +a
 fi
-
-# --- Load variables ---
-set -a
-# shellcheck disable=SC1090
-source "$TMP_DECRYPTED"
-set +a
 
 # --- Create temporary files for sensitive values ---
 SWARM_DIR="$(mktemp -d /tmp/ipfs_swarm_key.XXXXXX)"
