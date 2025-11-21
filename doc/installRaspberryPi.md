@@ -2,7 +2,7 @@
 
 - Use raspberry installation guide to install plain raspbian
 - Configure ssh
-- Install docker
+- Install docker (e.g. using the official [install guide](https://docs.docker.com/engine/install/raspberry-pi-os/)) or via the official install script `curl -fsSL https://get.docker.com | sh`
 - Install git
 
 # Clone repo
@@ -13,56 +13,26 @@
 git clone https://github.com/openkfw/TruSpace.git
 ```
 
-- Execute configuration script `bash ./scripts/configure.sh`. Select `development` as `NODE_ENV`, in case the raspberry runs on a local installation and is not available via DNS. Otherwise the CORS handling might be too strict.
+- Update your domain with
 
-- If the IPFS connection is too slow, you can also execute `docker exec ipfs0 ipfs config profile apply lowpower`, which creates a config file that is optimised for slow servers. However you have to update the `Routing` variable to `dht` again in the config file in `./volumes/ipfs0/config`:
+```bash
+sed 's|http://localhost|http://raspidomain.local|g' .env.example > .env
+```
 
+- Initially build and start docker containers with
+
+```bash
+bash ./start.sh
 ```
-"Routing": {
-    "Type": "dht"
-  },
-```
+
+- If the raspberry is too slow, apply a low power IPFS configuration `docker exec ipfs0 ipfs config profile apply lowpower`
+- Also increase the `swap` file size if the raspberry runs out of memory
 
 # OPTIONAL: Configure Large Language Model (LLM)
 
 - LLM is configured in `.env` file
 - Default is `gemma3:1b`
 - Available models are at https://ollama.com/library
-
-# Build IPFS cluster image
-
-- The `latest` tag of ipfs-cluster does not support arm64v8, therefore clone the ipfs-cluster image and execute `docker build . -t truspace/ipfs-cluster`.
-
-```bash
-cd ~
-git clone https://github.com/ipfs-cluster/ipfs-cluster.git
-cd ipfs-cluster
-docker build . -t truspace/ipfs-cluster
-```
-
-- Replace the image tag `ipfs/ipfs-cluster:latest` in `docker-compose.yml` with the built image `truspace/ipfs-cluster`
-
-# Initial start of TruSpace via docker compose
-
-- Execute `start.sh` and check that all containers are up and running
-
-```bash
-bash start.sh
-```
-
-or
-
-```sh
-./start.sh
-```
-
----
-
-**NOTE**
-
-If you plan to use a custom local domain (e.g. `truspace.local` instead of `localhost`), you have to set the respective environment variable and update CORS settings in the `.env`file, therefore in the `.env` file update the lines
-`NEXT_PUBLIC_API_URL=http://truspace.local:8000/api`
-`CORS_ORIGIN=http://truspace.local:3000`
 
 ---
 
@@ -72,13 +42,6 @@ If you plan to use a custom local domain (e.g. `truspace.local` instead of `loca
 - Login with this user
 - Create workspaces etc
 - Upload a document and check that the AI is working and generating perspectives
-
-# Connect IPFS node
-
-- To connect another node, it needs to be added to the cluster
-- Enter `~/truspace/volumes/cluster0/service.json` and enter the peer node in field `peer_addresses`
-- Restart cluster container
-- Login to cluster0 with `docker exec -it cluster0 sh` and execute `ipfs-cluster-ctl peers ls`. The top line should say `cluster0 | Sees *1* other peers`
 
 ---
 
