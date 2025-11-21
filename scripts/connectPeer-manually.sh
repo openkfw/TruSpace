@@ -101,15 +101,20 @@ if [[ -n "$CLUSTER_SECRET_PATH" ]]; then
     echo "❌ Cluster secret file not found at $CLUSTER_SECRET_PATH" >&2
     exit 1
   fi
+
   CLUSTER_SECRET=$(<"$CLUSTER_SECRET_PATH")
   if [[ ! "$CLUSTER_SECRET" =~ ^[0-9a-fA-F]+$ ]]; then
     echo "⚠️ Warning: cluster secret seems not to be a valid hex string" >&2
   fi
+
   echo "🔑 Updating cluster secret in service.json..."
-  tmp_cs="$(mktemp)"
-  jq --arg secret "$CLUSTER_SECRET" '.cluster.secret = $secret' "$CLUSTER_CONFIG" > "$tmp_cs"
-  mv "$tmp_cs" "$CLUSTER_CONFIG"
+
+  sed -i.bak -E \
+    "s/\"secret\": *\"[0-9a-fA-F]*\"/\"secret\": \"$CLUSTER_SECRET\"/" \
+    "$CLUSTER_CONFIG"
+
   echo "🔐 Cluster secret updated."
+
 else
   echo "ℹ️ No cluster secret provided — keeping existing one."
 fi

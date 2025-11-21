@@ -69,15 +69,28 @@ check_cmd() { command -v "$1" >/dev/null 2>&1 || die "$1 required but not found"
 echo "Collecting connection details..."
 
 # Check basic deps
-check_cmd jq
 check_cmd curl
 
 # --- Fetch values ---
+compact_json() {
+    # Bring json into one large row
+    tr -d '\n\r' < "$1" | sed 's/[[:space:]]\+/ /g'
+}
+json_get() {
+    # Extract value for inputted target
+    echo "$2" | grep "\"$1\"" | sed -E "s/.*\"$1\"[[:space:]]*:[[:space:]]*\"([^\"]*)\".*/\1/"
+}
+
 MY_IP="$(curl -fsS https://api.ipify.org || echo '127.0.0.1')"
-IPFS_ID="$(jq -r '.Identity.PeerID' "$IPFS_CONFIG" 2>/dev/null || echo '')"
+
+IPFS_CONFIG_JSON="$(compact_json "$IPFS_CONFIG")"
+CLUSTER_ID_JSON="$(compact_json "$CLUSTER_IDENTITY")"
+CLUSTER_CFG_JSON="$(compact_json "$CLUSTER_CONFIG")"
+
+IPFS_ID="$(json_get PeerID "$IPFS_CONFIG_JSON")"
 IPFS_SWARM_KEY_="$( [[ -f "$SWARM_KEY" ]] && cat "$SWARM_KEY" || echo '')"
-CLUSTER_ID="$(jq -r '.id // empty' "$CLUSTER_IDENTITY" 2>/dev/null || echo '')"
-CLUSTER_SECRET="$(jq -r '.cluster.secret' "$CLUSTER_CONFIG" 2>/dev/null || echo '')"
+CLUSTER_ID="$(json_get id "$CLUSTER_ID_JSON")"
+CLUSTER_SECRET="$(json_get secret "$CLUSTER_CFG_JSON")"
 
 # --- Write plaintext temporary .connection content ---
 cat > "$TMP_PLAIN" <<EOF
