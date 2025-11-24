@@ -1,16 +1,5 @@
-#!/usr/bin/env :qbash
+#!/usr/bin/env bash
 set -euo pipefail
-
-#──────────────────────────────────────────────────────────────────────────────
-# COLORS
-#──────────────────────────────────────────────────────────────────────────────
-
-RED="\033[0;31m"     YELLOW="\033[0;33m"
-GREEN="\033[0;32m"   NC="\033[0m"
-
-info(){ echo -e "${GREEN}✔ $*${NC}"; }
-warn(){ echo -e "${YELLOW}➜ $*${NC}"; }
-err(){ echo -e "${RED}✖ $*${NC}"; }
 
 #──────────────────────────────────────────────────────────────────────────────
 # PATHS
@@ -21,11 +10,18 @@ TEMPLATE="${SCRIPT_DIR}/../.env.example"
 ENVFILE="${SCRIPT_DIR}/../.env"
 
 #──────────────────────────────────────────────────────────────────────────────
+# SOURCES
+#──────────────────────────────────────────────────────────────────────────────
+
+# import error(), warn(), success(), section(), info() functions for uniform logging
+source "${SCRIPT_DIR}/libs/logging.sh"
+
+#──────────────────────────────────────────────────────────────────────────────
 # PRE-CHECK
 #──────────────────────────────────────────────────────────────────────────────
 
 if [[ ! -f "$TEMPLATE" ]]; then
-  err "Template file '$TEMPLATE' not found in $(pwd). Please place your template there."
+  error "Template file '$TEMPLATE' not found in $(pwd). Please place your template there."
   exit 1
 fi
 
@@ -36,8 +32,8 @@ if [[ -f "$ENVFILE" ]]; then
     read -rp "Do you want to replace it? (Y/n): " REPLACE_ENV
     REPLACE_ENV=${REPLACE_ENV:-y}
     if [[ "$REPLACE_ENV" =~ ^[Yy]$ ]]; then
-      info "Removing old .env file so a new one can be created..."
       rm -f "$ENVFILE"
+      success "Removed old .env file so a new one can be created..."
       break
     elif [[ "$REPLACE_ENV" =~ ^[Nn]$ ]]; then
       info "Keeping existing .env. Nothing to do."
@@ -52,10 +48,9 @@ fi
 # PROMPTS - GENERAL SETTINGS
 #──────────────────────────────────────────────────────────────────────────────
 
-echo
-echo -e "${YELLOW}Welcome! Let's configure your TruSpace environment step by step.${NC}"
-echo "You can accept defaults by pressing ENTER."
-echo
+section "Welcome! Let's configure your TruSpace environment step by step."
+info "You can accept defaults by pressing ENTER."
+info
 
 # NODE_ENV
 read -rp "01) NODE_ENV (e.g. development/production) [development]: " NODE_ENV
@@ -64,19 +59,19 @@ NODE_ENV=${NODE_ENV:-development}
 # MASTER_PASSWORD
 while :; do
   read -rsp "02) Master admin password for critical actions (min 8 chars) [Kennwort123]: " MASTER_PASSWORD
-  echo
+  info
   # Use default if empty
   MASTER_PASSWORD=${MASTER_PASSWORD:-Kennwort123}
 
   # Validate length
   if [[ ${#MASTER_PASSWORD} -lt 8 ]]; then
-    warn "   ▶ Password too short; must be at least 8 characters."
+    warn "Password too short; must be at least 8 characters."
     continue
   fi
 
   # Prevent default in production
   if [[ "$NODE_ENV" == "production" && "$MASTER_PASSWORD" == "Kennwort123" ]]; then
-    warn "   ▶ Using the default master password in production is forbidden!"
+    warn "Using the default master password in production is forbidden!"
     continue
   fi
 
@@ -86,17 +81,17 @@ done
 # JWT_SECRET
 while :; do
   read -rsp "03) Secret used to sign JWT authentication tokens (min 12 chars) [auto-generate]: " JWT_SECRET
-  echo
+  info
 
   # Auto-generate if empty
   if [[ -z "$JWT_SECRET" ]]; then
     JWT_SECRET="$(openssl rand -hex 32)"
-    info "   ▶ Auto-generated JWT_SECRET"
+    success "Auto-generated JWT_SECRET"
   fi
 
   # Length check
   if [[ ${#JWT_SECRET} -lt 12 ]]; then
-    warn "   ▶ JWT_SECRET too short; must be ≥12 characters."
+    warn "JWT_SECRET too short; must be ≥12 characters."
     continue
   fi
   break
@@ -106,14 +101,14 @@ done
 # PROMPTS - DOMAIN
 #──────────────────────────────────────────────────────────────────────────────
 
-echo -e "${GREEN}--- DOMAIN SETTINGS ---${NC}"
+section "DOMAIN SETTINGS"
 
 # PROTOCOL
 while :; do
   read -rp "04) Use HTTPS for URLs? (Y/n): "
   USE_HTTPS=${USE_HTTPS:-y}
   if [[ "$USE_HTTPS" =~ ^[YyNn]$ ]]; then break; fi
-  warn "   ▶ Please enter y (yes) or n (no)."
+  warn "Please enter y (yes) or n (no)."
 done
 PROTOCOL="http"
 [[ "$USE_HTTPS" =~ ^[Yy]$ ]] && PROTOCOL="https"
@@ -123,7 +118,7 @@ while :; do
   read -rp "05) Your Public DOMAIN (e.g. example.com) [example.com]: " DOMAIN
   DOMAIN=${DOMAIN:-example.com}
   if [[ ${#DOMAIN} -ge 5 && "$DOMAIN" =~ [A-Za-z0-9.-]+ ]]; then break; fi
-  warn "   ▶ Domain must be at least 5 characters (letters, numbers, dots)."
+  warn "Domain must be at least 5 characters (letters, numbers, dots)."
 done
 
 # FRONTEND_PORT
@@ -135,7 +130,7 @@ while :; do
   read -rp "07) Your API DOMAIN (e.g. api.example.com) [api.${DOMAIN}]: " API_DOMAIN
   API_DOMAIN=${API_DOMAIN:-api.${DOMAIN}}
   if [[ ${#API_DOMAIN} -ge 5 ]]; then break; fi
-  warn "   ▶ Must be at least 5 characters."
+  warn "Must be at least 5 characters."
 done
 
 # API_PORT
@@ -146,7 +141,7 @@ API_PORT=${API_PORT:-8000}
 # PROMPTS - IPFS
 #──────────────────────────────────────────────────────────────────────────────
 
-echo -e "${GREEN}--- IPFS SETTINGS ---${NC}"
+section "IPFS SETTINGS"
 
 read -rp "09) SWARM Port [4001]: " SWARM_PORT
 SWARM_PORT=${SWARM_PORT:-4001}
@@ -167,7 +162,7 @@ CLUSTER_SWARM_PORT=${CLUSTER_SWARM_PORT:-9096}
 # PROMPTS - OPENWEBUI
 #──────────────────────────────────────────────────────────────────────────────
 
-echo -e "${GREEN}--- OPENWEBUI SETTINGS ---${NC}"
+section "OPENWEBUI SETTINGS"
 
 # ADMIN_USER_EMAIL (OpenWebUI admin email)
 while :; do
@@ -176,13 +171,13 @@ while :; do
 
   # Basic email validation
   if [[ ! "$ADMIN_USER_EMAIL" =~ ^[^[:space:]]+@[^[:space:]]+\.[^[:space:]]+$ ]]; then
-    warn "   ▶ Invalid email format. Expected something like user@example.com."
+    warn "Invalid email format. Expected something like user@example.com."
     continue
   fi
 
   # Prevent default in production
   if [[ "$NODE_ENV" == "production" && "$ADMIN_USER_EMAIL" == "admin@example.com" ]]; then
-    warn "   ▶ Using the default admin@example.com in production is forbidden!"
+    warn "Using the default admin@example.com in production is forbidden!"
     continue
   fi
 
@@ -193,25 +188,25 @@ done
 while :; do
   read -rsp "15) OpenWebUI ADMIN password (min 8 chars) [Kennwort123]: " ADMIN_USER_PASSWORD
   ADMIN_USER_PASSWORD=${ADMIN_USER_PASSWORD:-Kennwort123}
-  echo
+  info
   if [[ ${#ADMIN_USER_PASSWORD} -ge 8 ]]; then break; fi
-  warn "   ▶ Password too short; needs ≥8 characters."
+  warn "Password too short; needs ≥8 characters."
 done
 
 # OPENWEBUI SECRET KEY
 while :; do
   read -rsp "16) WEBUI_SECRET_KEY for OpenWebUI sessions (min 12 chars) [auto-generate]: " WEBUI_SECRET_KEY
-  echo
+  info
 
   # Auto-generate if empty
   if [[ -z "$WEBUI_SECRET_KEY" ]]; then
     WEBUI_SECRET_KEY="$(openssl rand -hex 32)"
-    info "   ▶ Auto-generated WEBUI_SECRET_KEY"
+    success "Auto-generated WEBUI_SECRET_KEY"
   fi
 
   # Length check
   if [[ ${#WEBUI_SECRET_KEY} -lt 12 ]]; then
-    warn "   ▶ WEBUI_SECRET_KEY too short; must be ≥12 characters."
+    warn "WEBUI_SECRET_KEY too short; must be ≥12 characters."
     continue
   fi
 
@@ -228,10 +223,10 @@ OPEN_API_PORT=${OPEN_API_PORT:-9094}
 # CREATE .env FROM TEMPLATE
 #──────────────────────────────────────────────────────────────────────────────
 
-echo -e "${GREEN}--- CREATING ENV FILE ---${NC}"
+section "CREATING ENV FILE"
 
 cp "$TEMPLATE" "$ENVFILE"
-info "Copied $TEMPLATE → $ENVFILE"
+success "Copied $TEMPLATE → $ENVFILE"
 
 #──────────────────────────────────────────────────────────────────────────────
 # CORS
@@ -298,10 +293,10 @@ sed "${SED_EXT[@]}" \
   -e "s|WEBUI_SECRET_KEY=\"t0p-s3cr3t\"|WEBUI_SECRET_KEY=\"${WEBUI_SECRET_KEY}\"|g" \
   "$ENVFILE"
 
-info ".env file has been created and all placeholders replaced!"
-echo
-echo -e  "${GREEN}Next steps:${NC}"
-echo " • Review and adjust any CONTENT_SECURITY_POLICY_* entries in $ENVFILE"
-echo " • For a more detailed configuration (e.g. email server), have a look at the configuration in $ENVFILE"
-echo " • Start TruSpace with ./start.sh"
-echo " • Connect to other TruSpace nodes with ./scripts/connectPeer-automatic.sh or ...-manual.sh"
+success ".env file has been created and all placeholders replaced!"
+info
+section "Next steps"
+info " • Review and adjust any CONTENT_SECURITY_POLICY_* entries in $ENVFILE"
+info " • For a more detailed configuration (e.g. email server), have a look at the configuration in $ENVFILE"
+info " • Start TruSpace with ./start.sh"
+info " • Connect to other TruSpace nodes with ./scripts/connectPeer-automatic.sh or ...-manual.sh"
