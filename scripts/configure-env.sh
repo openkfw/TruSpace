@@ -6,7 +6,7 @@ set -euo pipefail
 #──────────────────────────────────────────────────────────────────────────────
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-TEMPLATE="${SCRIPT_DIR}/../.env.example"
+#TEMPLATE="${SCRIPT_DIR}/../.env.example"
 ENVFILE="${SCRIPT_DIR}/../.env"
 
 #──────────────────────────────────────────────────────────────────────────────
@@ -20,10 +20,10 @@ source "${SCRIPT_DIR}/libs/logging.sh"
 # PRE-CHECK
 #──────────────────────────────────────────────────────────────────────────────
 
-if [[ ! -f "$TEMPLATE" ]]; then
-  error "Template file '$TEMPLATE' not found in $(pwd). Please place your template there."
-  exit 1
-fi
+#if [[ ! -f "$TEMPLATE" ]]; then
+#  error "Template file '$TEMPLATE' not found in $(pwd). Please place your template there."
+#  exit 1
+#fi
 
 if [[ -f "$ENVFILE" ]]; then
   warn "An existing $ENVFILE was found."
@@ -184,7 +184,7 @@ while :; do
   break
 done
 
-# OPENWEBUI ADMIN PASSWORD
+# ADMIN_USER_PASSWORD
 while :; do
   read -rsp "15) OpenWebUI ADMIN password (min 8 chars) [Kennwort123]: " ADMIN_USER_PASSWORD
   ADMIN_USER_PASSWORD=${ADMIN_USER_PASSWORD:-Kennwort123}
@@ -193,7 +193,7 @@ while :; do
   warn "Password too short; needs ≥8 characters."
 done
 
-# OPENWEBUI SECRET KEY
+# WEBUI_SECRET_KEY
 while :; do
   read -rsp "16) WEBUI_SECRET_KEY for OpenWebUI sessions (min 12 chars) [auto-generate]: " WEBUI_SECRET_KEY
   info
@@ -220,81 +220,215 @@ read -rp "18) OpenAPI Port [9094]: " OPEN_API_PORT
 OPEN_API_PORT=${OPEN_API_PORT:-9094}
 
 #──────────────────────────────────────────────────────────────────────────────
-# CREATE .env FROM TEMPLATE
-#──────────────────────────────────────────────────────────────────────────────
-
-section "CREATING ENV FILE"
-
-cp "$TEMPLATE" "$ENVFILE"
-success "Copied $TEMPLATE → $ENVFILE"
-
-#──────────────────────────────────────────────────────────────────────────────
 # CORS
 #──────────────────────────────────────────────────────────────────────────────
 
 # Base CORS (production) values
-CORS_ORIGIN="\
-        ${PROTOCOL}://${DOMAIN},\
-        ${PROTOCOL}://${API_DOMAIN}/api"
+CORS_ORIGIN_ARRAY=(
+    "${PROTOCOL}://${DOMAIN}"
+    "${PROTOCOL}://${API_DOMAIN}/api"
+)
 
-OI_CORS_ALLOW_ORIGIN="\
-        ${PROTOCOL}://${DOMAIN}:${FRONTEND_PORT};\
-        ${PROTOCOL}://${DOMAIN}:${API_PORT};\
-        ${PROTOCOL}://backend:${API_PORT}"
+OI_CORS_ALLOW_ORIGIN_ARRAY=(
+    "${PROTOCOL}://${DOMAIN}:${FRONTEND_PORT}"
+    "${PROTOCOL}://${DOMAIN}:${API_PORT}"
+    "${PROTOCOL}://backend:${API_PORT}"
+)
 
 # Add localhost entries only in development
 if [[ "$NODE_ENV" == "development" ]]; then
-  CORS_ORIGIN="\
-          ${PROTOCOL}://localhost:${FRONTEND_PORT},\
-          ${CORS_ORIGIN}"
-
-  OI_CORS_ALLOW_ORIGIN="\
-          ${PROTOCOL}://localhost:${FRONTEND_PORT};\
-          ${PROTOCOL}://localhost:${API_PORT};\
-          ${OI_CORS_ALLOW_ORIGIN}"
+    CORS_ORIGIN_ARRAY=(
+        "http://localhost:${FRONTEND_PORT}"
+        "${CORS_ORIGIN_ARRAY[@]}"
+    )
+    OI_CORS_ALLOW_ORIGIN_ARRAY=(
+        "http://localhost:${FRONTEND_PORT}"
+        "http://localhost:${API_PORT}"
+        "${OI_CORS_ALLOW_ORIGIN_ARRAY[@]}"
+    )
 fi
+
+# Join array into one line
+CORS_ORIGIN=$(IFS=, ; echo "${CORS_ORIGIN_ARRAY[*]}")
+OI_CORS_ALLOW_ORIGIN=$(IFS=\; ; echo "${OI_CORS_ALLOW_ORIGIN_ARRAY[*]}")
 
 NEXT_PUBLIC_API_URL="${PROTOCOL}://${API_DOMAIN}/api"
 EMAIL_SENDER="\"TruSpace <truspace@${DOMAIN}>\""
 
 #──────────────────────────────────────────────────────────────────────────────
-# SED CONFIG
+# WRITE ENV FILE
 #──────────────────────────────────────────────────────────────────────────────
 
-if [[ "$OSTYPE" == "darwin"* ]]; then
-        SED_EXT=(-i '')
-else
-        SED_EXT=(-i)
-fi
-
+cat >"$ENVFILE" <<EOF
 #──────────────────────────────────────────────────────────────────────────────
-# SUBSTITUTE PLACEHOLDERS
+# 🔧 Configuration you are most likely to change
+#    (Set these for your environment before running)
 #──────────────────────────────────────────────────────────────────────────────
 
-sed "${SED_EXT[@]}" \
-  -e "s|NODE_ENV=development|NODE_ENV=${NODE_ENV}|g" \
-  -e "s|JWT_SECRET=super-secret-key|JWT_SECRET=${JWT_SECRET}|g" \
-  -e "s|MASTER_PASSWORD=Kennwort123|MASTER_PASSWORD=${MASTER_PASSWORD}|g" \
-  -e "s|CORS_ORIGIN=http://localhost:3000,https://example.com|CORS_ORIGIN=${CORS_ORIGIN}|g" \
-  -e "s|NEXT_PUBLIC_API_URL=http://localhost:8000/api|NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}|g" \
-  -e "s|API_PORT=8000|API_PORT=${API_PORT}|g" \
-  -e "s|FRONTEND_PORT=3000|FRONTEND_PORT=${FRONTEND_PORT}|g" \
-  -e "s|OPEN_WEBUI_PORT=3333|OPEN_WEBUI_PORT=${OPEN_WEBUI_PORT}|g" \
-  -e "s|SWARM_PORT=4001|SWARM_PORT=${SWARM_PORT}|g" \
-  -e "s|IPFS_API_PORT=5001|IPFS_API_PORT=${IPFS_API_PORT}|g" \
-  -e "s|IPFS_GATEWAY_PORT=8080|IPFS_GATEWAY_PORT=${IPFS_GATEWAY_PORT}|g" \
-  -e "s|OPEN_API_PORT=9094|OPEN_API_PORT=${OPEN_API_PORT}|g" \
-  -e "s|PINNING_SERVICE_PORT=9097|PINNING_SERVICE_PORT=${PINNING_SERVICE_PORT}|g" \
-  -e "s|CLUSTER_SWARM_PORT=9096|CLUSTER_SWARM_PORT=${CLUSTER_SWARM_PORT}|g" \
-  -e "s|OI_CORS_ALLOW_ORIGIN=.*|OI_CORS_ALLOW_ORIGIN=\"${OI_CORS_ALLOW_ORIGIN}\"|g" \
-  -e "s|EMAIL_SENDER=\"TruSpace <truspace@truspace.com>\"|EMAIL_SENDER=${EMAIL_SENDER}|g" \
-  -e "s|ADMIN_USER_EMAIL=admin@example.com|ADMIN_USER_EMAIL=${ADMIN_USER_EMAIL}|g" \
-  -e "s|ADMIN_USER_PASSWORD=admin|ADMIN_USER_PASSWORD=${ADMIN_USER_PASSWORD}|g" \
-  -e "s|WEBUI_SECRET_KEY=\"t0p-s3cr3t\"|WEBUI_SECRET_KEY=\"${WEBUI_SECRET_KEY}\"|g" \
-  "$ENVFILE"
+# Environment mode for the backend.
+#   development → verbose logging, hot reload, dev defaults
+#   production  → optimized build, no debug logs
+NODE_ENV=${NODE_ENV}
 
-success ".env file has been created and all placeholders replaced!"
-info
+# AI model used by the backend, start with a small model if unsure.
+# A complete list is available https://ollama.com/search
+# Example: gemma3:1b, llama2, mistral, etc.
+OLLAMA_MODEL=gemma3:1b
+
+# 🔑 Secret used to sign JWT authentication tokens.
+# Must be at least 12 characters and unique in production!
+# forbiddenInProdRegex:/^super-secret-key$/ regex:/[^[:space:]]{12,}/
+JWT_SECRET=${JWT_SECRET}
+
+# 🌐 Comma-separated list of allowed origins for CORS.
+# Add your frontend URLs here, other URLs will not be able to access the website to prevent malicious attacks
+# forbiddenInProdRegex:/^http://localhost:3000,https://example.com$/ regex:/[^[:space:]]{5,}/
+CORS_ORIGIN=${CORS_ORIGIN}
+
+# 🌍 URL that the frontend will use to call the backend API.
+# forbiddenInProdRegex:/^http://localhost:8000/api$/ regex:/[^[:space:]]{5,}$/
+NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+
+# 🌐 Allowed CORS origins if you plan to access OpenWebUI directly, separated by semicolons.
+OI_CORS_ALLOW_ORIGIN="${OI_CORS_ALLOW_ORIGIN}"
+
+# 🛡️ Master admin password for critical actions.
+# forbiddenInProdRegex:/^Kennwort123$/ regex:/[^[:space:]]{8,}/
+MASTER_PASSWORD=${MASTER_PASSWORD}
+
+#──────────────────────────────────────────────────────────────────────────────
+# ⚙️ Configuration that rarely needs changing
+#    (Defaults should work for most setups)
+#──────────────────────────────────────────────────────────────────────────────
+
+# Build container or pull image
+#   build -> build containers from scratch
+#   pull -> load published image (add version tag below if wanted)
+BUILD_OR_PULL_IMAGES=build
+
+# 🚀 Version tag for pulling backend/frontend images.
+# Set to a specific version in production (e.g., 1.2.3).
+VERSION=latest
+
+# 🌐 If true, IPFS will NOT connect to the public network.
+START_PRIVATE_NETWORK=true
+
+# 📡 Backend API port
+API_PORT=${API_PORT}
+
+# Internal IPFS Cluster and gateway URLs
+IPFS_CLUSTER_HOST=http://cluster0:9094
+IPFS_PINSVC_HOST=http://cluster0:9097
+IPFS_GATEWAY_HOST=http://ipfs0:8080
+
+# 📜 Logging level (DEBUG, INFO, WARN, ERROR)
+LOG_LEVEL=DEBUG
+
+# URL where OpenWebUI backend is running
+OPENWEBUI_HOST=http://webui:8080
+
+# If true, AI models configured in this file will be auto-downloaded if missing in the docker volume
+AUTO_DOWNLOAD=true
+
+# If true, disables all AI-related functionality, i.e. if a document is uploaded, no AI processing will be executed
+DISABLE_ALL_AI_FUNCTIONALITY=false
+
+# Path to the backend SQLite database file
+DATABASE_PATH=/app/data/truspace.db
+
+# ⏳ JWT token expiration time (in seconds)
+JWT_MAX_AGE=86400
+
+# 🌐 Public frontend URL
+FRONTEND_URL=http://localhost:3000
+
+# 🛡️ Content Security Policy (CSP) settings
+CONTENT_SECURITY_POLICY_DEFAULT_URLS=
+CONTENT_SECURITY_POLICY_IMG_URLS=
+CONTENT_SECURITY_POLICY_FRAME_URLS=
+CONTENT_SECURITY_POLICY_SCRIPT_URLS=
+CONTENT_SECURITY_POLICY_WORKER_URLS=
+
+# ⏱️ API request limit per minute to prevent denial of service attacks
+RATE_LIMIT_PER_MINUTE=200
+
+# If true, new users must be approved before activation. You need to either change it in the sqlite DB or configure the SMTP server to get the activation email!
+REGISTER_USERS_AS_INACTIVE=false
+
+#──────────────────────────────────────────────────────────────────────────────
+# 📧 SMTP Email Settings
+#──────────────────────────────────────────────────────────────────────────────
+SMTP_HOST="host.docker.internal"
+SMTP_USER=
+SMTP_PASSWORD=   # regex:/[^[:space:]]{8,}/
+SMTP_PORT=1025
+SMTP_SSL=false
+SMTP_TLS=false
+EMAIL_SENDER=${EMAIL_SENDER}
+
+#──────────────────────────────────────────────────────────────────────────────
+# 🖥️ OpenWebUI Admin Settings used for AI processing, see https://openwebui.com/
+#──────────────────────────────────────────────────────────────────────────────
+
+# Admin email for OpenWebUI
+# forbiddenInProdRegex:/^admin@example.com$/ regex:/^[^[:space:]]+@[^[:space:]]+\.[^[:space:]]+$/
+ADMIN_USER_EMAIL=${ADMIN_USER_EMAIL}
+
+# Admin password for OpenWebUI
+# forbiddenInProdRegex:/^admin@example.com$/ regex:/[^[:space:]]{8,}/
+ADMIN_USER_PASSWORD=${ADMIN_USER_PASSWORD}
+
+# Secret key for OpenWebUI sessions (min. 12 chars)
+# forbiddenInProdRegex:/^admin@example.com$/ regex:/[^[:space:]]{12,}/
+WEBUI_SECRET_KEY=${WEBUI_SECRET_KEY}
+
+# Port for OpenWebUI service
+OPEN_WEBUI_PORT=${OPEN_WEBUI_PORT}
+
+#──────────────────────────────────────────────────────────────────────────────
+# 🎨 Frontend Settings
+#──────────────────────────────────────────────────────────────────────────────
+FRONTEND_PORT=${FRONTEND_PORT}
+
+#──────────────────────────────────────────────────────────────────────────────
+# 🌐 IPFS Kubo Node Settings
+#──────────────────────────────────────────────────────────────────────────────
+SWARM_PORT=${SWARM_PORT}
+IPFS_API_PORT=${IPFS_API_PORT}
+IPFS_GATEWAY_PORT=${IPFS_GATEWAY_PORT}
+
+#──────────────────────────────────────────────────────────────────────────────
+# 📦 IPFS Cluster - General Settings
+#──────────────────────────────────────────────────────────────────────────────
+
+# Interval between cluster peer health checks
+CLUSTER_MONITORPINGINTERVAL="2s"
+
+# Multiaddresses for cluster APIs
+CLUSTER_RESTAPI_HTTPLISTENMULTIADDRESS=/ip4/0.0.0.0/tcp/9094
+CLUSTER_PINSVCAPI_HTTPLISTENMULTIADDRESS=/ip4/0.0.0.0/tcp/9097
+
+# API & pinning service ports
+OPEN_API_PORT=${OPEN_API_PORT}
+PINNING_SERVICE_PORT=${PINNING_SERVICE_PORT}
+
+# Cluster swarm port (peer-to-peer)
+CLUSTER_SWARM_PORT=${CLUSTER_SWARM_PORT}
+
+#──────────────────────────────────────────────────────────────────────────────
+# 🔗 IPFS Cluster - Node 0
+#──────────────────────────────────────────────────────────────────────────────
+CLUSTER_PEERNAME_0=cluster0
+CLUSTER_IPFSHTTP_NODEMULTIADDRESS_0=/dns4/ipfs0/tcp/5001
+CLUSTER_CRDT_TRUSTEDPEERS_0="*"
+EOF
+
+success "Wrote $ENVFILE"
+
+#──────────────────────────────────────────────────────────────────────────────
+# NEXT STEPS
+#──────────────────────────────────────────────────────────────────────────────
+
 section "Next steps"
 info " • Review and adjust any CONTENT_SECURITY_POLICY_* entries in $ENVFILE"
 info " • For a more detailed configuration (e.g. email server), have a look at the configuration in $ENVFILE"
