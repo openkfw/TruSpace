@@ -11,7 +11,7 @@ set -euo pipefail
 # 2. Sources the variables into the current shell environment.
 # 3. Prints them for confirmation.
 #
-# Dependencies: openssl, jq (optional)
+# Dependencies: openssl
 # -------------------------------------------------------
 
 print_help() {
