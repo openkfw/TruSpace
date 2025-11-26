@@ -105,7 +105,7 @@ section "DOMAIN SETTINGS"
 
 # PROTOCOL
 while :; do
-  read -rp "04) Use HTTPS for URLs? (Y/n): "
+  read -rp "04) Use HTTPS for URLs? (Y/n): " USE_HTTPS
   USE_HTTPS=${USE_HTTPS:-y}
   if [[ "$USE_HTTPS" =~ ^[YyNn]$ ]]; then break; fi
   warn "Please enter y (yes) or n (no)."

@@ -275,4 +275,3 @@ if [ "$LOCAL_FRONTEND" = "true" ]; then
   rm -rf .next # Clean previous builds
   npm run dev
 fi
-1
