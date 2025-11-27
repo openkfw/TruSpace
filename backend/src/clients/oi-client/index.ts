@@ -558,15 +558,10 @@ export class OpenWebUIClient {
       password: config.openWebUI.password,
     });
     const jwt = data.token;
+    setToken(jwt);
 
-    const apiKeyRes = await this.auths.getApiKey(jwt);
-    const apiKey = apiKeyRes?.api_key;
-    if (!apiKey) {
-      const genRes = await this.auths.generateApiKey(jwt);
-      setToken(genRes.api_key);
-    } else {
-      setToken(apiKeyRes.api_key);
-    }
+    // Attach JWT to all future requests
+    this.axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${jwt}`;
   }
 
   // Detect language in the document
