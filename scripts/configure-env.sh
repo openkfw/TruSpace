@@ -6,263 +6,454 @@ set -euo pipefail
 #──────────────────────────────────────────────────────────────────────────────
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-#TEMPLATE="${SCRIPT_DIR}/../.env.example"
 ENVFILE="${SCRIPT_DIR}/../.env"
 
 #──────────────────────────────────────────────────────────────────────────────
 # SOURCES
 #──────────────────────────────────────────────────────────────────────────────
 
-# import error(), warn(), success(), section(), info() functions for uniform logging
+# import echo_error, echo_warn, echo_success, echo_section, echo_info and prompt functions for uniform logging
 source "${SCRIPT_DIR}/libs/logging.sh"
+
+#──────────────────────────────────────────────────────────────────────────────
+# FUNCTIONS
+#──────────────────────────────────────────────────────────────────────────────
+
+prompt_until_valid() {
+  local var_name=$1
+  local prompt_text=$2
+  local default_value=$3
+  shift 3   # remove first 3 parameters so that "$@" now only contains validator functions
+  local validators=("$@")   # array of validator functions
+  local value
+
+  if [[ -n "${!var_name-}" ]]; then # check if value is already set by profile
+    echo_success "$var_name set by profile to ${!var_name}"
+    return
+  fi
+
+  while :; do
+    prompt "$var_name - $prompt_text [$default_value]: " value
+    value=${value:-$default_value}
+
+    local valid=true
+    for validator in "${validators[@]}"; do
+      if ! "$validator" "$value" "$var_name" "$default_value"; then
+        valid=false
+        break
+      fi
+    done
+    $valid && break
+  done
+
+  # assign to caller's variable
+  printf -v "$var_name" '%s' "$value"
+  echo_success "${var_name} set to ${value}"
+}
+
+prompt_secret_until_valid() {
+  local var_name=$1
+  local prompt_text=$2
+  shift 2   # remove first 2 parameters so that "$@" now only contains validator functions
+  local validators=("$@")   # array of validator functions
+  local value
+
+  while :; do
+    prompt "$var_name - $prompt_text [auto-generate]: " value
+
+    if [[ -z "$value" ]]; then
+      value="$(openssl rand -hex 32)"
+      echo_success "$var_name auto-generated"
+    fi
+
+    local valid=true
+    for validator in "${validators[@]}"; do
+      if ! "$validator" "$value" "$var_name"; then
+        valid=false
+        break
+      fi
+    done
+
+    $valid && break
+  done
+
+  # assign to caller's variable
+  printf -v "$var_name" '%s' "$value"
+  echo_success "${var_name} set to ${value}"
+}
+
+prompt_choice_until_valid() {
+  local var_name=$1  # variable to assign
+  local prompt_text=$2   # text to display
+  local default_value=$3   # default choice
+  shift 3  # remove first 3 arguments
+  local -a choices=("$@")  # remaining args are allowed choices
+  local value
+
+  # If value already preset by profile, skip
+  if [[ -n "${!var_name-}" ]]; then
+    echo_success "$var_name set by profile to ${!var_name}"
+    return
+  fi
+
+  while :; do
+    echo_info "$var_name - $prompt_text"
+    # Display numbered choices
+    for i in "${!choices[@]}"; do
+      local index=$((i+1))
+      echo_info "  $index) ${choices[i]}"
+    done
+
+    prompt "Enter choice [$default_value]: " value
+    value=${value:-$default_value}
+
+    # Check if input is one of the allowed choices
+    if ! [[ "$value" =~ ^[0-9]+$ ]] || (( value < 1 || value > ${#choices[@]} )); then
+      echo_warn "Invalid choice. Enter a number between 1 and ${#choices[@]}."
+      continue
+    fi
+    break
+  done
+
+  # Assign final value
+  printf -v "$var_name" '%s' "$value"
+  echo_success "${var_name} set to ${value}"
+}
+
+#──────────────────────────────────────────────────────────────────────────────
+# VALIDATORS
+#──────────────────────────────────────────────────────────────────────────────
+
+validate_password() {
+  local val="$1"
+  local var_name="$2"
+
+  if [[ ${#val} -lt 8 ]]; then
+    echo_warn "$var_name too short; must be at least 8 characters."
+    return 1
+  fi
+  return 0
+}
+
+validate_secret() {
+  local val="$1"
+  local var_name="$2"
+
+  if [[ ${#val} -lt 12 ]]; then
+    echo_warn "$var_name too short; must be at least 12 characters."
+    return 1
+  fi
+  return 0
+}
+
+validate_not_default_in_production() {
+  local value="$1"
+  local var_name="$2"
+  local default_value="$3"
+
+  if [[ "$NODE_ENV" == "production" && "$value" == "$default_value" ]]; then
+    echo_warn "Using the default $var_name in production is forbidden!"
+    return 1
+  fi
+  return 0
+}
+
+validate_domain() {
+  local val="$1"
+  local var_name="$2"
+
+  # Length check
+  [[ ${#val} -lt 5 ]] && { echo_warn "$var_name must be at least 5 characters."; return 1; }
+
+  # Allowed characters
+  [[ ! "$val" =~ ^[A-Za-z0-9.-]+$ ]] && { echo_warn "$var_name contains invalid characters."; return 1; }
+
+  # No consecutive dots or hyphens
+  [[ "$val" =~ \.\. || "$val" =~ -- ]] && { echo_warn "$var_name cannot contain consecutive dots or hyphens."; return 1; }
+
+  # Cannot start or end with dot or hyphen
+  [[ "$val" =~ ^[.-] || "$val" =~ [.-]$ ]] && { echo_warn "$var_name cannot start or end with a dot or hyphen."; return 1; }
+
+  # Must contain at least one dot
+  [[ "$val" != *.* ]] && { echo_warn "$var_name must contain at least one dot."; return 1; }
+
+  return 0
+}
+
+validate_port() {
+  local val="$1"
+  local var_name="$2"
+
+  # Check if numeric
+  if ! [[ "$val" =~ ^[0-9]+$ ]]; then
+    echo_warn "$var_name must be a number."
+    return 1
+  fi
+
+  # Check range
+  if (( val < 1 || val > 65535 )); then
+    echo_warn "$var_name must be between 1 and 65535."
+    return 1
+  fi
+
+  return 0
+}
+
+validate_email() {
+  local val="$1"
+  local var_name="${2:-Email}"
+
+  # Basic format check
+  if [[ ! "$val" =~ ^[^[:space:]]+@[^[:space:]]+\.[^[:space:]]+$ ]]; then
+    echo_warn "Invalid $var_name format. Expected something like user@example.com."
+    return 1
+  fi
+
+  return 0
+}
 
 #──────────────────────────────────────────────────────────────────────────────
 # PRE-CHECK
 #──────────────────────────────────────────────────────────────────────────────
 
-#if [[ ! -f "$TEMPLATE" ]]; then
-#  error "Template file '$TEMPLATE' not found in $(pwd). Please place your template there."
-#  exit 1
-#fi
-
 if [[ -f "$ENVFILE" ]]; then
-  warn "An existing $ENVFILE was found."
+  echo_warn "An existing $ENVFILE was found."
 
   while :; do
-    read -rp "Do you want to replace it? (Y/n): " REPLACE_ENV
+    prompt "Do you want to replace it? (Y/n): " REPLACE_ENV
     REPLACE_ENV=${REPLACE_ENV:-y}
     if [[ "$REPLACE_ENV" =~ ^[Yy]$ ]]; then
       rm -f "$ENVFILE"
-      success "Removed old .env file so a new one can be created..."
+      echo_success "Removed old .env file so a new one can be created..."
       break
     elif [[ "$REPLACE_ENV" =~ ^[Nn]$ ]]; then
-      info "Keeping existing .env. Nothing to do."
+      echo_success "Keeping existing .env. Nothing to do."
       exit 0
     else
-      warn "Please enter y (yes) or n (no)."
+      echo_warn "Please enter y (yes) or n (no)."
     fi
   done
 fi
 
 #──────────────────────────────────────────────────────────────────────────────
-# PROMPTS - GENERAL SETTINGS
+# DEFAULT VALUES
 #──────────────────────────────────────────────────────────────────────────────
 
-section "Welcome! Let's configure your TruSpace environment step by step."
-info "You can accept defaults by pressing ENTER."
-info
+DEFAULT_MASTER_PASSWORD="Kennwort123"
+DEFAULT_DOMAIN="example.com"
+DEFAULT_FRONTEND_PORT=3000
+DEFAULT_API_PORT=8000
+DEFAULT_SWARM_PORT=4001
+DEFAULT_IPFS_API_PORT=5001
+DEFAULT_IPFS_GATEWAY_PORT=8080
+DEFAULT_PINNING_SERVICE_PORT=9097
+DEFAULT_CLUSTER_SWARM_PORT=9096
+DEFAULT_ADMIN_USER_PASSWORD="Kennwort123"
+DEFAULT_OPEN_WEBUI_PORT=3333
+DEFAULT_OPEN_API_PORT=9094
+DEFAULT_OLLAMA_MODEL="gemma3:1b"
+
+#──────────────────────────────────────────────────────────────────────────────
+# PROFILES
+#──────────────────────────────────────────────────────────────────────────────
+
+echo_section "Welcome! Let's configure your TruSpace environment step by step."
+echo_info "You can accept defaults by pressing ENTER.\n"
+
+# PROFILE
+prompt_choice_until_valid PROFILE "Specify an environment profile to prefill selected settings." 1 \
+  "development - pre-fills everything for a local environment." \
+  "domain - pre-fills most values but prompts for the domain" \
+  "production - requires the user to specify all values"
+
+case "$PROFILE" in
+  1)
+    NODE_ENV="development"
+    MASTER_PASSWORD=$DEFAULT_MASTER_PASSWORD
+    DOMAIN=$DEFAULT_DOMAIN
+    FRONTEND_PORT=$DEFAULT_FRONTEND_PORT
+    API_DOMAIN="api.$DOMAIN"
+    API_PORT=$DEFAULT_API_PORT
+    SWARM_PORT=$DEFAULT_SWARM_PORT
+    IPFS_API_PORT=$DEFAULT_IPFS_API_PORT
+    IPFS_GATEWAY_PORT=$DEFAULT_IPFS_GATEWAY_PORT
+    PINNING_SERVICE_PORT=$DEFAULT_PINNING_SERVICE_PORT
+    CLUSTER_SWARM_PORT=$DEFAULT_CLUSTER_SWARM_PORT
+    ADMIN_USER_EMAIL="admin@$DOMAIN"
+    ADMIN_USER_PASSWORD=$DEFAULT_ADMIN_USER_PASSWORD
+    OPEN_WEBUI_PORT=$DEFAULT_OPEN_WEBUI_PORT
+    OPEN_API_PORT=$DEFAULT_OPEN_API_PORT
+    OLLAMA_MODEL=$DEFAULT_OLLAMA_MODEL
+    ;;
+  2)
+    NODE_ENV="development"
+    MASTER_PASSWORD=$DEFAULT_MASTER_PASSWORD
+    SWARM_PORT=$DEFAULT_SWARM_PORT
+    IPFS_API_PORT=$DEFAULT_IPFS_API_PORT
+    IPFS_GATEWAY_PORT=$DEFAULT_IPFS_GATEWAY_PORT
+    PINNING_SERVICE_PORT=$DEFAULT_PINNING_SERVICE_PORT
+    CLUSTER_SWARM_PORT=$DEFAULT_CLUSTER_SWARM_PORT
+    ADMIN_USER_PASSWORD=$DEFAULT_ADMIN_USER_PASSWORD
+    OPEN_WEBUI_PORT=$DEFAULT_OPEN_WEBUI_PORT
+    OPEN_API_PORT=$DEFAULT_OPEN_API_PORT
+    OLLAMA_MODEL=$DEFAULT_OLLAMA_MODEL
+    ;;
+  3)
+    NODE_ENV="production"
+    ;;
+esac
+
+#──────────────────────────────────────────────────────────────────────────────
+# GENERAL SETTINGS
+#──────────────────────────────────────────────────────────────────────────────
+
+echo_section "GENERAL SETTINGS"
 
 # NODE_ENV
-read -rp "01) NODE_ENV (e.g. development/production) [development]: " NODE_ENV
-NODE_ENV=${NODE_ENV:-development}
+prompt_choice_until_valid NODE_ENV "Specifies the environment in which the application is running." 1 \
+  "development" \
+  "production"
 
 # MASTER_PASSWORD
-while :; do
-  read -rsp "02) Master admin password for critical actions (min 8 chars) [Kennwort123]: " MASTER_PASSWORD
-  info
-  # Use default if empty
-  MASTER_PASSWORD=${MASTER_PASSWORD:-Kennwort123}
-
-  # Validate length
-  if [[ ${#MASTER_PASSWORD} -lt 8 ]]; then
-    warn "Password too short; must be at least 8 characters."
-    continue
-  fi
-
-  # Prevent default in production
-  if [[ "$NODE_ENV" == "production" && "$MASTER_PASSWORD" == "Kennwort123" ]]; then
-    warn "Using the default master password in production is forbidden!"
-    continue
-  fi
-
-  break
-done
+prompt_until_valid MASTER_PASSWORD "Master admin password for critical actions (min 8 chars)" $DEFAULT_MASTER_PASSWORD validate_password validate_not_default_in_production
 
 # JWT_SECRET
-while :; do
-  read -rsp "03) Secret used to sign JWT authentication tokens (min 12 chars) [auto-generate]: " JWT_SECRET
-  info
-
-  # Auto-generate if empty
-  if [[ -z "$JWT_SECRET" ]]; then
-    JWT_SECRET="$(openssl rand -hex 32)"
-    success "Auto-generated JWT_SECRET"
-  fi
-
-  # Length check
-  if [[ ${#JWT_SECRET} -lt 12 ]]; then
-    warn "JWT_SECRET too short; must be ≥12 characters."
-    continue
-  fi
-  break
-done
+prompt_secret_until_valid JWT_SECRET "Secret used to sign JWT authentication tokens (min 12 chars)" validate_secret
 
 #──────────────────────────────────────────────────────────────────────────────
-# PROMPTS - DOMAIN
+# DOMAIN SETTINGS
 #──────────────────────────────────────────────────────────────────────────────
 
-section "DOMAIN SETTINGS"
+echo_section "DOMAIN SETTINGS"
 
 # PROTOCOL
 while :; do
-  read -rp "04) Use HTTPS for URLs? (Y/n): " USE_HTTPS
+  prompt "PROTOCOL - Use HTTPS for URLs? (Y/n): " USE_HTTPS
   USE_HTTPS=${USE_HTTPS:-y}
   if [[ "$USE_HTTPS" =~ ^[YyNn]$ ]]; then break; fi
-  warn "Please enter y (yes) or n (no)."
+  echo_warn "Please enter y (yes) or n (no)."
 done
 PROTOCOL="http"
 [[ "$USE_HTTPS" =~ ^[Yy]$ ]] && PROTOCOL="https"
+echo_success "PROTOCOL set to ${PROTOCOL}"
 
 # DOMAIN
-while :; do
-  read -rp "05) Your Public DOMAIN (e.g. example.com) [example.com]: " DOMAIN
-  DOMAIN=${DOMAIN:-example.com}
-  if [[ ${#DOMAIN} -ge 5 && "$DOMAIN" =~ [A-Za-z0-9.-]+ ]]; then break; fi
-  warn "Domain must be at least 5 characters (letters, numbers, dots)."
-done
+prompt_until_valid DOMAIN "Your Public DOMAIN (e.g. example.com)" $DEFAULT_DOMAIN validate_domain validate_not_default_in_production
 
 # FRONTEND_PORT
-read -rp "06) Frontend Port [3000]: " FRONTEND_PORT
-FRONTEND_PORT=${FRONTEND_PORT:-3000}
+prompt_until_valid FRONTEND_PORT "Port for your Frontend" $DEFAULT_FRONTEND_PORT validate_port
+
+# FRONTEND_URL
+FRONTEND_URL="${PROTOCOL}://${DOMAIN}:${FRONTEND_PORT}"
+echo_success "FRONTEND_URL set to ${FRONTEND_URL}"
 
 # API_DOMAIN
-while :; do
-  read -rp "07) Your API DOMAIN (e.g. api.example.com) [api.${DOMAIN}]: " API_DOMAIN
-  API_DOMAIN=${API_DOMAIN:-api.${DOMAIN}}
-  if [[ ${#API_DOMAIN} -ge 5 ]]; then break; fi
-  warn "Must be at least 5 characters."
-done
+prompt_until_valid API_DOMAIN "Your API DOMAIN (e.g. api.example.com)" "api.${DOMAIN}" validate_domain
 
 # API_PORT
-read -rp "08) Backend API Port [8000]: " API_PORT
-API_PORT=${API_PORT:-8000}
+prompt_until_valid API_PORT "Port for your API" $DEFAULT_API_PORT validate_port
 
-#──────────────────────────────────────────────────────────────────────────────
-# PROMPTS - IPFS
-#──────────────────────────────────────────────────────────────────────────────
+# NEXT_PUBLIC_API_URL
+NEXT_PUBLIC_API_URL="${PROTOCOL}://${API_DOMAIN}:${API_PORT}/api"
+echo_success "NEXT_PUBLIC_API_URL set to ${NEXT_PUBLIC_API_URL}"
 
-section "IPFS SETTINGS"
-
-read -rp "09) SWARM Port [4001]: " SWARM_PORT
-SWARM_PORT=${SWARM_PORT:-4001}
-
-read -rp "10) IPFS API Port [5001]: " IPFS_API_PORT
-IPFS_API_PORT=${IPFS_API_PORT:-5001}
-
-read -rp "11) IPFS Gateway Port [8080]: " IPFS_GATEWAY_PORT
-IPFS_GATEWAY_PORT=${IPFS_GATEWAY_PORT:-8080}
-
-read -rp "12) Pinning Service Port [9097]: " PINNING_SERVICE_PORT
-PINNING_SERVICE_PORT=${PINNING_SERVICE_PORT:-9097}
-
-read -rp "13) Cluster Swarm Port [9096]: " CLUSTER_SWARM_PORT
-CLUSTER_SWARM_PORT=${CLUSTER_SWARM_PORT:-9096}
-
-#──────────────────────────────────────────────────────────────────────────────
-# PROMPTS - OPENWEBUI
-#──────────────────────────────────────────────────────────────────────────────
-
-section "OPENWEBUI SETTINGS"
-
-# ADMIN_USER_EMAIL (OpenWebUI admin email)
-while :; do
-  read -rp "14) OpenWebUI ADMIN email [admin@${DOMAIN}]: " ADMIN_USER_EMAIL
-  ADMIN_USER_EMAIL=${ADMIN_USER_EMAIL:-admin@${DOMAIN}}
-
-  # Basic email validation
-  if [[ ! "$ADMIN_USER_EMAIL" =~ ^[^[:space:]]+@[^[:space:]]+\.[^[:space:]]+$ ]]; then
-    warn "Invalid email format. Expected something like user@example.com."
-    continue
-  fi
-
-  # Prevent default in production
-  if [[ "$NODE_ENV" == "production" && "$ADMIN_USER_EMAIL" == "admin@example.com" ]]; then
-    warn "Using the default admin@example.com in production is forbidden!"
-    continue
-  fi
-
-  break
-done
-
-# ADMIN_USER_PASSWORD
-while :; do
-  read -rsp "15) OpenWebUI ADMIN password (min 8 chars) [Kennwort123]: " ADMIN_USER_PASSWORD
-  ADMIN_USER_PASSWORD=${ADMIN_USER_PASSWORD:-Kennwort123}
-  info
-  if [[ ${#ADMIN_USER_PASSWORD} -ge 8 ]]; then break; fi
-  warn "Password too short; needs ≥8 characters."
-done
-
-# WEBUI_SECRET_KEY
-while :; do
-  read -rsp "16) WEBUI_SECRET_KEY for OpenWebUI sessions (min 12 chars) [auto-generate]: " WEBUI_SECRET_KEY
-  info
-
-  # Auto-generate if empty
-  if [[ -z "$WEBUI_SECRET_KEY" ]]; then
-    WEBUI_SECRET_KEY="$(openssl rand -hex 32)"
-    success "Auto-generated WEBUI_SECRET_KEY"
-  fi
-
-  # Length check
-  if [[ ${#WEBUI_SECRET_KEY} -lt 12 ]]; then
-    warn "WEBUI_SECRET_KEY too short; must be ≥12 characters."
-    continue
-  fi
-
-  break
-done
-
-read -rp "17) OpenWebUI Port [3333]: " OPEN_WEBUI_PORT
-OPEN_WEBUI_PORT=${OPEN_WEBUI_PORT:-3333}
-
-read -rp "18) OpenAPI Port [9094]: " OPEN_API_PORT
-OPEN_API_PORT=${OPEN_API_PORT:-9094}
-
-#──────────────────────────────────────────────────────────────────────────────
 # CORS
-#──────────────────────────────────────────────────────────────────────────────
-
-# Base CORS (production) values
 CORS_ORIGIN_ARRAY=(
-    "${PROTOCOL}://${DOMAIN}"
-    "${PROTOCOL}://${API_DOMAIN}/api"
+  "${PROTOCOL}://${DOMAIN}:${FRONTEND_PORT}"
+  "${PROTOCOL}://${API_DOMAIN}:${API_PORT}"
 )
 
 OI_CORS_ALLOW_ORIGIN_ARRAY=(
-    "${PROTOCOL}://${DOMAIN}:${FRONTEND_PORT}"
-    "${PROTOCOL}://${DOMAIN}:${API_PORT}"
-    "${PROTOCOL}://backend:${API_PORT}"
+  "${PROTOCOL}://${DOMAIN}:${FRONTEND_PORT}"
+  "${PROTOCOL}://${API_DOMAIN}:${API_PORT}"
+  "${PROTOCOL}://backend:${API_PORT}"
 )
 
 # Add localhost entries only in development
 if [[ "$NODE_ENV" == "development" ]]; then
-    CORS_ORIGIN_ARRAY=(
-        "http://localhost:${FRONTEND_PORT}"
-        "${CORS_ORIGIN_ARRAY[@]}"
-    )
-    OI_CORS_ALLOW_ORIGIN_ARRAY=(
-        "http://localhost:${FRONTEND_PORT}"
-        "http://localhost:${API_PORT}"
-        "${OI_CORS_ALLOW_ORIGIN_ARRAY[@]}"
-    )
+  CORS_ORIGIN_ARRAY=(
+    "${CORS_ORIGIN_ARRAY[@]}"
+    "http://localhost:${FRONTEND_PORT}"
+  )
+  OI_CORS_ALLOW_ORIGIN_ARRAY=(
+    "${OI_CORS_ALLOW_ORIGIN_ARRAY[@]}"
+    "http://localhost:${FRONTEND_PORT}"
+    "http://localhost:${API_PORT}"
+  )
 fi
 
-# Join array into one line
-CORS_ORIGIN=$(IFS=, ; echo "${CORS_ORIGIN_ARRAY[*]}")
-OI_CORS_ALLOW_ORIGIN=$(IFS=\; ; echo "${OI_CORS_ALLOW_ORIGIN_ARRAY[*]}")
+# CORS_ORIGIN
+CORS_ORIGIN=$(IFS=, ; echo "${CORS_ORIGIN_ARRAY[*]}") # Join array into one line
+echo_success "CORS_ORIGIN set to ${CORS_ORIGIN}"
 
-NEXT_PUBLIC_API_URL="${PROTOCOL}://${API_DOMAIN}/api"
+# OI_CORS_ALLOW_ORIGIN
+OI_CORS_ALLOW_ORIGIN=$(IFS=\; ; echo "${OI_CORS_ALLOW_ORIGIN_ARRAY[*]}")
+echo_success "OI_CORS_ALLOW_ORIGIN set to ${OI_CORS_ALLOW_ORIGIN}"
+
+#──────────────────────────────────────────────────────────────────────────────
+# IPFS SETTINGS
+#──────────────────────────────────────────────────────────────────────────────
+
+echo_section "IPFS SETTINGS"
+
+# SWARM_PORT
+prompt_until_valid SWARM_PORT "SWARM_PORT" $DEFAULT_SWARM_PORT validate_port
+
+# IPFS_API_PORT
+prompt_until_valid IPFS_API_PORT "IPFS_API_PORT" $DEFAULT_IPFS_API_PORT validate_port
+
+# IPFS_GATEWAY_PORT
+prompt_until_valid IPFS_GATEWAY_PORT "IPFS_GATEWAY_PORT" $DEFAULT_IPFS_GATEWAY_PORT validate_port
+
+# PINNING_SERVICE_PORT
+prompt_until_valid PINNING_SERVICE_PORT "PINNING_SERVICE_PORT" $DEFAULT_PINNING_SERVICE_PORT validate_port
+
+# CLUSTER_SWARM_PORT
+prompt_until_valid CLUSTER_SWARM_PORT "CLUSTER_SWARM_PORT" $DEFAULT_CLUSTER_SWARM_PORT validate_port
+
+#──────────────────────────────────────────────────────────────────────────────
+# OPENWEBUI SETTINGS
+#──────────────────────────────────────────────────────────────────────────────
+
+echo_section "OPENWEBUI SETTINGS"
+
+# ADMIN_USER_EMAIL (OpenWebUI admin email)
+prompt_until_valid ADMIN_USER_EMAIL "OpenWebUI ADMIN email" "admin@${DOMAIN}" validate_email
+
+# ADMIN_USER_PASSWORD
+prompt_until_valid ADMIN_USER_PASSWORD "OpenWebUI ADMIN password (min 8 chars)" $DEFAULT_ADMIN_USER_PASSWORD validate_password validate_not_default_in_production
+
+# WEBUI_SECRET_KEY
+prompt_secret_until_valid WEBUI_SECRET_KEY "Secret Key for OpenWebUI sessions (min 12 chars)"
+
+# OPEN_WEBUI_PORT
+prompt_until_valid OPEN_WEBUI_PORT "OPEN_WEBUI_PORT" $DEFAULT_OPEN_WEBUI_PORT validate_port
+
+# OPEN_API_PORT
+prompt_until_valid OPEN_API_PORT "OPEN_API_PORT" $DEFAULT_OPEN_API_PORT validate_port
+
+# OLLAMA_MODEL
+prompt_until_valid OLLAMA_MODEL "AI model used by the backend, a complete list is available at https://ollama.com/search (Example: gemma3:1b, llama2, mistral)" $DEFAULT_OLLAMA_MODEL
+
+#──────────────────────────────────────────────────────────────────────────────
+# SMTP Settings
+#──────────────────────────────────────────────────────────────────────────────
+
+echo_section "SMTP Settings"
+
 EMAIL_SENDER="\"TruSpace <truspace@${DOMAIN}>\""
+echo_success "EMAIL_SENDER set to $EMAIL_SENDER"
 
 #──────────────────────────────────────────────────────────────────────────────
 # WRITE ENV FILE
 #──────────────────────────────────────────────────────────────────────────────
 
+echo_section "WRITING ENV FILE"
+
 cat >"$ENVFILE" <<EOF
 #──────────────────────────────────────────────────────────────────────────────
 # 🔧 Configuration you are most likely to change
-#    (Set these for your environment before running)
+#  (Set these for your environment before running)
 #──────────────────────────────────────────────────────────────────────────────
 
 # Environment mode for the backend.
@@ -273,7 +464,7 @@ NODE_ENV=${NODE_ENV}
 # AI model used by the backend, start with a small model if unsure.
 # A complete list is available https://ollama.com/search
 # Example: gemma3:1b, llama2, mistral, etc.
-OLLAMA_MODEL=gemma3:1b
+OLLAMA_MODEL=${OLLAMA_MODEL}
 
 # 🔑 Secret used to sign JWT authentication tokens.
 # Must be at least 12 characters and unique in production!
@@ -298,7 +489,7 @@ MASTER_PASSWORD=${MASTER_PASSWORD}
 
 #──────────────────────────────────────────────────────────────────────────────
 # ⚙️ Configuration that rarely needs changing
-#    (Defaults should work for most setups)
+#  (Defaults should work for most setups)
 #──────────────────────────────────────────────────────────────────────────────
 
 # Build container or pull image
@@ -310,6 +501,9 @@ BUILD_OR_PULL_IMAGES=build
 # Set to a specific version in production (e.g., 1.2.3).
 VERSION=latest
 
+# 📜 Logging level (DEBUG, INFO, WARN, ERROR)
+LOG_LEVEL=DEBUG
+
 # 🌐 If true, IPFS will NOT connect to the public network.
 START_PRIVATE_NETWORK=true
 
@@ -320,9 +514,6 @@ API_PORT=${API_PORT}
 IPFS_CLUSTER_HOST=http://cluster0:9094
 IPFS_PINSVC_HOST=http://cluster0:9097
 IPFS_GATEWAY_HOST=http://ipfs0:8080
-
-# 📜 Logging level (DEBUG, INFO, WARN, ERROR)
-LOG_LEVEL=DEBUG
 
 # URL where OpenWebUI backend is running
 OPENWEBUI_HOST=http://webui:8080
@@ -340,7 +531,7 @@ DATABASE_PATH=/app/data/truspace.db
 JWT_MAX_AGE=86400
 
 # 🌐 Public frontend URL
-FRONTEND_URL=http://localhost:3000
+FRONTEND_URL=${FRONTEND_URL}
 
 # 🛡️ Content Security Policy (CSP) settings
 CONTENT_SECURITY_POLICY_DEFAULT_URLS=
@@ -423,14 +614,14 @@ CLUSTER_IPFSHTTP_NODEMULTIADDRESS_0=/dns4/ipfs0/tcp/5001
 CLUSTER_CRDT_TRUSTEDPEERS_0="*"
 EOF
 
-success "Wrote $ENVFILE"
+echo_success "Wrote $ENVFILE"
 
 #──────────────────────────────────────────────────────────────────────────────
 # NEXT STEPS
 #──────────────────────────────────────────────────────────────────────────────
 
-section "Next steps"
-info " • Review and adjust any CONTENT_SECURITY_POLICY_* entries in $ENVFILE"
-info " • For a more detailed configuration (e.g. email server), have a look at the configuration in $ENVFILE"
-info " • Start TruSpace with ./start.sh"
-info " • Connect to other TruSpace nodes with ./scripts/connectPeer-automatic.sh or ...-manual.sh"
+echo_section "Next steps"
+echo_info " • Review and adjust any CONTENT_SECURITY_POLICY_* entries in $ENVFILE"
+echo_info " • For a more detailed configuration (e.g. email server), have a look at the configuration in $ENVFILE"
+echo_info " • Start TruSpace with ./start.sh"
+echo_info " • Connect to other TruSpace nodes with ./scripts/connectPeer-automatic.sh or ...-manual.sh"

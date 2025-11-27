@@ -18,22 +18,28 @@ NC="\033[0m"  # No Color / reset
 # -----------------------------
 # Logging / output functions
 # -----------------------------
-success() {
+echo_success() {
   echo -e "${GREEN}✔ $*${NC}"
 }
 
-error() {
+echo_error() {
     echo -e "${RED}✖ $*${NC}"
 }
 
-warn() {
-    echo -e "${YELLOW}➜ $*${NC}"
+echo_warn() {
+    echo -e "${YELLOW}⚠ $*${NC}"
 }
 
-section() {
+echo_section() {
     echo -e "\n${CYAN}=== $* ===${NC}"
 }
 
-info() {
+echo_info() {
     echo -e "$*"
+}
+
+prompt() {
+    local message="$1"
+    local var="$2"
+    read -rp "→ $message" "$var"
 }
