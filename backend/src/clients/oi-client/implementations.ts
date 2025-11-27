@@ -220,40 +220,6 @@ class AuthsModule implements IAuthsModule {
     );
     return res.data;
   }
-
-  async generateApiKey(jwt: string): Promise<any> {
-    const res = await this.#axiosInstance.post(
-      "/api/v1/auths/api_key",
-      {},
-      {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${jwt}`,
-        },
-      }
-    );
-    return res.data;
-  }
-
-  async getApiKey(jwt: string): Promise<any> {
-    try {
-      const res = await this.#axiosInstance.get("/api/v1/auths/api_key", {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${jwt}`,
-        },
-      });
-      return res.data;
-    } catch (error: any) {
-      if (error.status === 404) {
-        return;
-      } else {
-        console.error(error);
-      }
-    }
-  }
 }
 
 export {
