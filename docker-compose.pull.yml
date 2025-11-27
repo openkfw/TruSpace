@@ -3,16 +3,18 @@
 
 services:
   backend:
-    image: kfwopensource/truspace-backend:${VERSION:-latest}
+    image: kfwopensource/truspace-backend:${VERSION_BACKEND:-latest}
 
   frontend:
-    image: kfwopensource/truspace-frontend:${VERSION:-latest
+    image: kfwopensource/truspace-frontend:${VERSION_FRONTEND:-latest}
 
   ipfs0:
-    image: ipfs/kubo:release
+    image: ipfs/kubo:${VERSION_IPFS:-release}
 
   cluster0:
-    image: ipfs/ipfs-cluster:latest}
+    image: ipfs/ipfs-cluster:${VERSION_IPFS_CLUSTER:-latest}
 
   webui:
-    image: ghcr.io/open-webui/open-webui:ollama
+    image: ghcr.io/open-webui/open-webui:${VERSION_WEBUI:-ollama}
+    # last tested and working on linux server on 2025-11-27
+    # ghcr.io/open-webui/open-webui@sha256:d3522d4f5c36de75266dfb1cda6b1ece565d5b074b3287f7de36b99328444e7f}
