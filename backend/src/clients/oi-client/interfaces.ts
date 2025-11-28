@@ -31,8 +31,6 @@ interface IAuthsModule {
     email: string;
     password: string;
   }): Promise<any>;
-  generateApiKey(jwt: string): Promise<any>;
-  getApiKey(jwt: string): Promise<any>;
 }
 
 export {
