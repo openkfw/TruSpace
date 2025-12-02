@@ -13,3 +13,4 @@ ipfs-cluster-ctl
 ipfs-cluster-service
 scripts/prompts/cookies.txt
 .scratch
+.idea
