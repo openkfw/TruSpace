@@ -81,6 +81,8 @@ prompt_var() {
             echo_success "$var_name auto-generated"
         elif [[ -z "$value" && "$default_value" == "$EMPTY" ]]; then
             value=""
+        else
+          value="${value:-${default_value}}"
         fi
         ;;
     esac
@@ -218,7 +220,11 @@ fi
 DEFAULT_NODE_ENV="development"
 DEFAULT_LOG_LEVEL="DEBUG"
 DEFAULT_BUILD_OR_PULL_IMAGES="build"
-DEFAULT_VERSION="latest"
+DEFAULT_VERSION_BACKEND="latest"  # if newest, "latest" or leave empty
+DEFAULT_VERSION_FRONTEND="latest"  # if newest, "latest" or leave empty
+DEFAULT_VERSION_IPFS="v0.39.0"  # if newest, "release" or leave empty
+DEFAULT_VERSION_IPFS_CLUSTER="v1.1.4"  # if newest, "latest" or leave empty
+DEFAULT_VERSION_WEBUI="ollama"  # we use "ollama" and can't append a version to thi
 DEFAULT_DATABASE_PATH="/app/data/truspace.db"
 # Security Configuration
 DEFAULT_MASTER_PASSWORD="Kennwort123"
@@ -298,7 +304,11 @@ case "$PROFILE" in
     NODE_ENV="$DEFAULT_NODE_ENV"
     LOG_LEVEL="$DEFAULT_LOG_LEVEL"
     BUILD_OR_PULL_IMAGES="$DEFAULT_BUILD_OR_PULL_IMAGES"
-    VERSION="$DEFAULT_VERSION"
+    VERSION_BACKEND="$DEFAULT_VERSION_BACKEND"
+    VERSION_FRONTEND="$DEFAULT_VERSION_FRONTEND"
+    VERSION_IPFS="$DEFAULT_VERSION_IPFS"
+    VERSION_IPFS_CLUSTER="$DEFAULT_VERSION_IPFS_CLUSTER"
+    VERSION_WEBUI="$DEFAULT_VERSION_WEBUI"
     DATABASE_PATH="$DEFAULT_DATABASE_PATH"
     # Security Configuration
     MASTER_PASSWORD="$DEFAULT_MASTER_PASSWORD"
@@ -360,6 +370,7 @@ case "$PROFILE" in
     # General Configuration
     NODE_ENV="production"
     LOG_LEVEL="INFO"
+    VERSION_WEBUI="$DEFAULT_VERSION_WEBUI"
     DATABASE_PATH="$DEFAULT_DATABASE_PATH"
     # Security Configuration
     JWT_SECRET=$(openssl rand -hex 32) && echo_success "JWT_SECRET auto-generated"
@@ -410,7 +421,13 @@ echo_section "General Configuration"
 prompt_var NODE_ENV choice "Specifies the environment in which the application is running." "$DEFAULT_NODE_ENV" "development" "production"
 prompt_var LOG_LEVEL choice "Logging verbosity. Use DEBUG during development for detailed logs." "$DEFAULT_LOG_LEVEL" "DEBUG" "INFO" "WARNING" "ERROR"
 prompt_var BUILD_OR_PULL_IMAGES bool "Build the container locally? (Otherwise the published image will be pulled)" "$DEFAULT_BUILD_OR_PULL_IMAGES" "build" "pull"
-prompt_var VERSION text "Version tag for pulling backend/frontend images - Set to a specific version in production (e.g., 1.2.3)" "$DEFAULT_VERSION"
+prompt_var VERSION_BACKEND text "Version tag for pulling backend images - Set to a specific version in production (e.g., 1.2.3)" "$DEFAULT_VERSION_BACKEND"
+prompt_var VERSION_FRONTEND text "Version tag for pulling frontend images - Set to a specific version in production (e.g., 1.2.3)" "$DEFAULT_VERSION_FRONTEND"
+prompt_var VERSION_IPFS text "Version tag for pulling IPFS images - Set to a specific version in production (e.g., 1.2.3)" "$DEFAULT_VERSION_IPFS"
+prompt_var VERSION_IPFS_CLUSTER text "Version tag for pulling IPFS Cluster images - Set to a specific version in production (e.g., 1.2.3)" "$DEFAULT_VERSION_IPFS_CLUSTER"
+prompt_var VERSION_WEBUI text "Version tag for pulling WEBUI - Set to a specific version in production (e.g., ollama)" "$DEFAULT_VERSION_WEBUI"
+
+
 prompt_var DATABASE_PATH text "Path to the SQLite database file which stores user credentials and other sensitive data that is not decentralized." "$DEFAULT_DATABASE_PATH"
 
 #──────────────────────────────────────────────────────────────────────────────
@@ -575,7 +592,11 @@ BUILD_OR_PULL_IMAGES=${BUILD_OR_PULL_IMAGES}
 
 # 🚀 Version tag for pulling backend/frontend images.
 # Set to a specific version in production (e.g., 1.2.3).
-VERSION=${VERSION}
+VERSION_BACKEND=${VERSION_BACKEND}
+VERSION_FRONTEND=${VERSION_FRONTEND}
+VERSION_IPFS=${VERSION_IPFS}
+VERSION_IPFS_CLUSTER=${VERSION_IPFS_CLUSTER}
+VERSION_WEBUI=${VERSION_WEBUI}
 
 # 📜 Logging level (DEBUG, INFO, WARN, ERROR)
 LOG_LEVEL=${LOG_LEVEL}
