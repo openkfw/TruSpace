@@ -100,48 +100,69 @@ export class IpfsClient implements IClient {
     }
   }
   async uploadAvatar(file: File): Promise<any> {
-    const form = new FormData();
+    try {
+      const form = new FormData();
 
-    form.append("file", file.data, {
-      filename: file.name,
-      contentType: file.mimetype,
-    });
+      form.append("file", file.data, {
+        filename: file.name,
+        contentType: file.mimetype,
+      });
 
-    const result = await this.#clusterAxios.post(
-      `/add?stream-channels=false`,
-      form,
-      {
-        headers: {
-          ...form.getHeaders(),
-        },
-        timeout: 30000,
-        maxContentLength: Infinity,
-      }
-    );
-    const data = result.data[0];
-    return data.cid;
+      const result = await this.#clusterAxios.post(
+        `/add?stream-channels=false`,
+        form,
+        {
+          headers: {
+            ...form.getHeaders(),
+          },
+          timeout: 30000,
+          maxContentLength: Infinity,
+        }
+      );
+      const data = result.data[0];
+      return data.cid;
+    } catch (error) {
+      logger.error("Error uploading avatar:", error);
+      throw error;
+    }
   }
 
   async pinSvcStatus(): Promise<boolean> {
-    const pinSvcStatus = (await this.#pinSvcAxios.get("/pins?limit=10")).status;
-    return pinSvcStatus === 200;
+    try {
+      const pinSvcStatus = (await this.#pinSvcAxios.get("/pins?limit=10"))
+        .status;
+      return pinSvcStatus === 200;
+    } catch (error) {
+      logger.error("Error checking pinSvc status:", error);
+      return false;
+    }
   }
 
   async gatewayStatus(): Promise<boolean> {
-    const status = (
-      await this.#gatewayAxios.get("/", {
-        // don't throw error on status
-        validateStatus: function (_status: any) {
-          return true;
-        },
-      })
-    ).status;
-    return status < 500;
+    try {
+      const status = (
+        await this.#gatewayAxios.get("/", {
+          // don't throw error on status
+          validateStatus: function (_status: any) {
+            return true;
+          },
+        })
+      ).status;
+      return status < 500;
+    } catch (error) {
+      logger.error("Error checking gateway status:", error);
+      return false;
+    }
   }
 
   async clusterStatus(): Promise<boolean> {
-    const clusterSvcStatus = await this.#clusterAxios.get("/health");
-    return clusterSvcStatus.status === 204;
+    try {
+      const clusterSvcStatus = await this.#clusterAxios.get("/health");
+      return clusterSvcStatus.status === 204;
+    } catch (error) {
+      logger.error("Error checking cluster status:", error);
+      return false;
+    }
   }
 
   async clusterId(): Promise<{
@@ -160,8 +181,13 @@ export class IpfsClient implements IClient {
     };
     peername: string;
   }> {
-    const clusterId = (await this.#clusterAxios.get("/id")).data;
-    return clusterId;
+    try {
+      const clusterId = (await this.#clusterAxios.get("/id")).data;
+      return clusterId;
+    } catch (error) {
+      logger.error("Error getting cluster ID:", error);
+      throw error;
+    }
   }
 
   async #getLanguageForVersion(
@@ -186,29 +212,37 @@ export class IpfsClient implements IClient {
   }
 
   async getDocumentVersionDetailsByCid(cid: string): Promise<Document> {
-    const clusterRes = (await this.#clusterAxios.get(`/allocations/${cid}`))
-      .data;
-    const language = await this.#getLanguageForVersion(cid);
+    try {
+      const clusterRes = (await this.#clusterAxios.get(`/allocations/${cid}`))
+        .data;
+      const language = await this.#getLanguageForVersion(cid);
 
-    return {
-      docId: clusterRes.metadata.docId,
-      cid: clusterRes.cid,
-      meta: {
-        creator: clusterRes.metadata.creator,
-        creatorUiid: clusterRes.metadata.creatorUiid,
-        workspaceOrigin: clusterRes.metadata.workspaceOrigin,
-        filename: clusterRes.metadata.filename,
-        timestamp: clusterRes.metadata.timestamp,
-        version: clusterRes.metadata.version,
-        encrypted: clusterRes.metadata.encrypted,
-        language: language,
-        size: clusterRes.metadata.size
-          ? Number(clusterRes.metadata.size)
-          : undefined,
-        versionTagName: clusterRes.metadata.versionTagName || "",
-        // mimetype: clusterRes.metadata.mimetype, // If available and needed
-      },
-    };
+      return {
+        docId: clusterRes.metadata.docId,
+        cid: clusterRes.cid,
+        meta: {
+          creator: clusterRes.metadata.creator,
+          creatorUiid: clusterRes.metadata.creatorUiid,
+          workspaceOrigin: clusterRes.metadata.workspaceOrigin,
+          filename: clusterRes.metadata.filename,
+          timestamp: clusterRes.metadata.timestamp,
+          version: clusterRes.metadata.version,
+          encrypted: clusterRes.metadata.encrypted,
+          language: language,
+          size: clusterRes.metadata.size
+            ? Number(clusterRes.metadata.size)
+            : undefined,
+          versionTagName: clusterRes.metadata.versionTagName || "",
+          // mimetype: clusterRes.metadata.mimetype, // If available and needed
+        },
+      };
+    } catch (error) {
+      logger.error(
+        `Error getting document version details for CID ${cid}:`,
+        error
+      );
+      throw error;
+    }
   }
 
   /**
@@ -217,60 +251,70 @@ export class IpfsClient implements IClient {
    * @returns
    */
   async getDocumentDetailsById(docId: string): Promise<DocumentWithVersions> {
-    const res = await this.#pinSvcAxios.get(
-      `/pins?limit=1000&meta={"type":"document","docId":"${docId}"}`
-    );
-
-    const documentPins = res.data.results as DocumentPinRequest[];
-
-    const documentVersionsPromises = documentPins.map(
-      async (r: DocumentPinRequest) => {
-        const language = await this.#getLanguageForVersion(r.pin.cid);
-        return this.#transformPinToDocument(r.pin, language);
-      }
-    );
-
-    let documentVersions = await Promise.all(documentVersionsPromises);
-
-    documentVersions = documentVersions.sort((a: Document, b: Document) => {
-      return Number(b.meta.timestamp) - Number(a.meta.timestamp);
-    });
-
-    if (documentVersions.length === 0) {
-      logger.warn(
-        `No document versions found for docId: ${docId}. Returning minimal structure.`
+    try {
+      const res = await this.#pinSvcAxios.get(
+        `/pins?limit=1000&meta={"type":"document","docId":"${docId}"}`
       );
-      return {
-        docId: docId,
-        cid: "", // No primary CID if no versions
-        meta: {
-          // Minimal meta
-          filename: "",
-          timestamp: "",
-          version: "",
-          creator: "",
-          creatorUiid: "",
-          workspaceOrigin: "", // This might need to be fetched differently if no versions
-          language: undefined,
-          size: 0,
-          encrypted: "false",
-          versionTagName: "",
-        },
-        documentVersions: [],
-      };
-    }
 
-    return { ...documentVersions[0], documentVersions };
+      const documentPins = res.data.results as DocumentPinRequest[];
+
+      const documentVersionsPromises = documentPins.map(
+        async (r: DocumentPinRequest) => {
+          const language = await this.#getLanguageForVersion(r.pin.cid);
+          return this.#transformPinToDocument(r.pin, language);
+        }
+      );
+
+      let documentVersions = await Promise.all(documentVersionsPromises);
+
+      documentVersions = documentVersions.sort((a: Document, b: Document) => {
+        return Number(b.meta.timestamp) - Number(a.meta.timestamp);
+      });
+
+      if (documentVersions.length === 0) {
+        logger.warn(
+          `No document versions found for docId: ${docId}. Returning minimal structure.`
+        );
+        return {
+          docId: docId,
+          cid: "", // No primary CID if no versions
+          meta: {
+            // Minimal meta
+            filename: "",
+            timestamp: "",
+            version: "",
+            creator: "",
+            creatorUiid: "",
+            workspaceOrigin: "", // This might need to be fetched differently if no versions
+            language: undefined,
+            size: 0,
+            encrypted: "false",
+            versionTagName: "",
+          },
+          documentVersions: [],
+        };
+      }
+
+      return { ...documentVersions[0], documentVersions };
+    } catch (error) {
+      logger.error(`Error getting document details for docId ${docId}:`, error);
+      throw error;
+    }
   }
 
   async getDocumentsByDocumentId(docId: string): Promise<Document[]> {
-    const res = await this.#pinSvcAxios.get(
-      `/pins?limit=1000&meta={"type":"document","docId":"${docId}"}`
-    );
+    try {
+      const res = await this.#pinSvcAxios.get(
+        `/pins?limit=1000&meta={"type":"document","docId":"${docId}"}`
+      );
 
-    return res.data.results.map((r: DocumentPinRequest) =>
-      this.#transformPinToDocument(r.pin)
-    );
+      return res.data.results.map((r: DocumentPinRequest) =>
+        this.#transformPinToDocument(r.pin)
+      );
+    } catch (error) {
+      logger.error(`Error getting documents by document ID ${docId}:`, error);
+      throw error;
+    }
   }
 
   /**
@@ -324,23 +368,31 @@ export class IpfsClient implements IClient {
   async getDocumentVersionContentByCid(
     cid: string
   ): Promise<{ data: Buffer; size: number }> {
-    const docInfo = await this.getDocumentVersionDetailsByCid(cid);
-    const metadata = docInfo.meta;
+    try {
+      const docInfo = await this.getDocumentVersionDetailsByCid(cid);
+      const metadata = docInfo.meta;
 
-    const result = await this.#gatewayAxios.get(`/ipfs/${cid}`, {
-      responseType: "arraybuffer",
-    });
-    const fileBuffer = Buffer.from(result.data);
+      const result = await this.#gatewayAxios.get(`/ipfs/${cid}`, {
+        responseType: "arraybuffer",
+      });
+      const fileBuffer = Buffer.from(result.data);
 
-    let modifiedBuffer = fileBuffer;
+      let modifiedBuffer = fileBuffer;
 
-    if (metadata.encrypted === "true") {
-      modifiedBuffer = await decrypt(fileBuffer, metadata.workspaceOrigin);
+      if (metadata.encrypted === "true") {
+        modifiedBuffer = await decrypt(fileBuffer, metadata.workspaceOrigin);
+      }
+      return {
+        data: modifiedBuffer,
+        size: Number(metadata.size),
+      };
+    } catch (error) {
+      logger.error(
+        `Error getting document version content for CID ${cid}:`,
+        error
+      );
+      throw error;
     }
-    return {
-      data: modifiedBuffer,
-      size: Number(metadata.size),
-    };
   }
 
   /**
@@ -373,35 +425,40 @@ export class IpfsClient implements IClient {
   async createWorkspace(
     workspace: WorkspaceRequest
   ): Promise<WorkspaceCreateResponse> {
-    const json = JSON.stringify(workspace, null);
-    const form = new FormData();
+    try {
+      const json = JSON.stringify(workspace, null);
+      const form = new FormData();
 
-    form.append("file", json, {
-      filename: workspace.uuid,
-      contentType: "application/json",
-    });
+      form.append("file", json, {
+        filename: workspace.uuid,
+        contentType: "application/json",
+      });
 
-    let metadataQuery = "";
+      let metadataQuery = "";
 
-    for (const [key, value] of Object.entries(workspace.meta)) {
-      if (key === "name") {
-        metadataQuery += `&meta-${key}=${encodeURIComponent(value)}`;
-      } else {
-        metadataQuery += `&meta-${key}=${value}`;
+      for (const [key, value] of Object.entries(workspace.meta)) {
+        if (key === "name") {
+          metadataQuery += `&meta-${key}=${encodeURIComponent(value)}`;
+        } else {
+          metadataQuery += `&meta-${key}=${value}`;
+        }
       }
+
+      const result = await this.#clusterAxios.post(
+        `/add?stream-channels=false&name=${workspace.uuid}${metadataQuery}`,
+        form,
+        {
+          headers: {
+            ...form.getHeaders(),
+          },
+        }
+      );
+      const data = result.data[0];
+      return { cid: data.cid, uuid: data.name };
+    } catch (error) {
+      logger.error(`Error creating workspace:`, error);
+      throw error;
     }
-
-    const result = await this.#clusterAxios.post(
-      `/add?stream-channels=false&name=${workspace.uuid}${metadataQuery}`,
-      form,
-      {
-        headers: {
-          ...form.getHeaders(),
-        },
-      }
-    );
-    const data = result.data[0];
-    return { cid: data.cid, uuid: data.name };
   }
 
   /**
@@ -410,71 +467,96 @@ export class IpfsClient implements IClient {
    * @param wUID
    */
   async deleteWorkspaceById(wCID: string, wUID: string): Promise<void> {
-    const workspace = await this.getWorkspaceById(wUID);
-    if (!workspace.length) {
-      throw new Error(`No workspace found for ID: ${wUID}`);
-    }
+    try {
+      const workspace = await this.getWorkspaceById(wUID);
+      if (!workspace.length) {
+        throw new Error(`No workspace found for ID: ${wUID}`);
+      }
 
-    const everythingInWorkspace = await this.getEverythingInWorkspace(wUID);
-    await this.deleteDocumentsAndAssociatedItems(everythingInWorkspace);
-    await this.#clusterAxios.delete(`/pins/${wCID}`);
+      const everythingInWorkspace = await this.getEverythingInWorkspace(wUID);
+      await this.deleteDocumentsAndAssociatedItems(everythingInWorkspace);
+      await this.#clusterAxios.delete(`/pins/${wCID}`);
+    } catch (error) {
+      logger.error(`Error deleting workspace ${wUID}:`, error);
+      throw error;
+    }
   }
 
   async getWorkspaceById(wId: string): Promise<Workspace[]> {
-    const pinRes: PinningResponse = (
-      await this.#pinSvcAxios.get(
-        `/pins?limit=1000&meta={"type":"workspace","workspace_uuid":"${wId}"}`
-      )
-    ).data;
-    const result = pinRes.results.map((r: PinRequest) =>
-      this.#transformPinToWorkspace(r.pin)
-    );
-    return result;
+    try {
+      const pinRes: PinningResponse = (
+        await this.#pinSvcAxios.get(
+          `/pins?limit=1000&meta={"type":"workspace","workspace_uuid":"${wId}"}`
+        )
+      ).data;
+      const result = pinRes.results.map((r: PinRequest) =>
+        this.#transformPinToWorkspace(r.pin)
+      );
+      return result;
+    } catch (error) {
+      logger.error(`Error getting workspace by ID ${wId}:`, error);
+      throw error;
+    }
   }
 
   async getWorkspaceByName(name: string): Promise<Workspace[]> {
-    const pinRes: PinningResponse = (
-      await this.#pinSvcAxios.get(
-        `/pins?limit=1000&meta={"type":"workspace","name":"${encodeURIComponent(name)}"}`
-      )
-    ).data;
+    try {
+      const pinRes: PinningResponse = (
+        await this.#pinSvcAxios.get(
+          `/pins?limit=1000&meta={"type":"workspace","name":"${encodeURIComponent(name)}"}`
+        )
+      ).data;
 
-    const result = pinRes.results.map((r: PinRequest) =>
-      this.#transformPinToWorkspace(r.pin)
-    );
-    return result;
+      const result = pinRes.results.map((r: PinRequest) =>
+        this.#transformPinToWorkspace(r.pin)
+      );
+      return result;
+    } catch (error) {
+      logger.error(`Error getting workspace by name ${name}:`, error);
+      throw error;
+    }
   }
 
   async getPublicWorkspaces(): Promise<Workspace[]> {
-    const pinRes: PinningResponse = (
-      await this.#pinSvcAxios.get(
-        `/pins?limit=1000&meta={"type":"workspace","is_public":"true"}`
-      )
-    ).data;
+    try {
+      const pinRes: PinningResponse = (
+        await this.#pinSvcAxios.get(
+          `/pins?limit=1000&meta={"type":"workspace","is_public":"true"}`
+        )
+      ).data;
 
-    const result = pinRes.results.map((r: PinRequest) =>
-      this.#transformPinToWorkspace(r.pin)
-    );
-    return result;
+      const result = pinRes.results.map((r: PinRequest) =>
+        this.#transformPinToWorkspace(r.pin)
+      );
+      return result;
+    } catch (error) {
+      logger.error(`Error getting public workspaces:`, error);
+      throw error;
+    }
   }
 
   async updateWorkspaceType(
     workspaceId: string,
     isPublic: boolean
   ): Promise<void> {
-    const workspace = await this.getWorkspaceById(workspaceId);
+    try {
+      const workspace = await this.getWorkspaceById(workspaceId);
 
-    const pinRequest: WorkspaceRequest = {
-      uuid: workspaceId,
-      meta: {
-        ...workspace[0].meta,
-        is_public: isPublic,
-        type: "workspace",
-      },
-    };
-    await this.createWorkspace(pinRequest);
+      const pinRequest: WorkspaceRequest = {
+        uuid: workspaceId,
+        meta: {
+          ...workspace[0].meta,
+          is_public: isPublic,
+          type: "workspace",
+        },
+      };
+      await this.createWorkspace(pinRequest);
 
-    await this.#clusterAxios.delete(`/pins/${workspace[0].cid}`);
+      await this.#clusterAxios.delete(`/pins/${workspace[0].cid}`);
+    } catch (error) {
+      logger.error(`Error updating workspace type for ${workspaceId}:`, error);
+      throw error;
+    }
   }
 
   /**
@@ -487,57 +569,67 @@ export class IpfsClient implements IClient {
     doc: DocumentRequest,
     file: File
   ): Promise<DocumentCreateResponse> {
-    const form = new FormData();
+    try {
+      const form = new FormData();
 
-    form.append("file", file.data, {
-      filename: file.name,
-      contentType: file.mimetype,
-    });
+      form.append("file", file.data, {
+        filename: file.name,
+        contentType: file.mimetype,
+      });
 
-    let metadataQuery = "";
+      let metadataQuery = "";
 
-    for (const [key, value] of Object.entries(doc.meta)) {
-      if (key === "filename") {
-        metadataQuery += `&meta-${key}=${encodeURIComponent(value)}`;
-      } else {
-        metadataQuery += `&meta-${key}=${value}`;
+      for (const [key, value] of Object.entries(doc.meta)) {
+        if (key === "filename") {
+          metadataQuery += `&meta-${key}=${encodeURIComponent(value)}`;
+        } else {
+          metadataQuery += `&meta-${key}=${value}`;
+        }
       }
+
+      const result = await this.#clusterAxios.post(
+        `/add?stream-channels=false&name=${encodeURIComponent(file.name)}${metadataQuery}&meta-docId=${doc.docId}&meta-type=document`,
+        form,
+        {
+          headers: {
+            ...form.getHeaders(),
+          },
+          timeout: 30000,
+          maxContentLength: Infinity,
+        }
+      );
+      const data = result.data[0];
+      return { cid: data.cid, uuid: doc.docId };
+    } catch (error) {
+      logger.error(`Error creating document:`, error);
+      throw error;
     }
-
-    const result = await this.#clusterAxios.post(
-      `/add?stream-channels=false&name=${encodeURIComponent(file.name)}${metadataQuery}&meta-docId=${doc.docId}&meta-type=document`,
-      form,
-      {
-        headers: {
-          ...form.getHeaders(),
-        },
-        timeout: 30000,
-        maxContentLength: Infinity,
-      }
-    );
-    const data = result.data[0];
-    return { cid: data.cid, uuid: doc.docId };
   }
 
   async getAllDocuments(
     from: number = 0,
     limit: number = 100
   ): Promise<DocumentsResponse> {
-    const pinRes: DocumentPinningResponse = (
-      await this.#pinSvcAxios.get(
-        `/pins?limit=${maxNumberOfFetchedPins}&meta={"type":"document"}`
-      )
-    ).data;
+    try {
+      const pinRes: DocumentPinningResponse = (
+        await this.#pinSvcAxios.get(
+          `/pins?limit=${maxNumberOfFetchedPins}&meta={"type":"document"}`
+        )
+      ).data;
 
-    const count = pinRes.count || 0;
-    const result = this.#pins2Docs(pinRes.results);
+      const count = pinRes.count || 0;
+      const result = this.#pins2Docs(pinRes.results);
 
-    return {
-      count,
-      from,
-      limit,
-      data: result.slice(from, from + limit),
-    };
+      return {
+        count,
+        from,
+        limit,
+        data: result.slice(from, from + limit),
+      };
+    } catch (error) {
+      logger.error(`Error getting all documents:`, error);
+      throw error;
+    }
   }
 
   async getDocumentsByWorkspace(
@@ -546,22 +638,27 @@ export class IpfsClient implements IClient {
     limit: number,
     searchString: string = ""
   ): Promise<DocumentsResponse> {
-    const pinRes: DocumentPinningResponse = (
-      await this.#pinSvcAxios.get(
-        `/pins?limit=${maxNumberOfFetchedPins}&meta={"type":"document","workspaceOrigin":"${wId}"}`
-      )
-    ).data;
+    try {
+      const pinRes: DocumentPinningResponse = (
+        await this.#pinSvcAxios.get(
+          `/pins?limit=${maxNumberOfFetchedPins}&meta={"type":"document","workspaceOrigin":"${wId}"}`
+        )
+      ).data;
 
-    const result = this.#pins2Docs(pinRes.results);
-    const filteredResult = result.filter((doc) =>
-      searchString && searchString.length > 0
-        ? doc.meta.filename.toLowerCase().includes(searchString.toLowerCase())
-        : true
-    );
-    return {
-      data: filteredResult.slice(from, from + limit),
-      count: filteredResult.length,
-    };
+      const result = this.#pins2Docs(pinRes.results);
+      const filteredResult = result.filter((doc) =>
+        searchString && searchString.length > 0
+          ? doc.meta.filename.toLowerCase().includes(searchString.toLowerCase())
+          : true
+      );
+      return {
+        data: filteredResult.slice(from, from + limit),
+        count: filteredResult.length,
+      };
+    } catch (error) {
+      logger.error(`Error getting documents by workspace ${wId}:`, error);
+      throw error;
+    }
   }
 
   /**
@@ -569,64 +666,84 @@ export class IpfsClient implements IClient {
    * @returns
    */
   async createMessage(message: ChatMessageRequest): Promise<string> {
-    const json = JSON.stringify(message, null);
-    const form = new FormData();
+    try {
+      const json = JSON.stringify(message, null);
+      const form = new FormData();
 
-    form.append("file", json, {
-      contentType: "application/json",
-    });
+      form.append("file", json, {
+        contentType: "application/json",
+      });
 
-    let metadataQuery = "";
+      let metadataQuery = "";
 
-    for (const [key, value] of Object.entries(message.meta)) {
-      metadataQuery += `&meta-${key}=${value}`;
-    }
-
-    const clusterResp = await this.#clusterAxios.post(
-      `/add?stream-channels=false${metadataQuery}`,
-      form,
-      {
-        headers: {
-          ...form.getHeaders(),
-        },
+      for (const [key, value] of Object.entries(message.meta)) {
+        metadataQuery += `&meta-${key}=${value}`;
       }
-    );
-    const result = clusterResp.data[0].cid;
-    return result;
+
+      const clusterResp = await this.#clusterAxios.post(
+        `/add?stream-channels=false${metadataQuery}`,
+        form,
+        {
+          headers: {
+            ...form.getHeaders(),
+          },
+        }
+      );
+      const result = clusterResp.data[0].cid;
+      return result;
+    } catch (error) {
+      logger.error(`Error creating message:`, error);
+      throw error;
+    }
   }
 
   async getPeers() {
-    const response = await this.#clusterAxios.get("/peers");
-    const peers = this.#parseMultipleJSON(response.data);
-    return peers;
+    try {
+      const response = await this.#clusterAxios.get("/peers");
+      const peers = this.#parseMultipleJSON(response.data);
+      return peers;
+    } catch (error) {
+      logger.error(`Error getting peers:`, error);
+      throw error;
+    }
   }
 
   async getMessagesByDocumentId(docId: string): Promise<ChatMessage[]> {
-    const res = await this.#pinSvcAxios.get(
-      `/pins?limit=1000&meta={"type":"chat","docId":"${docId}"}`
-    );
+    try {
+      const res = await this.#pinSvcAxios.get(
+        `/pins?limit=1000&meta={"type":"chat","docId":"${docId}"}`
+      );
 
-    const pins: PinningResponse = res.data;
-    const result = pins.results
-      .map((el) => this.#transformPinToChatMessage(el.pin))
-      .sort((a: ChatMessage, b: ChatMessage) => {
-        return Number(a.meta.timestamp) - Number(b.meta.timestamp);
-      });
-    return result;
+      const pins: PinningResponse = res.data;
+      const result = pins.results
+        .map((el) => this.#transformPinToChatMessage(el.pin))
+        .sort((a: ChatMessage, b: ChatMessage) => {
+          return Number(a.meta.timestamp) - Number(b.meta.timestamp);
+        });
+      return result;
+    } catch (error) {
+      logger.error(`Error getting messages by document ID ${docId}:`, error);
+      throw error;
+    }
   }
 
   async getAllMessages(): Promise<ChatMessage[]> {
-    const res = await this.#pinSvcAxios.get(
-      `/pins?limit=1000&meta={"type":"chat"}`
-    );
+    try {
+      const res = await this.#pinSvcAxios.get(
+        `/pins?limit=1000&meta={"type":"chat"}`
+      );
 
-    const pins: PinningResponse = res.data;
-    const result = pins.results
-      .map((el) => this.#transformPinToChatMessage(el.pin))
-      .sort((a: ChatMessage, b: ChatMessage) => {
-        return Number(a.meta.timestamp) - Number(b.meta.timestamp);
-      });
-    return result;
+      const pins: PinningResponse = res.data;
+      const result = pins.results
+        .map((el) => this.#transformPinToChatMessage(el.pin))
+        .sort((a: ChatMessage, b: ChatMessage) => {
+          return Number(a.meta.timestamp) - Number(b.meta.timestamp);
+        });
+      return result;
+    } catch (error) {
+      logger.error(`Error getting all messages:`, error);
+      throw error;
+    }
   }
 
   async createPerspective(_perspective: PerspectiveRequest): Promise<string> {
@@ -664,33 +781,46 @@ export class IpfsClient implements IClient {
   }
 
   async getPerspectivesByDocumentId(docId: string): Promise<Perspective[]> {
-    const pinRes: PinningResponse = (
-      await this.#pinSvcAxios.get(
-        `/pins?limit=1000&meta={"type":"perspective","docId":"${docId}"}`
-      )
-    ).data;
+    try {
+      const pinRes: PinningResponse = (
+        await this.#pinSvcAxios.get(
+          `/pins?limit=1000&meta={"type":"perspective","docId":"${docId}"}`
+        )
+      ).data;
 
-    const perspectives = pinRes.results.map((r: PinRequest) => {
-      return this.#transformPinToPerspective(r.pin);
-    });
-    return this.#fetchPerspectiveFiles(perspectives);
+      const perspectives = pinRes.results.map((r: PinRequest) => {
+        return this.#transformPinToPerspective(r.pin);
+      });
+      return this.#fetchPerspectiveFiles(perspectives);
+    } catch (error) {
+      logger.error(
+        `Error getting perspectives by document ID ${docId}:`,
+        error
+      );
+      throw error;
+    }
   }
 
   async getPerspectivesByVersionCid(cid: string): Promise<Perspective[]> {
-    const pinRes: PinningResponse = (
-      await this.#pinSvcAxios.get(
-        `/pins?limit=1000&meta={"type":"perspective","versionCid":"${cid}"}`
-      )
-    ).data;
+    try {
+      const pinRes: PinningResponse = (
+        await this.#pinSvcAxios.get(
+          `/pins?limit=1000&meta={"type":"perspective","versionCid":"${cid}"}`
+        )
+      ).data;
 
-    const perspectives = pinRes.results.map((r: PinRequest) => {
-      return this.#transformPinToPerspective(r.pin);
-    });
-    return (await this.#fetchPerspectiveFiles(perspectives)).sort(
-      (a: Perspective, b: Perspective) =>
-        Number(new Date(a.meta.timestamp).getTime()) -
-        Number(new Date(b.meta.timestamp).getTime())
-    );
+      const perspectives = pinRes.results.map((r: PinRequest) => {
+        return this.#transformPinToPerspective(r.pin);
+      });
+      return (await this.#fetchPerspectiveFiles(perspectives)).sort(
+        (a: Perspective, b: Perspective) =>
+          Number(new Date(a.meta.timestamp).getTime()) -
+          Number(new Date(b.meta.timestamp).getTime())
+      );
+    } catch (error) {
+      logger.error(`Error getting perspectives by version CID ${cid}:`, error);
+      throw error;
+    }
   }
 
   /**
@@ -700,17 +830,25 @@ export class IpfsClient implements IClient {
   async getEverythingInWorkspace(
     workspaceId: string
   ): Promise<GeneralTemplateOfItemInWorkspace[]> {
-    const pinRes: PinningResponse = (
-      await this.#pinSvcAxios.get(
-        `/pins?limit=1000&meta={"workspaceOrigin":"${workspaceId}"}`
-      )
-    ).data;
+    try {
+      const pinRes: PinningResponse = (
+        await this.#pinSvcAxios.get(
+          `/pins?limit=1000&meta={"workspaceOrigin":"${workspaceId}"}`
+        )
+      ).data;
 
-    const everythingInWorkspace = pinRes.results.map((r: PinRequest) => {
-      return this.#transformPinToGeneralWorkspaceItem(r.pin);
-    });
+      const everythingInWorkspace = pinRes.results.map((r: PinRequest) => {
+        return this.#transformPinToGeneralWorkspaceItem(r.pin);
+      });
 
-    return everythingInWorkspace;
+      return everythingInWorkspace;
+    } catch (error) {
+      logger.error(
+        `Error getting everything in workspace ${workspaceId}:`,
+        error
+      );
+      throw error;
+    }
   }
 
   /**
@@ -720,117 +858,159 @@ export class IpfsClient implements IClient {
   async getEverythingByDocId(
     docId: string
   ): Promise<GeneralTemplateOfItemInWorkspace[]> {
-    const pinRes: PinningResponse = (
-      await this.#pinSvcAxios.get(`/pins?limit=1000&meta={"docId":"${docId}"}`)
-    ).data;
+    try {
+      const pinRes: PinningResponse = (
+        await this.#pinSvcAxios.get(
+          `/pins?limit=1000&meta={"docId":"${docId}"}`
+        )
+      ).data;
 
-    const docsAndAssociatedItems = pinRes.results.map((r: PinRequest) => {
-      return this.#transformPinToGeneralWorkspaceItem(r.pin);
-    });
+      const docsAndAssociatedItems = pinRes.results.map((r: PinRequest) => {
+        return this.#transformPinToGeneralWorkspaceItem(r.pin);
+      });
 
-    return docsAndAssociatedItems;
+      return docsAndAssociatedItems;
+    } catch (error) {
+      logger.error(`Error getting everything by doc ID ${docId}:`, error);
+      throw error;
+    }
   }
 
   async createTag(tag: TagRequest): Promise<string> {
-    const json = JSON.stringify(tag, null);
-    const form = new FormData();
+    try {
+      const json = JSON.stringify(tag, null);
+      const form = new FormData();
 
-    form.append("file", json, {
-      contentType: "application/json",
-    });
+      form.append("file", json, {
+        contentType: "application/json",
+      });
 
-    let metadataQuery = "";
+      let metadataQuery = "";
 
-    for (const [key, value] of Object.entries(tag.meta)) {
-      metadataQuery += `&meta-${key}=${value}`;
-    }
-
-    const clusterResp = await this.#clusterAxios.post(
-      `/add?stream-channels=false${metadataQuery}`,
-      form,
-      {
-        headers: {
-          ...form.getHeaders(),
-        },
+      for (const [key, value] of Object.entries(tag.meta)) {
+        metadataQuery += `&meta-${key}=${value}`;
       }
-    );
-    const result = clusterResp.data[0].cid;
-    return result;
+
+      const clusterResp = await this.#clusterAxios.post(
+        `/add?stream-channels=false${metadataQuery}`,
+        form,
+        {
+          headers: {
+            ...form.getHeaders(),
+          },
+        }
+      );
+      const result = clusterResp.data[0].cid;
+      return result;
+    } catch (error) {
+      logger.error(`Error creating tag:`, error);
+      throw error;
+    }
   }
 
   async deleteTag(tagId: string): Promise<void> {
-    await this.#clusterAxios.delete(`/pins/${tagId}`);
+    try {
+      await this.#clusterAxios.delete(`/pins/${tagId}`);
+    } catch (error) {
+      logger.error(`Error deleting tag ${tagId}:`, error);
+      throw error;
+    }
   }
 
   async deleteDocument(docId: string): Promise<void> {
-    const docsAndAssociatedItems = await this.getEverythingByDocId(docId);
-    this.deleteDocumentsAndAssociatedItems(docsAndAssociatedItems);
+    try {
+      const docsAndAssociatedItems = await this.getEverythingByDocId(docId);
+      this.deleteDocumentsAndAssociatedItems(docsAndAssociatedItems);
+    } catch (error) {
+      logger.error(`Error deleting document ${docId}:`, error);
+      throw error;
+    }
   }
 
   async deleteDocumentsAndAssociatedItems(
     allItems: GeneralTemplateOfItemInWorkspace[]
   ) {
-    const allItemCids = allItems.map((item) => item.cid);
+    try {
+      const allItemCids = allItems.map((item) => item.cid);
 
-    const allDocuments = allItems.filter(
-      (item) => item.meta.type === "document"
-    );
-    const allDocCids = allDocuments.map((doc) => doc.cid);
-
-    const requestIds: string[] = [];
-    allDocCids.forEach((docCid) => {
-      requestIds.push(`req_tags_${docCid}`);
-      requestIds.push(`req_perspectives_${docCid}`);
-    });
-
-    if (allItemCids.length) {
-      await Promise.all(
-        allItemCids.map((itemCid) =>
-          this.#clusterAxios.delete(`/pins/${itemCid}`)
-        )
+      const allDocuments = allItems.filter(
+        (item) => item.meta.type === "document"
       );
-    }
+      const allDocCids = allDocuments.map((doc) => doc.cid);
 
-    await deleteMultipleJobStatusesDb(requestIds);
+      const requestIds: string[] = [];
+      allDocCids.forEach((docCid) => {
+        requestIds.push(`req_tags_${docCid}`);
+        requestIds.push(`req_perspectives_${docCid}`);
+      });
+
+      if (allItemCids.length) {
+        await Promise.all(
+          allItemCids.map((itemCid) =>
+            this.#clusterAxios.delete(`/pins/${itemCid}`)
+          )
+        );
+      }
+
+      await deleteMultipleJobStatusesDb(requestIds);
+    } catch (error) {
+      logger.error(`Error deleting documents and associated items:`, error);
+      throw error;
+    }
   }
 
   async getTagsByDocumentId(docId: string): Promise<Tag[]> {
-    const pinRes: PinningResponse = (
-      await this.#pinSvcAxios.get(
-        `/pins?limit=1000&meta={"type":"tag","docId":"${docId}"}`
-      )
-    ).data;
+    try {
+      const pinRes: PinningResponse = (
+        await this.#pinSvcAxios.get(
+          `/pins?limit=1000&meta={"type":"tag","docId":"${docId}"}`
+        )
+      ).data;
 
-    const result = pinRes.results.map((r: PinRequest) => {
-      return this.#transformPinToTag(r.pin);
-    });
-    return result;
+      const result = pinRes.results.map((r: PinRequest) => {
+        return this.#transformPinToTag(r.pin);
+      });
+      return result;
+    } catch (error) {
+      logger.error(`Error getting tags by document ID ${docId}:`, error);
+      throw error;
+    }
   }
 
   async getTagsByVersionCid(cid: string): Promise<Tag[]> {
-    const pinRes: PinningResponse = (
-      await this.#pinSvcAxios.get(
-        `/pins?limit=1000&meta={"type":"tag","versionCid":"${cid}"}`
-      )
-    ).data;
+    try {
+      const pinRes: PinningResponse = (
+        await this.#pinSvcAxios.get(
+          `/pins?limit=1000&meta={"type":"tag","versionCid":"${cid}"}`
+        )
+      ).data;
 
-    const result = pinRes.results.map((r: PinRequest) => {
-      return this.#transformPinToTag(r.pin);
-    });
-    return result;
+      const result = pinRes.results.map((r: PinRequest) => {
+        return this.#transformPinToTag(r.pin);
+      });
+      return result;
+    } catch (error) {
+      logger.error(`Error getting tags by version CID ${cid}:`, error);
+      throw error;
+    }
   }
 
   async getAllPerspectives(): Promise<Perspective[]> {
-    const pinRes: PinningResponse = (
-      await this.#pinSvcAxios.get(
-        '/pins?limit=1000&meta={"type":"perspective"}'
-      )
-    ).data;
+    try {
+      const pinRes: PinningResponse = (
+        await this.#pinSvcAxios.get(
+          '/pins?limit=1000&meta={"type":"perspective"}'
+        )
+      ).data;
 
-    const perspectives = pinRes.results.map((r: PinRequest) => {
-      return this.#transformPinToPerspective(r.pin);
-    });
-    return this.#fetchPerspectiveFiles(perspectives);
+      const perspectives = pinRes.results.map((r: PinRequest) => {
+        return this.#transformPinToPerspective(r.pin);
+      });
+      return this.#fetchPerspectiveFiles(perspectives);
+    } catch (error) {
+      logger.error(`Error getting all perspectives:`, error);
+      throw error;
+    }
   }
 
   #transformPinToWorkspace(pin: Pin): Workspace {
@@ -986,50 +1166,72 @@ export class IpfsClient implements IClient {
 
     return objects;
   }
+
   /** If `data` field is too large, IPFS pinning service won't return it. It is necessary to get the files themselves */
   async #fetchPerspectiveFiles(
     perspectives: Perspective[]
   ): Promise<Perspective[]> {
-    const perspectiveCids = perspectives.map((p) => p.cid);
-    const perspectiveFilesResponse = await Promise.all(
-      perspectiveCids.map(async (perspectiveCid) => {
-        const response = await this.#gatewayAxios.get(
-          `/ipfs/${perspectiveCid}`
-        );
-        return { ...response, perspectiveCid };
-      })
-    );
-    const result = perspectiveFilesResponse.map((r) => ({
-      ...r.data,
-      cid: r.perspectiveCid,
-    }));
-    return result;
+    try {
+      const perspectiveCids = perspectives.map((p) => p.cid);
+      const perspectiveFilesResponse = await Promise.all(
+        perspectiveCids.map(async (perspectiveCid) => {
+          try {
+            const response = await this.#gatewayAxios.get(
+              `/ipfs/${perspectiveCid}`
+            );
+            return { ...response, perspectiveCid };
+          } catch (error) {
+            logger.error(
+              `Error fetching perspective file ${perspectiveCid}:`,
+              error
+            );
+            return null;
+          }
+        })
+      );
+
+      const result = perspectiveFilesResponse
+        .filter((r) => r !== null)
+        .map((r) => ({
+          ...r!.data,
+          cid: r!.perspectiveCid,
+        }));
+      return result;
+    } catch (error) {
+      logger.error("Error fetching perspective files:", error);
+      throw error;
+    }
   }
 
   async createLanguage(langRequest: LanguageRequest) {
-    const json = JSON.stringify(langRequest, null);
-    const form = new FormData();
+    try {
+      const json = JSON.stringify(langRequest, null);
+      const form = new FormData();
 
-    form.append("file", json, {
-      contentType: "application/json",
-    });
+      form.append("file", json, {
+        contentType: "application/json",
+      });
 
-    let metadataQuery = "";
+      let metadataQuery = "";
 
-    for (const [key, value] of Object.entries(langRequest.meta)) {
-      metadataQuery += `&meta-${key}=${value}`;
-    }
-
-    const clusterResp = await this.#clusterAxios.post(
-      `/add?stream-channels=false${metadataQuery}`,
-      form,
-      {
-        headers: {
-          ...form.getHeaders(),
-        },
+      for (const [key, value] of Object.entries(langRequest.meta)) {
+        metadataQuery += `&meta-${key}=${value}`;
       }
-    );
-    const result = clusterResp.data[0].cid;
-    return result;
+
+      const clusterResp = await this.#clusterAxios.post(
+        `/add?stream-channels=false${metadataQuery}`,
+        form,
+        {
+          headers: {
+            ...form.getHeaders(),
+          },
+        }
+      );
+      const result = clusterResp.data[0].cid;
+      return result;
+    } catch (error) {
+      logger.error(`Error creating language:`, error);
+      throw error;
+    }
   }
 }
