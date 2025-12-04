@@ -17,8 +17,8 @@
   },
   "dependencies": {
     "@opendocsg/pdf2md": "^0.2.1",
-    "@types/nodemailer": "^6.4.17",
     "@types/node": "^22.15.29",
+    "@types/nodemailer": "^6.4.17",
     "axios": "^1.7.9",
     "bcrypt": "^5.1.1",
     "cookie-parser": "~1.4.4",
@@ -35,7 +35,7 @@
     "js-yaml": "^4.1.0",
     "jsonwebtoken": "^9.0.2",
     "knex": "^3.1.0",
-    "mammoth": "^1.9.0",
+    "mammoth": "^1.11.0",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
     "node-fetch": "^3.3.2",
