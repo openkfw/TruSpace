@@ -1,7 +1,6 @@
-# On push to 'release' branch
+# On push to 'main' branch
 # A) In docker-images.yml, build and scan images and if successful, push to Docker Hub
 # B) On workflow_run completion, bump version, create GitHub release and publish
-# C) Deprecate old GitHub releases (keep last 5)
 # parallel to A) In codeql.yml, run code scanning
 
 name: Create and publish release
@@ -11,6 +10,10 @@ on:
     workflows: ["Docker Images CI"]
     types:
       - completed
+
+# Also add write permissions for commits and pushes
+permissions:
+  contents: write
 
 jobs:
   release:
@@ -47,18 +50,18 @@ jobs:
 
           echo "new_version=$NEW" >> $GITHUB_OUTPUT
 
-      - name: Commit new version to release
+      - name: Commit new version to main
         run: |
           git add VERSION publiccode.yml
           git commit -m "Bump version to ${{ steps.version.outputs.new_version }}"
-          git push origin release
-
-      - name: Push version bump to main
-        run: |
-          git fetch origin main
-          git checkout main
-          git merge --no-ff release -m "Sync release version ${{ steps.version.outputs.new_version }} to main"
           git push origin main
+
+      - name: Push version bump to dev
+        run: |
+          git checkout main
+          git branch -D dev || true
+          git checkout -b dev
+          git push origin dev --force
 
       - name: Create Release
         uses: actions/create-release@v1
@@ -66,18 +69,8 @@ jobs:
           tag_name: ${{ steps.version.outputs.new_version }}
           release_name: Release ${{ steps.version.outputs.new_version }}
           body: |
-            Auto-generated release from Docker Images CI.
+            Auto-generated release
           draft: false
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Deprecate old releases
-        run: |
-          # Keep last 5 releases, mark older ones as deprecated
-          gh release list --limit 100 --repo $GITHUB_REPOSITORY | awk '{print $1}' | sort -V | tail -n +6 | while read OLD_TAG; do
-            echo "Deprecating $OLD_TAG"
-            gh release edit "$OLD_TAG" --notes "This release is deprecated." --repo $GITHUB_REPOSITORY || true
-          done
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

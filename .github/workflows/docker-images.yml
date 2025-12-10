@@ -1,5 +1,5 @@
 # TruSpace backend and frontend images
-# On push to 'release' branch
+# On push to 'main' branch
 # Build and push to Docker Hub
 # Test and scan for insecurities
 # If failure: clean up images
@@ -9,7 +9,7 @@ name: Docker Images CI
 
 on:
   push:
-    branches: ["release"]
+    branches: ["main"]
     tags: ["v*"]
 
 env:
