@@ -25,14 +25,14 @@ import {
 import { deleteTag, loadTags, postTag } from "@/lib/services";
 
 const colors = [
-   { color: "bg-blue-600", textColor: "text-white" },
-   { color: "bg-red-600", textColor: "text-white" },
-   { color: "bg-orange-500", textColor: "text-white" },
-   { color: "bg-yellow-500", textColor: "text-black" },
-   { color: "bg-green-600", textColor: "text-white" },
-   { color: "bg-blue-500", textColor: "text-white" },
-   { color: "bg-indigo-700", textColor: "text-white" },
-   { color: "bg-violet-300", textColor: "text-black" }
+   { color: "bg-blue-600", borderColor: "border-blue-600", textColor: "text-white" },
+   { color: "bg-red-600", borderColor: "border-red-600", textColor: "text-white" },
+   { color: "bg-orange-500", borderColor: "border-orange-500", textColor: "text-white" },
+   { color: "bg-yellow-500", borderColor: "border-yellow-500", textColor: "text-black" },
+   { color: "bg-green-600", borderColor: "border-green-600", textColor: "text-white" },
+   { color: "bg-blue-500", borderColor: "border-blue-500", textColor: "text-white" },
+   { color: "bg-indigo-700", borderColor: "border-indigo-700", textColor: "text-white" },
+   { color: "bg-violet-300", borderColor: "border-violet-300", textColor: "text-black" }
 ];
 export default function DocumentTags({ cid, workspaceOrigin, docId, status }) {
    const [tags, setTags] = useState([]);
@@ -118,6 +118,15 @@ export default function DocumentTags({ cid, workspaceOrigin, docId, status }) {
       }
    };
 
+   const getBadgeBorderColor = (color) => {
+      const found = colors.find((c) => c.color === color);
+      if (found) {
+         return found.borderColor;
+      }
+
+      return colors[0].borderColor;
+   }
+
    const getBadgeTextColor = (color) => {
       const found = colors.find((c) => c.color === color);
       if (found) {
@@ -134,7 +143,7 @@ export default function DocumentTags({ cid, workspaceOrigin, docId, status }) {
    return (
       <div className="flex flex-col">
          <div className="h-full">
-            <div className="space-y-4">
+            <div className="space-y-4 mb-2">
                {isGenerating ? (
                   <div className="flex flex-col items-center justify-center">
                      <Loader2 className="animate-spin h-10 w-10 mb-2" />
@@ -149,7 +158,7 @@ export default function DocumentTags({ cid, workspaceOrigin, docId, status }) {
                         <Badge
                            key={tag.id}
                            variant="default"
-                           className={`mr-1 pr-1 mt-4 min-h-[30px] ${tag.color} ${getBadgeTextColor(tag.color)}`}
+                           className={`mr-1 pr-1 mt-2 min-h-[30px] bg-white bg-opacity-25 border-2 ${getBadgeBorderColor(tag.color)} text-black dark:bg-gray-700 dark:bg-opacity-75 dark:text-white hover:bg-white hover:bg-opacity-75 dark:hover:bg-gray-700 dark:hover:bg-opacity-100`}
                         >
                            {tag?.name.replace(/"/g, "")}
                            {tag?.creatorType === "ai" && (
@@ -176,7 +185,7 @@ export default function DocumentTags({ cid, workspaceOrigin, docId, status }) {
                      ))}
                   {!isAdding && !isGenerating && (
                      <Button
-                        className="h-6 mt-4 min-h-[30px]"
+                        className="h-6 mt-2 min-h-[30px] bg-white bg-opacity-25 border-2 border-gray-400 text-gray-400 dark:bg-gray-700 dark:bg-opacity-75 dark:text-white hover:bg-white hover:bg-opacity-75 dark:hover:bg-gray-700 dark:hover:bg-opacity-100"
                         onClick={() => setIsAdding(true)}
                      >
                         <Plus />
