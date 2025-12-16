@@ -1,21 +1,27 @@
+#####################
+# INFO:
+# BUILT WORKFLOW IN .github/workflows/main-push.yml TO SYNC GITHUB MAIN TO OPENCODE GITLAB MAIN
+# IF THIS WORKS, THIS CI IS UNNECESSARY AND CAN BE DELETED
+#####################
+
 # CI to mirror our GitHub repository to OpenCode GitLab
 # Instructions on the mirroring here: https://guide.opencode.de/projekte/spiegeln/#so-funktioniert-die-pull-spiegelung
 # The exact component can be found here: https://gitlab.opencode.de/pull-mirroring/component
 
 stages:
   - build
-  - test
-  - deploy
+  #- test
+  #- deploy
   - mirroring
 
 include:
   # DevGuard CI Pipeline
-  - remote: "https://gitlab.opencode.de/l3montree/devguard-ci-components/-/raw/v0.17.1/templates/full.yml"
-    inputs:
-      asset_name: "$DEVGUARD_ASSET_NAME"
-      token: "$DEVGUARD_TOKEN"
-      api_url: "$DEVGUARD_API_URL"
-      web_ui: "https://devguard.opencode.de"
+  #- remote: "https://gitlab.opencode.de/l3montree/devguard-ci-components/-/raw/v0.17.1/templates/full.yml"
+  #  inputs:
+  #    asset_name: "$DEVGUARD_ASSET_NAME"
+  #    token: "$DEVGUARD_TOKEN"
+  #    api_url: "$DEVGUARD_API_URL"
+  #    web_ui: "https://devguard.opencode.de"
 
   # GitHub → OpenCode Pull Mirroring
   - component: $CI_SERVER_FQDN/pull-mirroring/component/pull-mirroring@1.0.1

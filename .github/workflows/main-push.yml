@@ -1,6 +1,7 @@
 # On push to 'main' branch
 # A) In docker-images.yml, build and scan images and if successful, push to Docker Hub
 # B) On workflow_run completion, bump version, create GitHub release and publish
+# C) On successful GitHub release, sync GitHub main to OpenCode GitLab main
 # parallel to A) In codeql.yml, run code scanning
 
 name: Create and publish release
@@ -74,3 +75,27 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  push_to_opencode:
+    name: Push main to OpenCode Repository
+    runs-on: ubuntu-latest
+    needs: release
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "GitHub → OpenCode Bot"
+          git config user.email "mirror@opencode.de"
+
+      - name: Add OpenCode GitLab remote
+        run: |
+          git remote add opencode \
+            https://oauth2:${{ secrets.OPENCODE_GITLAB_PAT }}@gitlab.opencode.de/openkfw/truspace.git
+
+      - name: Push main to OpenCode
+        run: |
+          git push opencode main:main --force
