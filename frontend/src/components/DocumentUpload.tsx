@@ -244,7 +244,6 @@ export default function DocumentUpload({
                         onChange={handleInputChange}
                         multiple
                         className="hidden"
-                        accept=".pdf,.doc,.docx,.txt,.ppt,.pptx,.xls,.xlsx,.png,.jpg,.jpeg"
                      />
                      <div className="flex items-center mt-2">
                         <Button
