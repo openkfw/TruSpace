@@ -166,6 +166,18 @@ export const storeUserSettingsDb = async (
   }
 };
 
+export const updateUserName = async (email: string, name: string) => {
+  try {
+    await db<UserDb>("users")
+      .update({ username: name })
+      .where({ email: email });
+  }
+  catch (error) {
+    logger.error("Error updating user", error);
+    throw new Error("Error updating user");
+  }
+};
+
 export const updateUserPassword = async (
   userId: number,
   passwordHash: string

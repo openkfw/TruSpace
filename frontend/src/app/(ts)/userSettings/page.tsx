@@ -18,10 +18,10 @@ import {
    SelectValue
 } from "@/components/ui/select";
 import { useUser } from "@/contexts/UserContext";
-import { updateUserSettings } from "@/lib/services";
+import { updateUserSettings, updateUserName } from "@/lib/services";
 
 export default function UserSettings() {
-   const { user, loading, updatePreferedLanguage, updateAvatar, refreshUser } =
+   const { user, loading, updatePreferedLanguage, updateUser, updateAvatar, refreshUser } =
       useUser();
    const [file, setFile] = useState<File>();
    const [selectedLanguage, setSelectedLanguage] = useState<string>();
@@ -82,6 +82,18 @@ export default function UserSettings() {
          setSettingChanged(true);
       }
    };
+
+   const handleNameChange = async (
+      e: React.KeyboardEvent<HTMLInputElement>
+    ) => {
+        const name = e.currentTarget.value;
+
+        if (user && name !== user.name) {
+            updateUser({ name });
+            await updateUserName(name);
+            setSettingChanged(true);
+        }
+    }
 
    const handlePreferedLanguageChange = (language) => {
       setSelectedLanguage(language);
@@ -170,9 +182,14 @@ export default function UserSettings() {
                <Label htmlFor="name">{registerTranslations("name")}</Label>
                <Input
                   id="name"
+                  type="text"
                   className="p-2 bg-slate-50 dark:bg-slate-800 dark:text-white dark:placeholder:text-white"
                   defaultValue={user.name}
-                  disabled
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleNameChange(e);
+                    }
+                  }}
                />
             </div>
             <div>
