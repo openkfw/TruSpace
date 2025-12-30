@@ -58,6 +58,7 @@ import {
    TooltipTrigger
 } from "./ui/tooltip";
 import PaginationComponent from "./Pagination";
+import DocumentTags from "../app/(ts)/workspace/[workspaceId]/document/[documentId]/DocumentTags";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
    "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -126,7 +127,7 @@ const DocumentList = ({ workspaceId }) => {
                   : row.original.meta.filename;
                return (
                   <div>
-                     <div className="text-lg font-bold mb-1 mt-3">
+                     <div className="text-lg font-bold mt-3">
                         {fileName}
                         {isEditableFile && (
                            <Badge className="ml-2">
@@ -134,9 +135,12 @@ const DocumentList = ({ workspaceId }) => {
                            </Badge>
                         )}
                      </div>
-                     <div className="font-thin">
-                        {documentTranslations("summaryOf")}
-                     </div>
+                      <DocumentTags
+                          cid={row.original.cid}
+                          workspaceOrigin={row.original.workspaceOrigin}
+                          docId={row.original.docId}
+                          status={row.original.status}
+                      />
                      <div className="font-semibold flex flex-inline mb-3">
                         {row.original.meta.creator} <Dot className="-mt-0.5" />{" "}
                         {fileSize} <Dot className="-mt-0.5" />{" "}
