@@ -414,7 +414,6 @@
       "documentCreated": "Dokument erfolgreich erstellt",
       "documentCreateError": "Beim Erstellen des Dokuments ist ein Fehler aufgetreten",
       "documentTooLargeError": "Dokument ist zu groß",
-      "summaryOf": "Zusammenfassung des Dokuments und der zugehörigen Tags",
       "details": "Details",
       "download": "Herunterladen",
       "versions": "Versionen",

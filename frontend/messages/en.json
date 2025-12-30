@@ -414,7 +414,6 @@
       "documentDeleted": "Document deleted successfully",
       "documentDeleteError": "An error occurred while deleting the document",
       "documentTooLargeError": "Document is too large",
-      "summaryOf": "Summary of document and related tags",
       "details": "Details",
       "download": "Download",
       "versions": "Versions",
