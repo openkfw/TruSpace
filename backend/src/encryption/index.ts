@@ -76,25 +76,33 @@ export async function decrypt(data: Buffer, password: string): Promise<Buffer> {
 }
 
 /**
- * Generates a random password with specified length
- * @param length The length of the password
- * @returns A random password string
+ * Generates a cryptographically secure random password with a specified length and charset.
+ * Uses rejection sampling to avoid modulo bias.
+ *
+ * @param length - The desired length of the password (default: 12)
+ * @param charset - The set of characters to choose from (default: alphanumeric + symbols)
+ * @returns A secure random password string
  */
-export function generatePassword(length: number = 12): string {
-  const charset =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=";
-  let password = "";
+export function generatePassword(
+  length: number = 12,
+  charset: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=",
+): string {
+  if (length <= 0) throw new Error("Password length must be greater than 0");
+  if (charset.length === 0) throw new Error("Charset must not be empty");
 
-  // Get random bytes from crypto
-  const randomBytes = crypto.randomBytes(length);
+  const password: string[] = [];
+  const maxValidByte = 256 - (256 % charset.length);
 
-  // Use each byte to select a character from the charset
-  for (let i = 0; i < length; i++) {
-    const randomIndex = randomBytes[i] % charset.length;
-    password += charset[randomIndex];
+  while (password.length < length) {
+    const byte = crypto.randomBytes(1)[0];
+
+    // Only use bytes that won't introduce bias
+    if (byte >= maxValidByte) continue;
+
+    password.push(charset[byte % charset.length]);
   }
 
-  return password;
+  return password.join("");
 }
 
 export async function hashPassword(plaintext: string): Promise<string> {
