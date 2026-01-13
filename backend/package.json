@@ -50,6 +50,7 @@
     "typescript": "^5.7.3",
     "undici": "^7.3.0",
     "uuid": "^11.0.5",
+    "webdav": "^4.11.5",
     "winston": "^3.17.0"
   },
   "devDependencies": {

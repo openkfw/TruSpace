@@ -23,6 +23,7 @@ import tagsRouter from "./routes/tags";
 import permissionsRouter from "./routes/userPermissions";
 import usersRouter from "./routes/users";
 import workspacesRouter from "./routes/workspaces";
+import nextcloudRouter from "./routes/nextcloud";
 
 const app = express();
 const { env, contentSecurityPolicy, rateLimitPerMinute } = config;
@@ -101,6 +102,7 @@ app.use("/api/users", usersRouter);
 app.use("/api/language", authenticateCookie, languageRouter);
 app.use("/api/permissions", authenticateCookie, permissionsRouter);
 app.use("/api/prompts", authenticateCookie, promptsRouter);
+app.use("/api/nextcloud", nextcloudRouter);
 
 // OpenAPI docs
 const pathToOpenapi =
