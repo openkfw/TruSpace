@@ -1,0 +1,101 @@
+# On push to 'main' branch
+# A) In docker-images.yml, build and scan images and if successful, push to Docker Hub
+# B) On workflow_run completion, bump version, create GitHub release and publish
+# C) On successful GitHub release, sync GitHub main to OpenCode GitLab main
+# parallel to A) In codeql.yml, run code scanning
+
+name: Create and publish release
+
+on:
+  workflow_run:
+    workflows: ["Docker Images CI"]
+    types:
+      - completed
+
+# Also add write permissions for commits and pushes
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Publish GitHub Release
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Git
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+
+      - name: Bump version
+        id: version
+        run: |
+          # Read current version from VERSION file
+          OLD=$(cat VERSION)
+          echo "Old version: $OLD"
+
+          # Remove leading 'v' if exists and split
+          NUM=${OLD#v}
+          IFS='.' read -r MAJ MIN <<< "$NUM"
+          MIN=$((MIN+1))
+          NEW="v$MAJ.$MIN"
+
+          # Write back to VERSION
+          echo "$NEW" > VERSION
+          echo "New version: $NEW"
+
+          # Update publiccode.yml to read from VERSION
+          sed -i "s/^softwareVersion:.*/softwareVersion: $NEW/" publiccode.yml
+
+          echo "new_version=$NEW" >> $GITHUB_OUTPUT
+
+      - name: Commit new version to main
+        run: |
+          git add VERSION publiccode.yml
+          git commit -m "Bump version to ${{ steps.version.outputs.new_version }}"
+          git push origin main
+
+      - name: Push version bump to dev
+        run: |
+          git checkout main
+          git branch -D dev || true
+          git checkout -b dev
+          git push origin dev --force
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ steps.version.outputs.new_version }}
+          release_name: Release ${{ steps.version.outputs.new_version }}
+          body: |
+            Auto-generated release
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  push_to_opencode:
+    name: Push main to OpenCode Repository
+    runs-on: ubuntu-latest
+    needs: release
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "GitHub → OpenCode Bot"
+          git config user.email "mirror@opencode.de"
+
+      - name: Add OpenCode GitLab remote
+        run: |
+          git remote add opencode \
+            https://oauth2:${{ secrets.OPENCODE_GITLAB_PAT }}@gitlab.opencode.de/openkfw/truspace.git
+
+      - name: Push main to OpenCode
+        run: |
+          git push opencode main:main --force

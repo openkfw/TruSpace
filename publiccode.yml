@@ -1,4 +1,4 @@
-# This repository adheres to the publiccode.yml standard by including this 
+# This repository adheres to the publiccode.yml standard by including this
 # metadata file that makes public software easily discoverable.
 # More info at https://github.com/italia/publiccode.yml
 
@@ -8,7 +8,7 @@ url: 'https://github.com/openkfw/TruSpace'
 landingURL: 'https://web.truspace.dev'
 releaseDate: '2025-08-17'
 logo: publiccodeLogo.svg
-softwareVersion: v.0.9
+softwareVersion: v0.9
 developmentStatus: beta
 softwareType: standalone/iot
 platforms:
