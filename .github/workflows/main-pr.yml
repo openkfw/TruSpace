@@ -80,7 +80,7 @@ jobs:
       - name: Start app, wait for health, then stop
         run: |
           echo "Starting application..."
-          ./start.sh &
+          ./start.sh --dev &
           APP_PID=$!
           echo $APP_PID > app.pid
 

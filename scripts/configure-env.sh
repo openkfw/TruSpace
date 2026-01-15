@@ -18,6 +18,19 @@ EMPTY="empty"
 source "${SCRIPT_DIR}/libs/logging.sh"
 
 #──────────────────────────────────────────────────────────────────────────────
+# PARSE ARGUMENTS
+#──────────────────────────────────────────────────────────────────────────────
+DEV="false"
+while [[ "$#" -gt 0 ]]; do
+  case "$1" in
+    --dev)
+      DEV="true"
+      shift
+      ;;
+  esac
+done
+
+#──────────────────────────────────────────────────────────────────────────────
 # FUNCTIONS
 #──────────────────────────────────────────────────────────────────────────────
 
@@ -296,7 +309,13 @@ PROFILE_PRODUCTION="production - Prefills stable, reliable defaults that work in
 PROFILE_CUSTOM="custom - No defaults; you can specify every value"
 
 # PROFILE
-prompt_var PROFILE choice "Specify an environment profile to prefill selected settings" "$PROFILE_DEVELOPMENT" "$PROFILE_DEVELOPMENT" "$PROFILE_PRODUCTION" "$PROFILE_CUSTOM"
+# Do not prompt if --dev flag is set (then development profile is used automatically)
+if [ "$DEV" = "true" ]; then
+  PROFILE="$PROFILE_DEVELOPMENT"
+  echo_success "DEV mode detected, using 'development' profile."
+else
+  prompt_var PROFILE choice "Specify an environment profile to prefill selected settings" "$PROFILE_DEVELOPMENT" "$PROFILE_DEVELOPMENT" "$PROFILE_PRODUCTION" "$PROFILE_CUSTOM"
+fi
 
 case "$PROFILE" in
   "$PROFILE_DEVELOPMENT")
