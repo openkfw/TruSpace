@@ -89,7 +89,7 @@ jobs:
       - name: Configure Git
         run: |
           git config user.name "GitHub → OpenCode Bot"
-          git config user.email "mirror@opencode.de"
+          git config user.email "actions@github.com"
 
       - name: Add OpenCode GitLab remote
         run: |
