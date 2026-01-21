@@ -1,0 +1,106 @@
+# On pull request to 'main' branch
+# A) Make sure that the pull request comes from 'main' branch
+# B) Scan for npm vulnerabilities
+# C) Test whether application starts
+# parallel to A) In codeql.yml, run code scanning
+
+name: Protect PRs to `main`
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  restrict_pr:
+    name: Ensure PRs come from `dev`
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if PR is from dev
+        run: |
+          if [ "${{ github.head_ref }}" != "dev" ]; then
+            echo "❌ Pull requests to `main` must come from `dev` only."
+            exit 1
+          else
+            echo "✅ PR is from `dev`."
+          fi
+
+  npm_audit_backend:
+    name: Scan backend for npm vulnerabilities
+    runs-on: ubuntu-latest
+    needs: restrict_pr
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Audit backend
+        working-directory: ./backend
+        run: npm audit --audit-level=high
+
+  npm_audit_frontend:
+    name: Scan frontend for npm vulnerabilities
+    runs-on: ubuntu-latest
+    needs: restrict_pr
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Audit frontend
+        working-directory: ./frontend
+        run: npm audit --audit-level=high
+
+  start_app:
+    name: Test application
+    runs-on: ubuntu-latest
+    needs:
+      - npm_audit_backend
+      - npm_audit_frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ensure script is executable
+        run: chmod +x ./start.sh
+
+      - name: Start app, wait for health, then stop
+        run: |
+          echo "Starting application..."
+          ./start.sh --dev &
+          APP_PID=$!
+          echo $APP_PID > app.pid
+
+          timeout=1200       # 20 minutes
+          interval=10
+          elapsed=0
+
+          echo "Waiting for application to become healthy (max 20 minutes)..."
+
+          while ! curl -s -f http://localhost:3000/appStatus; do
+            if [ $elapsed -ge $timeout ]; then
+              echo "❌ Application did not become healthy within 20 minutes."
+              kill $APP_PID || true
+              exit 1
+            fi
+            sleep $interval
+            elapsed=$((elapsed + interval))
+          done
+
+          echo "✅ Application is healthy!"
+
+          echo "Stopping application..."
+          kill $APP_PID || true
