@@ -134,7 +134,10 @@ export const activateUserDb = async (userId: number): Promise<void> => {
   try {
     await db("users")
       .where({ id: userId })
-      .update({ status: USER_STATUS.active });
+      .update({
+        status: USER_STATUS.active,
+        updated_at: db.fn.now(),
+    });
   } catch (error) {
     logger.error("Error activating user:", error);
   }
@@ -158,6 +161,7 @@ export const storeUserSettingsDb = async (
         avatar_cid: avatarCid,
         prefered_language: preferedLanguage,
         notification_settings: notificationSettings,
+        updated_at: db.fn.now(),
       })
       .where({ email: email });
   } catch (error) {
@@ -172,7 +176,10 @@ export const updateUserPassword = async (
 ) => {
   try {
     await db<UserDb>("users")
-      .update({ password_hash: passwordHash })
+      .update({
+        password_hash: passwordHash,
+        updated_at: db.fn.now(),
+      })
       .where({ id: userId });
   } catch (error) {
     logger.error("Error updating user", error);
@@ -183,7 +190,10 @@ export const updateUserPassword = async (
 export const updateUserToken = async (userId: number, token: string) => {
   try {
     await db<UserDb>("users")
-      .update({ user_token: token })
+      .update({
+        user_token: token,
+        updated_at: db.fn.now(),
+      })
       .where({ id: userId });
   } catch (error) {
     logger.error("Error updating user", error);
