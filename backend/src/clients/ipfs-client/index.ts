@@ -35,6 +35,7 @@ import {
   WorkspaceRequest,
 } from "../../types/interfaces/truspace";
 import { checkPermissionForWorkspace } from "../../utility/permissions";
+import { assertAndEncodeURIComponent } from "../../utility/validation";
 import { deleteMultipleJobStatusesDb } from "../db";
 import { IClient } from "./IClient";
 
@@ -80,7 +81,7 @@ export class IpfsClient implements IClient {
   async downloadAvatar(
     req: AuthenticatedRequest,
     res: Response,
-    cid: string
+    cid: string,
   ): Promise<any> {
     try {
       const result = await this.#gatewayAxios.get(`/ipfs/${cid}`, {
@@ -117,7 +118,7 @@ export class IpfsClient implements IClient {
           },
           timeout: 30000,
           maxContentLength: Infinity,
-        }
+        },
       );
       const data = result.data[0];
       return data.cid;
@@ -191,11 +192,11 @@ export class IpfsClient implements IClient {
   }
 
   async #getLanguageForVersion(
-    versionCid: string
+    versionCid: string,
   ): Promise<string | undefined> {
     try {
       const res = await this.#pinSvcAxios.get(
-        `/pins?limit=1&meta={"type":"language","versionCid":"${versionCid}"}`
+        `/pins?limit=1&meta={"type":"language","versionCid":"${versionCid}"}`,
       );
       if (res.data && res.data.results && res.data.results.length > 0) {
         const languagePin = res.data.results[0].pin;
@@ -205,7 +206,7 @@ export class IpfsClient implements IClient {
     } catch (error) {
       logger.error(
         `Error fetching language for version CID ${versionCid}:`,
-        error
+        error,
       );
       return undefined;
     }
@@ -213,8 +214,10 @@ export class IpfsClient implements IClient {
 
   async getDocumentVersionDetailsByCid(cid: string): Promise<Document> {
     try {
-      const clusterRes = (await this.#clusterAxios.get(`/allocations/${cid}`))
-        .data;
+      const safeCid = assertAndEncodeURIComponent(cid);
+      const clusterRes = (
+        await this.#clusterAxios.get(`/allocations/${safeCid}`)
+      ).data;
       const language = await this.#getLanguageForVersion(cid);
 
       return {
@@ -239,7 +242,7 @@ export class IpfsClient implements IClient {
     } catch (error) {
       logger.error(
         `Error getting document version details for CID ${cid}:`,
-        error
+        error,
       );
       throw error;
     }
@@ -253,7 +256,7 @@ export class IpfsClient implements IClient {
   async getDocumentDetailsById(docId: string): Promise<DocumentWithVersions> {
     try {
       const res = await this.#pinSvcAxios.get(
-        `/pins?limit=1000&meta={"type":"document","docId":"${docId}"}`
+        `/pins?limit=1000&meta={"type":"document","docId":"${docId}"}`,
       );
 
       const documentPins = res.data.results as DocumentPinRequest[];
@@ -262,7 +265,7 @@ export class IpfsClient implements IClient {
         async (r: DocumentPinRequest) => {
           const language = await this.#getLanguageForVersion(r.pin.cid);
           return this.#transformPinToDocument(r.pin, language);
-        }
+        },
       );
 
       let documentVersions = await Promise.all(documentVersionsPromises);
@@ -273,7 +276,7 @@ export class IpfsClient implements IClient {
 
       if (documentVersions.length === 0) {
         logger.warn(
-          `No document versions found for docId: ${docId}. Returning minimal structure.`
+          `No document versions found for docId: ${docId}. Returning minimal structure.`,
         );
         return {
           docId: docId,
@@ -305,11 +308,11 @@ export class IpfsClient implements IClient {
   async getDocumentsByDocumentId(docId: string): Promise<Document[]> {
     try {
       const res = await this.#pinSvcAxios.get(
-        `/pins?limit=1000&meta={"type":"document","docId":"${docId}"}`
+        `/pins?limit=1000&meta={"type":"document","docId":"${docId}"}`,
       );
 
       return res.data.results.map((r: DocumentPinRequest) =>
-        this.#transformPinToDocument(r.pin)
+        this.#transformPinToDocument(r.pin),
       );
     } catch (error) {
       logger.error(`Error getting documents by document ID ${docId}:`, error);
@@ -326,7 +329,7 @@ export class IpfsClient implements IClient {
   async downloadDocumentVersionByCid(
     req: AuthenticatedRequest,
     res: Response,
-    cid: string
+    cid: string,
   ): Promise<void> {
     try {
       const docInfo = await this.getDocumentVersionDetailsByCid(cid);
@@ -335,10 +338,11 @@ export class IpfsClient implements IClient {
       await checkPermissionForWorkspace(
         req.user?.email as string,
         res,
-        metadata.workspaceOrigin
+        metadata.workspaceOrigin,
       );
 
-      const result = await this.#gatewayAxios.get(`/ipfs/${cid}`, {
+      const safeCid = assertAndEncodeURIComponent(cid);
+      const result = await this.#gatewayAxios.get(`/ipfs/${safeCid}`, {
         responseType: "arraybuffer",
       });
 
@@ -347,14 +351,14 @@ export class IpfsClient implements IClient {
       if (metadata.encrypted === "true") {
         modifiedBuffer = await decrypt(
           fileBuffer,
-          await getWorkspacePassword(metadata.workspaceOrigin)
+          await getWorkspacePassword(metadata.workspaceOrigin),
         );
       }
 
       res.setHeader("Content-Type", result.headers["content-type"]);
       res.setHeader(
         "Content-Disposition",
-        `attachment; filename="${encodeURIComponent(metadata.filename) || cid}"`
+        `attachment; filename="${encodeURIComponent(metadata.filename) || cid}"`,
       );
 
       res.end(modifiedBuffer);
@@ -366,7 +370,7 @@ export class IpfsClient implements IClient {
   }
 
   async getDocumentVersionContentByCid(
-    cid: string
+    cid: string,
   ): Promise<{ data: Buffer; size: number }> {
     try {
       const docInfo = await this.getDocumentVersionDetailsByCid(cid);
@@ -389,7 +393,7 @@ export class IpfsClient implements IClient {
     } catch (error) {
       logger.error(
         `Error getting document version content for CID ${cid}:`,
-        error
+        error,
       );
       throw error;
     }
@@ -403,7 +407,7 @@ export class IpfsClient implements IClient {
     try {
       const pinRes: PinningResponse = (
         await this.#pinSvcAxios.get(
-          '/pins?limit=1000&meta={"type":"workspace"}'
+          '/pins?limit=1000&meta={"type":"workspace"}',
         )
       ).data;
 
@@ -423,7 +427,7 @@ export class IpfsClient implements IClient {
    * @returns
    */
   async createWorkspace(
-    workspace: WorkspaceRequest
+    workspace: WorkspaceRequest,
   ): Promise<WorkspaceCreateResponse> {
     try {
       const json = JSON.stringify(workspace, null);
@@ -451,7 +455,7 @@ export class IpfsClient implements IClient {
           headers: {
             ...form.getHeaders(),
           },
-        }
+        },
       );
       const data = result.data[0];
       return { cid: data.cid, uuid: data.name };
@@ -475,7 +479,8 @@ export class IpfsClient implements IClient {
 
       const everythingInWorkspace = await this.getEverythingInWorkspace(wUID);
       await this.deleteDocumentsAndAssociatedItems(everythingInWorkspace);
-      await this.#clusterAxios.delete(`/pins/${wCID}`);
+      const safeWCID = assertAndEncodeURIComponent(wCID);
+      await this.#clusterAxios.delete(`/pins/${safeWCID}`);
     } catch (error) {
       logger.error(`Error deleting workspace ${wUID}:`, error);
       throw error;
@@ -486,11 +491,11 @@ export class IpfsClient implements IClient {
     try {
       const pinRes: PinningResponse = (
         await this.#pinSvcAxios.get(
-          `/pins?limit=1000&meta={"type":"workspace","workspace_uuid":"${wId}"}`
+          `/pins?limit=1000&meta={"type":"workspace","workspace_uuid":"${wId}"}`,
         )
       ).data;
       const result = pinRes.results.map((r: PinRequest) =>
-        this.#transformPinToWorkspace(r.pin)
+        this.#transformPinToWorkspace(r.pin),
       );
       return result;
     } catch (error) {
@@ -503,12 +508,12 @@ export class IpfsClient implements IClient {
     try {
       const pinRes: PinningResponse = (
         await this.#pinSvcAxios.get(
-          `/pins?limit=1000&meta={"type":"workspace","name":"${encodeURIComponent(name)}"}`
+          `/pins?limit=1000&meta={"type":"workspace","name":"${encodeURIComponent(name)}"}`,
         )
       ).data;
 
       const result = pinRes.results.map((r: PinRequest) =>
-        this.#transformPinToWorkspace(r.pin)
+        this.#transformPinToWorkspace(r.pin),
       );
       return result;
     } catch (error) {
@@ -521,12 +526,12 @@ export class IpfsClient implements IClient {
     try {
       const pinRes: PinningResponse = (
         await this.#pinSvcAxios.get(
-          `/pins?limit=1000&meta={"type":"workspace","is_public":"true"}`
+          `/pins?limit=1000&meta={"type":"workspace","is_public":"true"}`,
         )
       ).data;
 
       const result = pinRes.results.map((r: PinRequest) =>
-        this.#transformPinToWorkspace(r.pin)
+        this.#transformPinToWorkspace(r.pin),
       );
       return result;
     } catch (error) {
@@ -537,7 +542,7 @@ export class IpfsClient implements IClient {
 
   async updateWorkspaceType(
     workspaceId: string,
-    isPublic: boolean
+    isPublic: boolean,
   ): Promise<void> {
     try {
       const workspace = await this.getWorkspaceById(workspaceId);
@@ -567,7 +572,7 @@ export class IpfsClient implements IClient {
    */
   async createDocument(
     doc: DocumentRequest,
-    file: File
+    file: File,
   ): Promise<DocumentCreateResponse> {
     try {
       const form = new FormData();
@@ -596,7 +601,7 @@ export class IpfsClient implements IClient {
           },
           timeout: 30000,
           maxContentLength: Infinity,
-        }
+        },
       );
       const data = result.data[0];
       return { cid: data.cid, uuid: doc.docId };
@@ -608,12 +613,12 @@ export class IpfsClient implements IClient {
 
   async getAllDocuments(
     from: number = 0,
-    limit: number = 100
+    limit: number = 100,
   ): Promise<DocumentsResponse> {
     try {
       const pinRes: DocumentPinningResponse = (
         await this.#pinSvcAxios.get(
-          `/pins?limit=${maxNumberOfFetchedPins}&meta={"type":"document"}`
+          `/pins?limit=${maxNumberOfFetchedPins}&meta={"type":"document"}`,
         )
       ).data;
 
@@ -636,12 +641,12 @@ export class IpfsClient implements IClient {
     wId: string,
     from: number,
     limit: number,
-    searchString: string = ""
+    searchString: string = "",
   ): Promise<DocumentsResponse> {
     try {
       const pinRes: DocumentPinningResponse = (
         await this.#pinSvcAxios.get(
-          `/pins?limit=${maxNumberOfFetchedPins}&meta={"type":"document","workspaceOrigin":"${wId}"}`
+          `/pins?limit=${maxNumberOfFetchedPins}&meta={"type":"document","workspaceOrigin":"${wId}"}`,
         )
       ).data;
 
@@ -649,7 +654,7 @@ export class IpfsClient implements IClient {
       const filteredResult = result.filter((doc) =>
         searchString && searchString.length > 0
           ? doc.meta.filename.toLowerCase().includes(searchString.toLowerCase())
-          : true
+          : true,
       );
       return {
         data: filteredResult.slice(from, from + limit),
@@ -687,7 +692,7 @@ export class IpfsClient implements IClient {
           headers: {
             ...form.getHeaders(),
           },
-        }
+        },
       );
       const result = clusterResp.data[0].cid;
       return result;
@@ -711,7 +716,7 @@ export class IpfsClient implements IClient {
   async getMessagesByDocumentId(docId: string): Promise<ChatMessage[]> {
     try {
       const res = await this.#pinSvcAxios.get(
-        `/pins?limit=1000&meta={"type":"chat","docId":"${docId}"}`
+        `/pins?limit=1000&meta={"type":"chat","docId":"${docId}"}`,
       );
 
       const pins: PinningResponse = res.data;
@@ -730,7 +735,7 @@ export class IpfsClient implements IClient {
   async getAllMessages(): Promise<ChatMessage[]> {
     try {
       const res = await this.#pinSvcAxios.get(
-        `/pins?limit=1000&meta={"type":"chat"}`
+        `/pins?limit=1000&meta={"type":"chat"}`,
       );
 
       const pins: PinningResponse = res.data;
@@ -768,13 +773,13 @@ export class IpfsClient implements IClient {
           headers: {
             ...form.getHeaders(),
           },
-        }
+        },
       );
       const result = clusterResp.data[0].cid;
       return result;
     } catch (error) {
       logger.error(
-        `Error storing perspective in IPFS! ${JSON.stringify(error, null, 2)}`
+        `Error storing perspective in IPFS! ${JSON.stringify(error, null, 2)}`,
       );
       throw error;
     }
@@ -784,7 +789,7 @@ export class IpfsClient implements IClient {
     try {
       const pinRes: PinningResponse = (
         await this.#pinSvcAxios.get(
-          `/pins?limit=1000&meta={"type":"perspective","docId":"${docId}"}`
+          `/pins?limit=1000&meta={"type":"perspective","docId":"${docId}"}`,
         )
       ).data;
 
@@ -795,7 +800,7 @@ export class IpfsClient implements IClient {
     } catch (error) {
       logger.error(
         `Error getting perspectives by document ID ${docId}:`,
-        error
+        error,
       );
       throw error;
     }
@@ -805,7 +810,7 @@ export class IpfsClient implements IClient {
     try {
       const pinRes: PinningResponse = (
         await this.#pinSvcAxios.get(
-          `/pins?limit=1000&meta={"type":"perspective","versionCid":"${cid}"}`
+          `/pins?limit=1000&meta={"type":"perspective","versionCid":"${cid}"}`,
         )
       ).data;
 
@@ -815,7 +820,7 @@ export class IpfsClient implements IClient {
       return (await this.#fetchPerspectiveFiles(perspectives)).sort(
         (a: Perspective, b: Perspective) =>
           Number(new Date(a.meta.timestamp).getTime()) -
-          Number(new Date(b.meta.timestamp).getTime())
+          Number(new Date(b.meta.timestamp).getTime()),
       );
     } catch (error) {
       logger.error(`Error getting perspectives by version CID ${cid}:`, error);
@@ -828,12 +833,12 @@ export class IpfsClient implements IClient {
    * @param workspaceId
    */
   async getEverythingInWorkspace(
-    workspaceId: string
+    workspaceId: string,
   ): Promise<GeneralTemplateOfItemInWorkspace[]> {
     try {
       const pinRes: PinningResponse = (
         await this.#pinSvcAxios.get(
-          `/pins?limit=1000&meta={"workspaceOrigin":"${workspaceId}"}`
+          `/pins?limit=1000&meta={"workspaceOrigin":"${workspaceId}"}`,
         )
       ).data;
 
@@ -845,7 +850,7 @@ export class IpfsClient implements IClient {
     } catch (error) {
       logger.error(
         `Error getting everything in workspace ${workspaceId}:`,
-        error
+        error,
       );
       throw error;
     }
@@ -856,12 +861,12 @@ export class IpfsClient implements IClient {
    * @param workspaceId
    */
   async getEverythingByDocId(
-    docId: string
+    docId: string,
   ): Promise<GeneralTemplateOfItemInWorkspace[]> {
     try {
       const pinRes: PinningResponse = (
         await this.#pinSvcAxios.get(
-          `/pins?limit=1000&meta={"docId":"${docId}"}`
+          `/pins?limit=1000&meta={"docId":"${docId}"}`,
         )
       ).data;
 
@@ -898,7 +903,7 @@ export class IpfsClient implements IClient {
           headers: {
             ...form.getHeaders(),
           },
-        }
+        },
       );
       const result = clusterResp.data[0].cid;
       return result;
@@ -910,7 +915,8 @@ export class IpfsClient implements IClient {
 
   async deleteTag(tagId: string): Promise<void> {
     try {
-      await this.#clusterAxios.delete(`/pins/${tagId}`);
+      const safeTagId = assertAndEncodeURIComponent(tagId);
+      await this.#clusterAxios.delete(`/pins/${safeTagId}`);
     } catch (error) {
       logger.error(`Error deleting tag ${tagId}:`, error);
       throw error;
@@ -928,13 +934,13 @@ export class IpfsClient implements IClient {
   }
 
   async deleteDocumentsAndAssociatedItems(
-    allItems: GeneralTemplateOfItemInWorkspace[]
+    allItems: GeneralTemplateOfItemInWorkspace[],
   ) {
     try {
       const allItemCids = allItems.map((item) => item.cid);
 
       const allDocuments = allItems.filter(
-        (item) => item.meta.type === "document"
+        (item) => item.meta.type === "document",
       );
       const allDocCids = allDocuments.map((doc) => doc.cid);
 
@@ -947,8 +953,8 @@ export class IpfsClient implements IClient {
       if (allItemCids.length) {
         await Promise.all(
           allItemCids.map((itemCid) =>
-            this.#clusterAxios.delete(`/pins/${itemCid}`)
-          )
+            this.#clusterAxios.delete(`/pins/${itemCid}`),
+          ),
         );
       }
 
@@ -963,7 +969,7 @@ export class IpfsClient implements IClient {
     try {
       const pinRes: PinningResponse = (
         await this.#pinSvcAxios.get(
-          `/pins?limit=1000&meta={"type":"tag","docId":"${docId}"}`
+          `/pins?limit=1000&meta={"type":"tag","docId":"${docId}"}`,
         )
       ).data;
 
@@ -981,7 +987,7 @@ export class IpfsClient implements IClient {
     try {
       const pinRes: PinningResponse = (
         await this.#pinSvcAxios.get(
-          `/pins?limit=1000&meta={"type":"tag","versionCid":"${cid}"}`
+          `/pins?limit=1000&meta={"type":"tag","versionCid":"${cid}"}`,
         )
       ).data;
 
@@ -999,7 +1005,7 @@ export class IpfsClient implements IClient {
     try {
       const pinRes: PinningResponse = (
         await this.#pinSvcAxios.get(
-          '/pins?limit=1000&meta={"type":"perspective"}'
+          '/pins?limit=1000&meta={"type":"perspective"}',
         )
       ).data;
 
@@ -1111,7 +1117,7 @@ export class IpfsClient implements IClient {
   }
 
   #transformPinToGeneralWorkspaceItem(
-    pin: Pin
+    pin: Pin,
   ): GeneralTemplateOfItemInWorkspace {
     const generalTemplate = {
       cid: pin.cid,
@@ -1138,7 +1144,7 @@ export class IpfsClient implements IClient {
         // unique by docId
         .filter(
           (v, i, a) =>
-            a.findIndex((t) => t.pin.meta.docId === v.pin.meta.docId) === i
+            a.findIndex((t) => t.pin.meta.docId === v.pin.meta.docId) === i,
         )
         .map((el) => this.#transformPinToDocument(el.pin))
     );
@@ -1169,7 +1175,7 @@ export class IpfsClient implements IClient {
 
   /** If `data` field is too large, IPFS pinning service won't return it. It is necessary to get the files themselves */
   async #fetchPerspectiveFiles(
-    perspectives: Perspective[]
+    perspectives: Perspective[],
   ): Promise<Perspective[]> {
     try {
       const perspectiveCids = perspectives.map((p) => p.cid);
@@ -1177,17 +1183,17 @@ export class IpfsClient implements IClient {
         perspectiveCids.map(async (perspectiveCid) => {
           try {
             const response = await this.#gatewayAxios.get(
-              `/ipfs/${perspectiveCid}`
+              `/ipfs/${perspectiveCid}`,
             );
             return { ...response, perspectiveCid };
           } catch (error) {
             logger.error(
               `Error fetching perspective file ${perspectiveCid}:`,
-              error
+              error,
             );
             return null;
           }
-        })
+        }),
       );
 
       const result = perspectiveFilesResponse
@@ -1225,7 +1231,7 @@ export class IpfsClient implements IClient {
           headers: {
             ...form.getHeaders(),
           },
-        }
+        },
       );
       const result = clusterResp.data[0].cid;
       return result;
