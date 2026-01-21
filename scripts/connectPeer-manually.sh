@@ -140,18 +140,45 @@ run_ipfs_config --json Routing.DelegatedRouters '[]'
 run_ipfs_config --json Ipns.DelegatedPublishers '[]'
 
 # Update IPFS Bootstrap address directly via ipfs config
+# echo ""
+# echo "🔁 Updating IPFS Bootstrap entry..."
+# run_ipfs_config --json Bootstrap "[\"$IPFS_ADDR\"]"
+# echo "✅ Updated IPFS Bootstrap"
+
+# Update IPFS Peer addresses directly via ipfs config
 echo ""
-echo "🔁 Updating IPFS Bootstrap entry to $IPFS_ADDR ..."
-run_ipfs_config --json Bootstrap "[\"$IPFS_ADDR\"]"
-echo "✅ Updated IPFS Bootstrap to: $IPFS_ADDR"
+echo "🔁 Updating IPFS Peering.Peers ..."
+CURRENT_PEERS=$(run_ipfs_config Peering.Peers --json)
+UPDATED_PEERS=$(echo "$CURRENT_PEERS" | jq \
+  --arg id "$IPFS_ID" \
+  --arg ip "$PEER_IP" '
+  (
+    . // []
+  )
+  + [
+      {
+        ID: $id,
+        Addrs: ["\/ip4\/\($ip)\/tcp\/4001"]
+      }
+    ]
+  | unique_by(.ID)
+')
+run_ipfs_config --json Peering.Peers "$UPDATED_PEERS"
+
+echo "✅ Updated IPFS Peering.Peers"
 
 # Update Cluster peer_addresses via jq
+# If peer_addresses exist, add the new one uniquely instead of replacing
 echo ""
 echo "🔁 Updating Cluster peer_addresses..."
 tmp_cl="$(mktemp)"
-jq --arg addr "$CLUSTER_ADDR" '.cluster.peer_addresses = [$addr]' "$CLUSTER_CONFIG" > "$tmp_cl"
+jq --arg addr "$CLUSTER_ADDR" '
+  .cluster.peer_addresses = (
+    (.cluster.peer_addresses // []) + [$addr] | unique
+  )
+' "$CLUSTER_CONFIG" > "$tmp_cl"
 mv "$tmp_cl" "$CLUSTER_CONFIG"
-echo "✅ Updated Cluster peer_addresses to: $CLUSTER_ADDR"
+echo "✅ Updated Cluster peer_addresses"
 
 # Restart IPFS container
 echo ""
