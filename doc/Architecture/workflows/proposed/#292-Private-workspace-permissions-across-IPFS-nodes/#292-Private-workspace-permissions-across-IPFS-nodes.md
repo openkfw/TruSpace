@@ -89,9 +89,8 @@ This diagram shows the entire invite process across nodes, including acceptance,
 ```mermaid
 sequenceDiagram
     participant A1 as User A1 (Node A)
-    participant A2 as User A2 (Node A)
-    participant NodeA_DB as Node A DB
-    participant NodeB_DB as Node B DB
+    participant NodeA_DB as Node A
+    participant NodeB_DB as Node B
     participant B1 as User B1 (Node B)
 
     %% Invite creation
