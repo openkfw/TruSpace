@@ -27,7 +27,7 @@ export const createPermissionDb = async (permission: UserPermissionDto) => {
       .insert({
         workspace_id: permission.workspaceId,
         user_email: permission.email,
-        last_event_id: permission.lastEventId
+        last_event_id: permission.lastEventId,
         role: permission.role,
         status: permission.status,
       })
