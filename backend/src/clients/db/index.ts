@@ -5,6 +5,7 @@ export * from "./prompts";
 export * from "./userPermissions";
 export * from "./users";
 export * from "./workspacePasswords";
+export * from "./events";
 
 const REQUIRED_TABLES = [
   "users",
@@ -12,7 +13,8 @@ const REQUIRED_TABLES = [
   "workspace_passwords",
   "job_status",
   "prompts",
-  "password_reset_tokens"
+  "password_reset_tokens",
+  "events",
 ];
 
 export const getHealthDb = async () => {
@@ -38,7 +40,7 @@ export const getHealthDb = async () => {
     return true;
   } catch (error) {
     logger.error(
-      `Database connection error: ${JSON.stringify(error, null, 2)}`
+      `Database connection error: ${JSON.stringify(error, null, 2)}`,
     );
     return false;
   }

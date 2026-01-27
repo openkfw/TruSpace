@@ -6,6 +6,7 @@ interface UserPermissionDb {
   id: number;
   user_email: string;
   workspace_id: string;
+  last_event_id: string;
   role: string;
   status: string;
   created_at?: Date;
@@ -17,6 +18,7 @@ export interface UserPermissionDto {
   email: string;
   role: string;
   status: string;
+  lastEventId: string;
 }
 
 export const createPermissionDb = async (permission: UserPermissionDto) => {
@@ -25,6 +27,7 @@ export const createPermissionDb = async (permission: UserPermissionDto) => {
       .insert({
         workspace_id: permission.workspaceId,
         user_email: permission.email,
+        last_event_id: permission.lastEventId
         role: permission.role,
         status: permission.status,
       })
@@ -59,7 +62,7 @@ export const findUsersInWorkspaceDb = async (workspaceId: string) => {
         "user_permissions.user_email as email",
         "users.username as name",
         "user_permissions.workspace_id as workspaceId",
-        "user_permissions.role"
+        "user_permissions.role",
       );
     return users;
   } catch (error) {
