@@ -48,7 +48,6 @@ Introduce a **cross-node invitation system** based on **USER_PERMISSIONS** as a 
   - `entity_id` — unique ID of the affected entity (invite ID, workspace ID)
   - `entity_event` — `invited`, `revoked`, `removed`
   - `created_at` — timestamp
-  - `processed` — boolean flag
 
 5. **Remote nodes process event**
 
@@ -139,7 +138,6 @@ sequenceDiagram
 - `entity_event` — `invited`, `revoked`, `removed`
 - `payload` — JSON with additional metadata
 - `created_at` — timestamp
-- `processed` — boolean flag
 
 **Behavior:**
 
