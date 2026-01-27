@@ -19,24 +19,21 @@ erDiagram
     USER_PERMISSIONS {
         int id PK
         string workspace_id
-        string node_id
-        string user_id FK "references USERS.id"
+        string user_email FK "references USERS.email"
         string role
-        string status "pending|accepted"
-        string last_invite_id
+        string status
+        string last_event_id
         datetime created_at
         datetime updated_at
     }
 
     %% Generic event log
     EVENTS {
-        int id PK
+        string id PK
         string entity_type "permission|workspace|notification|job|etc."
         string entity_id "e.g., invite_id, workspace_id, job_id"
-        string event_type "invited|accepted|revoked|created|deleted|pending|completed|..."
+        string entity_event "invited|accepted|revoked|created|deleted|pending|completed|..."
         json payload "Additional metadata per event"
-        string source_node_id
-        string target_node_id
         datetime created_at
         boolean processed "true if event applied locally"
     }
@@ -44,7 +41,7 @@ erDiagram
     %% Notifications
     NOTIFICATIONS {
         int id PK
-        string user_id FK "references USERS.id"
+        string user_email FK "references USERS.email"
         string type "workspace_invite|job_update|message|..."
         json payload
         boolean read
