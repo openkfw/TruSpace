@@ -1,0 +1,86 @@
+erDiagram
+    %% Users table
+    USERS {
+        int id PK
+        string username
+        string email
+        string status
+        string uiid
+        string password_hash
+        string user_token
+        string avatar_cid
+        string preferred_language
+        string notification_settings
+        datetime created_at
+        datetime updated_at
+    }
+
+    %% Permissions (materialized)
+    USER_PERMISSIONS {
+        int id PK
+        string workspace_id
+        string user_email FK "references USERS.email"
+        string role
+        string status
+        string last_event_id
+        datetime created_at
+        datetime updated_at
+    }
+
+    %% Generic event log
+    EVENTS {
+        string id PK
+        string entity_type "permission|workspace|notification|job|etc."
+        string entity_id "e.g., invite_id, workspace_id, job_id"
+        string entity_event "invited|accepted|revoked|created|deleted|pending|completed|..."
+        json payload "Additional metadata per event"
+        datetime created_at
+    }
+
+    %% Notifications
+    NOTIFICATIONS {
+        int id PK
+        string user_email FK "references USERS.email"
+        string type "workspace_invite|job_update|message|..."
+        json payload
+        boolean read
+        datetime created_at
+    }
+
+    %% AI / Job status
+    JOB_STATUS {
+        int id PK
+        string request_id
+        string status "pending|processing|completed|failed"
+        string error
+        json attributes
+        string template_id
+        datetime created_at
+        datetime updated_at
+    }
+
+    %% Workspace passwords
+    WORKSPACE_PASSWORDS {
+        int id PK
+        string workspace_id
+        blob encrypted_password
+        datetime created_at
+        datetime updated_at
+    }
+
+    %% Password reset tokens
+    PASSWORD_RESET_TOKENS {
+        int id PK
+        int user_id FK "references USERS.id"
+        string token
+        datetime created_at
+        datetime updated_at
+    }
+
+    %% Relationships
+    USERS ||--o{ USER_PERMISSIONS : "has"
+    USERS ||--o{ PASSWORD_RESET_TOKENS : "has"
+    USERS ||--o{ NOTIFICATIONS : "receives"
+
+    %% Notes for constraints (Mermaid style)
+    %% USER_PERMISSIONS "Unique constraint: workspace_id + node_id + user_id"
