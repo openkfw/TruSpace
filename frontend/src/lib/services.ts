@@ -702,6 +702,28 @@ export const updateUserSettings = async (formData: FormData) => {
    }
 };
 
+export const updateUserName = async (name: string) => {
+    try {
+        const res = await fetch(`${USERS_ENDPOINT}/reset-name`, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ name })
+        });
+
+        if (!res.ok) {
+            throw new Error("Failed to update user name");
+        }
+        return res.json();
+    }
+    catch (error) {
+        console.error("Error updating user name:", error);
+        throw error;
+    }
+};
+
 export const downloadAvatar = async () => {
    try {
       const res = await fetch(`${USERS_ENDPOINT}/avatar`, {
