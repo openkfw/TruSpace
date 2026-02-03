@@ -14,6 +14,7 @@ import {
   getTotalUsersDb,
   storeUserSettingsDb,
   updateUserFirstSignIn,
+  updateUserName,
   updateUserPassword,
   updateUserToken,
 } from "../clients/db";
@@ -523,6 +524,32 @@ router.post(
       res.status(500).json({
         status: "failure",
         message: "Unknown error occurred",
+      });
+    }
+  }
+);
+
+router.post(
+  "/reset-name",
+  authenticateCookie,
+  validate([body("name").isString().isLength({ min: 3 })]),
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const email = req.user?.email;
+      if (!email) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      await updateUserName(email, req.body.name);
+      return res.json({
+        status: "success",
+        message: "Name updated successfully",
+      });
+    } catch (error) {
+      logger.error(error);
+      res.status(500).json({
+        status: "failure",
+        message: "Could not update name",
       });
     }
   }
