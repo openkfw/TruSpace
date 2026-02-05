@@ -95,7 +95,7 @@ export default function DocumentVersions({ documentVersions }) {
                      )}
                   </div>
                   <div className="font-semibold flex flex-inline mb-3">
-                     {row.original?.meta?.creator} <Dot className="-mt-0.5" />{" "}
+                     {row.original?.meta?.creatorName} <Dot className="-mt-0.5" />{" "}
                      {fileSize} <Dot className="-mt-0.5" />{" "}
                      <TooltipProvider>
                         <Tooltip>

@@ -142,7 +142,7 @@ const DocumentList = ({ workspaceId }) => {
                           status={row.original.status}
                       />
                      <div className="font-semibold flex flex-inline mb-3">
-                        {row.original.meta.creator} <Dot className="-mt-0.5" />{" "}
+                        {row.original.meta.creatorName} <Dot className="-mt-0.5" />{" "}
                         {fileSize} <Dot className="-mt-0.5" />{" "}
                         {version ? (
                            <>
