@@ -18,6 +18,7 @@ export interface DocumentMeta {
   version: string;
   creatorNodeId: string;
   creatorUserId: string;
+  creatorName?: string;
   workspaceOrigin: string;
   encrypted: string;
   language?: string;
@@ -35,7 +36,6 @@ export interface Document extends DocumentRequest {
   docId: string;
   cid: string;
   meta: DocumentMeta;
-  userData?: UserData;
   documentVersions?: DocumentVersion[];
 }
 
@@ -49,7 +49,6 @@ export interface DocumentsResponse {
 export interface DocumentVersion {
   cid: string;
   meta: DocumentMeta;
-  userData?: UserData;
   docId: string;
 }
 
@@ -70,6 +69,7 @@ interface WorkspaceMeta {
   type: "workspace";
   creatorNodeId: string;
   creatorUserId: string;
+  creatorName?: string;
   name: string;
   password_hash?: string;
   is_public: boolean;
@@ -100,6 +100,7 @@ interface ChatMessageMeta {
   timestamp: string;
   creatorNodeId: string;
   creatorUserId: string;
+  creatorName?: string;
 }
 
 export interface ChatMessageRequest {
@@ -121,6 +122,7 @@ interface PerspectiveMeta {
   creatorType: string;
   creatorNodeId: string;
   creatorUserId: string;
+  creatorName?: string;
   prompt: string;
   model?: string;
 }
@@ -152,6 +154,7 @@ interface TagMeta {
   creatorNodeId: string;
   creatorUserId: string;
   creatorType: string;
+  creatorName?: string;
 }
 
 export interface GeneralTemplateOfItemInWorkspace {
@@ -166,6 +169,7 @@ interface GeneralTemplateOfItemInWorkspaceMeta {
   timestamp: string;
   creatorNodeId: string;
   creatorUserId: string;
+  creatorName?: string;
   creatorType?: string;
 }
 

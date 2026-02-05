@@ -46,6 +46,20 @@ import { getUserSettings } from "../utility/user";
 const router = express.Router();
 logger.info("Registering user");
 
+const resolveNodeId = async (explicitNodeId?: string): Promise<string> => {
+  if (explicitNodeId) {
+    return explicitNodeId;
+  }
+
+  try {
+    const clusterId = await new IpfsClient().clusterId();
+    return clusterId?.ipfs?.id || "";
+  } catch (error) {
+    logger.error("Error resolving nodeId:", error);
+    return "";
+  }
+};
+
 router.post(
   "/register",
   validate([
@@ -86,6 +100,21 @@ router.post(
         if (!result) {
           throw Error("Unknown error");
         }
+
+        const createdUser = await findUserByEmailDb(email);
+        const nodeId = await resolveNodeId();
+        if (createdUser?.uiid && nodeId) {
+          try {
+            await new IpfsClient().createUserData({
+              nodeId,
+              userId: createdUser.uiid,
+              userName: name,
+            });
+          } catch (error) {
+            logger.error("Error creating user data:", error);
+          }
+        }
+
         const filePath = path.join(
           process.cwd(),
           "src/mailing/templates/registrationConfirmation.html"
@@ -125,6 +154,21 @@ router.post(
         if (!result) {
           throw Error("Unknown error");
         }
+
+        const createdUser = await findUserByEmailDb(email);
+        const nodeId = await resolveNodeId();
+        if (createdUser?.uiid && nodeId) {
+          try {
+            await new IpfsClient().createUserData({
+              nodeId,
+              userId: createdUser.uiid,
+              userName: name,
+            });
+          } catch (error) {
+            logger.error("Error creating user data:", error);
+          }
+        }
+
         res.json({
           status: "success",
           message: "Your registration request has been processed",
@@ -190,10 +234,12 @@ router.post(
         });
       }
 
+      const nodeId = await resolveNodeId();
       const payload: JwtPayload = {
         name: user.username,
         email: user.email,
         uiid: user.uiid,
+        nodeId,
         firstSignIn: user.first_sign_in === "true",
       };
 
@@ -225,6 +271,7 @@ router.post(
           name: user.username,
           email: user.email,
           uiid: user.uiid,
+          nodeId,
           firstSignIn: user.first_sign_in === "true",
           expires: decodedToken.exp,
         },
@@ -541,6 +588,21 @@ router.post(
       }
 
       await updateUserName(email, req.body.name);
+
+      const nodeId = await resolveNodeId(req.user?.nodeId);
+      const userId = req.user?.uiid;
+      if (nodeId && userId) {
+        try {
+          await new IpfsClient().modifyUserData({
+            nodeId,
+            userId,
+            userName: req.body.name,
+          });
+        } catch (error) {
+          logger.error("Error updating user data:", error);
+        }
+      }
+
       return res.json({
         status: "success",
         message: "Name updated successfully",

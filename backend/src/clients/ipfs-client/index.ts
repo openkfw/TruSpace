@@ -358,10 +358,10 @@ export class IpfsClient implements IClient {
       return {
         docId: clusterRes.metadata.docId,
         cid: clusterRes.cid,
-        userData,
         meta: {
           creatorNodeId: clusterRes.metadata.creatorNodeId || "",
           creatorUserId: clusterRes.metadata.creatorUserId || "",
+          creatorName: userData.userName,
           workspaceOrigin: clusterRes.metadata.workspaceOrigin,
           filename: clusterRes.metadata.filename,
           timestamp: clusterRes.metadata.timestamp,
@@ -405,7 +405,13 @@ export class IpfsClient implements IClient {
             doc.meta.creatorNodeId,
             doc.meta.creatorUserId,
           );
-          return { ...doc, userData };
+          return {
+            ...doc,
+            meta: {
+              ...doc.meta,
+              creatorName: userData.userName,
+            },
+          };
         },
       );
 
@@ -456,13 +462,19 @@ export class IpfsClient implements IClient {
         this.#transformPinToDocument(r.pin),
       );
       return await Promise.all(
-        docs.map(async (doc: Document) => ({
-          ...doc,
-          userData: await this.getUserData(
+        docs.map(async (doc: Document) => {
+          const userData = await this.getUserData(
             doc.meta.creatorNodeId,
             doc.meta.creatorUserId,
-          ),
-        })),
+          );
+          return {
+            ...doc,
+            meta: {
+              ...doc.meta,
+              creatorName: userData.userName,
+            },
+          };
+        }),
       );
     } catch (error) {
       logger.error(`Error getting documents by document ID ${docId}:`, error);
@@ -561,9 +573,25 @@ export class IpfsClient implements IClient {
         )
       ).data;
 
-      return pinRes.results
-        .sort((a, b) => a.pin.meta.name.localeCompare(b.pin.meta.name))
-        .map((r: PinRequest) => this.#transformPinToWorkspace(r.pin));
+      const workspaces = await Promise.all(
+        pinRes.results
+          .sort((a, b) => a.pin.meta.name.localeCompare(b.pin.meta.name))
+          .map(async (r: PinRequest) => {
+            const workspace = this.#transformPinToWorkspace(r.pin);
+            const userData = await this.getUserData(
+              workspace.meta.creatorNodeId,
+              workspace.meta.creatorUserId,
+            );
+            return {
+              ...workspace,
+              meta: {
+                ...workspace.meta,
+                creatorName: userData.userName,
+              },
+            };
+          }),
+      );
+      return workspaces;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       logger.error(`Error getting workspace pins: ${JSON.stringify(err)}`);
@@ -580,7 +608,9 @@ export class IpfsClient implements IClient {
     workspace: WorkspaceRequest,
   ): Promise<WorkspaceCreateResponse> {
     try {
-      const json = JSON.stringify(workspace, null);
+      const workspaceMeta = { ...workspace.meta };
+      delete workspaceMeta.creatorName;
+      const json = JSON.stringify({ ...workspace, meta: workspaceMeta }, null);
       const form = new FormData();
 
       form.append("file", json, {
@@ -590,7 +620,7 @@ export class IpfsClient implements IClient {
 
       let metadataQuery = "";
 
-      for (const [key, value] of Object.entries(workspace.meta)) {
+      for (const [key, value] of Object.entries(workspaceMeta)) {
         if (key === "name") {
           metadataQuery += `&meta-${key}=${encodeURIComponent(value)}`;
         } else {
@@ -644,8 +674,21 @@ export class IpfsClient implements IClient {
           `/pins?limit=1000&meta={"type":"workspace","workspace_uuid":"${wId}"}`,
         )
       ).data;
-      const result = pinRes.results.map((r: PinRequest) =>
-        this.#transformPinToWorkspace(r.pin),
+      const result = await Promise.all(
+        pinRes.results.map(async (r: PinRequest) => {
+          const workspace = this.#transformPinToWorkspace(r.pin);
+          const userData = await this.getUserData(
+            workspace.meta.creatorNodeId,
+            workspace.meta.creatorUserId,
+          );
+          return {
+            ...workspace,
+            meta: {
+              ...workspace.meta,
+              creatorName: userData.userName,
+            },
+          };
+        }),
       );
       return result;
     } catch (error) {
@@ -662,8 +705,21 @@ export class IpfsClient implements IClient {
         )
       ).data;
 
-      const result = pinRes.results.map((r: PinRequest) =>
-        this.#transformPinToWorkspace(r.pin),
+      const result = await Promise.all(
+        pinRes.results.map(async (r: PinRequest) => {
+          const workspace = this.#transformPinToWorkspace(r.pin);
+          const userData = await this.getUserData(
+            workspace.meta.creatorNodeId,
+            workspace.meta.creatorUserId,
+          );
+          return {
+            ...workspace,
+            meta: {
+              ...workspace.meta,
+              creatorName: userData.userName,
+            },
+          };
+        }),
       );
       return result;
     } catch (error) {
@@ -680,8 +736,21 @@ export class IpfsClient implements IClient {
         )
       ).data;
 
-      const result = pinRes.results.map((r: PinRequest) =>
-        this.#transformPinToWorkspace(r.pin),
+      const result = await Promise.all(
+        pinRes.results.map(async (r: PinRequest) => {
+          const workspace = this.#transformPinToWorkspace(r.pin);
+          const userData = await this.getUserData(
+            workspace.meta.creatorNodeId,
+            workspace.meta.creatorUserId,
+          );
+          return {
+            ...workspace,
+            meta: {
+              ...workspace.meta,
+              creatorName: userData.userName,
+            },
+          };
+        }),
       );
       return result;
     } catch (error) {
@@ -732,9 +801,11 @@ export class IpfsClient implements IClient {
         contentType: file.mimetype,
       });
 
+      const docMeta = { ...doc.meta };
+      delete docMeta.creatorName;
       let metadataQuery = "";
 
-      for (const [key, value] of Object.entries(doc.meta)) {
+      for (const [key, value] of Object.entries(docMeta)) {
         if (key === "filename") {
           metadataQuery += `&meta-${key}=${encodeURIComponent(value)}`;
         } else {
@@ -776,13 +847,19 @@ export class IpfsClient implements IClient {
       const result = this.#pins2Docs(pinRes.results);
       const sliced = result.slice(from, from + limit);
       const data = await Promise.all(
-        sliced.map(async (doc: Document) => ({
-          ...doc,
-          userData: await this.getUserData(
+        sliced.map(async (doc: Document) => {
+          const userData = await this.getUserData(
             doc.meta.creatorNodeId,
             doc.meta.creatorUserId,
-          ),
-        })),
+          );
+          return {
+            ...doc,
+            meta: {
+              ...doc.meta,
+              creatorName: userData.userName,
+            },
+          };
+        }),
       );
 
       return {
@@ -818,13 +895,19 @@ export class IpfsClient implements IClient {
       );
       const sliced = filteredResult.slice(from, from + limit);
       const data = await Promise.all(
-        sliced.map(async (doc: Document) => ({
-          ...doc,
-          userData: await this.getUserData(
+        sliced.map(async (doc: Document) => {
+          const userData = await this.getUserData(
             doc.meta.creatorNodeId,
             doc.meta.creatorUserId,
-          ),
-        })),
+          );
+          return {
+            ...doc,
+            meta: {
+              ...doc.meta,
+              creatorName: userData.userName,
+            },
+          };
+        }),
       );
       return {
         data,
@@ -842,7 +925,9 @@ export class IpfsClient implements IClient {
    */
   async createMessage(message: ChatMessageRequest): Promise<string> {
     try {
-      const json = JSON.stringify(message, null);
+      const messageMeta = { ...message.meta };
+      delete messageMeta.creatorName;
+      const json = JSON.stringify({ ...message, meta: messageMeta }, null);
       const form = new FormData();
 
       form.append("file", json, {
@@ -851,7 +936,7 @@ export class IpfsClient implements IClient {
 
       let metadataQuery = "";
 
-      for (const [key, value] of Object.entries(message.meta)) {
+      for (const [key, value] of Object.entries(messageMeta)) {
         metadataQuery += `&meta-${key}=${value}`;
       }
 
@@ -890,12 +975,25 @@ export class IpfsClient implements IClient {
       );
 
       const pins: PinningResponse = res.data;
-      const result = pins.results
-        .map((el) => this.#transformPinToChatMessage(el.pin))
-        .sort((a: ChatMessage, b: ChatMessage) => {
-          return Number(a.meta.timestamp) - Number(b.meta.timestamp);
-        });
-      return result;
+      const result = await Promise.all(
+        pins.results.map(async (el) => {
+          const chat = this.#transformPinToChatMessage(el.pin);
+          const userData = await this.getUserData(
+            chat.meta.creatorNodeId,
+            chat.meta.creatorUserId,
+          );
+          return {
+            ...chat,
+            meta: {
+              ...chat.meta,
+              creatorName: userData.userName,
+            },
+          };
+        }),
+      );
+      return result.sort((a: ChatMessage, b: ChatMessage) => {
+        return Number(a.meta.timestamp) - Number(b.meta.timestamp);
+      });
     } catch (error) {
       logger.error(`Error getting messages by document ID ${docId}:`, error);
       throw error;
@@ -909,12 +1007,25 @@ export class IpfsClient implements IClient {
       );
 
       const pins: PinningResponse = res.data;
-      const result = pins.results
-        .map((el) => this.#transformPinToChatMessage(el.pin))
-        .sort((a: ChatMessage, b: ChatMessage) => {
-          return Number(a.meta.timestamp) - Number(b.meta.timestamp);
-        });
-      return result;
+      const result = await Promise.all(
+        pins.results.map(async (el) => {
+          const chat = this.#transformPinToChatMessage(el.pin);
+          const userData = await this.getUserData(
+            chat.meta.creatorNodeId,
+            chat.meta.creatorUserId,
+          );
+          return {
+            ...chat,
+            meta: {
+              ...chat.meta,
+              creatorName: userData.userName,
+            },
+          };
+        }),
+      );
+      return result.sort((a: ChatMessage, b: ChatMessage) => {
+        return Number(a.meta.timestamp) - Number(b.meta.timestamp);
+      });
     } catch (error) {
       logger.error(`Error getting all messages:`, error);
       throw error;
@@ -923,7 +1034,12 @@ export class IpfsClient implements IClient {
 
   async createPerspective(_perspective: PerspectiveRequest): Promise<string> {
     try {
-      const json = JSON.stringify(_perspective, null);
+      const perspectiveMeta = { ..._perspective.meta };
+      delete perspectiveMeta.creatorName;
+      const json = JSON.stringify(
+        { ..._perspective, meta: perspectiveMeta },
+        null,
+      );
       const form = new FormData();
 
       form.append("file", json, {
@@ -932,7 +1048,7 @@ export class IpfsClient implements IClient {
 
       let metadataQuery = "";
 
-      for (const [key, value] of Object.entries(_perspective.meta)) {
+      for (const [key, value] of Object.entries(perspectiveMeta)) {
         metadataQuery += `&meta-${key}=${value}`;
       }
 
@@ -966,7 +1082,26 @@ export class IpfsClient implements IClient {
       const perspectives = pinRes.results.map((r: PinRequest) => {
         return this.#transformPinToPerspective(r.pin);
       });
-      return this.#fetchPerspectiveFiles(perspectives);
+      const fetched = await this.#fetchPerspectiveFiles(perspectives);
+      const enriched = await Promise.all(
+        fetched.map(async (perspective) => {
+          const userData = await this.getUserData(
+            perspective.meta.creatorNodeId,
+            perspective.meta.creatorUserId,
+          );
+          return {
+            ...perspective,
+            meta: {
+              ...perspective.meta,
+              creatorName:
+                (perspective.meta.creatorType ?? "user") === "user"
+                  ? userData.userName
+                  : perspective.meta.creatorUserId,
+            },
+          };
+        }),
+      );
+      return enriched;
     } catch (error) {
       logger.error(
         `Error getting perspectives by document ID ${docId}:`,
@@ -987,7 +1122,26 @@ export class IpfsClient implements IClient {
       const perspectives = pinRes.results.map((r: PinRequest) => {
         return this.#transformPinToPerspective(r.pin);
       });
-      return (await this.#fetchPerspectiveFiles(perspectives)).sort(
+      const fetched = await this.#fetchPerspectiveFiles(perspectives);
+      const enriched = await Promise.all(
+        fetched.map(async (perspective) => {
+          const userData = await this.getUserData(
+            perspective.meta.creatorNodeId,
+            perspective.meta.creatorUserId,
+          );
+          return {
+            ...perspective,
+            meta: {
+              ...perspective.meta,
+              creatorName:
+                (perspective.meta.creatorType ?? "user") === "user"
+                  ? userData.userName
+                  : perspective.meta.creatorUserId,
+            },
+          };
+        }),
+      );
+      return enriched.sort(
         (a: Perspective, b: Perspective) =>
           Number(new Date(a.meta.timestamp).getTime()) -
           Number(new Date(b.meta.timestamp).getTime()),
@@ -1143,9 +1297,25 @@ export class IpfsClient implements IClient {
         )
       ).data;
 
-      const result = pinRes.results.map((r: PinRequest) => {
-        return this.#transformPinToTag(r.pin);
-      });
+      const result = await Promise.all(
+        pinRes.results.map(async (r: PinRequest) => {
+          const tag = this.#transformPinToTag(r.pin);
+          const userData = await this.getUserData(
+            tag.meta.creatorNodeId,
+            tag.meta.creatorUserId,
+          );
+          return {
+            ...tag,
+            meta: {
+              ...tag.meta,
+              creatorName:
+                (tag.meta.creatorType ?? "user") === "user"
+                  ? userData.userName
+                  : tag.meta.creatorUserId,
+            },
+          };
+        }),
+      );
       return result;
     } catch (error) {
       logger.error(`Error getting tags by document ID ${docId}:`, error);
@@ -1161,9 +1331,25 @@ export class IpfsClient implements IClient {
         )
       ).data;
 
-      const result = pinRes.results.map((r: PinRequest) => {
-        return this.#transformPinToTag(r.pin);
-      });
+      const result = await Promise.all(
+        pinRes.results.map(async (r: PinRequest) => {
+          const tag = this.#transformPinToTag(r.pin);
+          const userData = await this.getUserData(
+            tag.meta.creatorNodeId,
+            tag.meta.creatorUserId,
+          );
+          return {
+            ...tag,
+            meta: {
+              ...tag.meta,
+              creatorName:
+                (tag.meta.creatorType ?? "user") === "user"
+                  ? userData.userName
+                  : tag.meta.creatorUserId,
+            },
+          };
+        }),
+      );
       return result;
     } catch (error) {
       logger.error(`Error getting tags by version CID ${cid}:`, error);
@@ -1182,7 +1368,26 @@ export class IpfsClient implements IClient {
       const perspectives = pinRes.results.map((r: PinRequest) => {
         return this.#transformPinToPerspective(r.pin);
       });
-      return this.#fetchPerspectiveFiles(perspectives);
+      const fetched = await this.#fetchPerspectiveFiles(perspectives);
+      const enriched = await Promise.all(
+        fetched.map(async (perspective) => {
+          const userData = await this.getUserData(
+            perspective.meta.creatorNodeId,
+            perspective.meta.creatorUserId,
+          );
+          return {
+            ...perspective,
+            meta: {
+              ...perspective.meta,
+              creatorName:
+                (perspective.meta.creatorType ?? "user") === "user"
+                  ? userData.userName
+                  : perspective.meta.creatorUserId,
+            },
+          };
+        }),
+      );
+      return enriched;
     } catch (error) {
       logger.error(`Error getting all perspectives:`, error);
       throw error;
@@ -1197,6 +1402,8 @@ export class IpfsClient implements IClient {
       meta: {
         creatorNodeId: pin.meta.creatorNodeId || pin.meta.creator_id || "",
         creatorUserId: pin.meta.creatorUserId || "",
+        creatorName:
+          pin.meta.creatorName || pin.meta.creator_name || pin.meta.creator || "",
         created_at: pin.meta.created_at,
         type: "workspace",
         workspace_uuid: pin.meta.workspace_uuid,
@@ -1214,6 +1421,7 @@ export class IpfsClient implements IClient {
       meta: {
         creatorNodeId: pin.meta.creatorNodeId || "",
         creatorUserId: pin.meta.creatorUserId || "",
+        creatorName: pin.meta.creatorName || pin.meta.creator || "",
         workspaceOrigin: pin.meta.workspaceOrigin,
         filename: pin.meta.filename,
         timestamp: pin.meta.timestamp,
@@ -1241,6 +1449,7 @@ export class IpfsClient implements IClient {
         data: pin.meta.data,
         creatorNodeId: pin.meta.creatorNodeId || "",
         creatorUserId: pin.meta.creatorUserId || "",
+        creatorName: pin.meta.creatorName || pin.meta.creator || "",
         workspaceOrigin: pin.meta.workspaceOrigin,
       },
     };
@@ -1260,6 +1469,7 @@ export class IpfsClient implements IClient {
         data: pin.meta.data,
         creatorNodeId: pin.meta.creatorNodeId || "",
         creatorUserId: pin.meta.creatorUserId || "",
+        creatorName: pin.meta.creatorName || pin.meta.creator || "",
         creatorType: pin.meta.creatorType,
         prompt: pin.meta.prompt,
       },
@@ -1280,6 +1490,7 @@ export class IpfsClient implements IClient {
         color: pin.meta.color,
         creatorNodeId: pin.meta.creatorNodeId || "",
         creatorUserId: pin.meta.creatorUserId || "",
+        creatorName: pin.meta.creatorName || pin.meta.creator || "",
         creatorType: pin.meta.creatorType,
       },
     };
@@ -1298,6 +1509,8 @@ export class IpfsClient implements IClient {
         timestamp: pin.meta.timestamp,
         creatorNodeId: pin.meta.creatorNodeId || "",
         creatorUserId: pin.meta.creatorUserId || "",
+        creatorName:
+          pin.meta.creatorName || pin.meta.creator_name || pin.meta.creator || "",
         creatorType: pin.meta.creatorType || "user",
       },
     };
