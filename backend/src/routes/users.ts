@@ -264,6 +264,26 @@ router.post(
         path: "/",
       });
 
+      if (user.uiid && nodeId) {
+        try {
+          const userData = await new IpfsClient().getUserData(nodeId, user.uiid);
+          if (userData?.userName && userData.userName !== "UNKNOWN") {
+            logger.info("User data exists in IPFS");
+          }
+          else {
+            logger.warn("User data is missing or invalid in IPFS, creating new user data");
+            await new IpfsClient().createUserData({
+              nodeId,
+              userId: user.uiid,
+              userName: user.username,
+            });
+            logger.info("User data created in IPFS");
+          }
+        } catch (error) {
+          logger.error("Error fetching/creating user data in IPFS:", error);
+        }
+      }
+
       return res.status(200).json({
         status: "success",
         message: "Authentication successful",
