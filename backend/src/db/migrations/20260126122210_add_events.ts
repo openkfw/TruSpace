@@ -21,17 +21,9 @@ export async function up(knex: Knex): Promise<void> {
       .primary()
       .comment("NodeID + UUID, globally unique event ID");
     table
-      .string("entity_type")
+      .string("type")
       .notNullable()
-      .comment("Type of entity: permission, workspace, etc.");
-    table
-      .string("entity_id")
-      .notNullable()
-      .comment("ID of the affected entity");
-    table
-      .string("entity_event")
-      .notNullable()
-      .comment("invited, revoked, removed, etc.");
+      .comment("Type of the event, e.g. 'permission_update'");
     table
       .json("payload")
       .nullable()

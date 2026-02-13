@@ -1,32 +1,21 @@
 import db from "../../config/database";
 import logger from "../../config/winston";
+import { EventModel } from "../../types/interfaces";
 
 interface EventDb {
   id: string;
-  entity_type: string;
-  entity_id: string;
-  entity_event: string;
+  type: string;
   payload: JSON;
   created_at?: Date;
 }
 
-export interface EventDto {
-  id: string;
-  entity_type: string;
-  entity_id: string;
-  entity_event: string;
-  payload: JSON;
-}
-
-export const createEventDb = async (event: EventDto) => {
+export const createEventDb = async (event: EventModel) => {
   try {
     const eventId = await db<EventDb>("events")
       .insert({
         id: event.id,
-        entity_type: event.entity_type,
-        entity_id: event.entity_id,
-        entity_event: event.entity_event,
-        payload: event.payload,
+        type: event.type,
+        payload: event.payload as unknown as JSON,
       })
       .returning<string>("id");
     return eventId;
@@ -49,20 +38,37 @@ export const findEventByIdDb = async (eventId: string) => {
   }
 };
 
-export const removeEventsForEntityDb = async (
-  entity_type: string,
-  entity_id: string,
-) => {
+export const removeEventDb = async (eventId: string) => {
+  try {
+    const result = await db<EventDb>("events")
+      .delete()
+      .where("id", "=", eventId);
+    const isRowFoundAndDeleted = result > 0;
+    return isRowFoundAndDeleted;
+  } catch (error) {
+    logger.error(`Error deleting event`, error);
+    return false;
+  }
+};
+
+export const removeEventsForWorkspaceDb = async (workspaceId: string) => {
   try {
     await db<EventDb>("events")
       .delete()
-      .where("entity_type", "=", entity_type)
-      .andWhere("entity_id", "=", entity_id);
+      .whereRaw("json_extract(payload, '$.workspaceId') = ?", [workspaceId]);
   } catch (error) {
-    logger.error(
-      `Error deleting events for entity ${entity_type} with ID ${entity_id}`,
-      error,
-    );
+    logger.error(`Error deleting events for workspace ${workspaceId}:`, error);
+    return [];
+  }
+};
+
+export const removeEventsForEmailDb = async (email: string) => {
+  try {
+    await db<EventDb>("events")
+      .delete()
+      .whereRaw("json_extract(payload, '$.email') = ?", [email]);
+  } catch (error) {
+    logger.error(`Error deleting events for email ${email}:`, error);
     return [];
   }
 };

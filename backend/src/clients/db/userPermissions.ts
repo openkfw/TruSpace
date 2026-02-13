@@ -6,7 +6,7 @@ interface UserPermissionDb {
   id: number;
   user_email: string;
   workspace_id: string;
-  last_event_id: string;
+  last_event_id?: string;
   role: string;
   status: string;
   created_at?: Date;
@@ -18,7 +18,7 @@ export interface UserPermissionDto {
   email: string;
   role: string;
   status: string;
-  lastEventId: string;
+  lastEventId?: string;
 }
 
 export const createPermissionDb = async (permission: UserPermissionDto) => {

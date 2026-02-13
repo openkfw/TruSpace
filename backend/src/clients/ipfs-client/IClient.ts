@@ -7,6 +7,7 @@ import {
   DocumentCreateResponse,
   DocumentRequest,
   DocumentsResponse,
+  EventModel,
   File,
   Perspective,
   PerspectiveRequest,
@@ -18,7 +19,7 @@ import {
 export interface IClient {
   // workspace
   createWorkspace(
-    workspace: WorkspaceRequest
+    workspace: WorkspaceRequest,
   ): Promise<WorkspaceCreateResponse>;
   getAllWorkspaces(): Promise<Workspace[]>;
   getWorkspaceByName(name: string): Promise<Workspace[]>;
@@ -30,7 +31,7 @@ export interface IClient {
   // documents
   createDocument(
     doc: DocumentRequest,
-    file: File
+    file: File,
   ): Promise<DocumentCreateResponse>;
   getAllDocuments(from: number, limit: number): Promise<DocumentsResponse>; // remove getAllDocuments when workspaces are fully implemented
   getDocumentDetailsById(docId: string): Promise<Document>;
@@ -38,12 +39,12 @@ export interface IClient {
   downloadDocumentVersionByCid(
     req: AuthenticatedRequest,
     res: Response,
-    cid: string
+    cid: string,
   ): Promise<void>;
   getDocumentsByWorkspace(
     wId: string,
     from: number,
-    limit: number
+    limit: number,
   ): Promise<DocumentsResponse>;
 
   // chat messages
@@ -67,6 +68,11 @@ export interface IClient {
   downloadAvatar(
     req: AuthenticatedRequest,
     res: Response,
-    cid: string
+    cid: string,
   ): Promise<any>;
+
+  // events
+  createEvent(event: EventModel): Promise<void>;
+  getEvents(exclude?: string[]): Promise<EventModel[]>;
+  deleteEvent(eventId: string): Promise<boolean>;
 }
