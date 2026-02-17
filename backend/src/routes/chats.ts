@@ -25,7 +25,9 @@ router.get("/export/:docId", async (req: Request, res: Response) => {
     .fontSize(25)
     .text(`Chat Messages for document "${document?.meta?.filename}`);
   doc.fontSize(15).text(`Document ID ${docId}`);
-  doc.fontSize(15).text(`Creator: ${document?.meta?.creator}`);
+  doc
+    .fontSize(15)
+    .text(`Creator: ${document?.meta?.creatorName || "UNKNOWN"}`);
   const formattedDate = new Date().toLocaleString();
   doc.fontSize(15).text(`Created at: ${formattedDate}`).moveDown();
   doc.fontSize(15).text(" ");
@@ -40,7 +42,7 @@ router.get("/export/:docId", async (req: Request, res: Response) => {
     }
 
     doc.fontSize(13).text(`Message: ${messageText}`);
-    doc.fontSize(10).text(`Author: ${message.meta.creator}`);
+    doc.fontSize(10).text(`Author: ${message.meta.creatorName || "UNKNOWN"}`);
     const formattedDate = new Date(
       Number(message.meta.timestamp)
     ).toLocaleString();
@@ -104,8 +106,8 @@ router.post(
         docId,
         workspaceOrigin,
         timestamp: Date.now().toString(),
-        creator: req.user?.name as string,
-        creatorUiid: req.user?.uiid as string,
+        creatorNodeId: req.user?.nodeId as string,
+        creatorUserId: req.user?.uiid as string,
       },
     };
 
@@ -114,7 +116,7 @@ router.post(
     const docInfo = await client.getDocumentDetailsById(docId);
 
     docInfo.documentVersions
-      .map((version) => version.meta.creatorUiid)
+      .map((version) => version.meta.creatorUserId)
       .reduce((acc: string[], uiid: string) => {
         if (!acc.includes(uiid)) {
           acc.push(uiid);

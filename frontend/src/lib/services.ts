@@ -242,8 +242,8 @@ export const usePerspectives = (cid: string) => {
             name: perspective.meta.perspectiveType,
             text: perspective.meta.data,
             creatorType: perspective.meta.creatorType,
-            creator: perspective.meta.creator,
-            creatorUiid: perspective.meta.creatorUiid,
+            creatorName: perspective.meta.creatorName,
+            creatorUserId: perspective.meta.creatorUserId,
             model: perspective.meta.model,
             prompt: perspective.meta.prompt,
             timestamp: perspective.meta.timestamp
