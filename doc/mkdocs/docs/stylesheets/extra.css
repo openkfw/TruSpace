@@ -1,0 +1,145 @@
+/* TruSpace Documentation Custom Styles */
+
+/* Root Variables - Custom TruSpace theme */
+:root {
+  --md-primary-fg-color: #7c3aed;
+  --md-primary-fg-color--light: #a78bfa;
+  --md-primary-fg-color--dark: #5b21b6;
+  --md-accent-fg-color: #06b6d4;
+  --md-accent-fg-color--transparent: rgba(6, 182, 212, 0.1);
+}
+
+/* Dark mode overrides */
+[data-md-color-scheme="slate"] {
+  --md-default-bg-color: #0f0f23;
+  --md-default-bg-color--light: #1a1a2e;
+  --md-code-bg-color: #16162a;
+}
+
+/* Hero section styling */
+.hero {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero h2 {
+  font-size: 1.5rem;
+  font-weight: 400;
+  opacity: 0.8;
+  margin-bottom: 1.5rem;
+}
+
+/* Button improvements */
+.md-button {
+  margin: 0.25rem;
+  border-radius: 8px;
+}
+
+.md-button--primary {
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+  border: none;
+}
+
+.md-button--primary:hover {
+  background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+}
+
+/* Card styling */
+.md-typeset .grid.cards > ul > li {
+  border-radius: 12px;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.md-typeset .grid.cards > ul > li:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Code block improvements */
+.md-typeset pre > code {
+  border-radius: 8px;
+}
+
+/* Admonition improvements */
+.md-typeset .admonition {
+  border-radius: 8px;
+  border-left-width: 4px;
+}
+
+/* Table of Contents */
+.md-nav__link--active {
+  color: var(--md-accent-fg-color);
+}
+
+/* Footer styling */
+.md-footer {
+  background: var(--md-default-bg-color--light);
+}
+
+/* Tab styling */
+.md-typeset .tabbed-labels > label {
+  border-radius: 8px 8px 0 0;
+}
+
+/* Mermaid diagram styling */
+.mermaid {
+  background: transparent !important;
+}
+
+/* Terminal/code block styling */
+.highlight .go {
+  color: #a78bfa;
+}
+
+/* Copy button */
+.md-clipboard {
+  border-radius: 4px;
+}
+
+/* Search improvements */
+.md-search__form {
+  border-radius: 8px;
+}
+
+/* Icon sizing in cards */
+.md-typeset .grid.cards .lg {
+  font-size: 2rem;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 76.1875em) {
+  .hero h1 {
+    font-size: 2rem;
+  }
+  
+  .hero h2 {
+    font-size: 1.2rem;
+  }
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Announcement bar */
+.md-banner {
+  background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%);
+}
+
+/* Badge styling */
+.md-typeset .badge {
+  border-radius: 4px;
+  padding: 0.2em 0.5em;
+  font-size: 0.75em;
+}
