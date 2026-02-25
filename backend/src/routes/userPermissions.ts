@@ -69,7 +69,7 @@ router.post(
       try {
         permissionId = await createPermissionDb(permission);
         await createEventDb(event);
-        await client.createEvent(event);
+        await client.createPermission(email, event);
       } catch (error) {
         console.error("Permission creation error:", error);
         if (permissionId) {
@@ -79,8 +79,6 @@ router.post(
         throw error;
       }
 
-      // Notify the user about the workspace assignement
-      // NOTE: will be deprecated once we switch to event based notifications
       sendNotification(
         email,
         "addedToWorkspace",
@@ -129,11 +127,33 @@ router.delete(
           message: "Permission not found",
         });
       }
-      await removePermissionDb(permissionId);
 
       const client = new IpfsClient();
-      const workspaces = await client.getWorkspaceById(permission.workspace_id);
+      const clusterId = await client.clusterId();
+      const ipfsId = clusterId.ipfs?.id;
+      const eventId = `${ipfsId}-${uuidv4()}`;
+
+      const event: EventModel = {
+        id: eventId,
+        type: EVENT_TYPES.userInWorkspaceRemove,
+        payload: {
+          email: permission.user_email,
+          workspaceId: permission.workspace_id,
+        },
+      };
+
+      try {
+        await createEventDb(event);
+        client.createPermission(permission.user_email, event);
+        await removePermissionDb(permissionId);
+      } catch (error) {
+        console.error("Permission creation error:", error);
+        removeEventDb(event.id);
+        throw error;
+      }
+
       // Notify the user about the workspace assignement
+      const workspaces = await client.getWorkspaceById(permission.workspace_id);
       sendNotification(
         permission.user_email,
         "removedFromWorkspace",

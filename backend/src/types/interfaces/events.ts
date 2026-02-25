@@ -1,7 +1,15 @@
 import { EVENT_TYPES } from "../../utility/constants";
 import { UserPermissionDto } from "../../clients/db/userPermissions";
 
-export type EventPayload = UserPermissionDto;
+export interface EventPayloadUserInWorkspaceRemove {
+  email: string;
+  workspaceId: string;
+}
+
+export type EventPayload =
+  | UserPermissionDto
+  | EventPayloadUserInWorkspaceRemove;
+
 export type EventType =
   | typeof EVENT_TYPES.userPermissionPost
   | typeof EVENT_TYPES.userInWorkspaceRemove;

@@ -1236,6 +1236,112 @@ export class IpfsClient implements IClient {
     }
   }
 
+  // === permissions ===
+  async createPermission(email: string, event: EventModel): Promise<void> {
+    try {
+      const json = JSON.stringify(event, null);
+      const normalizedEmail = email.trim().toLowerCase();
+      const encodedEmail = encodeURIComponent(normalizedEmail);
+      const encodedEventId = encodeURIComponent(event.id);
+      const filename = `${encodedEventId}.json`;
+      const filepath = `/permissions/${encodedEmail}/${encodedEventId}`;
+
+      const form = new FormData();
+      form.append("file", json, {
+        filename: `${filename}`,
+        contentType: "application/json",
+      });
+
+      await this.#clusterAxios.post(
+        `/add?stream-channels=false&name=${filepath}&meta-email=${encodedEmail}&meta-type=permission`,
+        form,
+        {
+          headers: {
+            ...form.getHeaders(),
+          },
+          timeout: 30000,
+          maxContentLength: Infinity,
+        },
+      );
+    } catch (error) {
+      logger.error("Error creating permission:", error);
+      throw error;
+    }
+  }
+
+  async getPermissionPins(
+    email: string,
+    exclude?: string[],
+  ): Promise<EventModel[]> {
+    const normalizedEmail = email.trim().toLowerCase();
+    const encodedEmail = encodeURIComponent(normalizedEmail);
+
+    try {
+      const res = await this.#pinSvcAxios.get(
+        `/pins?limit=${maxNumberOfFetchedPins}&meta-type=${encodedEmail}&meta-type=permission`,
+      );
+      console.log("=== IPFS RESULT ===");
+      console.log(JSON.stringify(res));
+      console.log("=== IPFS RESULT ===");
+
+      const pins: Pin[] = (res.data?.results ?? []).map(
+        (element: { pin: Pin }) => element.pin,
+      );
+
+      const onlyNewPins = pins.filter((pin) => !exclude?.includes(pin.name));
+
+      const events = await Promise.all(
+        onlyNewPins.map(async (pin) => {
+          try {
+            const response = await this.#gatewayAxios.get(`/ipfs/${pin.cid}`, {
+              responseType: "arraybuffer",
+            });
+
+            const json = Buffer.from(response.data).toString("utf-8");
+            return JSON.parse(json) as EventModel;
+          } catch (error) {
+            logger.error(
+              `Error fetching event ${pin.name} data with CID ${pin.cid}:`,
+              error,
+            );
+            return null;
+          }
+        }),
+      );
+      return events.filter((e): e is EventModel => e !== null);
+    } catch (error) {
+      logger.error("Error getting event data:", error);
+      return [];
+    }
+  }
+
+  async deletePermission(email: string, eventId: string): Promise<boolean> {
+    const normalizedEmail = email.trim().toLowerCase();
+    const encodedEmail = encodeURIComponent(normalizedEmail);
+    const encodedEventId = encodeURIComponent(eventId);
+    const filepath = `/permissions/${encodedEmail}/${encodedEventId}`;
+
+    try {
+      const res = await this.#pinSvcAxios.get(
+        `/pins?limit=1&name=${filepath}&meta-email=${encodedEmail}&meta-type=permission`,
+      );
+      const pins: Pin[] = (res.data?.results ?? []).map(
+        (element: { pin: Pin }) => element.pin,
+      );
+      if (pins.length !== 1) {
+        logger.error(
+          `Error deleting permission-event ${eventId}: expected 1 pin, found ${pins.length}`,
+        );
+        return false;
+      }
+      await this.#clusterAxios.delete(`/pins/${pins[0].cid}`);
+      return true;
+    } catch (error) {
+      logger.error(`Error deleting permission-event ${eventId}:`, error);
+      return false;
+    }
+  }
+
   // === event ===
   async createEvent(event: EventModel): Promise<void> {
     try {
