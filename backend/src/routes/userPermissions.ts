@@ -1,14 +1,13 @@
 import express, { Response } from "express";
 import { body } from "express-validator";
-import { v4 as uuidv4 } from "uuid";
 import {
   createPermissionDb,
-  createEventDb,
   findPermissionByIdDb,
   findUsersInWorkspaceDb,
   removePermissionDb,
   UserPermissionDto,
   removeEventDb,
+  findEmailsByWorkspaceIdDb,
 } from "../clients/db";
 import { IpfsClient } from "../clients/ipfs-client";
 import validate from "../middlewares/validate";
@@ -16,6 +15,7 @@ import { AuthenticatedRequest } from "../types";
 import { USER_PERMISSION_STATUS, EVENT_TYPES } from "../utility/constants";
 import { sendNotification } from "../mailing/notifications";
 import { EventModel } from "../types/interfaces";
+import { EventHandler } from "../handlers/events";
 
 const router = express.Router();
 
@@ -47,10 +47,7 @@ router.post(
         });
       }
 
-      const clusterId = await client.clusterId();
-      const ipfsId = clusterId.ipfs?.id;
-      const eventId = `${ipfsId}-${uuidv4()}`;
-
+      const eventId = await EventHandler.generateEventId();
       const permission: UserPermissionDto = {
         workspaceId,
         email,
@@ -58,18 +55,18 @@ router.post(
         status: USER_PERMISSION_STATUS.active,
         lastEventId: eventId,
       };
-
       const event: EventModel = {
         id: eventId,
         type: EVENT_TYPES.userPermissionPost,
         payload: permission,
       };
-
+      const eventReciever = await findEmailsByWorkspaceIdDb(
+        permission.workspaceId,
+      );
       let permissionId;
       try {
         permissionId = await createPermissionDb(permission);
-        await createEventDb(event);
-        await client.createPermission(email, event);
+        await EventHandler.createPermissionEvent(eventReciever, event);
       } catch (error) {
         console.error("Permission creation error:", error);
         if (permissionId) {
@@ -128,38 +125,29 @@ router.delete(
         });
       }
 
-      const client = new IpfsClient();
-      const clusterId = await client.clusterId();
-      const ipfsId = clusterId.ipfs?.id;
-      const eventId = `${ipfsId}-${uuidv4()}`;
-
+      const eventReciever = await findEmailsByWorkspaceIdDb(
+        permission.workspace_id,
+      );
       const event: EventModel = {
-        id: eventId,
+        id: await EventHandler.generateEventId(),
         type: EVENT_TYPES.userInWorkspaceRemove,
         payload: {
           email: permission.user_email,
           workspaceId: permission.workspace_id,
         },
       };
+      await EventHandler.createPermissionEvent(eventReciever, event);
+      await removePermissionDb(permissionId);
 
-      try {
-        await createEventDb(event);
-        client.createPermission(permission.user_email, event);
-        await removePermissionDb(permissionId);
-      } catch (error) {
-        console.error("Permission creation error:", error);
-        removeEventDb(event.id);
-        throw error;
-      }
-
+      // TODO We need a ney notification implementation similiar to the events
       // Notify the user about the workspace assignement
-      const workspaces = await client.getWorkspaceById(permission.workspace_id);
-      sendNotification(
-        permission.user_email,
-        "removedFromWorkspace",
-        "/",
-        workspaces[0].meta.name,
-      );
+      // const workspaces = await client.getWorkspaceById(permission.workspace_id);
+      // sendNotification(
+      //   permission.user_email,
+      //   "removedFromWorkspace",
+      //   "/",
+      //   workspaces[0].meta.name,
+      // );
       res.json();
     } catch (error) {
       console.error("Removing permissions error:", error);

@@ -73,7 +73,7 @@ export interface IClient {
   ): Promise<any>;
 
   // permissions
-  createPermission(email: string, event: EventModel): Promise<void>;
+  createPermissionEvent(reciever: string[], event: EventModel): Promise<void>;
   getPermissionEventPinsForEmail(email: string): Promise<Pin[]>;
   getPermissionEvents(pins: Pin[]): Promise<EventModel[]>;
   deletePermission(email: string, eventId: string): Promise<boolean>;

@@ -1236,31 +1236,35 @@ export class IpfsClient implements IClient {
     }
   }
 
-  // === permissions ===
-  async createPermission(email: string, event: EventModel): Promise<void> {
+  // === Permission Events ===
+  async createPermissionEvent(
+    eventReciever: string[],
+    event: EventModel,
+  ): Promise<void> {
     try {
       const json = JSON.stringify(event, null);
-      const normalizedEmail = email.trim().toLowerCase();
-      const encodedEmail = encodeURIComponent(normalizedEmail);
       const encodedEventId = encodeURIComponent(event.id);
-
-      const form = new FormData();
-      form.append("file", json, {
-        filename: encodedEventId,
-        contentType: "application/json",
-      });
-
-      await this.#clusterAxios.post(
-        `/add?stream-channels=false&name=${encodedEventId}&meta-email=${encodedEmail}&meta-type=permission`,
-        form,
-        {
-          headers: {
-            ...form.getHeaders(),
+      eventReciever.forEach(async (email: string) => {
+        const normalizedEmail = email.trim().toLowerCase();
+        const encodedEmail = encodeURIComponent(normalizedEmail);
+        const filename = `permissions/${encodedEmail}/${encodedEventId}`;
+        const form = new FormData();
+        form.append("file", json, {
+          filename: filename,
+          contentType: "application/json",
+        });
+        await this.#clusterAxios.post(
+          `/add?stream-channels=false&name=${filename}&meta-eventId=${encodedEventId}&meta-email=${encodedEmail}&meta-type=permission`,
+          form,
+          {
+            headers: {
+              ...form.getHeaders(),
+            },
+            timeout: 30000,
+            maxContentLength: Infinity,
           },
-          timeout: 30000,
-          maxContentLength: Infinity,
-        },
-      );
+        );
+      });
     } catch (error) {
       logger.error("Error creating permission:", error);
       throw error;
@@ -1311,7 +1315,7 @@ export class IpfsClient implements IClient {
     const normalizedEmail = email.trim().toLowerCase();
     const encodedEmail = encodeURIComponent(normalizedEmail);
     const encodedEventId = encodeURIComponent(eventId);
-    const filepath = `/permissions/${encodedEmail}/${encodedEventId}`;
+    const filepath = `permissions/${encodedEmail}/${encodedEventId}`;
 
     try {
       const res = await this.#pinSvcAxios.get(

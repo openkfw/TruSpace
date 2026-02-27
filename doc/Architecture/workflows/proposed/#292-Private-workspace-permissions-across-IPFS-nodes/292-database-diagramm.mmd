@@ -30,9 +30,7 @@ erDiagram
     %% Generic event log
     EVENTS {
         string id PK
-        string entity_type "permission|notification|job|etc."
-        string entity_id "e.g., invite_id, workspace_id, job_id"
-        string entity_event "invited|accepted|revoked|created|deleted|pending|completed|..."
+        string type "permission|notification|job|etc."
         json payload "Additional metadata per event"
         datetime created_at
     }

@@ -6,21 +6,16 @@ import jwt from "jsonwebtoken";
 import path from "path";
 import {
   activateUserDb,
-  createEventDb,
-  createPermissionDb,
   createUserDb,
   deleteUserById,
-  filterNewEventIdsDb,
   findUserByEmailDb,
   findUserByTokenDb,
   getTotalRecentlyAddedUsersDb,
   getTotalUsersDb,
-  removePermissionsForWorkspaceAndEmailDb,
   storeUserSettingsDb,
   updateUserFirstSignIn,
   updateUserPassword,
   updateUserToken,
-  UserPermissionDto,
 } from "../clients/db";
 import { config } from "../config/config";
 import logger from "../config/winston";
@@ -32,10 +27,9 @@ import {
 } from "../mailing/mailingConstants";
 import { authenticateCookie } from "../middlewares/authenticate";
 import validate from "../middlewares/validate";
-import { JwtPayload, Pin } from "../types/interfaces";
+import { JwtPayload } from "../types/interfaces";
 import {
   CONFIRMATION_EMAIL_EXPIRATION,
-  EVENT_TYPES,
   USER_STATUS,
 } from "../utility/constants";
 import { AuthenticatedRequest } from "../types";
@@ -47,57 +41,10 @@ import {
   removeTokensOfUserDb,
 } from "../clients/db/resetPasswordTokens";
 import { getUserSettings } from "../utility/user";
+import { EventHandler } from "../handlers/events";
 
 const router = express.Router();
 logger.info("Registering user");
-
-async function readUserEvents(email: string) {
-  try {
-    const client = new IpfsClient();
-    const permissionPins = await client.getPermissionEventPinsForEmail(email);
-
-    if (!permissionPins.length) {
-      return;
-    }
-
-    const decodedPins = permissionPins.map((pin: Pin) => {
-      try {
-        return { pin, eventId: decodeURIComponent(pin.name) };
-      } catch {
-        return { pin, eventId: pin.name };
-      }
-    });
-
-    const newEventIds = await filterNewEventIdsDb(
-      decodedPins.map(({ eventId }) => eventId),
-    );
-    if (!newEventIds.length) {
-      return;
-    }
-
-    const newEventIdSet = new Set(newEventIds);
-    const newEventPins = decodedPins
-      .filter(({ eventId }) => newEventIdSet.has(eventId))
-      .map(({ pin }) => pin);
-
-    const newPermissionEvents = await client.getPermissionEvents(newEventPins);
-    await Promise.all(
-      newPermissionEvents.map(async (event) => {
-        if (event.type === EVENT_TYPES.userPermissionPost) {
-          await createPermissionDb(event.payload as UserPermissionDto);
-        } else if (event.type === EVENT_TYPES.userInWorkspaceRemove) {
-          await removePermissionsForWorkspaceAndEmailDb(
-            event.payload.workspaceId,
-            event.payload.email,
-          );
-        }
-        await createEventDb(event);
-      }),
-    );
-  } catch (error) {
-    logger.error("Error reading user events:", error);
-  }
-}
 
 router.post(
   "/register",
@@ -271,7 +218,7 @@ router.post(
         path: "/",
       });
 
-      readUserEvents(user.email);
+      EventHandler.readUserEvents(user.email);
 
       return res.status(200).json({
         status: "success",
