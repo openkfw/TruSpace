@@ -11,6 +11,7 @@ import {
   File,
   Perspective,
   PerspectiveRequest,
+  Pin,
   Workspace,
   WorkspaceCreateResponse,
   WorkspaceRequest,
@@ -70,6 +71,12 @@ export interface IClient {
     res: Response,
     cid: string,
   ): Promise<any>;
+
+  // permissions
+  createPermission(email: string, event: EventModel): Promise<void>;
+  getPermissionEventPinsForEmail(email: string): Promise<Pin[]>;
+  getPermissionEvents(pins: Pin[]): Promise<EventModel[]>;
+  deletePermission(email: string, eventId: string): Promise<boolean>;
 
   // events
   createEvent(event: EventModel): Promise<void>;

@@ -1243,17 +1243,15 @@ export class IpfsClient implements IClient {
       const normalizedEmail = email.trim().toLowerCase();
       const encodedEmail = encodeURIComponent(normalizedEmail);
       const encodedEventId = encodeURIComponent(event.id);
-      const filename = `${encodedEventId}.json`;
-      const filepath = `/permissions/${encodedEmail}/${encodedEventId}`;
 
       const form = new FormData();
       form.append("file", json, {
-        filename: `${filename}`,
+        filename: encodedEventId,
         contentType: "application/json",
       });
 
       await this.#clusterAxios.post(
-        `/add?stream-channels=false&name=${filepath}&meta-email=${encodedEmail}&meta-type=permission`,
+        `/add?stream-channels=false&name=${encodedEventId}&meta-email=${encodedEmail}&meta-type=permission`,
         form,
         {
           headers: {
@@ -1269,50 +1267,44 @@ export class IpfsClient implements IClient {
     }
   }
 
-  async getPermissionPins(
-    email: string,
-    exclude?: string[],
-  ): Promise<EventModel[]> {
+  async getPermissionEventPinsForEmail(email: string): Promise<Pin[]> {
     const normalizedEmail = email.trim().toLowerCase();
     const encodedEmail = encodeURIComponent(normalizedEmail);
-
+    console.log(encodedEmail);
     try {
       const res = await this.#pinSvcAxios.get(
-        `/pins?limit=${maxNumberOfFetchedPins}&meta-type=${encodedEmail}&meta-type=permission`,
+        `/pins?limit=${maxNumberOfFetchedPins}&meta={"type":"permission","email":"${encodedEmail}"}`,
       );
-      console.log("=== IPFS RESULT ===");
-      console.log(JSON.stringify(res));
-      console.log("=== IPFS RESULT ===");
-
       const pins: Pin[] = (res.data?.results ?? []).map(
         (element: { pin: Pin }) => element.pin,
       );
-
-      const onlyNewPins = pins.filter((pin) => !exclude?.includes(pin.name));
-
-      const events = await Promise.all(
-        onlyNewPins.map(async (pin) => {
-          try {
-            const response = await this.#gatewayAxios.get(`/ipfs/${pin.cid}`, {
-              responseType: "arraybuffer",
-            });
-
-            const json = Buffer.from(response.data).toString("utf-8");
-            return JSON.parse(json) as EventModel;
-          } catch (error) {
-            logger.error(
-              `Error fetching event ${pin.name} data with CID ${pin.cid}:`,
-              error,
-            );
-            return null;
-          }
-        }),
-      );
-      return events.filter((e): e is EventModel => e !== null);
+      return pins;
     } catch (error) {
       logger.error("Error getting event data:", error);
       return [];
     }
+  }
+
+  async getPermissionEvents(pins: Pin[]): Promise<EventModel[]> {
+    const events = await Promise.all(
+      pins.map(async (pin) => {
+        try {
+          const response = await this.#gatewayAxios.get(`/ipfs/${pin.cid}`, {
+            responseType: "arraybuffer",
+          });
+
+          const json = Buffer.from(response.data).toString("utf-8");
+          return JSON.parse(json) as EventModel;
+        } catch (error) {
+          logger.error(
+            `Error fetching event ${pin.name} data with CID ${pin.cid}:`,
+            error,
+          );
+          return null;
+        }
+      }),
+    );
+    return events.filter((e): e is EventModel => e !== null);
   }
 
   async deletePermission(email: string, eventId: string): Promise<boolean> {
@@ -1323,7 +1315,7 @@ export class IpfsClient implements IClient {
 
     try {
       const res = await this.#pinSvcAxios.get(
-        `/pins?limit=1&name=${filepath}&meta-email=${encodedEmail}&meta-type=permission`,
+        `/pins?limit=1&name=${filepath}&meta={"type":"permission","email":"${encodedEmail}"}`,
       );
       const pins: Pin[] = (res.data?.results ?? []).map(
         (element: { pin: Pin }) => element.pin,
@@ -1375,7 +1367,7 @@ export class IpfsClient implements IClient {
     try {
       // TODO FIXME what if maxNumberOfFetchedPins is less than total number of events?
       const res = await this.#pinSvcAxios.get(
-        `/pins?limit=${maxNumberOfFetchedPins}&meta-type=event`,
+        `/pins?limit=${maxNumberOfFetchedPins}&meta={"type":"event"}`,
       );
       const pins: Pin[] = (res.data?.results ?? []).map(
         (element: { pin: Pin }) => element.pin,
@@ -1410,7 +1402,7 @@ export class IpfsClient implements IClient {
   async deleteEvent(eventId: string): Promise<boolean> {
     try {
       const res = await this.#pinSvcAxios.get(
-        `/pins?limit=1&name=${encodeURIComponent(eventId)}&meta-type=event`,
+        `/pins?limit=1&name=${encodeURIComponent(eventId)}&meta={"type":"event"}`,
       );
       const pins: Pin[] = (res.data?.results ?? []).map(
         (element: { pin: Pin }) => element.pin,

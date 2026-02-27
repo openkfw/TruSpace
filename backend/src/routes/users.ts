@@ -6,16 +6,21 @@ import jwt from "jsonwebtoken";
 import path from "path";
 import {
   activateUserDb,
+  createEventDb,
+  createPermissionDb,
   createUserDb,
   deleteUserById,
+  filterNewEventIdsDb,
   findUserByEmailDb,
   findUserByTokenDb,
   getTotalRecentlyAddedUsersDb,
   getTotalUsersDb,
+  removePermissionsForWorkspaceAndEmailDb,
   storeUserSettingsDb,
   updateUserFirstSignIn,
   updateUserPassword,
   updateUserToken,
+  UserPermissionDto,
 } from "../clients/db";
 import { config } from "../config/config";
 import logger from "../config/winston";
@@ -27,9 +32,10 @@ import {
 } from "../mailing/mailingConstants";
 import { authenticateCookie } from "../middlewares/authenticate";
 import validate from "../middlewares/validate";
-import { JwtPayload } from "../types/interfaces";
+import { JwtPayload, Pin } from "../types/interfaces";
 import {
   CONFIRMATION_EMAIL_EXPIRATION,
+  EVENT_TYPES,
   USER_STATUS,
 } from "../utility/constants";
 import { AuthenticatedRequest } from "../types";
@@ -44,6 +50,54 @@ import { getUserSettings } from "../utility/user";
 
 const router = express.Router();
 logger.info("Registering user");
+
+async function readUserEvents(email: string) {
+  try {
+    const client = new IpfsClient();
+    const permissionPins = await client.getPermissionEventPinsForEmail(email);
+
+    if (!permissionPins.length) {
+      return;
+    }
+
+    const decodedPins = permissionPins.map((pin: Pin) => {
+      try {
+        return { pin, eventId: decodeURIComponent(pin.name) };
+      } catch {
+        return { pin, eventId: pin.name };
+      }
+    });
+
+    const newEventIds = await filterNewEventIdsDb(
+      decodedPins.map(({ eventId }) => eventId),
+    );
+    if (!newEventIds.length) {
+      return;
+    }
+
+    const newEventIdSet = new Set(newEventIds);
+    const newEventPins = decodedPins
+      .filter(({ eventId }) => newEventIdSet.has(eventId))
+      .map(({ pin }) => pin);
+
+    const newPermissionEvents = await client.getPermissionEvents(newEventPins);
+    await Promise.all(
+      newPermissionEvents.map(async (event) => {
+        if (event.type === EVENT_TYPES.userPermissionPost) {
+          await createPermissionDb(event.payload as UserPermissionDto);
+        } else if (event.type === EVENT_TYPES.userInWorkspaceRemove) {
+          await removePermissionsForWorkspaceAndEmailDb(
+            event.payload.workspaceId,
+            event.payload.email,
+          );
+        }
+        await createEventDb(event);
+      }),
+    );
+  } catch (error) {
+    logger.error("Error reading user events:", error);
+  }
+}
 
 router.post(
   "/register",
@@ -80,14 +134,14 @@ router.post(
           email,
           passwordHash,
           registerUsersAsInactive ? USER_STATUS.inactive : USER_STATUS.active,
-          token
+          token,
         );
         if (!result) {
           throw Error("Unknown error");
         }
         const filePath = path.join(
           process.cwd(),
-          "src/mailing/templates/registrationConfirmation.html"
+          "src/mailing/templates/registrationConfirmation.html",
         );
         const source = fs.readFileSync(filePath, "utf-8");
         const template = compile(source);
@@ -105,7 +159,7 @@ router.post(
         await sendEmail(
           email,
           registrationConfirmation[lang].subject,
-          htmlTemplateToSend
+          htmlTemplateToSend,
         );
         logger.info("Email sent");
         res.json({
@@ -119,7 +173,7 @@ router.post(
           email,
           passwordHash,
           registerUsersAsInactive ? USER_STATUS.inactive : USER_STATUS.active,
-          token
+          token,
         );
         if (!result) {
           throw Error("Unknown error");
@@ -147,7 +201,7 @@ router.post(
         });
       }
     }
-  }
+  },
 );
 
 router.post(
@@ -202,7 +256,7 @@ router.post(
 
       const decodedToken = jwt.verify(
         token,
-        Buffer.from(config.jwt.secret)
+        Buffer.from(config.jwt.secret),
       ) as jwt.JwtPayload;
 
       if (user.first_sign_in === "true") {
@@ -216,6 +270,8 @@ router.post(
         maxAge: config.jwt.expiration * 1000,
         path: "/",
       });
+
+      readUserEvents(user.email);
 
       return res.status(200).json({
         status: "success",
@@ -235,7 +291,7 @@ router.post(
         message: "Authentication error",
       });
     }
-  }
+  },
 );
 
 router.post("/logout", (_req: Request, res: Response) => {
@@ -273,7 +329,7 @@ router.get(
         message: "Unable to fetch statistics",
       });
     }
-  }
+  },
 );
 
 router.post(
@@ -314,12 +370,12 @@ router.post(
               Buffer.from(config.jwt.secret),
               {
                 expiresIn: CONFIRMATION_EMAIL_EXPIRATION, // 20 minutes
-              }
+              },
             );
             await updateUserToken(user.id, newToken);
             const filePath = path.join(
               process.cwd(),
-              "src/mailing/templates/registrationConfirmation.html"
+              "src/mailing/templates/registrationConfirmation.html",
             );
             const source = fs.readFileSync(filePath, "utf-8");
             const template = compile(source);
@@ -337,7 +393,7 @@ router.post(
             await sendEmail(
               user.email,
               registrationConfirmation[lang].subject,
-              htmlTemplateToSend
+              htmlTemplateToSend,
             );
             logger.info("New confirmation email sent");
             return res.status(400).json({
@@ -368,7 +424,7 @@ router.post(
         });
       }
     }
-  }
+  },
 );
 
 router.get(
@@ -391,14 +447,14 @@ router.get(
       });
     } catch (error) {
       logger.error(
-        `Error fetching user settings: ${JSON.stringify(error, null, 2)}`
+        `Error fetching user settings: ${JSON.stringify(error, null, 2)}`,
       );
       res.status(500).json({
         status: "failure",
         message: "User settings fetch failed",
       });
     }
-  }
+  },
 );
 
 router.post(
@@ -446,7 +502,7 @@ router.post(
         message: "User settings update failed",
       });
     }
-  }
+  },
 );
 
 router.get(
@@ -461,7 +517,7 @@ router.get(
         .json({ status: "failure", message: "Could not find avatar" });
     }
     return new IpfsClient().downloadAvatar(req, res, cid);
-  }
+  },
 );
 
 router.post(
@@ -498,7 +554,7 @@ router.post(
       await createTokenDb(user.id, token);
       const filePath = path.join(
         process.cwd(),
-        "src/mailing/templates/resetPasswordEmail.html"
+        "src/mailing/templates/resetPasswordEmail.html",
       );
       const source = fs.readFileSync(filePath, "utf-8");
       const template = compile(source);
@@ -525,7 +581,7 @@ router.post(
         message: "Unknown error occurred",
       });
     }
-  }
+  },
 );
 
 router.post(
@@ -570,7 +626,7 @@ router.post(
         });
       }
     }
-  }
+  },
 );
 
 export default router;

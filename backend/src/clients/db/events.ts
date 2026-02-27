@@ -38,6 +38,27 @@ export const findEventByIdDb = async (eventId: string) => {
   }
 };
 
+export const filterNewEventIdsDb = async (
+  eventIds: string[],
+): Promise<string[]> => {
+  try {
+    if (!eventIds.length) {
+      return [];
+    }
+
+    const uniqueEventIds = Array.from(new Set(eventIds));
+    const existing = await db<EventDb>("events")
+      .select("id")
+      .whereIn("id", uniqueEventIds);
+
+    const existingIds = new Set(existing.map((event) => event.id));
+    return uniqueEventIds.filter((eventId) => !existingIds.has(eventId));
+  } catch (error) {
+    logger.error("Error filtering new event IDs:", error);
+    return [];
+  }
+};
+
 export const removeEventDb = async (eventId: string) => {
   try {
     const result = await db<EventDb>("events")

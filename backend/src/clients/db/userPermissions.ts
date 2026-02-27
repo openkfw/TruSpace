@@ -105,3 +105,18 @@ export const removePermissionsForWorkspaceDb = async (workspaceId: string) => {
     return [];
   }
 };
+
+export const removePermissionsForWorkspaceAndEmailDb = async (
+  workspaceId: string,
+  email: string,
+) => {
+  try {
+    await db<UserPermissionDb>("user_permissions")
+      .delete()
+      .where("workspace_id", "=", workspaceId)
+      .andWhere("email", "=", email);
+  } catch (error) {
+    logger.error(`Error deleting permissions`, error);
+    return [];
+  }
+};
