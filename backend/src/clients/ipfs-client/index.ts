@@ -1274,7 +1274,6 @@ export class IpfsClient implements IClient {
   async getPermissionEventPinsForEmail(email: string): Promise<Pin[]> {
     const normalizedEmail = email.trim().toLowerCase();
     const encodedEmail = encodeURIComponent(normalizedEmail);
-    console.log(encodedEmail);
     try {
       const res = await this.#pinSvcAxios.get(
         `/pins?limit=${maxNumberOfFetchedPins}&meta={"type":"permission","email":"${encodedEmail}"}`,

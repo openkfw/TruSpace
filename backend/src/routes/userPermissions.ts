@@ -63,6 +63,7 @@ router.post(
       const eventReciever = await findEmailsByWorkspaceIdDb(
         permission.workspaceId,
       );
+      eventReciever.push(email);
       let permissionId;
       try {
         permissionId = await createPermissionDb(permission);

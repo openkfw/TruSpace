@@ -58,16 +58,19 @@ export const EventHandler = {
   readUserEvents: async function (email: string) {
     try {
       const permissionPins = await client.getPermissionEventPinsForEmail(email);
+      console.log(`permissionPins: ${JSON.stringify(permissionPins, null, 2)}`);
       if (!permissionPins.length) return;
 
       const eventIds = permissionPins.map((pin: Pin) => pin.meta.eventId);
       const newEventIds = await filterNewEventIdsDb(eventIds);
+      console.log(`newEventIds: ${JSON.stringify(newEventIds, null, 2)}`);
+
       if (!newEventIds.length) return;
 
       const newEventPins = permissionPins.filter((pin) =>
         newEventIds.includes(pin.meta.eventId),
       );
-
+      console.log(`newEventPins: ${JSON.stringify(newEventPins, null, 2)}`);
       const newPermissionEvents =
         await client.getPermissionEvents(newEventPins);
       await Promise.all(
