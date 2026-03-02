@@ -135,7 +135,7 @@ export const removePermissionsForWorkspaceAndEmailDb = async (
     await db<UserPermissionDb>("user_permissions")
       .delete()
       .where("workspace_id", "=", workspaceId)
-      .andWhere("email", "=", email);
+      .andWhere("user_email", "=", email);
   } catch (error) {
     logger.error(`Error deleting permissions`, error);
     return [];
