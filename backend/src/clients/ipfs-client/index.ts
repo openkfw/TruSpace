@@ -1242,29 +1242,40 @@ export class IpfsClient implements IClient {
     event: EventModel,
   ): Promise<void> {
     try {
-      const json = JSON.stringify(event, null);
       const encodedEventId = encodeURIComponent(event.id);
-      eventReciever.forEach(async (email: string) => {
-        const normalizedEmail = email.trim().toLowerCase();
-        const encodedEmail = encodeURIComponent(normalizedEmail);
-        const filename = `permissions/${encodedEmail}/${encodedEventId}`;
-        const form = new FormData();
-        form.append("file", json, {
-          filename: filename,
-          contentType: "application/json",
-        });
-        await this.#clusterAxios.post(
-          `/add?stream-channels=false&name=${filename}&meta-eventId=${encodedEventId}&meta-email=${encodedEmail}&meta-type=permission`,
-          form,
-          {
-            headers: {
-              ...form.getHeaders(),
+      const uniqueRecipients = Array.from(
+        new Set(eventReciever.map((email) => email.trim().toLowerCase())),
+      );
+      await Promise.all(
+        uniqueRecipients.map(async (email: string) => {
+          const encodedEmail = encodeURIComponent(email);
+          const filename = `permissions/${encodedEmail}/${encodedEventId}`;
+          // Keep per-recipient content distinct so each recipient gets a unique pin/CID.
+          const json = JSON.stringify(
+            { ...event, receiverEmail: email },
+            null,
+          );
+          const form = new FormData();
+          form.append("file", json, {
+            filename: filename,
+            contentType: "application/json",
+          });
+          await this.#clusterAxios.post(
+            `/add?stream-channels=false&name=${filename}&meta-eventId=${encodedEventId}&meta-email=${encodedEmail}&meta-type=permission`,
+            form,
+            {
+              headers: {
+                ...form.getHeaders(),
+              },
+              timeout: 30000,
+              maxContentLength: Infinity,
             },
-            timeout: 30000,
-            maxContentLength: Infinity,
-          },
-        );
-      });
+          );
+          console.log(
+            `created Event: ${JSON.stringify({ filename, encodedEventId, encodedEmail }, null, 2)}`,
+          );
+        }),
+      );
     } catch (error) {
       logger.error("Error creating permission:", error);
       throw error;

@@ -46,7 +46,17 @@ export const filterNewEventIdsDb = async (
       return [];
     }
 
-    const uniqueEventIds = Array.from(new Set(eventIds));
+    const uniqueEventIds = Array.from(
+      new Set(
+        eventIds.filter(
+          (eventId): eventId is string =>
+            typeof eventId === "string" && eventId.length > 0,
+        ),
+      ),
+    );
+    if (!uniqueEventIds.length) {
+      return [];
+    }
     const existing = await db<EventDb>("events")
       .select("id")
       .whereIn("id", uniqueEventIds);

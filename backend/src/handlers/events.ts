@@ -61,10 +61,9 @@ export const EventHandler = {
       console.log(`permissionPins: ${JSON.stringify(permissionPins, null, 2)}`);
       if (!permissionPins.length) return;
 
-      const eventIds = permissionPins.map((pin: Pin) => pin.meta.eventId);
+      const eventIds = permissionPins.map((pin: Pin) => pin.meta?.eventId);
       const newEventIds = await filterNewEventIdsDb(eventIds);
       console.log(`newEventIds: ${JSON.stringify(newEventIds, null, 2)}`);
-
       if (!newEventIds.length) return;
 
       const newEventPins = permissionPins.filter((pin) =>
