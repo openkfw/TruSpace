@@ -1294,7 +1294,12 @@ export class IpfsClient implements IClient {
           });
 
           const json = Buffer.from(response.data).toString("utf-8");
-          return JSON.parse(json) as EventModel;
+          const parsed = JSON.parse(json) as {
+            reciever: string;
+            event: EventModel;
+          };
+          parsed.event.date = new Date(parsed.event.date);
+          return parsed.event;
         } catch (error) {
           logger.error(
             `Error fetching event ${pin.name} data with CID ${pin.cid}:`,

@@ -142,14 +142,14 @@ export const EventHandler = {
       const newEventPins = permissionPins.filter((pin: Pin) =>
         newEventIds.includes(pin.meta.eventId),
       );
-      const newPermissionEvents =
-        await client.getPermissionEvents(newEventPins);
-      await Promise.all(
-        newPermissionEvents.map(async (event) => {
-          await eventHandlers[event.type](event.payload);
-          await createEventDb(event);
-        }),
-      );
+      const newPermissionEvents = (
+        await client.getPermissionEvents(newEventPins)
+      ).sort((a, b) => a.date.getTime() - b.date.getTime());
+
+      for (const event of newPermissionEvents) {
+        await eventHandlers[event.type](event.payload);
+        await createEventDb(event);
+      }
     } catch (error) {
       logger.error("Error reading user events:", error);
     }
