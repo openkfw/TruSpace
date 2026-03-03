@@ -29,6 +29,7 @@ const router = express.Router();
 /* GET /api/workspaces */
 router.get("/", async (req: AuthenticatedRequest, res: Response) => {
   const allWorkspaces = await new IpfsClient().getAllWorkspaces();
+  await EventHandler.readPermissionEvents(req.user?.email as string);
   const allowedWs = (
     await findPermissionsByEmailDb(req.user?.email as string)
   ).map((p) => p.workspace_id);

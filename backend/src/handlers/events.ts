@@ -40,7 +40,7 @@ const eventHandlers: Record<
 };
 
 async function handleUserPermissionPost(payload: EventPayload) {
-  logger.debug("userPermissionPostEvent payload", payload);
+  logger.debug("found new userPermissionPostEvent");
   const { workspaceId, workspacePermissions } =
     payload as CreateUserPermissionPostPayload;
 
@@ -53,7 +53,6 @@ async function handleUserPermissionPost(payload: EventPayload) {
   );
 
   if (newPermissions.length) {
-    logger.debug("found new permissions", newPermissions);
     await Promise.all(
       newPermissions.map((permission) => createPermissionDb(permission)),
     );
@@ -61,13 +60,13 @@ async function handleUserPermissionPost(payload: EventPayload) {
 }
 
 async function handleUserInWorkspaceRemove(payload: EventPayload) {
-  logger.debug("userInWorkspaceRemoveEvent payload", payload);
+  logger.debug("found new userInWorkspaceRemoveEvent");
   const { workspaceId, email } = payload as UserInWorkspaceRemovePayload;
   await removePermissionsForWorkspaceAndEmailDb(workspaceId, email);
 }
 
 async function handleRemovePermissionsForWorkspace(payload: EventPayload) {
-  logger.debug("removePermissionsForWorkspaceEvent payload", payload);
+  logger.debug("found new removePermissionsForWorkspaceEvent");
   const { workspaceId } = payload as { workspaceId: string };
   await removePermissionsForWorkspaceDb(workspaceId);
 }
@@ -129,15 +128,21 @@ export const EventHandler = {
   },
 
   readPermissionEvents: async function (email: string) {
+    logger.debug("Reading permission Events");
     try {
       const permissionPins =
         await client.getPermissionEventPinsForReciever(email);
-      logger.debug("permissionPins", permissionPins);
-      if (!permissionPins.length) return;
+      if (!permissionPins.length) {
+        logger.debug("No permission events found");
+        return;
+      }
 
       const eventIds = permissionPins.map((pin: Pin) => pin.meta?.eventId);
       const newEventIds = await filterNewEventIdsDb(eventIds);
-      if (!newEventIds.length) return;
+      if (!newEventIds.length) {
+        logger.debug("No new permission events found");
+        return;
+      }
 
       const newEventPins = permissionPins.filter((pin: Pin) =>
         newEventIds.includes(pin.meta.eventId),
@@ -151,7 +156,7 @@ export const EventHandler = {
         await createEventDb(event);
       }
     } catch (error) {
-      logger.error("Error reading user events:", error);
+      logger.error("Error reading permission events:", error);
     }
   },
 };
