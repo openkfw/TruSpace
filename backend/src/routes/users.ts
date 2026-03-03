@@ -218,7 +218,7 @@ router.post(
         path: "/",
       });
 
-      EventHandler.readUserEvents(user.email);
+      EventHandler.readPermissionEvents(user.email);
 
       return res.status(200).json({
         status: "success",

@@ -78,6 +78,7 @@ export class IpfsClient implements IClient {
     }
     return instance;
   }
+
   async downloadAvatar(
     req: AuthenticatedRequest,
     res: Response,
@@ -1238,58 +1239,43 @@ export class IpfsClient implements IClient {
 
   // === Permission Events ===
   async createPermissionEvent(
-    eventReciever: string[],
     event: EventModel,
+    reciever: string,
   ): Promise<void> {
     try {
       const encodedEventId = encodeURIComponent(event.id);
-      const uniqueRecipients = Array.from(
-        new Set(eventReciever.map((email) => email.trim().toLowerCase())),
+      const encodedReciever = encodeURIComponent(reciever);
+      const filename = `permissions/${encodedReciever}/${encodedEventId}`;
+      const form = new FormData();
+      form.append("file", JSON.stringify({ event, reciever }), {
+        filename: filename,
+        contentType: "application/json",
+      });
+      await this.#clusterAxios.post(
+        `/add?stream-channels=false&name=${filename}&meta-eventId=${encodedEventId}&meta-reciever=${encodedReciever}&meta-type=permission`,
+        form,
+        {
+          headers: {
+            ...form.getHeaders(),
+          },
+          timeout: 30000,
+          maxContentLength: Infinity,
+        },
       );
-      await Promise.all(
-        uniqueRecipients.map(async (email: string) => {
-          const encodedEmail = encodeURIComponent(email);
-          const filename = `permissions/${encodedEmail}/${encodedEventId}`;
-          // Keep per-recipient content distinct so each recipient gets a unique pin/CID.
-          const json = JSON.stringify(
-            { ...event, receiverEmail: email },
-            null,
-          );
-          const form = new FormData();
-          form.append("file", json, {
-            filename: filename,
-            contentType: "application/json",
-          });
-          await this.#clusterAxios.post(
-            `/add?stream-channels=false&name=${filename}&meta-eventId=${encodedEventId}&meta-email=${encodedEmail}&meta-type=permission`,
-            form,
-            {
-              headers: {
-                ...form.getHeaders(),
-              },
-              timeout: 30000,
-              maxContentLength: Infinity,
-            },
-          );
-          console.log(
-            `created Event: ${JSON.stringify({ filename, encodedEventId, encodedEmail }, null, 2)}`,
-          );
-        }),
-      );
+      logger.debug(`created Permission-Event: ${filename}`);
     } catch (error) {
       logger.error("Error creating permission:", error);
       throw error;
     }
   }
 
-  async getPermissionEventPinsForEmail(email: string): Promise<Pin[]> {
-    const normalizedEmail = email.trim().toLowerCase();
-    const encodedEmail = encodeURIComponent(normalizedEmail);
+  async getPermissionEventPinsForReciever(reciever: string): Promise<Pin[]> {
     try {
-      const res = await this.#pinSvcAxios.get(
-        `/pins?limit=${maxNumberOfFetchedPins}&meta={"type":"permission","email":"${encodedEmail}"}`,
+      const encodedReciever = encodeURIComponent(reciever);
+      const response = await this.#pinSvcAxios.get(
+        `/pins?limit=${maxNumberOfFetchedPins}&meta={"type":"permission","reciever":"${encodedReciever}"}`,
       );
-      const pins: Pin[] = (res.data?.results ?? []).map(
+      const pins: Pin[] = (response.data?.results ?? []).map(
         (element: { pin: Pin }) => element.pin,
       );
       return pins;

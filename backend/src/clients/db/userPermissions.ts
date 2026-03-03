@@ -84,26 +84,24 @@ export const findPermissionByIdDb = async (permissionId: string) => {
   }
 };
 
-export const findEmailsByWorkspaceIdDb = async (
-  workspaceId: string,
-): Promise<string[]> => {
+export const findPermissionsByWorkspaceIdDb = async (workspaceId: string) => {
   try {
-    const permissions = await db<UserPermissionDb>("user_permissions")
-      .select("user_email")
-      .where("workspace_id", "=", workspaceId)
-      .andWhere("status", "=", USER_PERMISSION_STATUS.active);
-
-    return Array.from(
-      new Set(permissions.map((permission) => permission.user_email)),
-    );
+    const permissionsDb = await db<UserPermissionDb>("user_permissions")
+      .select("*")
+      .where("workspace_id", "=", workspaceId);
+    const permissionsDto = permissionsDb.map((permission) => ({
+      workspaceId: permission.workspace_id,
+      email: permission.user_email,
+      role: permission.role,
+      status: permission.status,
+      lastEventId: permission.last_event_id,
+    }));
+    return permissionsDto;
   } catch (error) {
     logger.error(`Error finding emails for workspaceId ${workspaceId}:`, error);
     return [];
   }
 };
-
-// Backward-compatible export for existing callers using the old name.
-export const findemailsByWorkspaceIdDb = findEmailsByWorkspaceIdDb;
 
 export const removePermissionDb = async (permissionId: string) => {
   try {

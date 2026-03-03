@@ -5,6 +5,7 @@ import { EventModel } from "../../types/interfaces";
 interface EventDb {
   id: string;
   type: string;
+  date: Date;
   payload: JSON;
   created_at?: Date;
 }
@@ -15,6 +16,7 @@ export const createEventDb = async (event: EventModel) => {
       .insert({
         id: event.id,
         type: event.type,
+        date: event.date,
         payload: event.payload as unknown as JSON,
       })
       .returning<string>("id");
@@ -89,17 +91,6 @@ export const removeEventsForWorkspaceDb = async (workspaceId: string) => {
       .whereRaw("json_extract(payload, '$.workspaceId') = ?", [workspaceId]);
   } catch (error) {
     logger.error(`Error deleting events for workspace ${workspaceId}:`, error);
-    return [];
-  }
-};
-
-export const removeEventsForEmailDb = async (email: string) => {
-  try {
-    await db<EventDb>("events")
-      .delete()
-      .whereRaw("json_extract(payload, '$.email') = ?", [email]);
-  } catch (error) {
-    logger.error(`Error deleting events for email ${email}:`, error);
     return [];
   }
 };

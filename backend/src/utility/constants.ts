@@ -11,6 +11,7 @@ export const USER_PERMISSION_STATUS = {
 export const EVENT_TYPES = {
   userPermissionPost: "user-permission-post",
   userInWorkspaceRemove: "user-in-workspace-remove",
+  removePermissionsForWorkspace: "remove-permissions-for-workspace",
 } as const;
 
 export const CONFIRMATION_EMAIL_EXPIRATION = 1200; // seconds

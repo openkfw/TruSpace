@@ -24,6 +24,7 @@ export async function up(knex: Knex): Promise<void> {
       .string("type")
       .notNullable()
       .comment("Type of the event, e.g. 'permission_update'");
+    table.timestamp("date").notNullable().comment("Date of the actual event");
     table
       .json("payload")
       .nullable()

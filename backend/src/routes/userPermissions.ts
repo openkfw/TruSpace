@@ -6,15 +6,12 @@ import {
   findUsersInWorkspaceDb,
   removePermissionDb,
   UserPermissionDto,
-  removeEventDb,
-  findEmailsByWorkspaceIdDb,
 } from "../clients/db";
 import { IpfsClient } from "../clients/ipfs-client";
 import validate from "../middlewares/validate";
 import { AuthenticatedRequest } from "../types";
-import { USER_PERMISSION_STATUS, EVENT_TYPES } from "../utility/constants";
+import { USER_PERMISSION_STATUS } from "../utility/constants";
 import { sendNotification } from "../mailing/notifications";
-import { EventModel } from "../types/interfaces";
 import { EventHandler } from "../handlers/events";
 
 const router = express.Router();
@@ -55,27 +52,8 @@ router.post(
         status: USER_PERMISSION_STATUS.active,
         lastEventId: eventId,
       };
-      const event: EventModel = {
-        id: eventId,
-        type: EVENT_TYPES.userPermissionPost,
-        payload: permission,
-      };
-      const eventReciever = await findEmailsByWorkspaceIdDb(
-        permission.workspaceId,
-      );
-      eventReciever.push(email);
-      let permissionId;
-      try {
-        permissionId = await createPermissionDb(permission);
-        await EventHandler.createPermissionEvent(eventReciever, event);
-      } catch (error) {
-        console.error("Permission creation error:", error);
-        if (permissionId) {
-          await removePermissionDb(permissionId.toString());
-          await removeEventDb(event.id);
-        }
-        throw error;
-      }
+      await createPermissionDb(permission);
+      await EventHandler.userPermissionPost(workspaceId, eventId);
 
       sendNotification(
         email,
@@ -125,19 +103,10 @@ router.delete(
           message: "Permission not found",
         });
       }
-
-      const eventReciever = await findEmailsByWorkspaceIdDb(
+      await EventHandler.userInWorkspaceRemove(
         permission.workspace_id,
+        permission.user_email,
       );
-      const event: EventModel = {
-        id: await EventHandler.generateEventId(),
-        type: EVENT_TYPES.userInWorkspaceRemove,
-        payload: {
-          email: permission.user_email,
-          workspaceId: permission.workspace_id,
-        },
-      };
-      await EventHandler.createPermissionEvent(eventReciever, event);
       await removePermissionDb(permissionId);
 
       // TODO We need a ney notification implementation similiar to the events
