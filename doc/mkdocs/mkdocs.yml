@@ -1,0 +1,225 @@
+site_name: TruSpace Documentation
+site_url: https://docs.truspace.dev
+site_description: AI-infused, collaborative and decentralized file management solution
+site_author: KfW Development Bank - OpenKfW
+
+repo_name: openkfw/TruSpace
+repo_url: https://github.com/openkfw/TruSpace
+edit_uri: edit/main/docs/
+
+copyright: Copyright &copy; 2024 KfW Development Bank | Licensed under GPL-3.0
+
+theme:
+  name: material
+  custom_dir: overrides
+  language: en
+  
+  palette:
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: deep purple
+      accent: cyan
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+    
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: deep purple
+      accent: cyan
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+  font:
+    text: Inter
+    code: JetBrains Mono
+
+  features:
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.instant.progress
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.path
+    - navigation.indexes
+    - navigation.top
+    - navigation.footer
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - search.share
+    - header.autohide
+    - content.code.copy
+    - content.code.select
+    - content.code.annotate
+    - content.tabs.link
+    - content.tooltips
+    - announce.dismiss
+
+  icon:
+    repo: fontawesome/brands/github
+    logo: material/cube-outline
+    edit: material/pencil
+    view: material/eye
+    admonition:
+      note: octicons/tag-16
+      abstract: octicons/checklist-16
+      info: octicons/info-16
+      tip: octicons/squirrel-16
+      success: octicons/check-16
+      question: octicons/question-16
+      warning: octicons/alert-16
+      failure: octicons/x-circle-16
+      danger: octicons/zap-16
+      bug: octicons/bug-16
+      example: octicons/beaker-16
+      quote: octicons/quote-16
+
+  favicon: assets/favicon.png
+
+plugins:
+  - search:
+      separator: '[\s\u200b\-_,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
+  - material/tags
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+      permalink_title: Anchor link to this section
+      toc_depth: 3
+  - tables
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.magiclink:
+      normalize_issue_symbols: true
+      repo_url_shorthand: true
+      user: openkfw
+      repo: TruSpace
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+      combine_header_slug: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/openkfw/TruSpace
+      name: TruSpace on GitHub
+    - icon: fontawesome/brands/youtube
+      link: https://www.youtube.com/watch?v=dpo_D3NJpqE
+      name: TruSpace Demo Video
+    - icon: fontawesome/brands/medium
+      link: https://medium.com/@angryarchitect/your-place-or-my-place-a-tale-of-decentralization-and-sovereignty-c775dafbadbb
+      name: TruSpace Blog Post
+
+  status:
+    new: Recently added
+    deprecated: Deprecated
+
+  consent:
+    title: Cookie consent
+    description: >-
+      We use cookies to recognize your repeated visits and preferences, as well
+      as to measure the effectiveness of our documentation.
+
+  generator: false
+
+extra_css:
+  - stylesheets/extra.css
+
+extra_javascript:
+  - javascripts/extra.js
+
+nav:
+  - Home: index.md
+  
+  - Getting Started:
+    - getting-started/index.md
+    - Quick Start: getting-started/quickstart.md
+    - Installation:
+      - getting-started/installation/index.md
+      - Local Development: getting-started/installation/local-dev.md
+      - Docker Deployment: getting-started/installation/docker.md
+      - Raspberry Pi: getting-started/installation/raspberry-pi.md
+      - Production: getting-started/installation/production.md
+    - First Steps: getting-started/first-steps.md
+    - FAQ: getting-started/faq.md
+  
+  - Architecture:
+    - architecture/index.md
+    - System Overview: architecture/overview.md
+    - Components: architecture/components.md
+    - Data Model: architecture/data-model.md
+    - Security: architecture/security.md
+    - IPFS Network: architecture/ipfs-network.md
+  
+  - Configuration:
+    - configuration/index.md
+    - Environment Variables: configuration/environment-variables.md
+    - Startup Options: configuration/startup-options.md
+    - Network Configuration: configuration/network.md
+    - AI Configuration: configuration/ai-config.md
+  
+  - Guides:
+    - guides/index.md
+    - User Guide:
+      - guides/user/index.md
+      - Workspaces: guides/user/workspaces.md
+      - Documents: guides/user/documents.md
+      - AI Features: guides/user/ai-features.md
+    - Admin Guide:
+      - guides/admin/index.md
+      - User Management: guides/admin/user-management.md
+      - Workspace Management: guides/admin/workspace-management.md
+      - Connecting Nodes: guides/admin/connecting-nodes.md
+      - Backup & Recovery: guides/admin/backup-recovery.md
+    - Developer Guide:
+      - guides/developer/index.md
+      - Development Setup: guides/developer/setup.md
+      - Contributing: guides/developer/contributing.md
+      - API Reference: guides/developer/api.md
+      - Testing: guides/developer/testing.md
+  
+  - Reference:
+    - reference/index.md
+    - API Documentation: reference/api.md
+    - Data Types: reference/data-types.md
+    - CLI Reference: reference/cli.md
+    - Troubleshooting: reference/troubleshooting.md
+  
+  - Tags: tags.md

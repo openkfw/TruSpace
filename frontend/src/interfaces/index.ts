@@ -10,10 +10,14 @@ export interface DocumentMeta {
    filename: string;
    timestamp: string;
    version: string;
-   creator: string;
-   creatorUiid: string;
+   creatorNodeId: string;
+   creatorUserId: string;
+   creatorName?: string;
    workspaceOrigin: string;
-   language: string;
+   encrypted: string;
+   language?: string;
+   size?: number;
+   mimetype?: string;
    versionTagName?: string;
 }
 
@@ -26,6 +30,20 @@ export interface Document extends DocumentRequest {
    docId: string;
    cid: string;
    meta: DocumentMeta;
+   documentVersions?: DocumentVersion[];
+}
+
+export interface DocumentsResponse {
+   count: number;
+   from?: number;
+   limit?: number;
+   data: Document[];
+}
+
+export interface DocumentVersion {
+   cid: string;
+   meta: DocumentMeta;
+   docId: string;
 }
 
 export interface DocumentWithVersions extends Document {
@@ -43,8 +61,9 @@ export interface DocumentCreateResponse {
 interface WorkspaceMeta {
    workspace_uuid: string;
    type: "workspace";
-   creator_id: string;
-   creator_name: string;
+   creatorNodeId: string;
+   creatorUserId: string;
+   creatorName?: string;
    name: string;
    password_hash?: string;
    is_public: boolean;
@@ -62,7 +81,6 @@ export interface WorkspaceCreateResponse {
 }
 
 export interface Workspace extends WorkspaceRequest {
-   logo: string | File;
    cid: string;
 }
 
@@ -74,8 +92,9 @@ interface ChatMessageMeta {
    docId: string;
    workspaceOrigin: string;
    timestamp: string;
-   creator: string;
-   creatorUiid: string;
+   creatorNodeId: string;
+   creatorUserId: string;
+   creatorName?: string;
 }
 export interface ChatMessageRequest {
    meta: ChatMessageMeta;
@@ -90,7 +109,15 @@ interface PerspectiveMeta {
    perspectiveType: string;
    workspaceOrigin: string;
    docId: string;
+   versionCid: string;
    timestamp: string;
+   data: string;
+   creatorType: string;
+   creatorNodeId: string;
+   creatorUserId: string;
+   creatorName?: string;
+   prompt: string;
+   model?: string;
 }
 
 export interface PerspectiveRequest {
@@ -99,6 +126,58 @@ export interface PerspectiveRequest {
 
 export interface Perspective extends PerspectiveRequest {
    cid: string;
+}
+
+export interface TagRequest {
+   meta: TagMeta;
+}
+
+export interface Tag extends TagRequest {
+   cid: string;
+}
+
+interface TagMeta {
+   type: "tag";
+   workspaceOrigin: string;
+   docId: string;
+   versionCid: string;
+   timestamp: string;
+   name: string;
+   color: string;
+   creatorNodeId: string;
+   creatorUserId: string;
+   creatorType: string;
+   creatorName?: string;
+}
+
+export interface GeneralTemplateOfItemInWorkspace {
+   cid: string;
+   meta: GeneralTemplateOfItemInWorkspaceMeta;
+}
+
+interface GeneralTemplateOfItemInWorkspaceMeta {
+   type: string;
+   workspaceOrigin: string;
+   docId: string;
+   timestamp: string;
+   creatorNodeId: string;
+   creatorUserId: string;
+   creatorName?: string;
+   creatorType?: string;
+}
+
+interface LanguageMeta {
+   type: "language";
+   workspaceOrigin: string;
+   docId: string;
+   versionCid: string;
+   timestamp: string;
+   creatorType: string;
+   language: string;
+}
+
+export interface LanguageRequest {
+   meta: LanguageMeta;
 }
 
 export interface TextItem {

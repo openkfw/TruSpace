@@ -5,6 +5,7 @@ import { config } from "../config/config";
 import logger from "../config/winston";
 import { AuthenticatedRequest } from "../types";
 import { JwtPayload } from "../types/interfaces";
+import { IpfsClient } from "../clients/ipfs-client";
 import { USER_STATUS } from "../utility/constants";
 
 export async function authenticateCookie(
@@ -24,6 +25,16 @@ export async function authenticateCookie(
 
   try {
     const decoded = jwt.verify(token, config.jwt.secret) as JwtPayload;
+
+    if (!decoded.nodeId) {
+      try {
+        const clusterId = await new IpfsClient().clusterId();
+        decoded.nodeId = clusterId?.ipfs?.id || "";
+      } catch (error) {
+        logger.error("Error resolving nodeId:", error);
+      }
+    }
+
     req.user = decoded;
 
     if (config.env === "production") {

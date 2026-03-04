@@ -12,6 +12,7 @@ import {
   Perspective,
   PerspectiveRequest,
   Pin,
+  UserData,
   Workspace,
   WorkspaceCreateResponse,
   WorkspaceRequest,
@@ -58,6 +59,12 @@ export interface IClient {
   getPerspectivesByVersionCid(docId: string): Promise<Perspective[]>;
   // remove later when getting perspectives by document and version is implemented
   getAllPerspectives(): Promise<Perspective[]>;
+
+  // user data (stored separately in IPFS)
+  createUserData(userData: UserData): Promise<void>;
+  modifyUserData(userData: UserData): Promise<void>;
+  deleteUserData(nodeId: string, userId: string): Promise<void>;
+  getUserData(nodeId: string, userId: string): Promise<UserData>;
 
   // status
   pinSvcStatus(): Promise<boolean>;

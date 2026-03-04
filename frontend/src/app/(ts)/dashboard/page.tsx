@@ -126,7 +126,7 @@ export default function Dashboard() {
                                        {homeTranslations("editedBy")}:
                                     </span>
                                     <span className="text-base font-semibold truncate">
-                                       {lastEditedDocument.meta.creator ||
+                                       {lastEditedDocument.meta.creatorName ||
                                           homeTranslations("unknownCreator")}
                                     </span>
                                  </div>
@@ -195,7 +195,7 @@ export default function Dashboard() {
                                        {homeTranslations("addedBy")}:
                                     </span>
                                     <span className="text-base font-semibold truncate">
-                                       {lastChatMessage.meta.creator ||
+                                       {lastChatMessage.meta.creatorName ||
                                           homeTranslations("unknownCreator")}
                                     </span>
                                  </div>
@@ -268,7 +268,7 @@ export default function Dashboard() {
                                     {homeTranslations("addedBy")}:
                                  </span>
                                  <span className="text-base font-semibold truncate">
-                                    {recentlyAddedWorkspace.meta.creator_name ||
+                                    {recentlyAddedWorkspace.meta.creatorName ||
                                        homeTranslations("unknownCreator")}
                                  </span>
                               </div>

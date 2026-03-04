@@ -1,35 +1,34 @@
-#####################
-# INFO:
-# BUILT WORKFLOW IN .github/workflows/main-push.yml TO SYNC GITHUB MAIN TO OPENCODE GITLAB MAIN
-# IF THIS WORKS, THIS CI IS UNNECESSARY AND CAN BE DELETED
-#####################
-
-# CI to mirror our GitHub repository to OpenCode GitLab
+# CI to mirror our GitHub repository main branch to OpenCode GitLab main branch
+# Backstory: tried the official pull mirroring component but didnt work
 # Instructions on the mirroring here: https://guide.opencode.de/projekte/spiegeln/#so-funktioniert-die-pull-spiegelung
 # The exact component can be found here: https://gitlab.opencode.de/pull-mirroring/component
 
 stages:
-  - build
-  #- test
-  #- deploy
   - mirroring
 
-include:
-  # DevGuard CI Pipeline
-  #- remote: "https://gitlab.opencode.de/l3montree/devguard-ci-components/-/raw/v0.17.1/templates/full.yml"
-  #  inputs:
-  #    asset_name: "$DEVGUARD_ASSET_NAME"
-  #    token: "$DEVGUARD_TOKEN"
-  #    api_url: "$DEVGUARD_API_URL"
-  #    web_ui: "https://devguard.opencode.de"
+variables:
+  GIT_DEPTH: 0
 
-  # GitHub → OpenCode Pull Mirroring
-  - component: $CI_SERVER_FQDN/pull-mirroring/component/pull-mirroring@1.0.1
-    inputs:
-      target_url: https://github.com/openkfw/TruSpace.git
-      http_protocol: https
-      access_token_name: $GITLAB_PAT_NAME
-      access_token: $GITLAB_PAT
-      stage: mirroring
-      remote_name: origin
-      git_push_opt: --force
+mirror_github_main:
+  stage: mirroring
+  image: alpine/git
+
+  before_script:
+    - apk update
+    - git config --global user.name "${GITLAB_USER_NAME}"
+    - git config --global user.email "${GITLAB_USER_EMAIL}"
+
+    # Clone only main from GitHub
+    - git clone --branch main --single-branch https://github.com/openkfw/TruSpace.git repo
+    - cd repo
+
+    # Add GitLab target remote with token
+    - git remote add target "https://${GITLAB_PAT_NAME}:${GITLAB_PAT}@${CI_SERVER_FQDN}/${CI_PROJECT_PATH}.git"
+
+  script:
+    - echo "Pushing GitHub main → GitLab main"
+    - git push target main:main --force
+    - git push target --tags --force
+
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "schedule"'

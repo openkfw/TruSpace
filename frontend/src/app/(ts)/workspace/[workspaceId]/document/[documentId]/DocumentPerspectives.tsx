@@ -530,7 +530,7 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                                           {perspective.name}
                                           {perspective?.creatorType ===
                                              "user" &&
-                                             ` (${perspective.creator})`}
+                                             ` (${perspective.creatorName})`}
                                           {perspective?.creatorType ===
                                              "ai" && (
                                              <TooltipProvider>
@@ -562,7 +562,7 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                               {formatDate(
                                  new Date(currentPerspective?.timestamp)
                               )}{" "}
-                              {t("by")}: {currentPerspective?.creator}
+                              {t("by")}: {currentPerspective?.creatorName}
                            </span>
                         </div>
                      </div>

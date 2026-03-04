@@ -13,8 +13,8 @@ export function decodeFilename(filename: string) {
 export function createDocumentRequest({
   filename,
   docId,
-  creator,
-  creatorUiid,
+  creatorNodeId,
+  creatorUserId,
   workspaceOrigin,
   version,
   size,
@@ -23,8 +23,8 @@ export function createDocumentRequest({
 }: {
   filename: string;
   docId?: string;
-  creator: string;
-  creatorUiid: string;
+  creatorNodeId: string;
+  creatorUserId: string;
   workspaceOrigin: string;
   version?: string;
   size?: number;
@@ -38,8 +38,8 @@ export function createDocumentRequest({
       timestamp: Date.now().toString(),
       version: version || "1",
       size: size || 0,
-      creator,
-      creatorUiid,
+      creatorNodeId,
+      creatorUserId,
       workspaceOrigin,
       encrypted: "true",
       mimetype,
@@ -76,14 +76,14 @@ export async function getContributorsDocument(docId: string) {
     client.getPerspectivesByDocumentId(docId),
   ]);
 
-  docs.map((d) => contributors.push(d.meta.creatorUiid));
-  chats.map((d) => contributors.push(d.meta.creatorUiid));
+  docs.map((d) => contributors.push(d.meta.creatorUserId));
+  chats.map((d) => contributors.push(d.meta.creatorUserId));
   tags
     .filter((d) => d.meta.creatorType === "user")
-    .map((d) => contributors.push(d.meta.creatorUiid));
+    .map((d) => contributors.push(d.meta.creatorUserId));
   perspectives
     .filter((d) => d.meta.creatorType === "user")
-    .map((d) => contributors.push(d.meta.creatorUiid));
+    .map((d) => contributors.push(d.meta.creatorUserId));
 
   const uniqueContributors = [...new Set(contributors.filter((c) => c))];
   return { count: uniqueContributors.length, contributors: uniqueContributors };

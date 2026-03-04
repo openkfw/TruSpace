@@ -2,6 +2,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
 import fileUpload from "express-fileupload";
+import session from "express-session";
 import rateLimit from "express-rate-limit";
 import fs from "fs";
 import helmet from "helmet";
@@ -78,6 +79,37 @@ app.use(cookieParser());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// ─── SESSION + MINIMAL CSRF PROTECTION ──────────────────────────────────────
+/*
+  TODO: Implement full CSRF protection in the future.
+  Current minimal protection is provided by setting `sameSite: 'strict'`
+  on the session cookie. This prevents browsers from sending cookies
+  on cross-site requests, mitigating basic CSRF attacks.
+
+  Limitations:
+  - Does not protect against programmatic requests from scripts
+    outside the browser.
+  - Only provides browser-enforced protection; full CSRF tokens
+    are needed for complete security.
+
+  Benefit:
+  - No frontend changes required; enforced automatically by modern browsers.
+*/
+app.use(
+  session({
+    secret: process.env.JWT_SECRET || "dev-secret", // fallback for development
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // HTTPS only in production
+      sameSite: "strict",
+      maxAge: Number(process.env.JWT_MAX_AGE || 86400) * 1000, // match JWT lifetime
+    },
+  })
+);
+// ───────────────────────────────────────────────────────────────────────────
 
 // todo filesize should be configurable
 app.use(

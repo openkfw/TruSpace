@@ -168,8 +168,8 @@ router.get(
     const documentDetails = document.documentVersions;
     const documentVersions = documentDetails.reduce(
       (acc: string[], version: Document) => {
-        if (!acc.includes(version.meta.creatorUiid)) {
-          acc.push(version.meta.creatorUiid);
+        if (!acc.includes(version.meta.creatorUserId)) {
+          acc.push(version.meta.creatorUserId);
         }
         return acc;
       },
@@ -234,8 +234,8 @@ router.post(
     try {
       const { workspace } = req.body;
       const email = req.user?.email as string;
-      const userName = req.user?.name as string;
       const userUiid = req.user?.uiid as string;
+      const creatorNodeId = req.user?.nodeId as string;
 
       await checkPermissionForWorkspace(email, res, workspace);
 
@@ -244,8 +244,8 @@ router.post(
 
       const docRequest = createDocumentRequest({
         filename,
-        creator: userName,
-        creatorUiid: userUiid,
+        creatorNodeId,
+        creatorUserId: userUiid,
         workspaceOrigin: workspace,
         size: file.size,
         mimetype: file.mimetype,
@@ -389,8 +389,8 @@ router.put(
       const { workspace, versionTagName } = req.body;
       const { docId } = req.params;
       const email = req.user?.email as string;
-      const userName = req.user?.name as string;
       const userUiid = req.user?.uiid as string;
+      const creatorNodeId = req.user?.nodeId as string;
 
       await checkPermissionForWorkspace(email, res, workspace);
 
@@ -404,8 +404,8 @@ router.put(
       const docRequest = createDocumentRequest({
         filename,
         version: (parseInt(latestVersion) + 1).toString(),
-        creator: userName,
-        creatorUiid: userUiid,
+        creatorNodeId,
+        creatorUserId: userUiid,
         size: file.size,
         mimetype: file.mimetype,
         workspaceOrigin: workspace,
@@ -506,7 +506,7 @@ router.put(
           };
 
       docInfo.documentVersions
-        .map((version) => version.meta.creatorUiid)
+        .map((version) => version.meta.creatorUserId)
         .reduce((acc: string[], uiid: string) => {
           if (!acc.includes(uiid)) {
             acc.push(uiid);

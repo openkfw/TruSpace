@@ -69,10 +69,10 @@ export default function DocumentData({
    const linkInput = useRef(null);
 
    const uniqueContributors = documentVersions.reduce((acc, version) => {
-      if (acc.includes(version.meta.creatorUiid)) {
+      if (acc.includes(version.meta.creatorUserId)) {
          return acc;
       }
-      return [...acc, version.meta.creatorUiid];
+      return [...acc, version.meta.creatorUserId];
    }, []);
 
    const copyLink = () => {
@@ -228,8 +228,9 @@ export default function DocumentData({
                      <UserCircle className="mr-2" />
                      {
                         documentVersions.find(
-                           (version) => version.meta.creatorUiid === contributor
-                        ).meta.creator
+                           (version) =>
+                              version.meta.creatorUserId === contributor
+                        )?.meta.creatorName || translations("unknownCreator")
                      }
                   </Badge>
                ))}
@@ -242,7 +243,7 @@ export default function DocumentData({
                </Badge>
             </div>
             <div className="font-bold">{translations("creator")}</div>
-            <div>{meta?.creator}</div>
+            <div>{meta?.creatorName || translations("unknownCreator")}</div>
 
             <div className="font-bold">{translations("createdAt")}</div>
             <div>{formatDate(meta?.timestamp)}</div>

@@ -45,7 +45,7 @@ router.post(
     const docId = req.body.docId;
     const userUiId = req.user?.uiid as string;
     const email = req.user?.email as string;
-    const userName = req.user?.name as string;
+
 
     const client = new IpfsClient();
     const tagRequest: TagRequest = {
@@ -58,8 +58,8 @@ router.post(
         name: encodeURIComponent(tagName),
         color: color,
         creatorType: "user",
-        creator: userName,
-        creatorUiid: userUiId
+        creatorNodeId: req.user?.nodeId as string,
+        creatorUserId: userUiId
       },
     };
     await checkPermissionForWorkspace(email, res, workspaceOrigin);

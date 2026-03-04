@@ -242,8 +242,8 @@ export const usePerspectives = (cid: string) => {
             name: perspective.meta.perspectiveType,
             text: perspective.meta.data,
             creatorType: perspective.meta.creatorType,
-            creator: perspective.meta.creator,
-            creatorUiid: perspective.meta.creatorUiid,
+            creatorName: perspective.meta.creatorName,
+            creatorUserId: perspective.meta.creatorUserId,
             model: perspective.meta.model,
             prompt: perspective.meta.prompt,
             timestamp: perspective.meta.timestamp
@@ -700,6 +700,28 @@ export const updateUserSettings = async (formData: FormData) => {
       console.error("Error updating user settings:", error);
       throw error;
    }
+};
+
+export const updateUserName = async (name: string) => {
+    try {
+        const res = await fetch(`${USERS_ENDPOINT}/reset-name`, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ name })
+        });
+
+        if (!res.ok) {
+            throw new Error("Failed to update user name");
+        }
+        return res.json();
+    }
+    catch (error) {
+        console.error("Error updating user name:", error);
+        throw error;
+    }
 };
 
 export const downloadAvatar = async () => {

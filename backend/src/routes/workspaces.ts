@@ -90,8 +90,8 @@ router.post(
       meta: {
         workspace_uuid: workspaceId,
         type: "workspace",
-        creator_id: req.user?.uiid as string,
-        creator_name: req.user?.name as string,
+        creatorNodeId: req.user?.nodeId as string,
+        creatorUserId: req.user?.uiid as string,
         created_at: new Date().toISOString(),
         name,
         password_hash: workspacePasswordHash,

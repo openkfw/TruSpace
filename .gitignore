@@ -15,3 +15,5 @@ scripts/prompts/cookies.txt
 .scratch
 .idea
 .connection
+.connection.password
+doc/mkdocs/site

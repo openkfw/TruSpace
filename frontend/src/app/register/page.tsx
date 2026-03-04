@@ -107,7 +107,7 @@ export default function Register() {
          message: translations("nameMinLength")
       },
       pattern: {
-         value: /^[\p{L} .,'-]+(?: [\p{L} .,'-]+)*$/u,
+         value: /^\p{L}+([ .,'-]\p{L}+)*$/u,
          message: translations("namePattern")
       },
       setValueAs: (value) => value.trim()
