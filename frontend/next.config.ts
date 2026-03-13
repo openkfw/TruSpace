@@ -14,16 +14,14 @@ function getCommitHash() {
 }
 
 const nextConfig: NextConfig = {
-   experimental: {
-      turbo: {
-         resolveAlias: {
-            canvas: "./empty-module.ts"
-         }
-      }
-   },
    output: "standalone",
    env: {
       NEXT_PUBLIC_SHORT_COMMIT_HASH: getCommitHash()
+   },
+   turbopack: {
+      resolveAlias: {
+         canvas: "./empty-module.ts"
+      }
    }
 };
 
