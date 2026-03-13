@@ -7,9 +7,11 @@ import {
   DocumentCreateResponse,
   DocumentRequest,
   DocumentsResponse,
+  EventModel,
   File,
   Perspective,
   PerspectiveRequest,
+  Pin,
   UserData,
   Workspace,
   WorkspaceCreateResponse,
@@ -19,7 +21,7 @@ import {
 export interface IClient {
   // workspace
   createWorkspace(
-    workspace: WorkspaceRequest
+    workspace: WorkspaceRequest,
   ): Promise<WorkspaceCreateResponse>;
   getAllWorkspaces(): Promise<Workspace[]>;
   getWorkspaceByName(name: string): Promise<Workspace[]>;
@@ -31,7 +33,7 @@ export interface IClient {
   // documents
   createDocument(
     doc: DocumentRequest,
-    file: File
+    file: File,
   ): Promise<DocumentCreateResponse>;
   getAllDocuments(from: number, limit: number): Promise<DocumentsResponse>; // remove getAllDocuments when workspaces are fully implemented
   getDocumentDetailsById(docId: string): Promise<Document>;
@@ -39,12 +41,12 @@ export interface IClient {
   downloadDocumentVersionByCid(
     req: AuthenticatedRequest,
     res: Response,
-    cid: string
+    cid: string,
   ): Promise<void>;
   getDocumentsByWorkspace(
     wId: string,
     from: number,
-    limit: number
+    limit: number,
   ): Promise<DocumentsResponse>;
 
   // chat messages
@@ -74,6 +76,17 @@ export interface IClient {
   downloadAvatar(
     req: AuthenticatedRequest,
     res: Response,
-    cid: string
+    cid: string,
   ): Promise<any>;
+
+  // permissions
+  createPermissionEvent(event: EventModel, reciever: string): Promise<void>;
+  getPermissionEventPinsForReciever(reciever: string): Promise<Pin[]>;
+  getPermissionEvents(pins: Pin[]): Promise<EventModel[]>;
+  deletePermission(email: string, eventId: string): Promise<boolean>;
+
+  // events
+  createEvent(event: EventModel): Promise<void>;
+  getEvents(exclude?: string[]): Promise<EventModel[]>;
+  deleteEvent(eventId: string): Promise<boolean>;
 }

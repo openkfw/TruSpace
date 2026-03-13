@@ -6,6 +6,7 @@ interface UserPermissionDb {
   id: number;
   user_email: string;
   workspace_id: string;
+  last_event_id?: string;
   role: string;
   status: string;
   created_at?: Date;
@@ -17,6 +18,7 @@ export interface UserPermissionDto {
   email: string;
   role: string;
   status: string;
+  lastEventId?: string;
 }
 
 export const createPermissionDb = async (permission: UserPermissionDto) => {
@@ -25,6 +27,7 @@ export const createPermissionDb = async (permission: UserPermissionDto) => {
       .insert({
         workspace_id: permission.workspaceId,
         user_email: permission.email,
+        last_event_id: permission.lastEventId,
         role: permission.role,
         status: permission.status,
       })
@@ -59,7 +62,7 @@ export const findUsersInWorkspaceDb = async (workspaceId: string) => {
         "user_permissions.user_email as email",
         "users.username as name",
         "user_permissions.workspace_id as workspaceId",
-        "user_permissions.role"
+        "user_permissions.role",
       );
     return users;
   } catch (error) {
@@ -81,6 +84,25 @@ export const findPermissionByIdDb = async (permissionId: string) => {
   }
 };
 
+export const findPermissionsByWorkspaceIdDb = async (workspaceId: string) => {
+  try {
+    const permissionsDb = await db<UserPermissionDb>("user_permissions")
+      .select("*")
+      .where("workspace_id", "=", workspaceId);
+    const permissionsDto = permissionsDb.map((permission) => ({
+      workspaceId: permission.workspace_id,
+      email: permission.user_email,
+      role: permission.role,
+      status: permission.status,
+      lastEventId: permission.last_event_id,
+    }));
+    return permissionsDto;
+  } catch (error) {
+    logger.error(`Error finding emails for workspaceId ${workspaceId}:`, error);
+    return [];
+  }
+};
+
 export const removePermissionDb = async (permissionId: string) => {
   try {
     await db<UserPermissionDb>("user_permissions")
@@ -97,6 +119,21 @@ export const removePermissionsForWorkspaceDb = async (workspaceId: string) => {
     await db<UserPermissionDb>("user_permissions")
       .delete()
       .where("workspace_id", "=", workspaceId);
+  } catch (error) {
+    logger.error(`Error deleting permissions`, error);
+    return [];
+  }
+};
+
+export const removePermissionsForWorkspaceAndEmailDb = async (
+  workspaceId: string,
+  email: string,
+) => {
+  try {
+    await db<UserPermissionDb>("user_permissions")
+      .delete()
+      .where("workspace_id", "=", workspaceId)
+      .andWhere("user_email", "=", email);
   } catch (error) {
     logger.error(`Error deleting permissions`, error);
     return [];

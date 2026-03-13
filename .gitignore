@@ -14,4 +14,6 @@ ipfs-cluster-service
 scripts/prompts/cookies.txt
 .scratch
 .idea
-doc/mkdocs/site 
+.connection
+.connection.password
+doc/mkdocs/site

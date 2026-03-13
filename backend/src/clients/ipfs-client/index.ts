@@ -11,6 +11,7 @@ import {
   DocumentPin,
   DocumentPinningResponse,
   DocumentPinRequest,
+  EventModel,
   IpfsClientConfig,
   Pin,
   PinningResponse,
@@ -79,6 +80,7 @@ export class IpfsClient implements IClient {
     }
     return instance;
   }
+
   async downloadAvatar(
     req: AuthenticatedRequest,
     res: Response,
@@ -144,7 +146,9 @@ export class IpfsClient implements IClient {
         userId,
       }),
     );
-    const res = await this.#pinSvcAxios.get(`/pins?limit=1000&meta=${metaQuery}`);
+    const res = await this.#pinSvcAxios.get(
+      `/pins?limit=1000&meta=${metaQuery}`,
+    );
     const pins: PinningResponse = res.data;
     return pins.results || [];
   }
@@ -241,7 +245,8 @@ export class IpfsClient implements IClient {
       const fileBuffer = Buffer.from(result.data);
       const parsed = JSON.parse(fileBuffer.toString("utf-8"));
       const userName =
-        typeof parsed?.userName === "string" && parsed.userName.trim().length > 0
+        typeof parsed?.userName === "string" &&
+        parsed.userName.trim().length > 0
           ? parsed.userName
           : "UNKNOWN";
 
@@ -457,7 +462,6 @@ export class IpfsClient implements IClient {
       const res = await this.#pinSvcAxios.get(
         `/pins?limit=1000&meta={"type":"document","docId":"${docId}"}`,
       );
-
       const docs = res.data.results.map((r: DocumentPinRequest) =>
         this.#transformPinToDocument(r.pin),
       );
@@ -1403,7 +1407,10 @@ export class IpfsClient implements IClient {
         creatorNodeId: pin.meta.creatorNodeId || pin.meta.creator_id || "",
         creatorUserId: pin.meta.creatorUserId || "",
         creatorName:
-          pin.meta.creatorName || pin.meta.creator_name || pin.meta.creator || "",
+          pin.meta.creatorName ||
+          pin.meta.creator_name ||
+          pin.meta.creator ||
+          "",
         created_at: pin.meta.created_at,
         type: "workspace",
         workspace_uuid: pin.meta.workspace_uuid,
@@ -1510,7 +1517,10 @@ export class IpfsClient implements IClient {
         creatorNodeId: pin.meta.creatorNodeId || "",
         creatorUserId: pin.meta.creatorUserId || "",
         creatorName:
-          pin.meta.creatorName || pin.meta.creator_name || pin.meta.creator || "",
+          pin.meta.creatorName ||
+          pin.meta.creator_name ||
+          pin.meta.creator ||
+          "",
         creatorType: pin.meta.creatorType || "user",
       },
     };
@@ -1621,6 +1631,195 @@ export class IpfsClient implements IClient {
     } catch (error) {
       logger.error(`Error creating language:`, error);
       throw error;
+    }
+  }
+
+  // === Permission Events ===
+  async createPermissionEvent(
+    event: EventModel,
+    reciever: string,
+  ): Promise<void> {
+    try {
+      const encodedEventId = encodeURIComponent(event.id);
+      const encodedReciever = encodeURIComponent(reciever);
+      const filename = `permissions/${encodedReciever}/${encodedEventId}`;
+      const form = new FormData();
+      form.append("file", JSON.stringify({ event, reciever }), {
+        filename: filename,
+        contentType: "application/json",
+      });
+      await this.#clusterAxios.post(
+        `/add?stream-channels=false&name=${filename}&meta-eventId=${encodedEventId}&meta-reciever=${encodedReciever}&meta-type=permission`,
+        form,
+        {
+          headers: {
+            ...form.getHeaders(),
+          },
+          timeout: 30000,
+          maxContentLength: Infinity,
+        },
+      );
+      logger.debug(`created Permission-Event: ${filename}`);
+    } catch (error) {
+      logger.error("Error creating permission:", error);
+      throw error;
+    }
+  }
+
+  async getPermissionEventPinsForReciever(reciever: string): Promise<Pin[]> {
+    try {
+      const encodedReciever = encodeURIComponent(reciever);
+      const response = await this.#pinSvcAxios.get(
+        `/pins?limit=${maxNumberOfFetchedPins}&meta={"type":"permission","reciever":"${encodedReciever}"}`,
+      );
+      const pins: Pin[] = (response.data?.results ?? []).map(
+        (element: { pin: Pin }) => element.pin,
+      );
+      return pins;
+    } catch (error) {
+      logger.error("Error getting event data:", error);
+      return [];
+    }
+  }
+
+  async getPermissionEvents(pins: Pin[]): Promise<EventModel[]> {
+    const events = await Promise.all(
+      pins.map(async (pin) => {
+        try {
+          const response = await this.#gatewayAxios.get(`/ipfs/${pin.cid}`, {
+            responseType: "arraybuffer",
+          });
+
+          const json = Buffer.from(response.data).toString("utf-8");
+          const parsed = JSON.parse(json) as {
+            reciever: string;
+            event: EventModel;
+          };
+          parsed.event.date = new Date(parsed.event.date);
+          return parsed.event;
+        } catch (error) {
+          logger.error(
+            `Error fetching event ${pin.name} data with CID ${pin.cid}:`,
+            error,
+          );
+          return null;
+        }
+      }),
+    );
+    return events.filter((e): e is EventModel => e !== null);
+  }
+
+  async deletePermission(email: string, eventId: string): Promise<boolean> {
+    const normalizedEmail = email.trim().toLowerCase();
+    const encodedEmail = encodeURIComponent(normalizedEmail);
+    const encodedEventId = encodeURIComponent(eventId);
+    const filepath = `permissions/${encodedEmail}/${encodedEventId}`;
+
+    try {
+      const res = await this.#pinSvcAxios.get(
+        `/pins?limit=1&name=${filepath}&meta={"type":"permission","email":"${encodedEmail}"}`,
+      );
+      const pins: Pin[] = (res.data?.results ?? []).map(
+        (element: { pin: Pin }) => element.pin,
+      );
+      if (pins.length !== 1) {
+        logger.error(
+          `Error deleting permission-event ${eventId}: expected 1 pin, found ${pins.length}`,
+        );
+        return false;
+      }
+      await this.#clusterAxios.delete(`/pins/${pins[0].cid}`);
+      return true;
+    } catch (error) {
+      logger.error(`Error deleting permission-event ${eventId}:`, error);
+      return false;
+    }
+  }
+
+  // === event ===
+  async createEvent(event: EventModel): Promise<void> {
+    try {
+      const json = JSON.stringify(event, null);
+      const eventId = encodeURIComponent(event.id);
+
+      const form = new FormData();
+      form.append("file", json, {
+        filename: `${eventId}.json`,
+        contentType: "application/json",
+      });
+
+      await this.#clusterAxios.post(
+        `/add?stream-channels=false&name=${eventId}&meta-type=event`,
+        form,
+        {
+          headers: {
+            ...form.getHeaders(),
+          },
+          timeout: 30000,
+          maxContentLength: Infinity,
+        },
+      );
+    } catch (error) {
+      logger.error("Error creating event:", error);
+      throw error;
+    }
+  }
+
+  async getEvents(exclude?: string[]): Promise<EventModel[]> {
+    try {
+      // TODO FIXME what if maxNumberOfFetchedPins is less than total number of events?
+      const res = await this.#pinSvcAxios.get(
+        `/pins?limit=${maxNumberOfFetchedPins}&meta={"type":"event"}`,
+      );
+      const pins: Pin[] = (res.data?.results ?? []).map(
+        (element: { pin: Pin }) => element.pin,
+      );
+      const onlyNewPins = pins.filter((pin) => !exclude?.includes(pin.name));
+
+      const events = await Promise.all(
+        onlyNewPins.map(async (pin) => {
+          try {
+            const response = await this.#gatewayAxios.get(`/ipfs/${pin.cid}`, {
+              responseType: "arraybuffer",
+            });
+
+            const json = Buffer.from(response.data).toString("utf-8");
+            return JSON.parse(json) as EventModel;
+          } catch (error) {
+            logger.error(
+              `Error fetching event ${pin.name} data with CID ${pin.cid}:`,
+              error,
+            );
+            return null;
+          }
+        }),
+      );
+      return events.filter((e): e is EventModel => e !== null);
+    } catch (error) {
+      logger.error("Error getting event data:", error);
+      return [];
+    }
+  }
+
+  async deleteEvent(eventId: string): Promise<boolean> {
+    try {
+      const res = await this.#pinSvcAxios.get(
+        `/pins?limit=1&name=${encodeURIComponent(eventId)}&meta={"type":"event"}`,
+      );
+      const pins: Pin[] = (res.data?.results ?? []).map(
+        (element: { pin: Pin }) => element.pin,
+      );
+      if (pins.length !== 1) {
+        logger.error(
+          `Error deleting event ${eventId}: expected 1 pin, found ${pins.length}`,
+        );
+        return false;
+      }
+      await this.#clusterAxios.delete(`/pins/${pins[0].cid}`);
+      return true;
+    } catch (error) {
+      logger.error(`Error deleting event ${eventId}:`, error);
+      return false;
     }
   }
 }

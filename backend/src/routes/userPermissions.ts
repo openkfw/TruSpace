@@ -5,12 +5,14 @@ import {
   findPermissionByIdDb,
   findUsersInWorkspaceDb,
   removePermissionDb,
+  UserPermissionDto,
 } from "../clients/db";
 import { IpfsClient } from "../clients/ipfs-client";
 import validate from "../middlewares/validate";
 import { AuthenticatedRequest } from "../types";
 import { USER_PERMISSION_STATUS } from "../utility/constants";
 import { sendNotification } from "../mailing/notifications";
+import { EventHandler } from "../handlers/events";
 
 const router = express.Router();
 
@@ -41,18 +43,23 @@ router.post(
           message: "Adding user to workspace failed, workspace is public",
         });
       }
-      await createPermissionDb({
+
+      const eventId = await EventHandler.generateEventId();
+      const permission: UserPermissionDto = {
         workspaceId,
         email,
         role: "admin",
         status: USER_PERMISSION_STATUS.active,
-      });
-      // Notify the user about the workspace assignement
+        lastEventId: eventId,
+      };
+      await createPermissionDb(permission);
+      await EventHandler.userPermissionPost(workspaceId, eventId);
+
       sendNotification(
         email,
         "addedToWorkspace",
         `/workspace/${workspaceId}`,
-        workspaces[0].meta.name
+        workspaces[0].meta.name,
       );
       res.json({
         status: "success",
@@ -65,7 +72,7 @@ router.post(
         message: "Adding user to workspace failed",
       });
     }
-  }
+  },
 );
 
 router.get(
@@ -81,7 +88,7 @@ router.get(
         message: "Getting workspace permissions failed",
       });
     }
-  }
+  },
 );
 
 router.delete(
@@ -96,17 +103,21 @@ router.delete(
           message: "Permission not found",
         });
       }
+      await EventHandler.userInWorkspaceRemove(
+        permission.workspace_id,
+        permission.user_email,
+      );
       await removePermissionDb(permissionId);
 
-      const client = new IpfsClient();
-      const workspaces = await client.getWorkspaceById(permission.workspace_id);
+      // TODO We need a ney notification implementation similiar to the events
       // Notify the user about the workspace assignement
-      sendNotification(
-        permission.user_email,
-        "removedFromWorkspace",
-        "/",
-        workspaces[0].meta.name
-      );
+      // const workspaces = await client.getWorkspaceById(permission.workspace_id);
+      // sendNotification(
+      //   permission.user_email,
+      //   "removedFromWorkspace",
+      //   "/",
+      //   workspaces[0].meta.name,
+      // );
       res.json();
     } catch (error) {
       console.error("Removing permissions error:", error);
@@ -115,7 +126,7 @@ router.delete(
         message: "Removing workspace permissions failed",
       });
     }
-  }
+  },
 );
 
 export default router;

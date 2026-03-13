@@ -22,17 +22,19 @@ import { WorkspaceRequest } from "../types/interfaces/index";
 import { USER_PERMISSION_STATUS } from "../utility/constants";
 import { getUserSettings } from "../utility/user";
 import { sendNotification } from "../mailing/notifications";
+import { EventHandler } from "../handlers/events";
 
 const router = express.Router();
 
 /* GET /api/workspaces */
 router.get("/", async (req: AuthenticatedRequest, res: Response) => {
   const allWorkspaces = await new IpfsClient().getAllWorkspaces();
+  await EventHandler.readPermissionEvents(req.user?.email as string);
   const allowedWs = (
     await findPermissionsByEmailDb(req.user?.email as string)
   ).map((p) => p.workspace_id);
   const result = allWorkspaces.filter(
-    (ws) => allowedWs.includes(ws.uuid) || ws.meta.is_public
+    (ws) => allowedWs.includes(ws.uuid) || ws.meta.is_public,
   );
   res.json(result);
 });
@@ -52,7 +54,7 @@ router.get(
         message: "Failed to fetch workspace contributors",
       });
     }
-  }
+  },
 );
 
 /* POST /api/workspaces */
@@ -106,12 +108,12 @@ router.post(
     });
     await createWorkspacePasswordDb(
       workspaceId,
-      await encrypt(password, config.masterPassword)
+      await encrypt(password, config.masterPassword),
     );
 
     const result = await client.createWorkspace(workspaceReq);
     res.json(result);
-  }
+  },
 );
 
 router.delete("/:wCID/:wUID", async (req: Request, res: Response) => {
@@ -121,6 +123,7 @@ router.delete("/:wCID/:wUID", async (req: Request, res: Response) => {
   try {
     await client.deleteWorkspaceById(wCID, wUID);
     await removePermissionsForWorkspaceDb(wUID);
+    await EventHandler.removePermissionsForWorkspace(wUID);
     res.status(200).send({ message: "Workspace deleted successfully" });
   } catch (error: any) {
     if (axios.isAxiosError(error) && error.response?.status === 404) {
@@ -149,7 +152,7 @@ router.put(
       if (isPublic === false) {
         const currentPermissions = await findUsersInWorkspaceDb(wUID);
         const currentUserPermissions = currentPermissions.find(
-          (perm) => perm.email === req.user?.email
+          (perm) => perm.email === req.user?.email,
         );
 
         // Only create permission if it doesn't exist
@@ -176,7 +179,7 @@ router.put(
               email,
               "workspaceChange",
               `/workspace/${wUID}`,
-              `${workspaceDetails[0].meta.name}`
+              `${workspaceDetails[0].meta.name}`,
             );
           }
         });
@@ -193,7 +196,7 @@ router.put(
         res.status(500).send({ message: "Internal Server Error" });
       }
     }
-  }
+  },
 );
 
 export default router;
