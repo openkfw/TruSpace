@@ -31,6 +31,7 @@
     "express-validator": "^7.2.1",
     "handlebars": "^4.7.8",
     "helmet": "^8.1.0",
+    "lusca": "^1.7.0",
     "http-errors": "~1.6.3",
     "joi": "^17.13.3",
     "js-yaml": "^4.1.0",
