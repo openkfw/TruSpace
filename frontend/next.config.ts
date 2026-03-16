@@ -14,9 +14,6 @@ function getCommitHash() {
 }
 
 const nextConfig: NextConfig = {
-   devIndicators: {
-      appIsrStatus: false
-   },
    experimental: {
       turbo: {
          resolveAlias: {
