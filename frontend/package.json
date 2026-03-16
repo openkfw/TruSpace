@@ -67,11 +67,11 @@
       "react-pdf": "^9.2.1",
       "react-toastify": "^11.0.5",
       "recharts": "^2.15.1",
-      "swr": "^2.3.2",
+      "swr": "2.3.2",
       "tailwind-merge": "^2.6.0",
       "tailwindcss-animate": "^1.0.7",
       "tippy.js": "^6.3.7",
-      "tiptap-extension-resize-image": "^1.2.1",
+      "tiptap-extension-resize-image": "1.2.1",
       "tldts": "^6.1.85",
       "turndown": "^7.2.0",
       "validator": "^13.15.0"
