@@ -96,7 +96,25 @@ app.use(
   })
 );
 
-app.use(lusca.csrf());
+const csrfProtection = lusca.csrf();
+
+// FOR NOW: pragmatic solution to exclude auth routes from CSRF protection, since they don't have a session yet
+// FUTURE: consider implementing a more robust solution, e.g. using separate CSRF tokens for auth routes or rethinking the auth flow to establish a session earlier
+// For this, we could build a dedicated csrf endpoint /api/csrf-token that generates a CSRF token and sets the cookie, which clients can call before accessing protected routes. This way, we can keep all routes protected by CSRF while still allowing auth routes to function properly.
+app.use((req, res, next) => {
+  const isPublicAuthRoute =
+    req.path === "/api/users/login" ||
+    req.path === "/api/users/register" ||
+    req.path === "/api/users/forgot-password" ||
+    req.path === "/api/users/reset-password" ||
+    req.path === "/api/users/confirm-registration";
+
+  if (isPublicAuthRoute) {
+    return next();
+  }
+
+  return csrfProtection(req, res, next);
+});
 
 app.use((req, res, next) => {
   if (req.csrfToken) {
