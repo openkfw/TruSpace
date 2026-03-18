@@ -42,7 +42,6 @@ import {
   removeTokensOfUserDb,
 } from "../clients/db/resetPasswordTokens";
 import { getUserSettings } from "../utility/user";
-import { EventHandler } from "../handlers/events";
 
 const router = express.Router();
 logger.info("Registering user");
@@ -265,7 +264,6 @@ router.post(
         path: "/",
       });
 
-      EventHandler.readPermissionEvents(user.email);
       if (user.uiid && nodeId) {
         try {
           const userData = await new IpfsClient().getUserData(

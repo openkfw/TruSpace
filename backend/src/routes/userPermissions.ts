@@ -1,20 +1,21 @@
 import express, { Response } from "express";
 import { body } from "express-validator";
-import {
-  createPermissionDb,
-  findPermissionByIdDb,
-  findUsersInWorkspaceDb,
-  removePermissionDb,
-  UserPermissionDto,
-} from "../clients/db";
+
 import { IpfsClient } from "../clients/ipfs-client";
 import validate from "../middlewares/validate";
 import { AuthenticatedRequest } from "../types";
 import { USER_PERMISSION_STATUS } from "../utility/constants";
 import { sendNotification } from "../mailing/notifications";
-import { EventHandler } from "../handlers/events";
+import {
+  createPermission,
+  findPermissionById,
+  findUsersInWorkspace,
+  removePermission,
+  UserPermissionDto,
+} from "../handlers/userPermissions";
 
 const router = express.Router();
+const client = new IpfsClient();
 
 /* POST /api/permissions */
 router.post(
@@ -44,16 +45,13 @@ router.post(
         });
       }
 
-      const eventId = await EventHandler.generateEventId();
       const permission: UserPermissionDto = {
         workspaceId,
         email,
         role: "admin",
         status: USER_PERMISSION_STATUS.active,
-        lastEventId: eventId,
       };
-      await createPermissionDb(permission);
-      await EventHandler.userPermissionPost(workspaceId, eventId);
+      await createPermission(permission);
 
       sendNotification(
         email,
@@ -79,7 +77,7 @@ router.get(
   "/users-in-workspace/:workspaceId",
   async (req: AuthenticatedRequest, res: Response) => {
     try {
-      const results = await findUsersInWorkspaceDb(req.params.workspaceId);
+      const results = await findUsersInWorkspace(req.params.workspaceId);
       res.json(results);
     } catch (error) {
       console.error("Getting permissions error:", error);
@@ -96,28 +94,23 @@ router.delete(
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       const { permissionId } = req.params;
-      const permission = await findPermissionByIdDb(permissionId);
+      const permission = await findPermissionById(permissionId);
       if (!permission) {
         return res.status(404).json({
           status: "failure",
           message: "Permission not found",
         });
       }
-      await EventHandler.userInWorkspaceRemove(
-        permission.workspace_id,
-        permission.user_email,
-      );
-      await removePermissionDb(permissionId);
+      await removePermission(permissionId);
 
-      // TODO We need a ney notification implementation similiar to the events
       // Notify the user about the workspace assignement
-      // const workspaces = await client.getWorkspaceById(permission.workspace_id);
-      // sendNotification(
-      //   permission.user_email,
-      //   "removedFromWorkspace",
-      //   "/",
-      //   workspaces[0].meta.name,
-      // );
+      const workspaces = await client.getWorkspaceById(permission.workspaceId);
+      sendNotification(
+        permission.email,
+        "removedFromWorkspace",
+        "/",
+        workspaces[0].meta.name,
+      );
       res.json();
     } catch (error) {
       console.error("Removing permissions error:", error);

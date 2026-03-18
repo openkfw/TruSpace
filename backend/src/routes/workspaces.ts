@@ -4,13 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import { Request } from "express";
 import { body, param } from "express-validator";
-import {
-  createPermissionDb,
-  createWorkspacePasswordDb,
-  findPermissionsByEmailDb,
-  findUsersInWorkspaceDb,
-  removePermissionsForWorkspaceDb,
-} from "../clients/db";
+import { createWorkspacePasswordDb } from "../clients/db";
 import { IpfsClient } from "../clients/ipfs-client";
 import { config } from "../config/config";
 import logger from "../config/winston";
@@ -22,17 +16,21 @@ import { WorkspaceRequest } from "../types/interfaces/index";
 import { USER_PERMISSION_STATUS } from "../utility/constants";
 import { getUserSettings } from "../utility/user";
 import { sendNotification } from "../mailing/notifications";
-import { EventHandler } from "../handlers/events";
+import {
+  createPermission,
+  findPermissionsByEmail,
+  findUsersInWorkspace,
+  removePermissionsForWorkspace,
+} from "../handlers/userPermissions";
 
 const router = express.Router();
 
 /* GET /api/workspaces */
 router.get("/", async (req: AuthenticatedRequest, res: Response) => {
   const allWorkspaces = await new IpfsClient().getAllWorkspaces();
-  await EventHandler.readPermissionEvents(req.user?.email as string);
   const allowedWs = (
-    await findPermissionsByEmailDb(req.user?.email as string)
-  ).map((p) => p.workspace_id);
+    await findPermissionsByEmail(req.user?.email as string)
+  ).map((p) => p.workspaceId);
   const result = allWorkspaces.filter(
     (ws) => allowedWs.includes(ws.uuid) || ws.meta.is_public,
   );
@@ -100,7 +98,7 @@ router.post(
     };
 
     // TODO transaction
-    await createPermissionDb({
+    await createPermission({
       workspaceId,
       email: req.user?.email as string,
       role: "owner",
@@ -121,9 +119,8 @@ router.delete("/:wCID/:wUID", async (req: Request, res: Response) => {
   const wUID = req.params.wUID;
   const client = new IpfsClient();
   try {
+    await removePermissionsForWorkspace(wUID);
     await client.deleteWorkspaceById(wCID, wUID);
-    await removePermissionsForWorkspaceDb(wUID);
-    await EventHandler.removePermissionsForWorkspace(wUID);
     res.status(200).send({ message: "Workspace deleted successfully" });
   } catch (error: any) {
     if (axios.isAxiosError(error) && error.response?.status === 404) {
@@ -150,14 +147,14 @@ router.put(
     try {
       await client.updateWorkspaceType(wUID, isPublic);
       if (isPublic === false) {
-        const currentPermissions = await findUsersInWorkspaceDb(wUID);
+        const currentPermissions = await findUsersInWorkspace(wUID);
         const currentUserPermissions = currentPermissions.find(
           (perm) => perm.email === req.user?.email,
         );
 
         // Only create permission if it doesn't exist
         if (!currentUserPermissions) {
-          await createPermissionDb({
+          await createPermission({
             workspaceId: wUID,
             email: req.user?.email as string,
             role: "owner",
@@ -165,7 +162,7 @@ router.put(
           });
         }
       } else {
-        const usersInWs = await findUsersInWorkspaceDb(wUID);
+        const usersInWs = await findUsersInWorkspace(wUID);
         const workspaceDetails = await client.getWorkspaceById(wUID);
         usersInWs.forEach(async (user) => {
           const { email } = user;
@@ -183,7 +180,7 @@ router.put(
             );
           }
         });
-        await removePermissionsForWorkspaceDb(wUID);
+        await removePermissionsForWorkspace(wUID);
       }
 
       res.status(200).send({ message: "Workspace updated successfully" });
