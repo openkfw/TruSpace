@@ -29,7 +29,7 @@ const withCsrf = (options: RequestInit): RequestInit => {
       return options;
    }
    const headers = new Headers(options.headers || {});
-   headers.set("X-XSRF-Token", token);
+   headers.set("X-CSRF-Token", token);
    return { ...options, headers };
 };
 
