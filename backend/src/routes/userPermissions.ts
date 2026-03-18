@@ -15,7 +15,6 @@ import {
 } from "../handlers/userPermissions";
 
 const router = express.Router();
-const client = new IpfsClient();
 
 /* POST /api/permissions */
 router.post(
@@ -104,6 +103,7 @@ router.delete(
       await removePermission(permissionId);
 
       // Notify the user about the workspace assignement
+      const client = new IpfsClient();
       const workspaces = await client.getWorkspaceById(permission.workspaceId);
       sendNotification(
         permission.email,
