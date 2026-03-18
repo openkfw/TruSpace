@@ -1655,7 +1655,7 @@ export class IpfsClient implements IClient {
       }
 
       await this.#clusterAxios.post(
-        `/add?stream-channels=false&name=${filename}&meta-type=permission${encodeURIComponent(metadataQuery)}`,
+        `/add?stream-channels=false&name=${filename}&meta-type=permission${metadataQuery}`,
         form,
         {
           headers: {
@@ -1682,7 +1682,7 @@ export class IpfsClient implements IClient {
       const response = await this.#pinSvcAxios.get(
         `/pins?limit=${maxNumberOfFetchedPins}&meta={"type":"permission","${key}":"${encodedValue}"}`,
       );
-      const result: UserPermissionDto[] = (response.data?.results ?? []).map(
+      const results: UserPermissionDto[] = (response.data?.results ?? []).map(
         (element: { pin: Pin }) => ({
           id: element.pin.meta.id,
           workspaceId: element.pin.meta.workspaceId,
@@ -1693,7 +1693,19 @@ export class IpfsClient implements IClient {
           updated_at: element.pin.meta.updated_at,
         }),
       );
-      return result;
+      console.log(
+        JSON.stringify(
+          {
+            fetch: `/pins?limit=${maxNumberOfFetchedPins}&meta={"type":"permission","${key}":"${encodedValue}"}`,
+            key,
+            value,
+            results,
+          },
+          null,
+          2,
+        ),
+      );
+      return results;
     } catch (error) {
       logger.error("Error getting event data:", error);
       return [];
