@@ -11,10 +11,9 @@ export interface UserPermissionDto {
   updated_at?: Date;
 }
 
-const client = new IpfsClient();
-
 export const createPermission = async (permission: UserPermissionDto) => {
   try {
+    const client = new IpfsClient();
     const permissionId = await client.createPermission(permission);
     logger.info(
       `Permission created with ID: ${permissionId} for email: ${permission.email} in workspace: ${permission.workspaceId}`,
@@ -28,6 +27,7 @@ export const createPermission = async (permission: UserPermissionDto) => {
 
 export const findPermissionsByEmail = async (email: string) => {
   try {
+    const client = new IpfsClient();
     const permissions = await client.findPermissionsByKey("email", email);
     logger.info(`Found ${permissions.length} permissions for email: ${email}`);
     return permissions;
@@ -39,6 +39,7 @@ export const findPermissionsByEmail = async (email: string) => {
 
 export const findUsersInWorkspace = async (workspaceId: string) => {
   try {
+    const client = new IpfsClient();
     const permissions = await client.findPermissionsByKey(
       "workspaceId",
       workspaceId,
@@ -57,6 +58,7 @@ export const findUsersInWorkspace = async (workspaceId: string) => {
 
 export const findPermissionById = async (permissionId: string) => {
   try {
+    const client = new IpfsClient();
     const permissions = await client.findPermissionsByKey("id", permissionId);
     logger.info(
       `Found ${permissions.length} permissions for ID: ${permissionId}`,
@@ -73,6 +75,7 @@ export const findPermissionById = async (permissionId: string) => {
 
 export const removePermission = async (permissionId: string) => {
   try {
+    const client = new IpfsClient();
     const result = await client.deletePermission(permissionId);
     logger.info(`Permission deleted [${result}] with ID: ${permissionId}`);
     return result;
@@ -84,6 +87,7 @@ export const removePermission = async (permissionId: string) => {
 
 export const removePermissionsForWorkspace = async (workspaceId: string) => {
   try {
+    const client = new IpfsClient();
     const result = await client.deletePermissionForWorkspace(workspaceId);
     logger.info(
       `Deleted [${result}] Permissions for workspace: ${workspaceId}`,
