@@ -7,6 +7,32 @@ const fetcher = (url) =>
       credentials: "include"
    }).then((res) => res.json());
 
+const CSRF_COOKIE_NAME = "XSRF-TOKEN";
+
+const getCsrfToken = (): string | null => {
+   if (typeof document === "undefined") {
+      return null;
+   }
+   const match = document.cookie.match(
+      new RegExp(`(?:^|; )${CSRF_COOKIE_NAME}=([^;]*)`)
+   );
+   return match ? decodeURIComponent(match[1]) : null;
+};
+
+const withCsrf = (options: RequestInit): RequestInit => {
+   const method = (options.method || "GET").toUpperCase();
+   if (method === "GET" || method === "HEAD" || method === "OPTIONS") {
+      return options;
+   }
+   const token = getCsrfToken();
+   if (!token) {
+      return options;
+   }
+   const headers = new Headers(options.headers || {});
+   headers.set("X-CSRF-Token", token);
+   return { ...options, headers };
+};
+
 export const getApiUrl = (): string => {
    return process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 };
@@ -100,7 +126,7 @@ export const documentUpload = async (formData, docId, _errorText) => {
       body: formData,
       credentials: "include"
    };
-   const res = await fetch(url, options);
+   const res = await fetch(url, withCsrf(options));
    if (res.status === 413 || res.statusText === "Payload Too Large") {
       throw new Error("Payload Too Large");
    }
@@ -114,7 +140,7 @@ export const deleteDocument = async (docId: string, errorText) => {
       method: "DELETE",
       credentials: "include"
    };
-   const response = await fetch(url, options);
+   const response = await fetch(url, withCsrf(options));
    if (!response.ok) {
       throw new Error(errorText);
    }
@@ -139,7 +165,7 @@ export const createWorkspace = async (formData, errorText) => {
       },
       credentials: "include"
    };
-   const res = await fetch(WORKSPACES_ENDPOINT, options);
+   const res = await fetch(WORKSPACES_ENDPOINT, withCsrf(options));
    if (res.status === 409) {
       return res;
    } else if (!res.ok) {
@@ -161,7 +187,7 @@ export const updateWorkspaceType = async (
       },
       credentials: "include"
    };
-   const res = await fetch(`${WORKSPACES_ENDPOINT}/${wUID}`, options);
+   const res = await fetch(`${WORKSPACES_ENDPOINT}/${wUID}`, withCsrf(options));
    if (!res.ok) {
       throw new Error(errorText);
    }
@@ -191,7 +217,7 @@ export const deleteWorkspace = async (
       method: "DELETE",
       credentials: "include"
    };
-   const response = await fetch(url, options);
+   const response = await fetch(url, withCsrf(options));
    if (!response.ok) {
       throw new Error(errorText);
    }
@@ -206,7 +232,7 @@ export const createPerspective = async (formData, errorText) => {
       body: formData,
       credentials: "include"
    };
-   const response = await fetch(url, options);
+   const response = await fetch(url, withCsrf(options));
    if (!response.ok) {
       throw new Error(errorText);
    }
@@ -221,7 +247,7 @@ export const customPerspective = async (formData, errorText) => {
       body: formData,
       credentials: "include"
    };
-   const response = await fetch(url, options);
+   const response = await fetch(url, withCsrf(options));
    if (!response.ok) {
       throw new Error(errorText);
    }
@@ -242,8 +268,8 @@ export const usePerspectives = (cid: string) => {
             name: perspective.meta.perspectiveType,
             text: perspective.meta.data,
             creatorType: perspective.meta.creatorType,
-            creator: perspective.meta.creator,
-            creatorUiid: perspective.meta.creatorUiid,
+            creatorName: perspective.meta.creatorName,
+            creatorUserId: perspective.meta.creatorUserId,
             model: perspective.meta.model,
             prompt: perspective.meta.prompt,
             timestamp: perspective.meta.timestamp
@@ -372,7 +398,7 @@ export const postChat = async (formData, errorText) => {
       body: formData,
       credentials: "include"
    };
-   const res = await fetch(url, options);
+   const res = await fetch(url, withCsrf(options));
    if (!res.ok) {
       throw new Error(errorText);
    }
@@ -410,7 +436,7 @@ export const postTag = async (formData, cid: string) => {
       }),
       credentials: "include"
    };
-   const response = await fetch(url, options);
+   const response = await fetch(url, withCsrf(options));
    if (!response.ok) {
       throw new Error("Failed to add tag");
    }
@@ -424,7 +450,7 @@ export const deleteTag = async (tagId: string) => {
       method: "DELETE",
       credentials: "include"
    };
-   const response = await fetch(url, options);
+   const response = await fetch(url, withCsrf(options));
    if (!response.ok) {
       throw new Error("Failed to delete tag");
    }
@@ -477,7 +503,7 @@ export const registerUser = async (data: Record<string, string>) => {
       }),
       credentials: "include"
    };
-   const response = await fetch(url, options);
+   const response = await fetch(url, withCsrf(options));
    const result = await response.json();
    return result;
 };
@@ -495,7 +521,7 @@ export const loginUser = async (data: Record<string, string>) => {
       }),
       credentials: "include"
    };
-   const response = await fetch(url, options);
+   const response = await fetch(url, withCsrf(options));
    const result = await response.json();
    return result;
 };
@@ -522,7 +548,7 @@ export const postPermission = async (formData: {
       }),
       credentials: "include"
    };
-   const response = await fetch(PERMISSIONS_ENDPOINT, options);
+   const response = await fetch(PERMISSIONS_ENDPOINT, withCsrf(options));
    if (!response.ok) {
       throw new Error("Failed to add user to the workspace");
    }
@@ -556,7 +582,7 @@ export const deleteUserPermission = async (permissionId: number) => {
       },
       credentials: "include"
    };
-   const response = await fetch(url, options);
+   const response = await fetch(url, withCsrf(options));
    if (!response.ok) {
       throw new Error("Failed to remove user from the workspace");
    }
@@ -637,10 +663,13 @@ export const logout = async (): Promise<{
    message: string;
 }> => {
    try {
-      const response = await fetch(`${USERS_ENDPOINT}/logout`, {
-         method: "POST",
-         credentials: "include"
-      });
+      const response = await fetch(
+         `${USERS_ENDPOINT}/logout`,
+         withCsrf({
+            method: "POST",
+            credentials: "include"
+         })
+      );
 
       if (!response.ok) {
          throw new Error("Failed to log out");
@@ -673,9 +702,10 @@ export const confirmRegistration = async (
          body: JSON.stringify({
             lang: formData.lang,
             confirmationLink: formData.confirmationLink
-         })
+         }),
+         credentials: "include"
       };
-      const response = await fetch(url, options);
+      const response = await fetch(url, withCsrf(options));
 
       return await response.json();
    } catch (error) {
@@ -686,11 +716,14 @@ export const confirmRegistration = async (
 
 export const updateUserSettings = async (formData: FormData) => {
    try {
-      const res = await fetch(`${USERS_ENDPOINT}/user-settings`, {
-         method: "POST",
-         credentials: "include",
-         body: formData
-      });
+      const res = await fetch(
+         `${USERS_ENDPOINT}/user-settings`,
+         withCsrf({
+            method: "POST",
+            credentials: "include",
+            body: formData
+         })
+      );
 
       if (!res.ok) {
          throw new Error("Failed to update user settings");
@@ -700,6 +733,31 @@ export const updateUserSettings = async (formData: FormData) => {
       console.error("Error updating user settings:", error);
       throw error;
    }
+};
+
+export const updateUserName = async (name: string) => {
+    try {
+        const res = await fetch(
+            `${USERS_ENDPOINT}/reset-name`,
+            withCsrf({
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ name })
+            })
+        );
+
+        if (!res.ok) {
+            throw new Error("Failed to update user name");
+        }
+        return res.json();
+    }
+    catch (error) {
+        console.error("Error updating user name:", error);
+        throw error;
+    }
 };
 
 export const downloadAvatar = async () => {
@@ -759,9 +817,10 @@ export const forgotPassword = async (data: Record<string, string>) => {
          email: data.email,
          resetPasswordLink: data.resetPasswordLink,
          lang: data.lang
-      })
+      }),
+      credentials: "include"
    };
-   const response = await fetch(url, options);
+   const response = await fetch(url, withCsrf(options));
    const result = await response.json();
    return result;
 };
@@ -776,9 +835,10 @@ export const resetPassword = async (data: Record<string, string>) => {
       body: JSON.stringify({
          password: data.password,
          token: data.token
-      })
+      }),
+      credentials: "include"
    };
-   const response = await fetch(url, options);
+   const response = await fetch(url, withCsrf(options));
    const result = await response.json();
    return result;
 };

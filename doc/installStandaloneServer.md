@@ -4,14 +4,13 @@ Starting from an empty Ubuntu VM, follow these detailed steps. In case a chapter
 
 ## Setup basic infrastructure
 
-- Setup the DNS records to reflect the domain (e.g. `EXAMPLE.COM`) together with API endpoint (e.g. `api.EXAMPLE.COM` and Open Web UI endpoint (e.g. `oi.EXAMPLE.COM`) to the respective IP address of the server. Your IP address can be found using:
+- Setup the DNS records to reflect the domain (e.g. `EXAMPLE.COM`) together with API endpoint (e.g. `EXAMPLE.COM/api` and Open Web UI endpoint (e.g. `oi.EXAMPLE.COM`) to the respective IP address of the server. Your IP address can be found using:
 
 ```bash
    curl ifconfig.me
 ```
 
 - Open the firewall ports:
-
   - 22 inbound for SSH connection, if needed
   - 80 inbound for http communication for certbot to issue an https certificate
   - 443 inbound for https communication
@@ -71,6 +70,12 @@ sudo nano /etc/nginx/sites-available/EXAMPLE.COM
 server {
     listen 80;
     server_name EXAMPLE.COM;
+    client_max_body_size 100M;
+
+    location /api {
+        proxy_pass http://localhost:8000;
+    }
+
     location / {
         proxy_pass http://localhost:3000;
     }
@@ -84,14 +89,6 @@ server {
     }
 }
 
-server {
-    listen 80;
-    server_name api.EXAMPLE.COM;
-    client_max_body_size 100M;
-    location / {
-        proxy_pass http://localhost:8000;
-    }
-}
 ```
 
 - Test the nginx configuration file using
@@ -122,14 +119,14 @@ nginx: configuration file /etc/nginx/nginx.conf test is successful
 - To get certificates from LetsEncrypt, use certbot. Certbot will automatically edit your `nginx` config to include HTTPS.
 
 ```bash
-sudo certbot --nginx -d EXAMPLE.COM -d oi.EXAMPLE.COM -d api.EXAMPLE.COM
+sudo certbot --nginx -d EXAMPLE.COM -d oi.EXAMPLE.COM
 ```
 
 Expected result:
 
 ```bash
 Saving debug log to /var/log/letsencrypt/letsencrypt.log
-Requesting a certificate for EXAMPLE.COM and 2 more domains
+Requesting a certificate for EXAMPLE.COM and 1 more domain
 
 Successfully received certificate.
 Certificate is saved at: /etc/letsencrypt/live/EXAMPLE.COM/fullchain.pem
@@ -141,8 +138,7 @@ Certbot has set up a scheduled task to automatically renew this certificate in t
 Deploying certificate
 Successfully deployed certificate for EXAMPLE.COM to /etc/nginx/sites-enabled/EXAMPLE.COM
 Successfully deployed certificate for oi.EXAMPLE.COM to /etc/nginx/sites-enabled/EXAMPLE.COM
-Successfully deployed certificate for api.EXAMPLE.COM to /etc/nginx/sites-enabled/EXAMPLE.COM
-Congratulations! You have successfully enabled HTTPS on https://EXAMPLE.COM, https://oi.EXAMPLE.COM, and https://api.EXAMPLE.COM
+Congratulations! You have successfully enabled HTTPS on https://EXAMPLE.COM and https://oi.EXAMPLE.COM
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 If you like Certbot, please consider supporting our work by:
@@ -167,6 +163,17 @@ server {
     ssl_certificate_key /etc/letsencrypt/live/EXAMPLE.COM/privkey.pem;   # managed by Certbot
     include             /etc/letsencrypt/options-ssl-nginx.conf;          # managed by Certbot
     ssl_dhparam         /etc/letsencrypt/ssl-dhparams.pem;               # managed by Certbot
+
+    location /api {
+        proxy_pass http://localhost:8000;
+        proxy_http_version 1.1;
+        proxy_set_header Host              $host;
+        proxy_set_header X-Forwarded-Host  $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        client_max_body_size 100M;
+    }
 
     location / {
         proxy_pass http://localhost:3000;
@@ -203,28 +210,6 @@ server {
     }
 }
 
-server {
-    server_name api.EXAMPLE.COM;
-    client_max_body_size 100M;
-
-    listen 443 ssl; # managed by Certbot
-    ssl_certificate     /etc/letsencrypt/live/EXAMPLE.COM/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/letsencrypt/live/EXAMPLE.COM/privkey.pem;   # managed by Certbot
-    include             /etc/letsencrypt/options-ssl-nginx.conf;          # managed by Certbot
-    ssl_dhparam         /etc/letsencrypt/ssl-dhparams.pem;               # managed by Certbot
-
-    location / {
-        proxy_pass http://localhost:8000;
-
-        proxy_set_header Host              $host;
-        proxy_set_header X-Forwarded-Host  $host;
-        proxy_set_header X-Forwarded-Proto $scheme;
-
-        proxy_set_header X-Real-IP         $remote_addr;
-        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
-    }
-}
-
 # ──────────────────────────────────────────────────────────────────────────────
 # HTTP → HTTPS Redirects (managed by Certbot)
 # ──────────────────────────────────────────────────────────────────────────────
@@ -247,14 +232,6 @@ server {
     return 404;
 }
 
-server {
-    listen 80;
-    server_name api.EXAMPLE.COM;
-    if ($host = api.EXAMPLE.COM) {
-        return 301 https://$host$request_uri;
-    }
-    return 404;
-}
 ```
 
 ## Install docker

@@ -10,15 +10,17 @@ import {
   File,
   Perspective,
   PerspectiveRequest,
+  UserData,
   Workspace,
   WorkspaceCreateResponse,
   WorkspaceRequest,
 } from "../../types/interfaces";
+import { UserPermissionDto } from "../../handlers/userPermissions";
 
 export interface IClient {
   // workspace
   createWorkspace(
-    workspace: WorkspaceRequest
+    workspace: WorkspaceRequest,
   ): Promise<WorkspaceCreateResponse>;
   getAllWorkspaces(): Promise<Workspace[]>;
   getWorkspaceByName(name: string): Promise<Workspace[]>;
@@ -30,7 +32,7 @@ export interface IClient {
   // documents
   createDocument(
     doc: DocumentRequest,
-    file: File
+    file: File,
   ): Promise<DocumentCreateResponse>;
   getAllDocuments(from: number, limit: number): Promise<DocumentsResponse>; // remove getAllDocuments when workspaces are fully implemented
   getDocumentDetailsById(docId: string): Promise<Document>;
@@ -38,12 +40,12 @@ export interface IClient {
   downloadDocumentVersionByCid(
     req: AuthenticatedRequest,
     res: Response,
-    cid: string
+    cid: string,
   ): Promise<void>;
   getDocumentsByWorkspace(
     wId: string,
     from: number,
-    limit: number
+    limit: number,
   ): Promise<DocumentsResponse>;
 
   // chat messages
@@ -57,6 +59,12 @@ export interface IClient {
   // remove later when getting perspectives by document and version is implemented
   getAllPerspectives(): Promise<Perspective[]>;
 
+  // user data (stored separately in IPFS)
+  createUserData(userData: UserData): Promise<void>;
+  modifyUserData(userData: UserData): Promise<void>;
+  deleteUserData(nodeId: string, userId: string): Promise<void>;
+  getUserData(nodeId: string, userId: string): Promise<UserData>;
+
   // status
   pinSvcStatus(): Promise<boolean>;
   gatewayStatus(): Promise<boolean>;
@@ -67,6 +75,15 @@ export interface IClient {
   downloadAvatar(
     req: AuthenticatedRequest,
     res: Response,
-    cid: string
+    cid: string,
   ): Promise<any>;
+
+  // permissions
+  createPermission(permission: UserPermissionDto): Promise<string>;
+  findPermissionsByKey(
+    key: string,
+    value: string,
+  ): Promise<UserPermissionDto[]>;
+  deletePermission(permissionId: string): Promise<boolean>;
+  deletePermissionForWorkspace(workspaceId: string): Promise<number>;
 }

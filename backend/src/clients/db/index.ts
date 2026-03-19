@@ -1,18 +1,17 @@
 import db from "../../config/database";
 import logger from "../../config/winston";
+
 export * from "./jobStatus";
 export * from "./prompts";
-export * from "./userPermissions";
 export * from "./users";
 export * from "./workspacePasswords";
 
 const REQUIRED_TABLES = [
   "users",
-  "user_permissions",
   "workspace_passwords",
   "job_status",
   "prompts",
-  "password_reset_tokens"
+  "password_reset_tokens",
 ];
 
 export const getHealthDb = async () => {
@@ -38,7 +37,7 @@ export const getHealthDb = async () => {
     return true;
   } catch (error) {
     logger.error(
-      `Database connection error: ${JSON.stringify(error, null, 2)}`
+      `Database connection error: ${JSON.stringify(error, null, 2)}`,
     );
     return false;
   }

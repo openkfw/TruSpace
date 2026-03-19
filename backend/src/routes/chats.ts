@@ -8,7 +8,7 @@ import { AuthenticatedRequest } from "../types";
 import { ChatMessageRequest } from "../types/interfaces";
 import { getUserSettingsByUiid } from "../utility/user";
 import { sendNotification } from "../mailing/notifications";
-import { findPermissionsByEmailDb } from "../clients/db";
+import { findPermissionsByEmail } from "../handlers/userPermissions";
 
 const router = express.Router();
 const client = new IpfsClient();
@@ -25,7 +25,7 @@ router.get("/export/:docId", async (req: Request, res: Response) => {
     .fontSize(25)
     .text(`Chat Messages for document "${document?.meta?.filename}`);
   doc.fontSize(15).text(`Document ID ${docId}`);
-  doc.fontSize(15).text(`Creator: ${document?.meta?.creator}`);
+  doc.fontSize(15).text(`Creator: ${document?.meta?.creatorName || "UNKNOWN"}`);
   const formattedDate = new Date().toLocaleString();
   doc.fontSize(15).text(`Created at: ${formattedDate}`).moveDown();
   doc.fontSize(15).text(" ");
@@ -40,9 +40,9 @@ router.get("/export/:docId", async (req: Request, res: Response) => {
     }
 
     doc.fontSize(13).text(`Message: ${messageText}`);
-    doc.fontSize(10).text(`Author: ${message.meta.creator}`);
+    doc.fontSize(10).text(`Author: ${message.meta.creatorName || "UNKNOWN"}`);
     const formattedDate = new Date(
-      Number(message.meta.timestamp)
+      Number(message.meta.timestamp),
     ).toLocaleString();
     doc.fontSize(10).text(`Timestamp: ${formattedDate}`);
     doc.moveDown();
@@ -54,10 +54,10 @@ router.get("/export/:docId", async (req: Request, res: Response) => {
 router.get("/recent", async (req: AuthenticatedRequest, res: Response) => {
   const allWorkspaces = await new IpfsClient().getAllWorkspaces();
   const allowedWs = (
-    await findPermissionsByEmailDb(req.user?.email as string)
-  ).map((p) => p.workspace_id);
+    await findPermissionsByEmail(req.user?.email as string)
+  ).map((p) => p.workspaceId);
   const allAllowedWs = allWorkspaces.filter(
-    (ws) => allowedWs.includes(ws.uuid) || ws.meta.is_public
+    (ws) => allowedWs.includes(ws.uuid) || ws.meta.is_public,
   );
   const result = await client.getAllMessages();
   const filteredMessages = result
@@ -80,7 +80,7 @@ router.get(
     const { docId } = req.params;
     const result = await client.getMessagesByDocumentId(docId);
     res.json(result);
-  }
+  },
 );
 
 router.post(
@@ -104,8 +104,8 @@ router.post(
         docId,
         workspaceOrigin,
         timestamp: Date.now().toString(),
-        creator: req.user?.name as string,
-        creatorUiid: req.user?.uiid as string,
+        creatorNodeId: req.user?.nodeId as string,
+        creatorUserId: req.user?.uiid as string,
       },
     };
 
@@ -114,7 +114,7 @@ router.post(
     const docInfo = await client.getDocumentDetailsById(docId);
 
     docInfo.documentVersions
-      .map((version) => version.meta.creatorUiid)
+      .map((version) => version.meta.creatorUserId)
       .reduce((acc: string[], uiid: string) => {
         if (!acc.includes(uiid)) {
           acc.push(uiid);
@@ -132,12 +132,12 @@ router.post(
             userSettings?.email,
             "documentChat",
             `/workspace/${docInfo.meta.workspaceOrigin}/document/${docId}`,
-            docInfo.meta.filename
+            docInfo.meta.filename,
           );
         }
       });
     res.json(result);
-  }
+  },
 );
 
 export default router;

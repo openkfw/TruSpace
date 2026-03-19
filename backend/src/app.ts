@@ -2,9 +2,11 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
 import fileUpload from "express-fileupload";
+import session from "express-session";
 import rateLimit from "express-rate-limit";
 import fs from "fs";
 import helmet from "helmet";
+import lusca from "lusca";
 import createError from "http-errors";
 import yaml from "js-yaml";
 import morgan from "morgan";
@@ -24,8 +26,10 @@ import permissionsRouter from "./routes/userPermissions";
 import usersRouter from "./routes/users";
 import workspacesRouter from "./routes/workspaces";
 
-const app = express();
 const { env, contentSecurityPolicy, rateLimitPerMinute } = config;
+
+const app = express();
+app.set("trust proxy", 1); // trust first proxy (e.g. if behind a load balancer) for correct client IP and secure cookie handling
 
 app.use(morgan("dev"));
 
@@ -46,7 +50,7 @@ app.use(
         workerSrc: ["'self'", "blob:", ...contentSecurityPolicy.workerSrc],
       },
     },
-  })
+  }),
 );
 
 // Rate limiting configuration
@@ -71,13 +75,61 @@ app.use(
       }
     },
     credentials: true,
-  })
+  }),
 );
 
 app.use(cookieParser());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// ─── SESSION + CSRF PROTECTION ──────────────────────────────────────────────
+app.use(
+  session({
+    secret: process.env.JWT_SECRET || "dev-secret", // fallback for development
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // HTTPS only in production
+      sameSite: "strict",
+      maxAge: Number(process.env.JWT_MAX_AGE || 86400) * 1000, // match JWT lifetime
+    },
+  }),
+);
+
+const csrfProtection = lusca.csrf();
+
+// FOR NOW: pragmatic solution to exclude auth routes from CSRF protection, since they don't have a session yet
+// FUTURE: consider implementing a more robust solution, e.g. using separate CSRF tokens for auth routes or rethinking the auth flow to establish a session earlier
+// For this, we could build a dedicated csrf endpoint /api/csrf-token that generates a CSRF token and sets the cookie, which clients can call before accessing protected routes. This way, we can keep all routes protected by CSRF while still allowing auth routes to function properly.
+app.use((req, res, next) => {
+  const isPublicAuthRoute =
+    req.path === "/api/users/login" ||
+    req.path === "/api/users/register" ||
+    req.path === "/api/users/forgot-password" ||
+    req.path === "/api/users/reset-password" ||
+    req.path === "/api/users/confirm-registration";
+
+  if (isPublicAuthRoute) {
+    return next();
+  }
+
+  return csrfProtection(req, res, next);
+});
+
+app.use((req, res, next) => {
+  if (req.csrfToken) {
+    const token = req.csrfToken();
+    res.cookie("XSRF-TOKEN", token, {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+  }
+  next();
+});
+// ───────────────────────────────────────────────────────────────────────────
 
 // todo filesize should be configurable
 app.use(
@@ -87,7 +139,7 @@ app.use(
       fileSize: 109 * 1024 * 1024, // ±100 MB   limit
     },
     abortOnLimit: true,
-  })
+  }),
 );
 
 /** ROUTES */
@@ -109,7 +161,7 @@ const pathToOpenapi =
     : path.join(process.cwd(), "openapi", "openapi.yaml");
 
 const doc = yaml.load(
-  fs.readFileSync(pathToOpenapi, "utf8")
+  fs.readFileSync(pathToOpenapi, "utf8"),
 ) as swaggerUi.JsonObject;
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(doc));
 

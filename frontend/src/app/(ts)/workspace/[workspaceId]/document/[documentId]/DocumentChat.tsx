@@ -147,7 +147,7 @@ export default function DocumentChat({
                   return (
                      <ChatMessage
                         key={chat.cid}
-                        creator={chat.meta.creator}
+                        creator={chat.meta.creatorName}
                         version={
                            documentVersions.find(
                               (version) =>

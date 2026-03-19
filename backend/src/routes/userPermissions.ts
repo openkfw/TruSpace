@@ -1,16 +1,17 @@
 import express, { Response } from "express";
 import { body } from "express-validator";
-import {
-  createPermissionDb,
-  findPermissionByIdDb,
-  findUsersInWorkspaceDb,
-  removePermissionDb,
-} from "../clients/db";
+
 import { IpfsClient } from "../clients/ipfs-client";
 import validate from "../middlewares/validate";
 import { AuthenticatedRequest } from "../types";
-import { USER_PERMISSION_STATUS } from "../utility/constants";
 import { sendNotification } from "../mailing/notifications";
+import {
+  createPermission,
+  findPermissionById,
+  findUsersInWorkspace,
+  removePermission,
+  UserPermissionDto,
+} from "../handlers/userPermissions";
 
 const router = express.Router();
 
@@ -41,18 +42,19 @@ router.post(
           message: "Adding user to workspace failed, workspace is public",
         });
       }
-      await createPermissionDb({
+
+      const permission: UserPermissionDto = {
         workspaceId,
         email,
         role: "admin",
-        status: USER_PERMISSION_STATUS.active,
-      });
-      // Notify the user about the workspace assignement
+      };
+      await createPermission(permission);
+
       sendNotification(
         email,
         "addedToWorkspace",
         `/workspace/${workspaceId}`,
-        workspaces[0].meta.name
+        workspaces[0].meta.name,
       );
       res.json({
         status: "success",
@@ -65,14 +67,14 @@ router.post(
         message: "Adding user to workspace failed",
       });
     }
-  }
+  },
 );
 
 router.get(
   "/users-in-workspace/:workspaceId",
   async (req: AuthenticatedRequest, res: Response) => {
     try {
-      const results = await findUsersInWorkspaceDb(req.params.workspaceId);
+      const results = await findUsersInWorkspace(req.params.workspaceId);
       res.json(results);
     } catch (error) {
       console.error("Getting permissions error:", error);
@@ -81,7 +83,7 @@ router.get(
         message: "Getting workspace permissions failed",
       });
     }
-  }
+  },
 );
 
 router.delete(
@@ -89,23 +91,23 @@ router.delete(
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       const { permissionId } = req.params;
-      const permission = await findPermissionByIdDb(permissionId);
+      const permission = await findPermissionById(permissionId);
       if (!permission) {
         return res.status(404).json({
           status: "failure",
           message: "Permission not found",
         });
       }
-      await removePermissionDb(permissionId);
+      await removePermission(permissionId);
 
-      const client = new IpfsClient();
-      const workspaces = await client.getWorkspaceById(permission.workspace_id);
       // Notify the user about the workspace assignement
+      const client = new IpfsClient();
+      const workspaces = await client.getWorkspaceById(permission.workspaceId);
       sendNotification(
-        permission.user_email,
+        permission.email,
         "removedFromWorkspace",
         "/",
-        workspaces[0].meta.name
+        workspaces[0].meta.name,
       );
       res.json();
     } catch (error) {
@@ -115,7 +117,7 @@ router.delete(
         message: "Removing workspace permissions failed",
       });
     }
-  }
+  },
 );
 
 export default router;

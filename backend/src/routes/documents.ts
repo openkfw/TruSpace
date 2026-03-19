@@ -1,7 +1,6 @@
 import express, { Request, Response } from "express";
 import { UploadedFile } from "express-fileupload";
 import { body, param, query } from "express-validator";
-import { findPermissionsByEmailDb } from "../clients/db";
 import { IpfsClient } from "../clients/ipfs-client";
 import { oiClient } from "../clients/oi-client";
 import logger from "../config/winston";
@@ -32,6 +31,7 @@ import {
 } from "../utility/prompts";
 import { sendNotification } from "../mailing/notifications";
 import { getUserSettingsByUiid } from "../utility/user";
+import { findPermissionsByEmail } from "../handlers/userPermissions";
 
 (function () {
   addPerspectivesTemplate();
@@ -65,8 +65,8 @@ router.get(
         await Promise.all([
           publicWorkspacesPromise,
           client.getAllDocuments(),
-          findPermissionsByEmailDb(req.user?.email as string).then(
-            (permissions) => permissions.map((p) => p.workspace_id)
+          findPermissionsByEmail(req.user?.email as string).then(
+            (permissions) => permissions.map((p) => p.workspaceId),
           ),
         ]);
 
@@ -74,11 +74,11 @@ router.get(
         (d) =>
           (allowedWs.includes(d.meta.workspaceOrigin) ||
             publicWorkspaces.some(
-              (ws) => ws.meta.workspace_uuid === d.meta.workspaceOrigin
+              (ws) => ws.meta.workspace_uuid === d.meta.workspaceOrigin,
             )) &&
           (searchString && searchString.length > 0
             ? d.meta.filename.toLowerCase().includes(searchString.toLowerCase())
-            : true)
+            : true),
       );
 
       const paginatedResult = result.slice(from, from + limit);
@@ -95,15 +95,15 @@ router.get(
           checkPermissionForWorkspace(
             req.user?.email as string,
             res,
-            workspace
+            workspace,
           ),
           client.getDocumentsByWorkspace(
             workspace as string,
             from,
             limit,
-            searchString
+            searchString,
           ),
-        ]
+        ],
       );
 
       const documentsWithDetails = await Promise.all(
@@ -123,7 +123,7 @@ router.get(
             uniqueContributorsLength: docContributors.count,
             documentVersionsLength: documentVersions.length,
           };
-        })
+        }),
       );
 
       res.json({
@@ -133,7 +133,7 @@ router.get(
         data: documentsWithDetails,
       });
     }
-  }
+  },
 );
 
 router.get(
@@ -146,12 +146,12 @@ router.get(
     await checkPermissionForWorkspace(
       req.user?.email as string,
       res,
-      documents.meta.workspaceOrigin
+      documents.meta.workspaceOrigin,
     );
 
     const result = documents;
     res.json(result);
-  }
+  },
 );
 
 router.get(
@@ -168,24 +168,24 @@ router.get(
     const documentDetails = document.documentVersions;
     const documentVersions = documentDetails.reduce(
       (acc: string[], version: Document) => {
-        if (!acc.includes(version.meta.creatorUiid)) {
-          acc.push(version.meta.creatorUiid);
+        if (!acc.includes(version.meta.creatorUserId)) {
+          acc.push(version.meta.creatorUserId);
         }
         return acc;
       },
-      []
+      [],
     );
 
     await checkPermissionForWorkspace(
       req.user?.email as string,
       res,
-      document.meta.workspaceOrigin
+      document.meta.workspaceOrigin,
     );
     res.json({
       chatsLength: chats.length,
       uniqueContributorsLength: documentVersions.length,
     });
-  }
+  },
 );
 
 /* GET file by cid (DOWNLOAD) */
@@ -195,7 +195,7 @@ router.get(
   async (req: Request, res: Response) => {
     const cid = req.params.cid;
     return new IpfsClient().downloadDocumentVersionByCid(req, res, cid);
-  }
+  },
 );
 
 /* GET statistics about documents */
@@ -205,7 +205,7 @@ router.get("/statistics", async (req: AuthenticatedRequest, res: Response) => {
     const { data: documents, count } = await client.getAllDocuments();
     const recentlyAddedDocuments = documents.filter(
       (doc) =>
-        Number(doc.meta.timestamp) > Date.now() - 10 * 24 * 60 * 60 * 1000
+        Number(doc.meta.timestamp) > Date.now() - 10 * 24 * 60 * 60 * 1000,
     );
     res.json({
       totalDocuments: count,
@@ -234,8 +234,8 @@ router.post(
     try {
       const { workspace } = req.body;
       const email = req.user?.email as string;
-      const userName = req.user?.name as string;
       const userUiid = req.user?.uiid as string;
+      const creatorNodeId = req.user?.nodeId as string;
 
       await checkPermissionForWorkspace(email, res, workspace);
 
@@ -244,8 +244,8 @@ router.post(
 
       const docRequest = createDocumentRequest({
         filename,
-        creator: userName,
-        creatorUiid: userUiid,
+        creatorNodeId,
+        creatorUserId: userUiid,
         workspaceOrigin: workspace,
         size: file.size,
         mimetype: file.mimetype,
@@ -283,7 +283,7 @@ router.post(
         const externalPrompts = readExternalPrompts();
         const summaryPrompts: Prompt[] = mergePromptArrays(
           externalPrompts,
-          examplePrompts
+          examplePrompts,
         );
 
         summariesTaskId = await TaskQueue.addJob({
@@ -367,7 +367,7 @@ router.post(
         message: err.message,
       });
     }
-  }
+  },
 );
 
 router.put(
@@ -389,8 +389,8 @@ router.put(
       const { workspace, versionTagName } = req.body;
       const { docId } = req.params;
       const email = req.user?.email as string;
-      const userName = req.user?.name as string;
       const userUiid = req.user?.uiid as string;
+      const creatorNodeId = req.user?.nodeId as string;
 
       await checkPermissionForWorkspace(email, res, workspace);
 
@@ -404,8 +404,8 @@ router.put(
       const docRequest = createDocumentRequest({
         filename,
         version: (parseInt(latestVersion) + 1).toString(),
-        creator: userName,
-        creatorUiid: userUiid,
+        creatorNodeId,
+        creatorUserId: userUiid,
         size: file.size,
         mimetype: file.mimetype,
         workspaceOrigin: workspace,
@@ -443,7 +443,7 @@ router.put(
         const externalPrompts = readExternalPrompts();
         const summaryPrompts: Prompt[] = mergePromptArrays(
           externalPrompts,
-          examplePrompts
+          examplePrompts,
         );
 
         summariesTaskId = await TaskQueue.addJob({
@@ -506,7 +506,7 @@ router.put(
           };
 
       docInfo.documentVersions
-        .map((version) => version.meta.creatorUiid)
+        .map((version) => version.meta.creatorUserId)
         .reduce((acc: string[], uiid: string) => {
           if (!acc.includes(uiid)) {
             acc.push(uiid);
@@ -524,7 +524,7 @@ router.put(
               userSettings?.email,
               "documentChanged",
               `/workspace/${docInfo.meta.workspaceOrigin}/document/${docId}`,
-              docInfo.meta.filename
+              docInfo.meta.filename,
             );
           }
         });
@@ -550,7 +550,7 @@ router.put(
         message: err.message,
       });
     }
-  }
+  },
 );
 
 router.delete(
@@ -564,12 +564,12 @@ router.delete(
     await checkPermissionForWorkspace(
       req.user?.email as string,
       res,
-      doc.meta.workspaceOrigin
+      doc.meta.workspaceOrigin,
     );
 
     const result = await client.deleteDocument(docId);
     res.json({ result });
-  }
+  },
 );
 
 export default router;

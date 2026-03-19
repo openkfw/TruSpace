@@ -1,7 +1,12 @@
 import { JwtPayload } from "../interfaces";
 
-declare namespace Express {
-  interface Request {
-    user?: JwtPayload;
+declare global {
+  namespace Express {
+    interface Request {
+      user?: JwtPayload;
+      csrfToken?: () => string;
+    }
   }
 }
+
+export {};

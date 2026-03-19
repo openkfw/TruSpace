@@ -14,6 +14,7 @@ import {
   getTotalUsersDb,
   storeUserSettingsDb,
   updateUserFirstSignIn,
+  updateUserName,
   updateUserPassword,
   updateUserToken,
 } from "../clients/db";
@@ -44,6 +45,20 @@ import { getUserSettings } from "../utility/user";
 
 const router = express.Router();
 logger.info("Registering user");
+
+const resolveNodeId = async (explicitNodeId?: string): Promise<string> => {
+  if (explicitNodeId) {
+    return explicitNodeId;
+  }
+
+  try {
+    const clusterId = await new IpfsClient().clusterId();
+    return clusterId?.ipfs?.id || "";
+  } catch (error) {
+    logger.error("Error resolving nodeId:", error);
+    return "";
+  }
+};
 
 router.post(
   "/register",
@@ -80,14 +95,29 @@ router.post(
           email,
           passwordHash,
           registerUsersAsInactive ? USER_STATUS.inactive : USER_STATUS.active,
-          token
+          token,
         );
         if (!result) {
           throw Error("Unknown error");
         }
+
+        const createdUser = await findUserByEmailDb(email);
+        const nodeId = await resolveNodeId();
+        if (createdUser?.uiid && nodeId) {
+          try {
+            await new IpfsClient().createUserData({
+              nodeId,
+              userId: createdUser.uiid,
+              userName: name,
+            });
+          } catch (error) {
+            logger.error("Error creating user data:", error);
+          }
+        }
+
         const filePath = path.join(
           process.cwd(),
-          "src/mailing/templates/registrationConfirmation.html"
+          "src/mailing/templates/registrationConfirmation.html",
         );
         const source = fs.readFileSync(filePath, "utf-8");
         const template = compile(source);
@@ -105,7 +135,7 @@ router.post(
         await sendEmail(
           email,
           registrationConfirmation[lang].subject,
-          htmlTemplateToSend
+          htmlTemplateToSend,
         );
         logger.info("Email sent");
         res.json({
@@ -119,11 +149,26 @@ router.post(
           email,
           passwordHash,
           registerUsersAsInactive ? USER_STATUS.inactive : USER_STATUS.active,
-          token
+          token,
         );
         if (!result) {
           throw Error("Unknown error");
         }
+
+        const createdUser = await findUserByEmailDb(email);
+        const nodeId = await resolveNodeId();
+        if (createdUser?.uiid && nodeId) {
+          try {
+            await new IpfsClient().createUserData({
+              nodeId,
+              userId: createdUser.uiid,
+              userName: name,
+            });
+          } catch (error) {
+            logger.error("Error creating user data:", error);
+          }
+        }
+
         res.json({
           status: "success",
           message: "Your registration request has been processed",
@@ -147,7 +192,7 @@ router.post(
         });
       }
     }
-  }
+  },
 );
 
 router.post(
@@ -189,10 +234,12 @@ router.post(
         });
       }
 
+      const nodeId = await resolveNodeId();
       const payload: JwtPayload = {
         name: user.username,
         email: user.email,
         uiid: user.uiid,
+        nodeId,
         firstSignIn: user.first_sign_in === "true",
       };
 
@@ -202,7 +249,7 @@ router.post(
 
       const decodedToken = jwt.verify(
         token,
-        Buffer.from(config.jwt.secret)
+        Buffer.from(config.jwt.secret),
       ) as jwt.JwtPayload;
 
       if (user.first_sign_in === "true") {
@@ -217,6 +264,30 @@ router.post(
         path: "/",
       });
 
+      if (user.uiid && nodeId) {
+        try {
+          const userData = await new IpfsClient().getUserData(
+            nodeId,
+            user.uiid,
+          );
+          if (userData?.userName && userData.userName !== "UNKNOWN") {
+            logger.info("User data exists in IPFS");
+          } else {
+            logger.warn(
+              "User data is missing or invalid in IPFS, creating new user data",
+            );
+            await new IpfsClient().createUserData({
+              nodeId,
+              userId: user.uiid,
+              userName: user.username,
+            });
+            logger.info("User data created in IPFS");
+          }
+        } catch (error) {
+          logger.error("Error fetching/creating user data in IPFS:", error);
+        }
+      }
+
       return res.status(200).json({
         status: "success",
         message: "Authentication successful",
@@ -224,6 +295,7 @@ router.post(
           name: user.username,
           email: user.email,
           uiid: user.uiid,
+          nodeId,
           firstSignIn: user.first_sign_in === "true",
           expires: decodedToken.exp,
         },
@@ -235,7 +307,7 @@ router.post(
         message: "Authentication error",
       });
     }
-  }
+  },
 );
 
 router.post("/logout", (_req: Request, res: Response) => {
@@ -273,7 +345,7 @@ router.get(
         message: "Unable to fetch statistics",
       });
     }
-  }
+  },
 );
 
 router.post(
@@ -314,12 +386,12 @@ router.post(
               Buffer.from(config.jwt.secret),
               {
                 expiresIn: CONFIRMATION_EMAIL_EXPIRATION, // 20 minutes
-              }
+              },
             );
             await updateUserToken(user.id, newToken);
             const filePath = path.join(
               process.cwd(),
-              "src/mailing/templates/registrationConfirmation.html"
+              "src/mailing/templates/registrationConfirmation.html",
             );
             const source = fs.readFileSync(filePath, "utf-8");
             const template = compile(source);
@@ -337,7 +409,7 @@ router.post(
             await sendEmail(
               user.email,
               registrationConfirmation[lang].subject,
-              htmlTemplateToSend
+              htmlTemplateToSend,
             );
             logger.info("New confirmation email sent");
             return res.status(400).json({
@@ -368,7 +440,7 @@ router.post(
         });
       }
     }
-  }
+  },
 );
 
 router.get(
@@ -391,14 +463,14 @@ router.get(
       });
     } catch (error) {
       logger.error(
-        `Error fetching user settings: ${JSON.stringify(error, null, 2)}`
+        `Error fetching user settings: ${JSON.stringify(error, null, 2)}`,
       );
       res.status(500).json({
         status: "failure",
         message: "User settings fetch failed",
       });
     }
-  }
+  },
 );
 
 router.post(
@@ -446,7 +518,7 @@ router.post(
         message: "User settings update failed",
       });
     }
-  }
+  },
 );
 
 router.get(
@@ -461,7 +533,7 @@ router.get(
         .json({ status: "failure", message: "Could not find avatar" });
     }
     return new IpfsClient().downloadAvatar(req, res, cid);
-  }
+  },
 );
 
 router.post(
@@ -498,7 +570,7 @@ router.post(
       await createTokenDb(user.id, token);
       const filePath = path.join(
         process.cwd(),
-        "src/mailing/templates/resetPasswordEmail.html"
+        "src/mailing/templates/resetPasswordEmail.html",
       );
       const source = fs.readFileSync(filePath, "utf-8");
       const template = compile(source);
@@ -525,7 +597,48 @@ router.post(
         message: "Unknown error occurred",
       });
     }
-  }
+  },
+);
+
+router.post(
+  "/reset-name",
+  authenticateCookie,
+  validate([body("name").isString().isLength({ min: 3 })]),
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const email = req.user?.email;
+      if (!email) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      await updateUserName(email, req.body.name);
+
+      const nodeId = await resolveNodeId(req.user?.nodeId);
+      const userId = req.user?.uiid;
+      if (nodeId && userId) {
+        try {
+          await new IpfsClient().modifyUserData({
+            nodeId,
+            userId,
+            userName: req.body.name,
+          });
+        } catch (error) {
+          logger.error("Error updating user data:", error);
+        }
+      }
+
+      return res.json({
+        status: "success",
+        message: "Name updated successfully",
+      });
+    } catch (error) {
+      logger.error(error);
+      res.status(500).json({
+        status: "failure",
+        message: "Could not update name",
+      });
+    }
+  },
 );
 
 router.post(
@@ -570,7 +683,7 @@ router.post(
         });
       }
     }
-  }
+  },
 );
 
 export default router;

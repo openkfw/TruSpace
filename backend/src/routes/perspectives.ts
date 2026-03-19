@@ -77,8 +77,8 @@ router.post(
         timestamp: new Date().toISOString(),
         data: req.body.perspectiveText as string,
         creatorType: "user",
-        creator: req.user?.name as string,
-        creatorUiid: req.user?.uiid as string,
+        creatorNodeId: req.user?.nodeId as string,
+        creatorUserId: req.user?.uiid as string,
         prompt: "",
       },
     };

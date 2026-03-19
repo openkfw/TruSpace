@@ -1,5 +1,6 @@
 node_modules
 volumes/*
+temp
 production/volumes/*
 .next
 copy.png
@@ -14,3 +15,6 @@ ipfs-cluster-service
 scripts/prompts/cookies.txt
 .scratch
 .idea
+.connection
+.connection.password
+doc/mkdocs/site
