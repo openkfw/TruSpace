@@ -13,7 +13,6 @@ import { getContributorsWorkspace } from "../handlers/workspaces";
 import validate from "../middlewares/validate";
 import { AuthenticatedRequest } from "../types";
 import { WorkspaceRequest } from "../types/interfaces/index";
-import { USER_PERMISSION_STATUS } from "../utility/constants";
 import { getUserSettings } from "../utility/user";
 import { sendNotification } from "../mailing/notifications";
 import {
@@ -102,7 +101,6 @@ router.post(
       workspaceId,
       email: req.user?.email as string,
       role: "owner",
-      status: USER_PERMISSION_STATUS.active,
     });
     await createWorkspacePasswordDb(
       workspaceId,
@@ -158,7 +156,6 @@ router.put(
             workspaceId: wUID,
             email: req.user?.email as string,
             role: "owner",
-            status: USER_PERMISSION_STATUS.active,
           });
         }
       } else {

@@ -4,7 +4,6 @@ import { body } from "express-validator";
 import { IpfsClient } from "../clients/ipfs-client";
 import validate from "../middlewares/validate";
 import { AuthenticatedRequest } from "../types";
-import { USER_PERMISSION_STATUS } from "../utility/constants";
 import { sendNotification } from "../mailing/notifications";
 import {
   createPermission,
@@ -48,7 +47,6 @@ router.post(
         workspaceId,
         email,
         role: "admin",
-        status: USER_PERMISSION_STATUS.active,
       };
       await createPermission(permission);
 

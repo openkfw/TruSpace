@@ -26,8 +26,10 @@ import permissionsRouter from "./routes/userPermissions";
 import usersRouter from "./routes/users";
 import workspacesRouter from "./routes/workspaces";
 
-const app = express();
 const { env, contentSecurityPolicy, rateLimitPerMinute } = config;
+
+const app = express();
+app.set("trust proxy", 1); // trust first proxy (e.g. if behind a load balancer) for correct client IP and secure cookie handling
 
 app.use(morgan("dev"));
 
@@ -48,7 +50,7 @@ app.use(
         workerSrc: ["'self'", "blob:", ...contentSecurityPolicy.workerSrc],
       },
     },
-  })
+  }),
 );
 
 // Rate limiting configuration
@@ -73,7 +75,7 @@ app.use(
       }
     },
     credentials: true,
-  })
+  }),
 );
 
 app.use(cookieParser());
@@ -90,10 +92,10 @@ app.use(
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // HTTPS only in production
-      sameSite: "strict",
+      sameSite: "none",
       maxAge: Number(process.env.JWT_MAX_AGE || 86400) * 1000, // match JWT lifetime
     },
-  })
+  }),
 );
 
 const csrfProtection = lusca.csrf();
@@ -122,7 +124,7 @@ app.use((req, res, next) => {
     res.cookie("XSRF-TOKEN", token, {
       httpOnly: false,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: "none",
     });
   }
   next();
@@ -137,7 +139,7 @@ app.use(
       fileSize: 109 * 1024 * 1024, // ±100 MB   limit
     },
     abortOnLimit: true,
-  })
+  }),
 );
 
 /** ROUTES */
@@ -159,7 +161,7 @@ const pathToOpenapi =
     : path.join(process.cwd(), "openapi", "openapi.yaml");
 
 const doc = yaml.load(
-  fs.readFileSync(pathToOpenapi, "utf8")
+  fs.readFileSync(pathToOpenapi, "utf8"),
 ) as swaggerUi.JsonObject;
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(doc));
 

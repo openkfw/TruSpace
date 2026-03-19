@@ -1643,15 +1643,15 @@ export class IpfsClient implements IClient {
       const encodedId = encodeURIComponent(permission.id);
       const filename = `permissions/${encodedId}`;
       const form = new FormData();
+
       form.append("file", JSON.stringify(permission), {
         filename: filename,
         contentType: "application/json",
       });
 
       let metadataQuery = "";
-
       for (const [key, value] of Object.entries(permission)) {
-        metadataQuery += `&meta-${key}=${value}`;
+        metadataQuery += `&meta-${key}=${encodeURIComponent(value)}`;
       }
 
       await this.#clusterAxios.post(

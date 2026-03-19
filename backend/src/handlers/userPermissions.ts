@@ -6,18 +6,15 @@ export interface UserPermissionDto {
   workspaceId: string;
   email: string;
   role: string;
-  status: string;
-  created_at?: Date;
-  updated_at?: Date;
 }
 
 export const createPermission = async (permission: UserPermissionDto) => {
   try {
     const client = new IpfsClient();
     const permissionId = await client.createPermission(permission);
-    logger.info(
-      `Permission created with ID: ${permissionId} for email: ${permission.email} in workspace: ${permission.workspaceId}`,
-    );
+    // logger.info(
+    //   `Permission created with ID: ${permissionId} for email: ${permission.email} in workspace: ${permission.workspaceId}`,
+    // );
     return permissionId;
   } catch (error) {
     logger.error("Error creating permission:", error);
@@ -29,7 +26,7 @@ export const findPermissionsByEmail = async (email: string) => {
   try {
     const client = new IpfsClient();
     const permissions = await client.findPermissionsByKey("email", email);
-    logger.info(`Found ${permissions.length} permissions for email: ${email}`);
+    // logger.info(`Found ${permissions.length} permissions for email: ${email}`);
     return permissions;
   } catch (error) {
     logger.error(`Error finding permissions for ${email}:`, error);
@@ -44,9 +41,9 @@ export const findUsersInWorkspace = async (workspaceId: string) => {
       "workspaceId",
       workspaceId,
     );
-    logger.info(
-      `Found ${permissions.length} permissions for workspace: ${workspaceId}`,
-    );
+    // logger.info(
+    //   `Found ${permissions.length} permissions for workspace: ${workspaceId}`,
+    // );
     // TODO convert to users data, for now this works since only email is needed
     // the tricky part will be reading user data from other nodes
     return permissions;
@@ -60,9 +57,9 @@ export const findPermissionById = async (permissionId: string) => {
   try {
     const client = new IpfsClient();
     const permissions = await client.findPermissionsByKey("id", permissionId);
-    logger.info(
-      `Found ${permissions.length} permissions for ID: ${permissionId}`,
-    );
+    // logger.info(
+    //   `Found ${permissions.length} permissions for ID: ${permissionId}`,
+    // );
     if (permissions.length === 0) {
       return undefined;
     }
@@ -77,7 +74,7 @@ export const removePermission = async (permissionId: string) => {
   try {
     const client = new IpfsClient();
     const result = await client.deletePermission(permissionId);
-    logger.info(`Permission deleted [${result}] with ID: ${permissionId}`);
+    // logger.info(`Permission deleted [${result}] with ID: ${permissionId}`);
     return result;
   } catch (error) {
     logger.error(`Error deleting permission`, error);
@@ -89,9 +86,9 @@ export const removePermissionsForWorkspace = async (workspaceId: string) => {
   try {
     const client = new IpfsClient();
     const result = await client.deletePermissionForWorkspace(workspaceId);
-    logger.info(
-      `Deleted [${result}] Permissions for workspace: ${workspaceId}`,
-    );
+    // logger.info(
+    //   `Deleted [${result}] Permissions for workspace: ${workspaceId}`,
+    // );
     return result;
   } catch (error) {
     logger.error(`Error deleting permissions`, error);
