@@ -1,20 +1,17 @@
 import db from "../../config/database";
 import logger from "../../config/winston";
+
 export * from "./jobStatus";
 export * from "./prompts";
-export * from "./userPermissions";
 export * from "./users";
 export * from "./workspacePasswords";
-export * from "./events";
 
 const REQUIRED_TABLES = [
   "users",
-  "user_permissions",
   "workspace_passwords",
   "job_status",
   "prompts",
   "password_reset_tokens",
-  "events",
 ];
 
 export const getHealthDb = async () => {

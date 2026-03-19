@@ -7,16 +7,15 @@ import {
   DocumentCreateResponse,
   DocumentRequest,
   DocumentsResponse,
-  EventModel,
   File,
   Perspective,
   PerspectiveRequest,
-  Pin,
   UserData,
   Workspace,
   WorkspaceCreateResponse,
   WorkspaceRequest,
 } from "../../types/interfaces";
+import { UserPermissionDto } from "../../handlers/userPermissions";
 
 export interface IClient {
   // workspace
@@ -80,13 +79,11 @@ export interface IClient {
   ): Promise<any>;
 
   // permissions
-  createPermissionEvent(event: EventModel, reciever: string): Promise<void>;
-  getPermissionEventPinsForReciever(reciever: string): Promise<Pin[]>;
-  getPermissionEvents(pins: Pin[]): Promise<EventModel[]>;
-  deletePermission(email: string, eventId: string): Promise<boolean>;
-
-  // events
-  createEvent(event: EventModel): Promise<void>;
-  getEvents(exclude?: string[]): Promise<EventModel[]>;
-  deleteEvent(eventId: string): Promise<boolean>;
+  createPermission(permission: UserPermissionDto): Promise<string>;
+  findPermissionsByKey(
+    key: string,
+    value: string,
+  ): Promise<UserPermissionDto[]>;
+  deletePermission(permissionId: string): Promise<boolean>;
+  deletePermissionForWorkspace(workspaceId: string): Promise<number>;
 }
