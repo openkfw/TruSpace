@@ -92,7 +92,7 @@ app.use(
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // HTTPS only in production
-      sameSite: "none",
+      sameSite: "strict",
       maxAge: Number(process.env.JWT_MAX_AGE || 86400) * 1000, // match JWT lifetime
     },
   }),
@@ -124,7 +124,7 @@ app.use((req, res, next) => {
     res.cookie("XSRF-TOKEN", token, {
       httpOnly: false,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "none",
+      sameSite: "strict",
     });
   }
   next();
