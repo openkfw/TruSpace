@@ -1,6 +1,6 @@
+import { config } from "./src/shared/config/config";
+import logger from "./src/shared/config/winston";
 import app from "./src/app";
-import { config } from "./src/config/config";
-import logger from "./src/config/winston";
 
 const { port } = config;
 
