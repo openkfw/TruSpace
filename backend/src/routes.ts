@@ -28,7 +28,6 @@ router.use(workspacesRouter);
 // router.use("/perspectives", authenticateCookie, perspectivesRouter);
 // router.use("/prompts", authenticateCookie, promptsRouter);
 // router.use("/tags", authenticateCookie, tagsRouter);
-// router.use("/users", usersRouter);
 // router.use("/workspaces", authenticateCookie, workspacesRouter);
 
 export default router;
