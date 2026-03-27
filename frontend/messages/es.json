@@ -156,7 +156,17 @@
     "notificationRemovedFromWorkspace": "Me han eliminado de un espacio de trabajo",
     "notificationDocumentChanged": "Se ha modificado un documento en el que estoy trabajando.",
     "notificationDocumentChat": "Se agrega un nuevo mensaje de chat a un documento en el que estoy trabajando",
-    "notificationWorkspaceChanged": "Se cambian los permisos del espacio de trabajo en el que estoy trabajando."
+    "notificationWorkspaceChanged": "Se cambian los permisos del espacio de trabajo en el que estoy trabajando.",
+    "deleteUserButton": "Eliminar cuenta",
+    "deleteUserDialogTitle": "¿Eliminar cuenta?",
+    "deleteUserDialogDescription": "Confirma que deseas eliminar tu cuenta de forma permanente. Esta acción no se puede deshacer.",
+    "deleteUserPasswordLabel": "Contraseña",
+    "deleteUserPasswordPlaceholder": "Introduce tu contraseña",
+    "deleteUserConfirm": "Eliminar cuenta",
+    "deleteUserPasswordRequired": "La contraseña es obligatoria",
+    "deleteUserPasswordInvalid": "La contraseña que ingresaste es incorrecta",
+    "deleteUserSuccess": "Tu cuenta se eliminó correctamente",
+    "deleteUserError": "Se produjo un error al eliminar tu cuenta"
   },
   "homePage": {
     "documentName": "nombre",

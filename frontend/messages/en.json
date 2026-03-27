@@ -156,7 +156,17 @@
       "notificationRemovedFromWorkspace": "I am removed from a workspace",
       "notificationDocumentChanged": "A document I am working on is changed",
       "notificationDocumentChat": "A new chat message is added to a document I am working on",
-      "notificationWorkspaceChanged": "The permissions of a workspace I am working on changed"
+      "notificationWorkspaceChanged": "The permissions of a workspace I am working on changed",
+      "deleteUserButton": "Delete account",
+      "deleteUserDialogTitle": "Delete account?",
+      "deleteUserDialogDescription": "Please confirm you want to permanently delete your account. This action cannot be undone.",
+      "deleteUserPasswordLabel": "Password",
+      "deleteUserPasswordPlaceholder": "Enter your password",
+      "deleteUserConfirm": "Delete account",
+      "deleteUserPasswordRequired": "Password is required",
+      "deleteUserPasswordInvalid": "The password you entered is incorrect",
+      "deleteUserSuccess": "Your account was deleted successfully",
+      "deleteUserError": "Something went wrong while deleting your account"
    },
    "homePage": {
       "documentName": "Document name",

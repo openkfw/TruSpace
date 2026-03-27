@@ -156,7 +156,17 @@
       "notificationRemovedFromWorkspace": "Ich aus einem Arbeitsbereich entfernt werde",
       "notificationDocumentChanged": "Ein Dokument, an dem ich arbeite, geändert wird",
       "notificationDocumentChat": "Eine neue Chat-Nachricht zu einem Dokument, an dem ich arbeite, hinzugefügt wird",
-      "notificationWorkspaceChanged": "Die Berechtigungen des Arbeitsbereichs, an dem ich arbeite, geändert werden"
+      "notificationWorkspaceChanged": "Die Berechtigungen des Arbeitsbereichs, an dem ich arbeite, geändert werden",
+      "deleteUserButton": "Konto löschen",
+      "deleteUserDialogTitle": "Konto wirklich löschen?",
+      "deleteUserDialogDescription": "Bitte bestätige, dass du dein Konto dauerhaft löschen möchtest. Diese Aktion kann nicht rückgängig gemacht werden.",
+      "deleteUserPasswordLabel": "Passwort",
+      "deleteUserPasswordPlaceholder": "Gib dein Passwort ein",
+      "deleteUserConfirm": "Konto löschen",
+      "deleteUserPasswordRequired": "Passwort ist erforderlich",
+      "deleteUserPasswordInvalid": "Das eingegebene Passwort ist falsch",
+      "deleteUserSuccess": "Dein Konto wurde erfolgreich gelöscht",
+      "deleteUserError": "Beim Löschen deines Kontos ist ein Fehler aufgetreten"
    },
    "homePage": {
       "documentName": "Name",

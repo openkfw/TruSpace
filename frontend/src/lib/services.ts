@@ -760,6 +760,48 @@ export const updateUserName = async (name: string) => {
     }
 };
 
+export const deleteUser = async () => {
+    try {
+        const res = await fetch(
+            `${USERS_ENDPOINT}/delete-user`,
+            withCsrf({
+                method: "DELETE",
+                credentials: "include"
+            })
+        );
+
+        if (!res.ok) {
+            throw new Error("Failed to delete user");
+        }
+        return res.json();
+    }
+    catch (error) {
+        console.error("Error deleting user:", error);
+        throw error;
+    }
+};
+
+export const removeAllUserPermissions = async (email: string) => {
+    try {
+        const res = await fetch(
+            `${PERMISSIONS_ENDPOINT}/user/remove-all/${encodeURIComponent(email)}`,
+            withCsrf({
+                method: "DELETE",
+                credentials: "include"
+            })
+        );
+
+        if (!res.ok) {
+            throw new Error("Failed to remove user permissions");
+        }
+        return res.json();
+    }
+    catch (error) {
+        console.error("Error removing user permissions:", error);
+        throw error;
+    }
+};
+
 export const downloadAvatar = async () => {
    try {
       const res = await fetch(`${USERS_ENDPOINT}/avatar`, {
