@@ -7,6 +7,7 @@ import { AuthenticatedRequest } from "../types";
 import { sendNotification } from "../mailing/notifications";
 import {
   createPermission,
+  findPermissionsByEmail,
   findPermissionById,
   findUsersInWorkspace,
   removePermission,
@@ -119,5 +120,44 @@ router.delete(
     }
   },
 );
+
+router.delete(
+  "/user/remove-all/:email",
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const { email } = req.params;
+      const permissions = await findPermissionsByEmail(email);
+
+      // We delete all found permissions
+      // Additionally: for each permission found, check the workspace if there are other users.
+      // If there are no other users, delete the workspace and all its data (files, folders, etc.)
+
+      for (const permission of permissions) {
+        if (!permission.id || !permission.workspaceId) {
+          continue;
+        }
+        await removePermission(permission.id);
+
+        const client = new IpfsClient();
+        const workspaces = await findUsersInWorkspace(permission.workspaceId);
+        if (workspaces.length === 0) {
+          const workspace = await client.getWorkspaceById(permission.workspaceId)
+          const wCID = workspace[0].cid;
+          await client.deleteWorkspaceById(wCID, permission.workspaceId);
+        }
+
+      }
+
+      res.json();
+    }
+    catch (error) {
+      console.error("Removing user error:", error);
+      return res.status(500).json({
+        status: "failure",
+        message: "Removing user failed",
+      });
+    }
+  }
+)
 
 export default router;
