@@ -159,7 +159,7 @@
     "notificationWorkspaceChanged": "Se cambian los permisos del espacio de trabajo en el que estoy trabajando.",
     "deleteUserButton": "Eliminar cuenta",
     "deleteUserDialogTitle": "¿Eliminar cuenta?",
-    "deleteUserDialogDescription": "Confirma que deseas eliminar tu cuenta de forma permanente. Esta acción no se puede deshacer.",
+    "deleteUserDialogDescription": "Confirma que deseas eliminar tu cuenta de forma definitiva. Al hacerlo, se eliminarán inmediatamente todos los datos personales de tu cuenta, así como todos los datos de los espacios de trabajo privados a los que solo tu cuenta tiene acceso. El resto de datos permanecerán en la red. Esta acción no se puede revertir.",
     "deleteUserPasswordLabel": "Contraseña",
     "deleteUserPasswordPlaceholder": "Introduce tu contraseña",
     "deleteUserConfirm": "Eliminar cuenta",

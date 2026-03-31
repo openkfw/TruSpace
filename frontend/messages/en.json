@@ -159,7 +159,7 @@
       "notificationWorkspaceChanged": "The permissions of a workspace I am working on changed",
       "deleteUserButton": "Delete account",
       "deleteUserDialogTitle": "Delete account?",
-      "deleteUserDialogDescription": "Please confirm you want to permanently delete your account. This action cannot be undone.",
+      "deleteUserDialogDescription": "Please confirm you want to permanently delete your account. This will immediately delete all personal account data and all data of private workspaces with permissions only for your account. All other data will remain in the network. This action cannot be undone.",
       "deleteUserPasswordLabel": "Password",
       "deleteUserPasswordPlaceholder": "Enter your password",
       "deleteUserConfirm": "Delete account",

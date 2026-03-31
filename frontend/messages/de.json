@@ -159,7 +159,7 @@
       "notificationWorkspaceChanged": "Die Berechtigungen des Arbeitsbereichs, an dem ich arbeite, geändert werden",
       "deleteUserButton": "Konto löschen",
       "deleteUserDialogTitle": "Konto wirklich löschen?",
-      "deleteUserDialogDescription": "Bitte bestätige, dass du dein Konto dauerhaft löschen möchtest. Diese Aktion kann nicht rückgängig gemacht werden.",
+      "deleteUserDialogDescription": "Bitte bestätige, dass du dein Konto dauerhaft löschen möchtest. Dadurch werden sofort alle persönlichen Kontodaten sowie alle Daten aus privaten Arbeitsbereichen, für die nur dein Konto Zugriffsrechte besitzt, gelöscht. Alle anderen Daten bleiben im Netzwerk erhalten. Diese Aktion kann nicht rückgängig gemacht werden.",
       "deleteUserPasswordLabel": "Passwort",
       "deleteUserPasswordPlaceholder": "Gib dein Passwort ein",
       "deleteUserConfirm": "Konto löschen",
