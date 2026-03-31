@@ -7,7 +7,8 @@ import { getRecentChats } from '../application/get-chats-recent.usecase';
 import { postChat } from '../application/post-chat.usecase';
 import { getChatsExportByDocumentId } from '../application/get-chats-export-by-document-id.usecase';
 
-export const ChatController = {
+export const ChatsController = {
+
   getChatsByDocumentId: async (req: Request, res: Response) => {
     const { docId } = req.params;
     const result = await getChatsByDocumentId(docId);
@@ -32,4 +33,5 @@ export const ChatController = {
     const result = await postChat(creatorNodeId, creatorUserId, data, cid, docId, workspaceOrigin);
     res.json(result);
   },
+  
 };

@@ -15,7 +15,7 @@ import swaggerUi from 'swagger-ui-express';
 
 import { config } from './shared/config/config';
 import { errorHandler } from './shared/middlewares/error';
-import router from './routes';
+import { router } from './routes';
 
 const { env, contentSecurityPolicy, rateLimitPerMinute } = config;
 

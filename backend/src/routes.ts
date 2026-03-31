@@ -10,7 +10,7 @@ import { tagsRouter } from './modules/tags/presentation/tags.routes';
 import { usersRouter } from './modules/users/presentation/users.routes';
 import { workspacesRouter } from './modules/workspaces/presentation/workspaces.routes';
 
-const router = express.Router();
+export const router = express.Router();
 
 router.use(chatsRouter);
 router.use(documentsRouter);
@@ -23,11 +23,9 @@ router.use(tagsRouter);
 router.use(usersRouter);
 router.use(workspacesRouter);
 
-// router.use("/language", authenticateCookie, languageRouter);
+
 // router.use("/permissions", authenticateCookie, permissionsRouter);
 // router.use("/perspectives", authenticateCookie, perspectivesRouter);
 // router.use("/prompts", authenticateCookie, promptsRouter);
 // router.use("/tags", authenticateCookie, tagsRouter);
 // router.use("/workspaces", authenticateCookie, workspacesRouter);
-
-export default router;

@@ -2,30 +2,24 @@ import express from 'express';
 
 import { authenticateCookie } from '../../../shared/middlewares/authenticate';
 
-import {
-  getDocumentsByDocumentIdValidator,
-  validateCID,
-  validateDocumentId,
-  putDocumentValidator,
-  postDocumentValidator,
-} from './documents.validators.';
+import { DocumentsValidator } from './documents.validators.';
 import { DocumentsController } from './documents.controller';
 
 export const documentsRouter = express.Router();
 
-documentsRouter.delete('/documents/:docId', authenticateCookie, validateDocumentId, DocumentsController.deleteDocument);
+documentsRouter.delete('/documents/:docId', authenticateCookie, DocumentsValidator.validateDocumentId, DocumentsController.deleteDocument);
 
 documentsRouter.get(
   '/documents',
   authenticateCookie,
-  getDocumentsByDocumentIdValidator,
+  DocumentsValidator.getDocumentsByDocumentId,
   DocumentsController.getDocumentsByWorkspaceId,
 );
 
 documentsRouter.get(
   '/documents/detail/:docId',
   authenticateCookie,
-  validateDocumentId,
+  DocumentsValidator.validateDocumentId,
   DocumentsController.getDocumentsDetailByDocumentId,
 );
 
@@ -34,17 +28,17 @@ documentsRouter.get('/documents/statistics', authenticateCookie, DocumentsContro
 documentsRouter.get(
   '/documents/stats/:docId',
   authenticateCookie,
-  validateDocumentId,
+  DocumentsValidator.validateDocumentId,
   DocumentsController.getDocumentsStatsByDocumentId,
 );
 
 documentsRouter.get(
   '/documents/version/:cid',
   authenticateCookie,
-  validateCID,
+  DocumentsValidator.validateCID,
   DocumentsController.getDocumentsVersionByCID,
 );
 
-documentsRouter.post('/documents', authenticateCookie, postDocumentValidator, DocumentsController.postDocument);
+documentsRouter.post('/documents', authenticateCookie, DocumentsValidator.postDocumentValidator, DocumentsController.postDocument);
 
-documentsRouter.put('/documents/:docId', authenticateCookie, putDocumentValidator, DocumentsController.putDocument);
+documentsRouter.put('/documents/:docId', authenticateCookie, DocumentsValidator.putDocumentValidator, DocumentsController.putDocument);

@@ -2,20 +2,20 @@ import express from 'express';
 
 import { authenticateCookie } from '../../../shared/middlewares/authenticate';
 
-import { getChatsByDocumentIdValidation, postChatValidation } from './chats.validators';
-import { ChatController } from './chats.controller';
+import { ChatsValidator } from './chats.validators';
+import { ChatsController } from './chats.controller';
 
 export const chatsRouter = express.Router();
 
 chatsRouter.get(
   '/chats/:docId',
   authenticateCookie,
-  getChatsByDocumentIdValidation,
-  ChatController.getChatsByDocumentId,
+  ChatsValidator.getChatsByDocumentId,
+  ChatsController.getChatsByDocumentId,
 );
 
-chatsRouter.get('/chats/export/:docId', authenticateCookie, ChatController.getChatsExportByDocumentId);
+chatsRouter.get('/chats/export/:docId', authenticateCookie, ChatsController.getChatsExportByDocumentId);
 
-chatsRouter.get('/chats/recent', authenticateCookie, ChatController.getRecentChats); // TODO check if this is really unused?
+chatsRouter.get('/chats/recent', authenticateCookie, ChatsController.getRecentChats);
 
-chatsRouter.post('/chats', authenticateCookie, postChatValidation, ChatController.postChat);
+chatsRouter.post('/chats', authenticateCookie, ChatsValidator.postChat, ChatsController.postChat);

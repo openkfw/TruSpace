@@ -16,9 +16,7 @@ export const DocumentsController = {
   deleteDocument: async (req: AuthenticatedRequest, res: Response) => {
     const docId = req.params.docId;
     const email = req.user?.email as string;
-
     const result = await deleteDocument(docId, email, res);
-
     res.json({ result });
   },
 
@@ -28,25 +26,20 @@ export const DocumentsController = {
     const limit = parseInt(req.query.limit as string) || 2;
     const searchString = req.query.search as string;
     const email = req.user?.email as string;
-
     const result = await getDocumentsByWorkspaceId(workspaceId, from, limit, searchString, email, res);
-
     res.json(result);
   },
 
   getDocumentsDetailByDocumentId: async (req: AuthenticatedRequest, res: Response) => {
     const documentId = req.params.docId;
     const email = req.user?.email as string;
-
     const result = await getDocumentsDetailByDocumentId(documentId, email, res);
-
     res.json(result);
   },
 
   getDocumentsStatistics: async (req: AuthenticatedRequest, res: Response) => {
     try {
       const result = await getDocumentsStatistics();
-
       res.json(result);
     } catch (err: any) {
       logger.error(err);
@@ -60,28 +53,23 @@ export const DocumentsController = {
   getDocumentsStatsByDocumentId: async (req: AuthenticatedRequest, res: Response) => {
     const { docId } = req.params;
     const email = req.user?.email as string;
-
     const result = await getDocumentsStatsByDocumentId(docId, email, res);
-
     res.json(result);
   },
 
   getDocumentsVersionByCID: async (req: Request, res: Response) => {
     const cid = req.params.cid;
-
     const result = await getDocumentsVersionByCID(cid, req, res);
     return result;
   },
 
   postDocument: async (req: AuthenticatedRequest, res: Response) => {
     const result = await postDocument(req, res);
-
     res.json(result);
   },
 
   putDocument: async (req: AuthenticatedRequest, res: Response) => {
     const result = await putDocument(req, res);
-
     res.json(result);
   },
 };
