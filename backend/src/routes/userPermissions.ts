@@ -129,7 +129,7 @@ router.delete(
       const permissions = await findPermissionsByEmail(email);
 
       // We delete all found permissions
-      // Additionally: for each permission found, check the workspace if there are other users.
+      // Additionally: for each permission found, check the workspace if there are other users and if it is private.
       // If there are no other users, delete the workspace and all its data (files, folders, etc.)
 
       for (const permission of permissions) {
@@ -139,9 +139,9 @@ router.delete(
         await removePermission(permission.id);
 
         const client = new IpfsClient();
+        const workspace = await client.getWorkspaceById(permission.workspaceId);
         const users = await findUsersInWorkspace(permission.workspaceId);
-        if (users.length === 0) {
-          const workspace = await client.getWorkspaceById(permission.workspaceId)
+        if (users.length === 0 && workspace.length > 0 && !workspace[0].meta.is_public) {
           const wCID = workspace[0].cid;
           await client.deleteWorkspaceById(wCID, permission.workspaceId);
         }
