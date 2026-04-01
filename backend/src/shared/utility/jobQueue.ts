@@ -5,11 +5,11 @@ import {
   getJobNotFinishedAndResetStatusesDb,
   getJobStatusPendingDb,
   updateJobStatusDb,
-} from "../clients/db/jobStatus";
-import logger from "../config/winston";
-import { Prompt } from "../shared/types/interfaces";
+} from '../clients/db/jobStatus';
+import logger from '../config/winston';
+import { Prompt } from '../types/interfaces';
 
-type JobStatus = "pending" | "processing" | "completed" | "failed" | null;
+type JobStatus = 'pending' | 'processing' | 'completed' | 'failed' | null;
 
 type JobAttributes = { [key: string]: string | number | boolean | Prompt[] };
 
@@ -55,18 +55,12 @@ class JobQueue {
           }
         })
         .catch((error) => {
-          console.error("Error loading pending jobs from database:", error);
+          console.error('Error loading pending jobs from database:', error);
         });
     }
   }
 
-  addJobTemplate({
-    templateId,
-    job,
-  }: {
-    templateId: string;
-    job: (attributes: JobAttributes) => Promise<any>;
-  }): void {
+  addJobTemplate({ templateId, job }: { templateId: string; job: (attributes: JobAttributes) => Promise<any> }): void {
     this.#jobTemplates[templateId] = job;
   }
 
@@ -76,7 +70,7 @@ class JobQueue {
     prompts,
     identifier,
   }: {
-    templateId: "tags" | "perspectives" | "language";
+    templateId: 'tags' | 'perspectives' | 'language';
     cid: string;
     prompts: Prompt[];
     identifier?: string;
@@ -101,25 +95,14 @@ class JobQueue {
   }): Promise<string | undefined> {
     const jobTemplate = this.#jobTemplates[templateId];
     if (!jobTemplate) {
-      logger.error(
-        `Job template "${templateId}" not found for job ${requestId}.`,
-      );
+      logger.error(`Job template "${templateId}" not found for job ${requestId}.`);
       return;
     }
 
-    return this.#enqueueJob(
-      requestId,
-      () => jobTemplate(attributes),
-      templateId,
-      attributes,
-    );
+    return this.#enqueueJob(requestId, () => jobTemplate(attributes), templateId, attributes);
   }
 
-  async updateJobStatus(
-    jobId: string,
-    status: "pending" | "processing" | "completed" | "failed",
-    error?: string,
-  ) {
+  async updateJobStatus(jobId: string, status: 'pending' | 'processing' | 'completed' | 'failed', error?: string) {
     return updateJobStatusDb(jobId, status, error);
   }
 
@@ -132,7 +115,7 @@ class JobQueue {
     const jobObject: Job = {
       id: requestId,
       job,
-      status: this.#useDatabase ? null : "pending",
+      status: this.#useDatabase ? null : 'pending',
       timestamp: new Date(),
     };
     this.#queue.push(jobObject);
@@ -141,7 +124,7 @@ class JobQueue {
       // If using a database, create a new entry for the job
       await createJobStatusDb({
         requestId,
-        status: "pending",
+        status: 'pending',
         templateId,
         attributes,
       });
@@ -160,7 +143,7 @@ class JobQueue {
     return {
       status: jobStatus.status,
       timestamp: jobStatus.created_at,
-      jobsBefore: jobStatus.status === "pending" ? queue?.length || -1 : -1,
+      jobsBefore: jobStatus.status === 'pending' ? queue?.length || -1 : -1,
       result: null,
       error: jobStatus.error,
     };
@@ -176,10 +159,7 @@ class JobQueue {
       return {
         status: foundJob.status,
         timestamp: foundJob.timestamp,
-        jobsBefore:
-          foundJob.status === "pending"
-            ? this.#queue.findIndex((jobLoop) => jobLoop.id === foundJob.id)
-            : -1,
+        jobsBefore: foundJob.status === 'pending' ? this.#queue.findIndex((jobLoop) => jobLoop.id === foundJob.id) : -1,
         result: foundJob.result,
         error: foundJob.error,
       };
@@ -200,18 +180,18 @@ class JobQueue {
         }
       }
 
-      if (job.status === "pending") {
-        job.status = "processing";
-        await updateJobStatusDb(job.id, "processing");
+      if (job.status === 'pending') {
+        job.status = 'processing';
+        await updateJobStatusDb(job.id, 'processing');
         try {
           logger.debug(`Processing job ${job.id}...`);
           const response = await job.job();
           job.result = response;
-          job.status = "completed";
+          job.status = 'completed';
           logger.debug(`Processing job ${job.id} complete.`);
         } catch (error) {
           job.error = error;
-          job.status = "failed";
+          job.status = 'failed';
           logger.warn(`Processing job ${job.id} failed.`);
         }
       }
@@ -223,7 +203,7 @@ class JobQueue {
 
   #generateRequestId = (
     cid: string,
-    type: "perspectives" | "tags" | "language",
+    type: 'perspectives' | 'tags' | 'language',
     suffix: string | undefined,
   ): string => {
     if (suffix) {

@@ -23,7 +23,17 @@ function mapToModel(userSchema: UserSchema): UserModel {
 }
 
 export const createUser = async (name: string, email: string, hash: string, status: string, token: string) => {
-  const userSchema: UserSchema = await createUserDb(name, email, hash, status, token);
+  const userId = await createUserDb(name, email, hash, status, token);
+  if (!userId) {
+    return undefined;
+  }
+
+  const userSchema = await db<UserSchema>('users').where({ id: userId }).first();
+  if (!userSchema) {
+    logger.error(`Created user ${email} could not be loaded from the database`);
+    return undefined;
+  }
+
   const userModel: UserModel = mapToModel(userSchema);
   return userModel;
 };

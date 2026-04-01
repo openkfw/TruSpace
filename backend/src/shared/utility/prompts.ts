@@ -1,12 +1,12 @@
-import * as fs from "fs";
-import * as path from "path";
-import logger from "../config/winston";
-import { Prompt } from "../shared/types/interfaces";
+import * as fs from 'fs';
+import * as path from 'path';
+import logger from '../config/winston';
+import { Prompt } from '../types/interfaces';
 
 export const examplePrompts = [];
 
 export const tagsPrompt = {
-  title: "tags",
+  title: 'tags',
   prompt: `Generate 1-3 broad tags categorizing the main themes of the file, along with 1-2 more specific subtopic tags.
 
               Guidelines:
@@ -21,7 +21,7 @@ export const tagsPrompt = {
 };
 
 export const languagePrompt: Prompt = {
-  title: "language",
+  title: 'language',
   prompt:
     'Detect the primary language of the provided document. Your response must be *only* the name of the language in JSON format (e.g., `{ "language": "English" }`, `{ "language": "Spanish" }`, `{ "language": "French" }`).',
 };
@@ -31,7 +31,7 @@ export const languagePrompt: Prompt = {
  * @returns Content of the JSON file or empty array
  */
 function readExternalPrompts(): Prompt[] {
-  const filePath = "./prompts/prompts.json";
+  const filePath = './prompts/prompts.json';
   try {
     const absolutePath = path.resolve(filePath);
 
@@ -40,13 +40,11 @@ function readExternalPrompts(): Prompt[] {
       return [] as Prompt[];
     }
 
-    const fileContent = fs.readFileSync(absolutePath, "utf8");
+    const fileContent = fs.readFileSync(absolutePath, 'utf8');
     const parsedContent = JSON.parse(fileContent) as Prompt[];
 
     if (!Array.isArray(parsedContent)) {
-      logger.error(
-        `File content is not an array: ${absolutePath}, returning []`,
-      );
+      logger.error(`File content is not an array: ${absolutePath}, returning []`);
       return [] as Prompt[];
     }
 

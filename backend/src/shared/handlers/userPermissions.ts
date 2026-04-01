@@ -1,5 +1,5 @@
-import { IpfsClient } from "../clients/ipfs-client";
-import logger from "../../config/winston";
+import { IpfsClient } from '../clients/ipfs-client';
+import logger from '../config/winston';
 
 export interface UserPermissionDto {
   id?: string;
@@ -17,7 +17,7 @@ export const createPermission = async (permission: UserPermissionDto) => {
     // );
     return permissionId;
   } catch (error) {
-    logger.error("Error creating permission:", error);
+    logger.error('Error creating permission:', error);
     return undefined;
   }
 };
@@ -25,7 +25,7 @@ export const createPermission = async (permission: UserPermissionDto) => {
 export const findPermissionsByEmail = async (email: string) => {
   try {
     const client = new IpfsClient();
-    const permissions = await client.findPermissionsByKey("email", email);
+    const permissions = await client.findPermissionsByKey('email', email);
     // logger.info(`Found ${permissions.length} permissions for email: ${email}`);
     return permissions;
   } catch (error) {
@@ -37,10 +37,7 @@ export const findPermissionsByEmail = async (email: string) => {
 export const findUsersInWorkspace = async (workspaceId: string) => {
   try {
     const client = new IpfsClient();
-    const permissions = await client.findPermissionsByKey(
-      "workspaceId",
-      workspaceId,
-    );
+    const permissions = await client.findPermissionsByKey('workspaceId', workspaceId);
     // logger.info(
     //   `Found ${permissions.length} permissions for workspace: ${workspaceId}`,
     // );
@@ -56,7 +53,7 @@ export const findUsersInWorkspace = async (workspaceId: string) => {
 export const findPermissionById = async (permissionId: string) => {
   try {
     const client = new IpfsClient();
-    const permissions = await client.findPermissionsByKey("id", permissionId);
+    const permissions = await client.findPermissionsByKey('id', permissionId);
     // logger.info(
     //   `Found ${permissions.length} permissions for ID: ${permissionId}`,
     // );

@@ -1,13 +1,13 @@
-import { v4 as uuidv4 } from "uuid";
-import { DocumentRequest } from "../types/interfaces";
-import { getWorkspacePasswordDb } from "../clients/db";
-import { IpfsClient } from "../clients/ipfs-client";
-import { config } from "../../config/config";
-import logger from "../../config/winston";
-import { decrypt } from "../encryption";
+import { v4 as uuidv4 } from 'uuid';
+import { DocumentRequest } from '../types/interfaces';
+import { getWorkspacePasswordDb } from '../clients/db';
+import { IpfsClient } from '../clients/ipfs-client';
+import { config } from '../config/config';
+import logger from '../config/winston';
+import { decrypt } from '../encryption';
 
 export function decodeFilename(filename: string) {
-  return Buffer.from(filename, "latin1").toString("utf-8");
+  return Buffer.from(filename, 'latin1').toString('utf-8');
 }
 
 export function createDocumentRequest({
@@ -36,12 +36,12 @@ export function createDocumentRequest({
     meta: {
       filename,
       timestamp: Date.now().toString(),
-      version: version || "1",
+      version: version || '1',
       size: size || 0,
       creatorNodeId,
       creatorUserId,
       workspaceOrigin,
-      encrypted: "true",
+      encrypted: 'true',
       mimetype,
       versionTagName,
     },
@@ -57,10 +57,7 @@ export async function getWorkspacePassword(workspaceId: string) {
     return workspaceId;
   }
 
-  const workspacePassword = await decrypt(
-    encryptedWorkspacePassword?.encrypted_password,
-    config.masterPassword,
-  );
+  const workspacePassword = await decrypt(encryptedWorkspacePassword?.encrypted_password, config.masterPassword);
 
   return workspacePassword.toString();
 }
@@ -78,12 +75,8 @@ export async function getContributorsDocument(docId: string) {
 
   docs.map((d) => contributors.push(d.meta.creatorUserId));
   chats.map((d) => contributors.push(d.meta.creatorUserId));
-  tags
-    .filter((d) => d.meta.creatorType === "user")
-    .map((d) => contributors.push(d.meta.creatorUserId));
-  perspectives
-    .filter((d) => d.meta.creatorType === "user")
-    .map((d) => contributors.push(d.meta.creatorUserId));
+  tags.filter((d) => d.meta.creatorType === 'user').map((d) => contributors.push(d.meta.creatorUserId));
+  perspectives.filter((d) => d.meta.creatorType === 'user').map((d) => contributors.push(d.meta.creatorUserId));
 
   const uniqueContributors = [...new Set(contributors.filter((c) => c))];
   return { count: uniqueContributors.length, contributors: uniqueContributors };

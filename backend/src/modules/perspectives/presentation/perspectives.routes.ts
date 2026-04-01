@@ -1,119 +1,45 @@
-import express, { Request, Response } from "express";
-import { body, param } from "express-validator";
-import { v4 as uuidv4 } from "uuid";
-import { IpfsClient } from "../clients/ipfs-client";
-import validate from "../middlewares/validate";
-import { AuthenticatedRequest } from "../../../shared/types";
-import { PerspectiveRequest } from "../../../shared/types/interfaces";
-import taskQueue from "../utility/jobQueue";
+import express from 'express';
 
-const router = express.Router();
+import { authenticateCookie } from '../../../shared/middlewares/authenticate';
 
-router.get(
-  "/status/:requestId",
-  validate([param("requestId").notEmpty()]),
-  async (req: Request, res: Response) => {
-    const { requestId } = req.params;
-    const job = await taskQueue.getJobStatus(requestId);
+import { PerspectivesController } from './perspectives.controller';
+import { PerspectivesValidator } from './perspectives.validators';
 
-    if (!job?.status) {
-      return res.status(200).json(null);
-    }
+export const perspectivesRouter = express.Router();
 
-    return res.json({
-      status: job?.status,
-      jobsBefore: job?.jobsBefore,
-      timestamp: job?.timestamp,
-    });
-  },
+perspectivesRouter.get(
+  '/perspectives/status/:requestId',
+  authenticateCookie,
+  PerspectivesValidator.getPerspectiveStatus,
+  PerspectivesController.getPerspectiveStatus,
 );
 
-router.get(
-  "/version/:cid",
-  validate([param("cid").notEmpty()]),
-  async (req: Request, res: Response) => {
-    const cid = req.params.cid;
-    const client = new IpfsClient();
-    const result = await client.getPerspectivesByVersionCid(cid);
-    res.json(result);
-  },
+perspectivesRouter.get(
+  '/perspectives/version/:cid',
+  authenticateCookie,
+  PerspectivesValidator.getPerspectivesByVersionCid,
+  PerspectivesController.getPerspectivesByVersionCid,
 );
 
-router.get(
-  "/:documentId",
-  validate([param("documentId").isUUID(4)]),
-  async (req: Request, res: Response) => {
-    const documentId = req.params.documentId;
-    const client = new IpfsClient();
-    const result = await client.getPerspectivesByDocumentId(documentId);
-    res.json(result);
-  },
+perspectivesRouter.get(
+  '/perspectives/:documentId',
+  authenticateCookie,
+  PerspectivesValidator.getPerspectivesByDocumentId,
+  PerspectivesController.getPerspectivesByDocumentId,
 );
 
-router.get("/", async (_req: Request, res: Response) => {
-  const client = new IpfsClient();
-  const result = await client.getAllPerspectives();
-  res.json(result);
-});
+perspectivesRouter.get('/perspectives', authenticateCookie, PerspectivesController.getAllPerspectives);
 
-router.post(
-  "/",
-  validate([
-    body("perspectiveType").isString().notEmpty(),
-    body("perspectiveText").isString().notEmpty(),
-    body("workspaceOrigin").isUUID(4).notEmpty(),
-    body("docId").isUUID(4).notEmpty(),
-    body("cid").isString().notEmpty(),
-  ]),
-  async (req: AuthenticatedRequest, res: Response) => {
-    const client = new IpfsClient();
-    const perspectiveRequest: PerspectiveRequest = {
-      meta: {
-        type: "perspective",
-        perspectiveType: req.body.perspectiveType,
-        workspaceOrigin: req.body.workspaceOrigin,
-        docId: req.body.docId,
-        versionCid: req.body.cid,
-        timestamp: new Date().toISOString(),
-        data: req.body.perspectiveText as string,
-        creatorType: "user",
-        creatorNodeId: req.user?.nodeId as string,
-        creatorUserId: req.user?.uiid as string,
-        prompt: "",
-      },
-    };
-    const result = await client.createPerspective(perspectiveRequest);
-    res.json(result);
-  },
+perspectivesRouter.post(
+  '/perspectives',
+  authenticateCookie,
+  PerspectivesValidator.postPerspective,
+  PerspectivesController.postPerspective,
 );
 
-router.post(
-  "/generate-custom",
-  validate([
-    body("promptTitle").isString().notEmpty(),
-    body("prompt").isString().notEmpty(),
-    body("workspaceOrigin").isUUID(4).notEmpty(),
-    body("docId").isUUID(4).notEmpty(),
-    body("cid").isString().notEmpty(),
-  ]),
-  async (req: AuthenticatedRequest, res: Response) => {
-    const { cid, prompt, promptTitle } = req.body;
-    const customSummaryTaskId = await taskQueue.addJob({
-      templateId: "perspectives",
-      cid,
-      prompts: [{ title: promptTitle, prompt: prompt }],
-      identifier: uuidv4(),
-    });
-
-    const customPromptInitialResponse = {
-      requestId: `${customSummaryTaskId}`,
-      message: "Request accepted. Processing started for task.",
-      statusEndpoint: `/api/perspectives/status/${customSummaryTaskId}`,
-    };
-
-    const result = customPromptInitialResponse;
-    res.json(result);
-  },
+perspectivesRouter.post(
+  '/perspectives/generate-custom',
+  authenticateCookie,
+  PerspectivesValidator.postCustomPerspective,
+  PerspectivesController.postCustomPerspective,
 );
-
-export default router;

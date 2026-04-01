@@ -1,25 +1,21 @@
-import { NextFunction, Response } from "express";
-import jwt from "jsonwebtoken";
-import { findUserByEmailDb } from "../clients/db";
-import { config } from "../config/config";
-import logger from "../config/winston";
-import { AuthenticatedRequest } from "../shared/types";
-import { JwtPayload } from "../shared/types/interfaces";
-import { IpfsClient } from "../clients/ipfs-client";
-import { USER_STATUS } from "../utility/constants";
+import { NextFunction, Response } from 'express';
+import jwt from 'jsonwebtoken';
+import { findUserByEmailDb } from '../clients/db';
+import { config } from '../config/config';
+import logger from '../config/winston';
+import { AuthenticatedRequest } from '../types';
+import { JwtPayload } from '../types/interfaces';
+import { IpfsClient } from '../clients/ipfs-client';
+import { USER_STATUS } from '../utility/constants';
 
-export async function authenticateCookie(
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction,
-) {
+export async function authenticateCookie(req: AuthenticatedRequest, res: Response, next: NextFunction) {
   const token = req.cookies.auth_token;
 
   if (!token) {
     logger.error(`${req.url} Missing auth_token authentication cookie`);
     return res.status(401).json({
-      status: "failure",
-      message: "Authentication required",
+      status: 'failure',
+      message: 'Authentication required',
     });
   }
 
@@ -29,20 +25,20 @@ export async function authenticateCookie(
     if (!decoded.nodeId) {
       try {
         const clusterId = await new IpfsClient().clusterId();
-        decoded.nodeId = clusterId?.ipfs?.id || "";
+        decoded.nodeId = clusterId?.ipfs?.id || '';
       } catch (error) {
-        logger.error("Error resolving nodeId:", error);
+        logger.error('Error resolving nodeId:', error);
       }
     }
 
     req.user = decoded;
 
-    if (config.env === "production") {
+    if (config.env === 'production') {
       const user = await findUserByEmailDb(req.user.email);
       if (!user || user.status !== USER_STATUS.active) {
         return res.status(401).json({
-          status: "failure",
-          message: "Account inactive",
+          status: 'failure',
+          message: 'Account inactive',
         });
       }
     }
@@ -51,8 +47,8 @@ export async function authenticateCookie(
   } catch (error) {
     logger.error(error);
     return res.status(401).json({
-      status: "failure",
-      message: "Invalid or expired token",
+      status: 'failure',
+      message: 'Invalid or expired token',
     });
   }
 }
