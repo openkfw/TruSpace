@@ -773,7 +773,8 @@ export const deleteUser = async () => {
         if (!res.ok) {
             throw new Error("Failed to delete user");
         }
-        return res.json();
+        const text = await res.text();
+        return text ? JSON.parse(text) : null;
     }
     catch (error) {
         console.error("Error deleting user:", error);
@@ -794,7 +795,8 @@ export const removeAllUserPermissions = async (email: string) => {
         if (!res.ok) {
             throw new Error("Failed to remove user permissions");
         }
-        return res.json();
+        const text = await res.text();
+        return text ? JSON.parse(text) : null;
     }
     catch (error) {
         console.error("Error removing user permissions:", error);

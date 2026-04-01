@@ -139,8 +139,8 @@ router.delete(
         await removePermission(permission.id);
 
         const client = new IpfsClient();
-        const workspaces = await findUsersInWorkspace(permission.workspaceId);
-        if (workspaces.length === 0) {
+        const users = await findUsersInWorkspace(permission.workspaceId);
+        if (users.length === 0) {
           const workspace = await client.getWorkspaceById(permission.workspaceId)
           const wCID = workspace[0].cid;
           await client.deleteWorkspaceById(wCID, permission.workspaceId);
