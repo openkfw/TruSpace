@@ -7,7 +7,7 @@ import path from "path";
 import {
   activateUserDb,
   createUserDb,
-  deleteUserById,
+  deleteUserByUiid,
   findUserByEmailDb,
   findUserByTokenDb,
   getTotalRecentlyAddedUsersDb,
@@ -184,7 +184,7 @@ router.post(
       } else {
         const user = await findUserByEmailDb(email);
         if (user) {
-          await deleteUserById(user.id);
+          await deleteUserByUiid(user.uiid);
         }
         res.status(500).json({
           status: "failure",
@@ -685,5 +685,52 @@ router.post(
     }
   },
 );
+
+router.delete(
+  "/delete-user",
+  authenticateCookie,
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const nodeId = await resolveNodeId(req.user?.nodeId);
+      const userId = req.user?.uiid;
+
+      if (nodeId && userId) {
+        try {
+          // Delete user data in ipfs
+          const client = new IpfsClient();
+          await client.deleteUserData(nodeId, userId);
+
+          // Delete user in db
+          await deleteUserByUiid(userId);
+
+          res.json({
+            status: "success",
+            message: "User deleted successfully",
+          });
+        }
+        catch (error) {
+          logger.error("Error deleting user data in IPFS:", error);
+          res.status(500).json({
+            status: "failure",
+            message: "Error deleting user data",
+          });
+        }
+      }
+      else {
+        res.status(400).json({
+          status: "failure",
+          message: "User ID or Node ID missing",
+        });
+      }
+    }
+    catch (error) {
+      logger.error("Error deleting user:", error);
+      res.status(500).json({
+        status: "failure",
+        message: "Error deleting user",
+      });
+    }
+  }
+)
 
 export default router;

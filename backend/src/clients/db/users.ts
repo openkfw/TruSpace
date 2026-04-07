@@ -213,9 +213,9 @@ export const updateUserToken = async (userId: number, token: string) => {
   }
 };
 
-export const deleteUserById = async (userId: number) => {
+export const deleteUserByUiid = async (userId: string) => {
   try {
-    await db<UserDb>("users").delete().where({ id: userId });
+    await db<UserDb>("users").delete().where({ uiid: userId });
   } catch (error) {
     logger.error("Error deleting user", error);
     throw new Error("Error deleting user");

@@ -6,6 +6,7 @@ export interface UserPermissionDto {
   workspaceId: string;
   email: string;
   role: string;
+  created_at?: string;
 }
 
 export const createPermission = async (permission: UserPermissionDto) => {
@@ -94,4 +95,16 @@ export const removePermissionsForWorkspace = async (workspaceId: string) => {
     logger.error(`Error deleting permissions`, error);
     return [];
   }
+};
+
+export const selectNextOldestPermissionUser = (
+  users: UserPermissionDto[],
+): UserPermissionDto | undefined => {
+  return [...users].sort((a, b) => {
+    const aDate = Date.parse(a.created_at ?? "");
+    const bDate = Date.parse(b.created_at ?? "");
+    const aValue = Number.isNaN(aDate) ? Number.MAX_SAFE_INTEGER : aDate;
+    const bValue = Number.isNaN(bDate) ? Number.MAX_SAFE_INTEGER : bDate;
+    return aValue - bValue;
+  })[0];
 };
