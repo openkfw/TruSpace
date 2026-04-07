@@ -62,13 +62,13 @@ cd TruSpace
 <summary>Please open to see the expected results with screenshots</summary>
 
 1. Open frontend in your browser at [http://localhost:3000](http://localhost:3000) to see the login screen:
-   ![Screenshot of login screen](./doc/screenshot_login.png)
+   ![Screenshot of login screen](./doc/images/screenshot_login.png)
 
 2. Click on "Register" to create a new user account. Fill out the required fields. The user account is local, your data is not going anywhere.
-   ![Screenshot of register screen](./doc/screenshot_register.png)
+   ![Screenshot of register screen](./doc/images/screenshot_register.png)
 
 3. After the submission, the app takes you back to the login screen, and from there to the dashboard.
-   ![Screenshot of dashboard](./doc/screenshot_dashboard.png)
+   ![Screenshot of dashboard](./doc/images/screenshot_dashboard.png)
 
 If something doesn't work, check that all containers are running with `docker ps`. They should show these containers:
 | CONTAINER ID | IMAGE | COMMAND | CREATED | STATUS | PORTS | NAMES |
@@ -194,11 +194,11 @@ For a complete reference and description of all variables, see [ENVIRONMENT_VARI
 
 In the overview, you can see how the components work together. The UI and API is part of this repository and provides the interface and the translation to other services. Once you start TruSpace, it pulls and connects to containers from Open Web UI (for AI processing) and IPFS/IPFS-Cluster to persist the data. The respective ports are outlined in the image.
 
-![Architecture](./doc/tech-arch-diagram.PNG "Tech Architecture overview")
+![Architecture](./doc/images/tech-arch-diagram.PNG "Tech Architecture overview")
 
 ### Data model for workspaces in IPFS
 
-The data model has a hierarchical structure of workspaces, documents and metadata. They are linked using UUIDs in the metadata-fields of the IPFS files. Each data entry is a single (small) file to avoid merge conflicts in the IPFS network, e.g. in case of network split. The concept is outlined in the visual representation of the [Data model](./doc/datamodel.png "Data model")
+The data model has a hierarchical structure of workspaces, documents and metadata. They are linked using UUIDs in the metadata-fields of the IPFS files. Each data entry is a single (small) file to avoid merge conflicts in the IPFS network, e.g. in case of network split. The concept is outlined in the visual representation of the [Data model](./doc/images/datamodel.png "Data model")
 
 The specific fields are described in [backend/src/types/interfaces/truspace.ts](backend/src/types/interfaces/truspace.ts)
 
