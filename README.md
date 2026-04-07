@@ -224,6 +224,9 @@ We welcome contributions! Please read the [CONTRIBUTING.md](CONTRIBUTING.md) and
 - Reporting issues and submitting pull requests
 - Code style guidelines
 
+To inspire contributers and make it easier to get started, we have visualized our 2 main goals for TruSpace in the near future and respective features that will help us get there:
+![WhatsNext](./doc/images/WhatsNext.jpg)
+
 ## 📜 License
 
 This project is licensed under the **GNU General Public License v3.0**. See the [LICENSE](./LICENSE) file for details.
