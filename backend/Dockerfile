@@ -12,7 +12,6 @@ RUN npm ci --include=dev
 
 # Copy the rest of the application source code
 COPY . .
-COPY openapi ./dist/openapi
 
 # Build the TypeScript code
 RUN npm run build
