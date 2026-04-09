@@ -1,0 +1,130 @@
+import { Request, Response } from 'express';
+
+import { IpfsClient } from '../../../shared/clients/ipfs-client';
+import { AuthenticatedRequest } from '../../../shared/types';
+import { getUsersAvatar } from '../application/get-users-avatar.usecase';
+import { getUsersStatistics } from '../application/get-users-statistics.usecase';
+import { getUsersUserSettings } from '../application/get-users-user-settings.usecase';
+import { postUsersLogin } from '../application/post-users-login.usecase';
+import { postUsersConfirmRegistration } from '../application/post-users-confirm-registration.usecase';
+import { postUsersForgotPassword } from '../application/post-users-forgot-password.usecase';
+import { postUsersRegister } from '../application/post-users-register.usecase';
+import { postUsersResetName } from '../application/post-users-reset-name.usecase';
+import { postUsersResetPassword } from '../application/post-users-reset-password.usecase';
+import { postUsersUserSettings } from '../application/post-users-user-settings.usecase';
+import { deleteUser } from '../application/delete-user.usecase';
+import logger from '../../../shared/config/winston';
+
+const sendResponse = (
+  res: Response,
+  result: {
+    statusCode?: number;
+    body: unknown;
+  },
+) => res.status(result.statusCode ?? 200).json(result.body);
+
+export const UsersController = {
+  postUsersRegister: async (req: Request, res: Response) => {
+    const { name, email, password, confirmationLink, lang } = req.body;
+    const result = await postUsersRegister(name, email, password, confirmationLink, lang, res);
+
+    if (!res.headersSent && result) {
+      res.json(result);
+    }
+  },
+
+  postUsersLogin: async (req: Request, res: Response) => {
+    await postUsersLogin(req, res);
+  },
+
+  postUsersLogout: (_req: Request, res: Response) => {
+    res.clearCookie('auth_token', {
+      httpOnly: true,
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
+    });
+
+    return res.status(200).json({
+      status: 'success',
+      message: 'Logout successful',
+    });
+  },
+
+  getUsersStatistics: async (_req: Request, res: Response) => {
+    const result = await getUsersStatistics();
+    sendResponse(res, result);
+  },
+
+  postUsersConfirmRegistration: async (req: Request, res: Response) => {
+    const result = await postUsersConfirmRegistration(
+      req.query.token as string,
+      req.body.lang,
+      req.body.confirmationLink,
+    );
+
+    sendResponse(res, result);
+  },
+
+  getUsersUserSettings: async (req: AuthenticatedRequest, res: Response) => {
+    const result = await getUsersUserSettings(req.user?.email as string);
+    sendResponse(res, result);
+  },
+
+  postUsersUserSettings: async (req: AuthenticatedRequest, res: Response) => {
+    const result = await postUsersUserSettings(req);
+    sendResponse(res, result);
+  },
+
+  getUsersAvatar: async (req: AuthenticatedRequest, res: Response) => {
+    const cid = await getUsersAvatar(req.user?.email as string);
+
+    if (!cid) {
+      return res.status(404).json({
+        status: 'failure',
+        message: 'Could not find avatar',
+      });
+    }
+
+    return new IpfsClient().downloadAvatar(req, res, cid);
+  },
+
+  postUsersForgotPassword: async (req: Request, res: Response) => {
+    const result = await postUsersForgotPassword(req.body.email, req.body.resetPasswordLink, req.body.lang);
+
+    sendResponse(res, result);
+  },
+
+  postUsersResetName: async (req: AuthenticatedRequest, res: Response) => {
+    const result = await postUsersResetName(req.user?.email, req.body.name, req.user?.nodeId, req.user?.uiid);
+
+    sendResponse(res, result);
+  },
+
+  postUsersResetPassword: async (req: Request, res: Response) => {
+    const result = await postUsersResetPassword(req.body.password, req.body.token);
+    sendResponse(res, result);
+  },
+
+  deleteUser: async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.user?.uiid;
+    const nodeId = req.user?.nodeId;
+
+    if (!nodeId || !userId) {
+      return res.status(400).json({
+        status: 'failure',
+        message: 'User ID or Node ID missing',
+      });
+    }
+
+    try {
+      await deleteUser(userId, nodeId, res);
+    } catch (error) {
+      logger.error('Error deleting user:', error);
+      res.status(500).json({
+        status: 'failure',
+        message: 'Error deleting user',
+      });
+    }
+  },
+};
