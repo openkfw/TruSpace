@@ -4,20 +4,16 @@ import express from 'express';
 import fileUpload from 'express-fileupload';
 import session from 'express-session';
 import rateLimit from 'express-rate-limit';
-import fs from 'fs';
 import helmet from 'helmet';
 import lusca from 'lusca';
 import createError from 'http-errors';
-import yaml from 'js-yaml';
 import morgan from 'morgan';
-import path from 'path';
-import swaggerUi from 'swagger-ui-express';
 
 import { config } from './shared/config/config';
 import { errorHandler } from './shared/middlewares/error';
 import { router } from './routes';
 
-const { env, contentSecurityPolicy, rateLimitPerMinute } = config;
+const { contentSecurityPolicy, rateLimitPerMinute } = config;
 
 const app = express();
 app.set('trust proxy', 1); // trust first proxy (e.g. if behind a load balancer) for correct client IP and secure cookie handling
@@ -127,16 +123,7 @@ app.use(
 /** ROUTES */
 app.use('/api', router);
 
-// OpenAPI docs
-const pathToOpenapi =
-  env === 'production'
-    ? path.join(process.cwd(), 'dist', 'openapi', 'openapi.yaml')
-    : path.join(process.cwd(), 'openapi', 'openapi.yaml');
-
-const doc = yaml.load(fs.readFileSync(pathToOpenapi, 'utf8')) as swaggerUi.JsonObject;
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(doc));
-
-app.use(function (req, res, next) {
+app.use(function (_req, res, next) {
   res.status(404);
   next(createError(404));
 });
