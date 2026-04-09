@@ -5,13 +5,15 @@ import { AuthenticatedRequest } from '../../../shared/types';
 import { getUsersAvatar } from '../application/get-users-avatar.usecase';
 import { getUsersStatistics } from '../application/get-users-statistics.usecase';
 import { getUsersUserSettings } from '../application/get-users-user-settings.usecase';
-import postUsersLogin from '../application/post-users-login.usecase';
+import { postUsersLogin } from '../application/post-users-login.usecase';
 import { postUsersConfirmRegistration } from '../application/post-users-confirm-registration.usecase';
 import { postUsersForgotPassword } from '../application/post-users-forgot-password.usecase';
-import postUsersRegister from '../application/post-users-register.usecase';
+import { postUsersRegister } from '../application/post-users-register.usecase';
 import { postUsersResetName } from '../application/post-users-reset-name.usecase';
 import { postUsersResetPassword } from '../application/post-users-reset-password.usecase';
 import { postUsersUserSettings } from '../application/post-users-user-settings.usecase';
+import { deleteUser } from '../application/delete-user.usecase';
+import logger from '../../../shared/config/winston';
 
 const sendResponse = (
   res: Response,
@@ -102,5 +104,27 @@ export const UsersController = {
   postUsersResetPassword: async (req: Request, res: Response) => {
     const result = await postUsersResetPassword(req.body.password, req.body.token);
     sendResponse(res, result);
+  },
+
+  deleteUser: async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.user?.uiid;
+    const nodeId = req.user?.nodeId;
+
+    if (!nodeId || !userId) {
+      return res.status(400).json({
+        status: 'failure',
+        message: 'User ID or Node ID missing',
+      });
+    }
+
+    try {
+      await deleteUser(userId, nodeId, res);
+    } catch (error) {
+      logger.error('Error deleting user:', error);
+      res.status(500).json({
+        status: 'failure',
+        message: 'Error deleting user',
+      });
+    }
   },
 };

@@ -13,25 +13,18 @@ usersRouter.post('/users/login', UsersValidator.postUsersLogin, UsersController.
 
 usersRouter.post('/users/logout', UsersController.postUsersLogout);
 
-usersRouter.get('/users/statistics', authenticateCookie, UsersController.getUsersStatistics);
-
+usersRouter.post(
+  '/users/forgot-password',
+  UsersValidator.postUsersForgotPassword,
+  UsersController.postUsersForgotPassword,
+);
 usersRouter.post(
   '/users/confirm-registration',
   UsersValidator.postUsersConfirmRegistration,
   UsersController.postUsersConfirmRegistration,
 );
 
-usersRouter.get('/users/user-settings', authenticateCookie, UsersController.getUsersUserSettings);
-
 usersRouter.post('/users/user-settings', authenticateCookie, UsersController.postUsersUserSettings);
-
-usersRouter.get('/users/avatar', authenticateCookie, UsersController.getUsersAvatar);
-
-usersRouter.post(
-  '/users/forgot-password',
-  UsersValidator.postUsersForgotPassword,
-  UsersController.postUsersForgotPassword,
-);
 
 usersRouter.post(
   '/users/reset-name',
@@ -45,3 +38,11 @@ usersRouter.post(
   UsersValidator.postUsersResetPassword,
   UsersController.postUsersResetPassword,
 );
+
+usersRouter.get('/users/statistics', authenticateCookie, UsersController.getUsersStatistics);
+
+usersRouter.get('/users/user-settings', authenticateCookie, UsersController.getUsersUserSettings);
+
+usersRouter.get('/users/avatar', authenticateCookie, UsersController.getUsersAvatar);
+
+usersRouter.delete('/users/delete-user', authenticateCookie, UsersController.deleteUser);

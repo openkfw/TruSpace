@@ -29,4 +29,18 @@ export const PermissionsController = {
     const result = await deletePermissionById(req.params.permissionId);
     sendResponse(res, result);
   },
+
+  deletePermissionsRemoveAllByEmail: async (req: AuthenticatedRequest, res: Response) => {
+    const { email } = req.params;
+    try {
+      const result = await deletePermissionById(email);
+      sendResponse(res, result);
+    } catch (error) {
+      console.error('Removing user error:', error);
+      return res.status(500).json({
+        status: 'failure',
+        message: 'Removing user failed',
+      });
+    }
+  },
 };

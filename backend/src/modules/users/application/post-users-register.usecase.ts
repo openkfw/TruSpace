@@ -4,7 +4,7 @@ import fs from 'fs';
 import { Response } from 'express';
 import { compile } from 'handlebars';
 
-import { createUserDb, findUserByEmailDb, deleteUserById } from '../../../shared/clients/db';
+import { createUserDb, findUserByEmailDb, deleteUserByUiid } from '../../../shared/clients/db';
 import { IpfsClient } from '../../../shared/clients/ipfs-client';
 import { hashPassword } from '../../../shared/encryption';
 import { sendEmail } from '../../../shared/mailing/mailing';
@@ -27,7 +27,7 @@ const resolveNodeId = async (explicitNodeId?: string): Promise<string> => {
   }
 };
 
-export default async function postUsersRegister(
+export async function postUsersRegister(
   name: string,
   email: string,
   password: string,
@@ -140,7 +140,7 @@ export default async function postUsersRegister(
     } else {
       const user = await findUserByEmailDb(email);
       if (user) {
-        await deleteUserById(user.id);
+        await deleteUserByUiid(user.uiid);
       }
       res.status(500).json({
         status: 'failure',

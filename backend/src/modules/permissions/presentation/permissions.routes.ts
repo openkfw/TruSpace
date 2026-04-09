@@ -28,3 +28,9 @@ permissionsRouter.delete(
   PermissionsValidator.deletePermission,
   PermissionsController.deletePermission,
 );
+
+permissionsRouter.delete(
+  '/permissions/user/remove-all/:email',
+  authenticateCookie,
+  PermissionsController.deletePermissionsRemoveAllByEmail,
+);

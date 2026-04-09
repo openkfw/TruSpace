@@ -1,6 +1,5 @@
 import db from '../../../shared/config/database';
 import logger from '../../../shared/config/winston';
-import { USER_STATUS } from '../../../shared/utility/constants';
 import { UserModel } from '../domain/users.model';
 import { createUserDb } from '../persistence/users.datasource';
 import { UserSchema } from '../persistence/users.schema';

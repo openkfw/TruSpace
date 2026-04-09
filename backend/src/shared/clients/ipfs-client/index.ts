@@ -1640,6 +1640,7 @@ export class IpfsClient implements IClient {
   async createPermission(permission: UserPermissionDto): Promise<string> {
     try {
       permission.id = uuidv4();
+      permission.created_at = permission.created_at ?? new Date().toISOString();
       const encodedId = encodeURIComponent(permission.id);
       const filename = `permissions/${encodedId}`;
       const form = new FormData();
@@ -1683,13 +1684,13 @@ export class IpfsClient implements IClient {
         `/pins?limit=${maxNumberOfFetchedPins}&meta={"type":"permission","${key}":"${encodedValue}"}`,
       );
       const results: UserPermissionDto[] = (response.data?.results ?? []).map(
-        (element: { pin: Pin }) => ({
+        (element: { pin: Pin; created?: string }) => ({
           id: element.pin.meta.id,
           workspaceId: element.pin.meta.workspaceId,
           email: element.pin.meta.email,
           role: element.pin.meta.role,
           status: element.pin.meta.status,
-          created_at: element.pin.meta.created_at,
+          created_at: element.pin.meta.created_at || element.created,
           updated_at: element.pin.meta.updated_at,
         }),
       );

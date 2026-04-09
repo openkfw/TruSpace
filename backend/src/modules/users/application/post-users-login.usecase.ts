@@ -24,7 +24,7 @@ const resolveNodeId = async (explicitNodeId?: string): Promise<string> => {
   }
 };
 
-export default async function postUsersLogin(req: Request, res: Response) {
+export async function postUsersLogin(req: Request, res: Response) {
   // can't use validate middleware here, need to return status: "failure"
   const validation = validationResult(req);
   if (!validation.isEmpty()) {
