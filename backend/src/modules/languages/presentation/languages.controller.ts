@@ -1,13 +1,11 @@
-import { Request, Response } from "express";
-import { UploadedFile } from "express-fileupload";
+import { Request, Response } from 'express';
+import { UploadedFile } from 'express-fileupload';
 
-import { postLanguage } from "../application/post-language.usecase";
-import { getLanguageStatus } from "../application/get-language-status.usecase";
-import { getLanguageByDocumentId } from "../application/get-language-by-document-id.usecase";
-
+import { postLanguage } from '../application/post-language.usecase';
+import { getLanguageStatus } from '../application/get-language-status.usecase';
+import { getLanguageByDocumentId } from '../application/get-language-by-document-id.usecase';
 
 export const LanguagesController = {
-
   postLanguage: async (req: Request, res: Response) => {
     const file = req.files?.file as UploadedFile;
     const document = req.body.document;
@@ -17,7 +15,7 @@ export const LanguagesController = {
 
   getLanguageStatus: async (req: Request, res: Response) => {
     const { requestId } = req.params;
-    const result = await getLanguageStatus(requestId, res);
+    const result = await getLanguageStatus(requestId);
     res.json(result);
   },
 
@@ -25,5 +23,5 @@ export const LanguagesController = {
     const { documentId } = req.params;
     const result = await getLanguageByDocumentId(documentId, res);
     res.json(result);
-  }
-}
+  },
+};

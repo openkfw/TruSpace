@@ -1,11 +1,10 @@
-import { Response } from 'express';
 import taskQueue from '../../../shared/utility/jobQueue';
 
-export async function getLanguageStatus(requestId: string, res: Response) {
+export async function getLanguageStatus(requestId: string) {
   const job = await taskQueue.getJobStatus(requestId);
 
   if (!job?.status) {
-    return res.status(200).json(null);
+    return null;
   }
 
   return {
