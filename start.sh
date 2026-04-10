@@ -133,6 +133,12 @@ fi
 
 echo_success "Environment variables loaded"
 
+# Always export TruSpace version for docker build/runtime (override if set)
+TRUSPACE_VERSION_FILE="$SCRIPT_DIR/VERSION"
+if [ -f "$TRUSPACE_VERSION_FILE" ]; then
+  export TRUSPACE_VERSION="$(cat "$TRUSPACE_VERSION_FILE")"
+fi
+
 #------------------------#
 ###--- DOCKER SETUP ---###
 #------------------------#

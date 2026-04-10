@@ -18,5 +18,6 @@ services:
       dockerfile: Dockerfile
       args:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+        TRUSPACE_VERSION: ${TRUSPACE_VERSION}
     environment:
       NODE_ENV: ${NODE_ENV}

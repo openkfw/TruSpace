@@ -1,16 +1,11 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 
-import { execSync } from "child_process";
 
 const withNextIntl = createNextIntlPlugin();
 
-function getCommitHash() {
-   try {
-      return execSync("git rev-parse --short HEAD").toString().trim();
-   } catch {
-      return "unknown";
-   }
+function getTruSpaceVersion() {
+   return process.env.TRUSPACE_VERSION ?? "unknown";
 }
 
 const nextConfig: NextConfig = {
@@ -23,7 +18,7 @@ const nextConfig: NextConfig = {
    },
    output: "standalone",
    env: {
-      NEXT_PUBLIC_SHORT_COMMIT_HASH: getCommitHash()
+      TRUSPACE_VERSION: getTruSpaceVersion()
    }
 };
 
