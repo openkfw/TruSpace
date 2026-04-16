@@ -229,6 +229,7 @@
    "documentPreview": {
       "preview": "Preview",
       "noPreview": "No Preview Available",
+      "editor": "Editor",
       "unsupportedFormat": "This file format is not supported for preview.",
       "page": "Page",
       "of": "of"
