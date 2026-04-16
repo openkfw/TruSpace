@@ -232,6 +232,7 @@ export default function DocumentDetailsPage() {
                         cid={document.cid}
                         docId={document.docId}
                         filename={document.meta?.filename}
+                        initialVersionTagName={document.meta?.versionTagName}
                      />
                   ) : (
                      <DocumentPreview

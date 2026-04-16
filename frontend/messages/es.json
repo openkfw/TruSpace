@@ -392,14 +392,11 @@
     "customPerspectiveCreated": "Se crea una perspectiva personalizada. Esto puede tardar varios minutos."
   },
   "documentEditable": {
-    "cancel": "Cancelar",
-    "creator": "Autor",
-    "creatorPlaceholder": "Introduzca el autor",
-    "send": "Enviar",
     "save": "Ahorrar",
-    "saveNewVersion": "Guardar nueva versión",
     "uploading": "Subiendo...",
-    "uploadError": "Error al subir"
+    "uploadError": "Error al subir",
+    "versionTagDefault": "Añadir etiqueta de versión",
+    "versionTagTip": "Añade aquí una nota sobre la versión para explicar los cambios que incluye."
   },
   "tags": {
     "aiTag": "Día generado por IA",
