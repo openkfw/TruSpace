@@ -9,15 +9,14 @@ import { Loader2 } from "lucide-react";
 import IPFSLoader from "@/components/IPFSLoader";
 import Editor from "@/components/tiptap-editor/Editor";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
-   Dialog,
-   DialogContent,
-   DialogDescription,
-   DialogFooter,
-   DialogHeader,
-   DialogTitle,
-   DialogTrigger
-} from "@/components/ui/dialog";
+   Tooltip,
+   TooltipContent,
+   TooltipProvider,
+   TooltipTrigger
+} from "@/components/ui/tooltip";
+
 import { useDocuments } from "@/contexts/DocumentsContext";
 import { useWorkspaceContext } from "@/contexts/WorkspaceContext";
 import { documentUpload, loadDocumentBlob } from "@/lib/services";
@@ -25,11 +24,13 @@ import { documentUpload, loadDocumentBlob } from "@/lib/services";
 export default function DocumentEditable({
    cid,
    docId,
-   filename
+   filename,
+   initialVersionTagName
 }: {
    cid: string;
    docId: string;
    filename: string;
+   initialVersionTagName?: string;
 }) {
    const translations = useTranslations("documentEditable");
    const { workspace } = useWorkspaceContext();
@@ -37,8 +38,16 @@ export default function DocumentEditable({
    const [editorContent, setEditorContent] = useState(null);
    const [loadedEditorContent, setLoadedEditorContent] = useState(null);
 
-   const [open, setOpen] = useState(false);
+   const [versionTagName, setVersionTagName] = useState(
+      initialVersionTagName ?? ""
+   );
    const [isUploading, setIsUploading] = useState(false);
+
+   useEffect(() => {
+      if (initialVersionTagName && versionTagName === "") {
+         setVersionTagName(initialVersionTagName);
+      }
+   }, [initialVersionTagName, versionTagName]);
 
    useEffect(() => {
       const loadFile = async () => {
@@ -60,7 +69,7 @@ export default function DocumentEditable({
       setIsUploading(true);
       const formData = new FormData();
       formData.append("workspace", workspace?.uuid);
-      formData.append("versionTagName", "");
+      formData.append("versionTagName", versionTagName);
 
       const editorContentBlob = new Blob([editorContent], {
          type: "text/html"
@@ -69,7 +78,6 @@ export default function DocumentEditable({
 
       try {
          await documentUpload(formData, docId, translations("uploadError"));
-         setOpen(false);
       } catch (err) {
          console.error(err);
       } finally {
@@ -80,54 +88,45 @@ export default function DocumentEditable({
 
    return loadedEditorContent ? (
       <div className="pb-[var(--chat-offset)]">
+         <div className="flex items-center justify-between gap-4">
+            <TooltipProvider>
+               <Tooltip>
+                  <TooltipTrigger asChild>
+                     <Input
+                        type="text"
+                        placeholder={translations("versionTagDefault")}
+                        value={versionTagName === "undefined" ? "" : versionTagName}
+                        onChange={(e) => setVersionTagName(e.target.value)}
+                        className="w-full max-w-xs"
+                     />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                     {translations("versionTagTip")}
+                  </TooltipContent>
+               </Tooltip>
+            </TooltipProvider>
+            <Button
+               disabled={isUploading}
+               type="button"
+               className="w-1/2 sm:w-auto"
+               onClick={handleSubmit}
+            >
+               {isUploading ? (
+                  <>
+                     <Loader2 className="animate-spin" />
+                     {translations("uploading")}
+                  </>
+               ) : (
+                  translations("save")
+               )}
+            </Button>
+         </div>
          <Editor
             content={loadedEditorContent}
             onChange={(editor) => setEditorContent(editor.getHTML())}
             stickyToolbarTopMargin="12"
          />
-         <div className="flex justify-end items-center mt-4">
-            <Dialog open={open} onOpenChange={(open) => setOpen(open)}>
-               <DialogTrigger asChild>
-                  <Button>{translations("save")}</Button>
-               </DialogTrigger>
-               <DialogContent
-                  className="sm:max-w-lg"
-                  onEscapeKeyDown={(e) => e.preventDefault()}
-                  onInteractOutside={(e) => e.preventDefault()}
-               >
-                  <DialogHeader>
-                     <DialogTitle>{translations("saveNewVersion")}</DialogTitle>
-                  </DialogHeader>
-                  <DialogDescription />
-                  <form onSubmit={handleSubmit}>
-                     <DialogFooter className="flex flex-row justify-between space-x-4">
-                        <Button
-                           className="w-1/2 sm:w-auto"
-                           type="button"
-                           variant="destructive"
-                           onClick={() => setOpen(false)}
-                        >
-                           {translations("cancel")}
-                        </Button>
-                        <Button
-                           disabled={isUploading}
-                           type="submit"
-                           className="w-1/2 sm:w-auto"
-                        >
-                           {isUploading ? (
-                              <>
-                                 <Loader2 className="animate-spin" />
-                                 {translations("uploading")}
-                              </>
-                           ) : (
-                              translations("save")
-                           )}
-                        </Button>
-                     </DialogFooter>
-                  </form>
-               </DialogContent>
-            </Dialog>
-         </div>
+
       </div>
    ) : (
       <IPFSLoader />
