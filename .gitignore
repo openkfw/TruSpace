@@ -18,3 +18,4 @@ scripts/prompts/cookies.txt
 .connection
 .connection.password
 doc/mkdocs/site
+frontend/public/terms/*
