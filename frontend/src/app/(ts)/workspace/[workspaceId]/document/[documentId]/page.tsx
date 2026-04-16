@@ -164,9 +164,13 @@ export default function DocumentDetailsPage() {
                   disabled={!isPreviewAvailable}
                   className="data-[state=active]:bg-blue-500 data-[state=active]:dark:bg-blue-800 data-[state=active]:text-white"
                >
-                  {isPreviewAvailable
-                     ? documentPreviewTranslations("preview")
-                     : documentPreviewTranslations("noPreview")}
+                 {
+                   isRichTextDocument
+                     ? documentPreviewTranslations("editor")
+                     : isPreviewAvailable
+                       ? documentPreviewTranslations("preview")
+                       : documentPreviewTranslations("noPreview")
+                 }
                </TabsTrigger>
                <TabsTrigger
                   value="versions"

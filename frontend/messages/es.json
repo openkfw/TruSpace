@@ -229,6 +229,7 @@
   "documentPreview": {
     "preview": "Avance",
     "noPreview": "No hay vista previa disponible",
+    "editor": "Editor",
     "unsupportedFormat": "Este formato de archivo no es compatible con la vista previa",
     "page": "Página",
     "of": "de"
