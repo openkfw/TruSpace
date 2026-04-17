@@ -37,6 +37,11 @@ services:
     entrypoint: sh ./entrypoint.sh
     volumes:
       - ./volumes/db:/app/data
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   ##################################################################################
   ## IPFS & Cluster PEER 0 #########################################################
@@ -55,6 +60,11 @@ services:
         - ./volumes/ipfs0:/data/ipfs
         - ./scripts/init-ipfs-config.sh:/init-ipfs-config.sh:ro
     entrypoint: ["/init-ipfs-config.sh", "${SWARM_PORT}", "${IPFS_API_PORT}", "${IPFS_GATEWAY_PORT}"] # Custom entrypoint to setup network settings with no bootstrapping
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   cluster0:
     container_name: cluster0
@@ -79,3 +89,8 @@ services:
       - "${CLUSTER_SWARM_PORT}:${CLUSTER_SWARM_PORT}"
     volumes:
       - ./volumes/cluster0:/data/ipfs-cluster
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

@@ -8,3 +8,8 @@ services:
       TRUSPACE_VERSION: ${TRUSPACE_VERSION}
     ports:
       - ${FRONTEND_PORT}:${FRONTEND_PORT}
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
