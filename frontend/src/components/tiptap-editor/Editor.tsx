@@ -299,7 +299,7 @@ const Editor = ({
 
          <EditorContent
             editor={editor}
-            className="bg-white dark:bg-gray-700 p-4"
+            className="bg-white dark:bg-gray-700 p-4 max-h-[63vh] overflow-y-auto"
          />
          {isRequired && hasError ? (
             <div

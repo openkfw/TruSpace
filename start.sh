@@ -148,13 +148,14 @@ echo_section "Docker Setup"
 # Ensure necessary Docker volume directories exist
 dirs=(
   "./volumes"
+  "./volumes/cluster0"
+  "./volumes/cluster1"
   "./volumes/db"
   "./volumes/db0"
   "./volumes/db1"
+  ".volumes/general"
   "./volumes/ipfs0"
-  "./volumes/cluster0"
   "./volumes/ipfs1"
-  "./volumes/cluster1"
   "./volumes/ollama"
   "./volumes/open-webui"
 )
@@ -168,6 +169,25 @@ done
 # Capture current user/group IDs for Docker
 export LUID=$(id -u)
 export LGID=$(id -g)
+
+# If non-existent yet, duplicate default terms and conditions from frontend/default_terms into volumes/general/terms
+DEFAULT_TERMS_DIR="$SCRIPT_DIR/frontend/default_terms"
+PUBLIC_TERMS_DIR="$SCRIPT_DIR/frontend/public/terms"
+LOCAL_TERMS_DIR="$SCRIPT_DIR/volumes/general/terms"
+
+if [ ! -d "$LOCAL_TERMS_DIR" ]; then
+    echo_info "Copying default terms and conditions to $LOCAL_TERMS_DIR"
+    mkdir -p "$LOCAL_TERMS_DIR"
+    cp "$DEFAULT_TERMS_DIR"/* "$LOCAL_TERMS_DIR"/
+fi
+
+# Ensure frontend/public/terms points to the volume-backed terms as symlink
+# These terms are then accessed in the frontend
+ABS_LOCAL_TERMS_DIR="$(cd "$LOCAL_TERMS_DIR" && pwd)"
+rm -rf "$PUBLIC_TERMS_DIR"
+mkdir -p "$PUBLIC_TERMS_DIR"
+cp "$LOCAL_TERMS_DIR"/* "$PUBLIC_TERMS_DIR"/
+## ln -s "$ABS_LOCAL_TERMS_DIR" "$PUBLIC_TERMS_DIR"
 
 
 #----------------------#

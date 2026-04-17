@@ -229,6 +229,7 @@
    "documentPreview": {
       "preview": "Vorschau",
       "noPreview": "Keine Vorschau verfügbar",
+      "editor": "Editor",
       "unsupportedFormat": "Dieses Dateiformat wird für die Vorschau nicht unterstützt",
       "page": "Seite",
       "of": "von"
@@ -391,14 +392,11 @@
       "customPerspectiveCreated": "Benutzerdefinierte Perspektive wird erstellt. Dies kann mehrere Minuten dauern."
    },
    "documentEditable": {
-      "cancel": "Abbrechen",
-      "creator": "AutorIn",
-      "creatorPlaceholder": "AutorIn eingeben",
-      "send": "Senden",
       "save": "Speichern",
-      "saveNewVersion": "Neue Version speichern",
       "uploading": "Wird hochgeladen...",
-      "uploadError": "Upload fehlgeschlagen"
+      "uploadError": "Upload fehlgeschlagen",
+      "versionTagDefault": "Setze ein Versionstag",
+      "versionTagTip": "Füge ein Versionstag hinzu um die Änderungen dieser Version zu klarifizieren."
    },
    "tags": {
       "aiTag": "Tag von KI generiert",
