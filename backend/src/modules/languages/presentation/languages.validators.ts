@@ -1,10 +1,8 @@
-import { param } from "express-validator";
-import validate from "../../../shared/middlewares/validate";
+import { param } from 'express-validator';
+import validate from '../../../shared/middlewares/validate';
 
 export const LanguageValidator = {
+  getLanguageStatus: validate([param('requestId').notEmpty()]),
 
-  getLanguageStatus: validate([param("requestId").notEmpty()]),
-  
-  getLanguageByDocumentId: validate([param("documentId").notEmpty()]),
-
-} 
+  getLanguageByDocumentId: validate([param('documentId').notEmpty()]),
+};

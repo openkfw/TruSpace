@@ -6,23 +6,15 @@ import { getPrompts } from '../application/get-prompts.usecase';
 import { postPrompt } from '../application/post-prompt.usecase';
 import { putPrompt } from '../application/put-prompt.usecase';
 
-const sendResponse = (
-  res: Response,
-  result: {
-    statusCode?: number;
-    body: unknown;
-  },
-) => res.status(result.statusCode ?? 200).json(result.body);
-
 export const PromptsController = {
   getPrompts: async (_req: AuthenticatedRequest, res: Response) => {
     const result = await getPrompts();
-    sendResponse(res, result);
+    res.json(result);
   },
 
   postPrompt: async (req: AuthenticatedRequest, res: Response) => {
     const result = await postPrompt(req.body.title, req.body.prompt, req.user?.uiid);
-    sendResponse(res, result);
+    res.status(201).json(result);
   },
 
   putPrompt: async (req: AuthenticatedRequest, res: Response) => {
@@ -31,11 +23,11 @@ export const PromptsController = {
       updated_by: req.user?.uiid,
     });
 
-    sendResponse(res, result);
+    res.json(result);
   },
 
   deletePrompt: async (req: AuthenticatedRequest, res: Response) => {
     const result = await deletePrompt(req.params.title);
-    sendResponse(res, result);
+    res.json(result);
   },
 };

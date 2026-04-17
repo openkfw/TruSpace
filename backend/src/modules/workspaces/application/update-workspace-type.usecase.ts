@@ -1,21 +1,17 @@
 import axios from 'axios';
 
 import { IpfsClient } from '../../../shared/clients/ipfs-client';
-import logger from '../../../shared/config/winston';
 import {
   createPermission,
   findUsersInWorkspace,
   removePermissionsForWorkspace,
 } from '../../../shared/handlers/userPermissions';
 import { sendNotification } from '../../../shared/mailing/notifications';
-import { UseCaseResponse } from '../../../shared/types/usecase';
 import { getUserSettings } from '../../../shared/utility/user';
+import { WorkspaceNotFoundError } from '../errors/workspace-not-found.error';
+import { InternalServerError } from '../../../shared/errors';
 
-export async function updateWorkspaceType(
-  wUID: string,
-  isPublic: boolean,
-  currentUserEmail: string,
-): Promise<UseCaseResponse> {
+export async function updateWorkspaceType(wUID: string, isPublic: boolean, currentUserEmail: string) {
   const client = new IpfsClient();
 
   try {
@@ -48,28 +44,11 @@ export async function updateWorkspaceType(
       await removePermissionsForWorkspace(wUID);
     }
 
-    return {
-      body: {
-        message: 'Workspace updated successfully',
-      },
-    };
+    return 'Workspace updated successfully';
   } catch (error) {
     if (axios.isAxiosError(error) && error.response?.status === 404) {
-      logger.error(error);
-      return {
-        statusCode: 404,
-        body: {
-          message: 'Workspace not found',
-        },
-      };
+      throw new WorkspaceNotFoundError(wUID, error);
     }
-
-    logger.error(error);
-    return {
-      statusCode: 500,
-      body: {
-        message: 'Internal Server Error',
-      },
-    };
+    throw new InternalServerError(`Failed to update workspace (${wUID})`, error);
   }
 }

@@ -1,3 +1,4 @@
+import 'express-async-errors';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
@@ -6,12 +7,12 @@ import session from 'express-session';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import lusca from 'lusca';
-import createError from 'http-errors';
 import morgan from 'morgan';
 
 import { config } from './shared/config/config';
-import { errorHandler } from './shared/middlewares/error';
+import { catchAllErrorsMiddleware } from './shared/middlewares/catch-all-errors.middleware';
 import { router } from './routes';
+import { notFoundMiddleware } from './shared/middlewares/not-found.middleware';
 
 const { contentSecurityPolicy, rateLimitPerMinute } = config;
 
@@ -122,13 +123,9 @@ app.use(
 
 /** ROUTES */
 app.use('/api', router);
-
-app.use(function (_req, res, next) {
-  res.status(404);
-  next(createError(404));
-});
-
-// catch-all error handler
-app.use(errorHandler);
+// catch 404 and forward to error handler
+app.use(notFoundMiddleware);
+// catch-all errors handler
+app.use(catchAllErrorsMiddleware);
 
 export default app;

@@ -13,24 +13,12 @@ import { postUsersResetName } from '../application/post-users-reset-name.usecase
 import { postUsersResetPassword } from '../application/post-users-reset-password.usecase';
 import { postUsersUserSettings } from '../application/post-users-user-settings.usecase';
 import { deleteUser } from '../application/delete-user.usecase';
-import logger from '../../../shared/config/winston';
-
-const sendResponse = (
-  res: Response,
-  result: {
-    statusCode?: number;
-    body: unknown;
-  },
-) => res.status(result.statusCode ?? 200).json(result.body);
 
 export const UsersController = {
   postUsersRegister: async (req: Request, res: Response) => {
     const { name, email, password, confirmationLink, lang } = req.body;
-    const result = await postUsersRegister(name, email, password, confirmationLink, lang, res);
-
-    if (!res.headersSent && result) {
-      res.json(result);
-    }
+    const result = await postUsersRegister(name, email, password, confirmationLink, lang);
+    res.json(result);
   },
 
   postUsersLogin: async (req: Request, res: Response) => {
@@ -53,7 +41,7 @@ export const UsersController = {
 
   getUsersStatistics: async (_req: Request, res: Response) => {
     const result = await getUsersStatistics();
-    sendResponse(res, result);
+    res.json(result);
   },
 
   postUsersConfirmRegistration: async (req: Request, res: Response) => {
@@ -63,68 +51,45 @@ export const UsersController = {
       req.body.confirmationLink,
     );
 
-    sendResponse(res, result);
+    res.json(result);
   },
 
   getUsersUserSettings: async (req: AuthenticatedRequest, res: Response) => {
     const result = await getUsersUserSettings(req.user?.email as string);
-    sendResponse(res, result);
+    res.json(result);
   },
 
   postUsersUserSettings: async (req: AuthenticatedRequest, res: Response) => {
     const result = await postUsersUserSettings(req);
-    sendResponse(res, result);
+    res.json(result);
   },
 
   getUsersAvatar: async (req: AuthenticatedRequest, res: Response) => {
     const cid = await getUsersAvatar(req.user?.email as string);
-
-    if (!cid) {
-      return res.status(404).json({
-        status: 'failure',
-        message: 'Could not find avatar',
-      });
-    }
-
     return new IpfsClient().downloadAvatar(req, res, cid);
   },
 
   postUsersForgotPassword: async (req: Request, res: Response) => {
     const result = await postUsersForgotPassword(req.body.email, req.body.resetPasswordLink, req.body.lang);
 
-    sendResponse(res, result);
+    res.json(result);
   },
 
   postUsersResetName: async (req: AuthenticatedRequest, res: Response) => {
     const result = await postUsersResetName(req.user?.email, req.body.name, req.user?.nodeId, req.user?.uiid);
 
-    sendResponse(res, result);
+    res.json(result);
   },
 
   postUsersResetPassword: async (req: Request, res: Response) => {
     const result = await postUsersResetPassword(req.body.password, req.body.token);
-    sendResponse(res, result);
+    res.json(result);
   },
 
   deleteUser: async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.user?.uiid;
     const nodeId = req.user?.nodeId;
-
-    if (!nodeId || !userId) {
-      return res.status(400).json({
-        status: 'failure',
-        message: 'User ID or Node ID missing',
-      });
-    }
-
-    try {
-      await deleteUser(userId, nodeId, res);
-    } catch (error) {
-      logger.error('Error deleting user:', error);
-      res.status(500).json({
-        status: 'failure',
-        message: 'Error deleting user',
-      });
-    }
+    const result = await deleteUser(userId as string, nodeId);
+    res.json(result);
   },
 };

@@ -72,7 +72,7 @@ export const readAllPromptsDb = async (): Promise<PromptDb[]> => {
     logger.error(
       `Error getting all prompts: ${JSON.stringify(error, null, 2)}`
     );
-    return [];
+    throw new Error("Failed to read prompts");
   }
 };
 
@@ -138,7 +138,15 @@ export const deletePromptDb = async (
   title: string
 ): Promise<PromptDbResult> => {
   try {
-    await db<PromptDb>("prompts").delete().where("title", "=", title);
+    const deletedRows = await db<PromptDb>("prompts")
+      .delete()
+      .where("title", "=", title);
+
+    if (!deletedRows) {
+      logger.error(`Prompt with title "${title}" not found`);
+      return { success: false, error: "PROMPT_NOT_FOUND" };
+    }
+
     return { success: true };
   } catch (error) {
     logger.error(`Error deleting prompt`, error);

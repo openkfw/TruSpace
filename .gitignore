@@ -19,3 +19,4 @@ scripts/prompts/cookies.txt
 .connection.password
 doc/mkdocs/site
 frontend/public/terms/*
+.codex

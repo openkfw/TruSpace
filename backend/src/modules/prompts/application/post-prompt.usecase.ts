@@ -1,7 +1,8 @@
 import { createPromptDb } from '../../../shared/clients/db';
-import { UseCaseResponse } from '../../../shared/types/usecase';
+import { InternalServerError } from '../../../shared/errors';
+import { PromptConflictError } from '../errors/prompt-conflict.error';
 
-export async function postPrompt(title: string, prompt: string, createdBy?: string): Promise<UseCaseResponse> {
+export async function postPrompt(title: string, prompt: string, createdBy?: string) {
   const result = await createPromptDb({
     title,
     prompt,
@@ -9,41 +10,11 @@ export async function postPrompt(title: string, prompt: string, createdBy?: stri
   });
 
   if (result.error) {
-    switch (result.error) {
-      case 'DUPLICATE_TITLE':
-        return {
-          statusCode: 409,
-          body: {
-            error: 'DUPLICATE_TITLE',
-            message: `A prompt with title "${title}" already exists.`,
-          },
-        };
-
-      case 'SQLITE_CONSTRAINT':
-        return {
-          statusCode: 409,
-          body: {
-            error: 'SQLITE_CONSTRAINT',
-            message: 'Database constraint violation. The prompt may already exist.',
-          },
-        };
-
-      default:
-        return {
-          statusCode: 500,
-          body: {
-            error: 'UNKNOWN_ERROR',
-            message: 'Could not create prompt. Please check server logs.',
-          },
-        };
+    if (['DUPLICATE_TITLE', 'SQLITE_CONSTRAINT'].includes(result.error)) {
+      throw new PromptConflictError(title, result.error);
     }
+    throw new InternalServerError('Could not post prompt', result.error);
   }
 
-  return {
-    statusCode: 201,
-    body: {
-      success: true,
-      message: `Prompt "${title}" created successfully.`,
-    },
-  };
+  return `Prompt "${title}" created successfully.`;
 }

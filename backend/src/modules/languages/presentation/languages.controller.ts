@@ -7,21 +7,17 @@ import { getLanguageByDocumentId } from '../application/get-language-by-document
 
 export const LanguagesController = {
   postLanguage: async (req: Request, res: Response) => {
-    const file = req.files?.file as UploadedFile;
-    const document = req.body.document;
-    const result = await postLanguage(file, document, res);
+    const result = await postLanguage(req.files?.file as UploadedFile, req.body.document);
     res.json(result);
   },
 
   getLanguageStatus: async (req: Request, res: Response) => {
-    const { requestId } = req.params;
-    const result = await getLanguageStatus(requestId);
+    const result = await getLanguageStatus(req.params.requestId);
     res.json(result);
   },
 
   getLanguageByDocumentId: async (req: Request, res: Response) => {
-    const { documentId } = req.params;
-    const result = await getLanguageByDocumentId(documentId, res);
+    const result = await getLanguageByDocumentId(req.params.documentId);
     res.json(result);
   },
 };

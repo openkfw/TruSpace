@@ -3,10 +3,11 @@ import { UploadedFile } from 'express-fileupload';
 import { storeUserSettingsDb } from '../../../shared/clients/db';
 import { IpfsClient } from '../../../shared/clients/ipfs-client';
 import logger from '../../../shared/config/winston';
+import { HttpError, InternalServerError } from '../../../shared/errors';
 import { AuthenticatedRequest } from '../../../shared/types';
-import { UseCaseResponse } from '../../../shared/types/usecase';
+import { UserNotFoundError } from '../errors/user-not-found.error';
 
-export async function postUsersUserSettings(req: AuthenticatedRequest): Promise<UseCaseResponse> {
+export async function postUsersUserSettings(req: AuthenticatedRequest) {
   try {
     const file = req.files?.file as UploadedFile;
 
@@ -23,26 +24,25 @@ export async function postUsersUserSettings(req: AuthenticatedRequest): Promise<
       workspaceChange: req.body.notificationWorkspaceChange === 'true',
     };
 
-    await storeUserSettingsDb(req.user?.email as string, {
+    const updatedUsers = await storeUserSettingsDb(req.user?.email as string, {
       avatarCid,
       preferedLanguage: req.body.preferedLanguage || 'en',
       notificationSettings: JSON.stringify(notificationSettings),
     });
 
+    if (!updatedUsers) {
+      throw new UserNotFoundError(`email: ${req.user?.email as string}`);
+    }
+
     return {
-      body: {
-        status: 'success',
-        message: 'User settings updated successfully',
-      },
+      status: 'success',
+      message: 'User settings updated successfully',
     };
   } catch (error) {
     logger.error(`Error uploading avatar: ${JSON.stringify(error, null, 2)}`);
-    return {
-      statusCode: 500,
-      body: {
-        status: 'failure',
-        message: 'User settings update failed',
-      },
-    };
+    if (error instanceof HttpError) {
+      throw error;
+    }
+    throw new InternalServerError('User settings update failed', error);
   }
 }

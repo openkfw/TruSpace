@@ -8,30 +8,29 @@ import { postChat } from '../application/post-chat.usecase';
 import { getChatsExportByDocumentId } from '../application/get-chats-export-by-document-id.usecase';
 
 export const ChatsController = {
-
   getChatsByDocumentId: async (req: Request, res: Response) => {
-    const { docId } = req.params;
-    const result = await getChatsByDocumentId(docId);
+    const result = await getChatsByDocumentId(req.params.docId);
     res.json(result);
   },
 
   getChatsExportByDocumentId: async (req: Request, res: Response) => {
-    const { docId } = req.params;
-    await getChatsExportByDocumentId(docId, res);
+    await getChatsExportByDocumentId(req.params.docId, res);
   },
 
   getRecentChats: async (req: AuthenticatedRequest, res: Response) => {
-    const email = req.user?.email as string;
-    const result = await getRecentChats(email);
+    const result = await getRecentChats(req.user?.email as string);
     res.json(result);
   },
 
   postChat: async (req: AuthenticatedRequest, res: Response) => {
-    const { data, cid, docId, workspaceOrigin } = req.body;
-    const creatorNodeId = req.user?.nodeId as string;
-    const creatorUserId = req.user?.uiid as string;
-    const result = await postChat(creatorNodeId, creatorUserId, data, cid, docId, workspaceOrigin);
+    const result = await postChat(
+      req.user?.nodeId as string,
+      req.user?.uiid as string,
+      req.body.data,
+      req.body.cid,
+      req.body.docId,
+      req.body.workspaceOrigin,
+    );
     res.json(result);
   },
-  
 };

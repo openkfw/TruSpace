@@ -1,7 +1,8 @@
-import { Response } from 'express';
 import { IpfsClient } from '../../../shared/clients/ipfs-client';
 import logger from '../../../shared/config/winston';
 import { deleteUserByUiid } from '../../../shared/clients/db';
+import { BadRequestError, InternalServerError } from '../../../shared/errors';
+import { UserNotFoundError } from '../errors/user-not-found.error';
 
 const resolveNodeId = async (explicitNodeId?: string): Promise<string> => {
   if (explicitNodeId) {
@@ -10,40 +11,33 @@ const resolveNodeId = async (explicitNodeId?: string): Promise<string> => {
 
   try {
     const clusterId = await new IpfsClient().clusterId();
-    return clusterId?.ipfs?.id || '';
+    const resolvedNodeId = clusterId?.ipfs?.id;
+
+    if (!resolvedNodeId) {
+      throw new InternalServerError('Failed to resolve node ID');
+    }
+
+    return resolvedNodeId;
   } catch (error) {
     logger.error('Error resolving nodeId:', error);
-    return '';
+    throw new InternalServerError('Failed to resolve node ID', error);
   }
 };
 
-export async function deleteUser(userId: string, nodeId: string, res: Response) {
+export async function deleteUser(userId: string, nodeId?: string) {
+  if (!userId) {
+    throw new BadRequestError('User ID missing');
+  }
+
   const resolvedNodeId = await resolveNodeId(nodeId);
 
-  if (resolvedNodeId && userId) {
-    try {
-      // Delete user data in ipfs
-      const client = new IpfsClient();
-      await client.deleteUserData(resolvedNodeId, userId);
+  const client = new IpfsClient();
+  await client.deleteUserData(resolvedNodeId, userId);
 
-      // Delete user in db
-      await deleteUserByUiid(userId);
-
-      res.json({
-        status: 'success',
-        message: 'User deleted successfully',
-      });
-    } catch (error) {
-      logger.error('Error deleting user data in IPFS:', error);
-      res.status(500).json({
-        status: 'failure',
-        message: 'Error deleting user data',
-      });
-    }
-  } else {
-    res.status(400).json({
-      status: 'failure',
-      message: 'User ID or Node ID missing',
-    });
+  const deletedUsers = await deleteUserByUiid(userId);
+  if (!deletedUsers) {
+    throw new UserNotFoundError(userId);
   }
+
+  return 'User deleted successfully';
 }

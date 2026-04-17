@@ -5,53 +5,43 @@ import { getTokenDb, removeTokensOfUserDb } from '../../../shared/clients/db/res
 import { config } from '../../../shared/config/config';
 import logger from '../../../shared/config/winston';
 import { hashPassword } from '../../../shared/encryption';
-import { UseCaseResponse } from '../../../shared/types/usecase';
+import { BadRequestError, HttpError, InternalServerError } from '../../../shared/errors';
+import { UserNotFoundError } from '../errors/user-not-found.error';
 
-export async function postUsersResetPassword(password: string, token: string): Promise<UseCaseResponse> {
+export async function postUsersResetPassword(password: string, token: string) {
   try {
     jwt.verify(token, Buffer.from(config.jwt.secret)) as jwt.JwtPayload;
     const result = await getTokenDb(token);
 
     if (!result) {
       logger.error('invalid token');
-      return {
-        statusCode: 400,
-        body: {
-          status: 'error',
-          message: 'invalid token',
-        },
-      };
+      throw new BadRequestError('Invalid token');
     }
 
     const passwordHash = await hashPassword(password);
-    await updateUserPassword(result.user_id, passwordHash);
+    const updatedUsers = await updateUserPassword(result.user_id, passwordHash);
+
+    if (!updatedUsers) {
+      throw new UserNotFoundError(`id: ${result.user_id}`);
+    }
+
     await removeTokensOfUserDb(result.user_id);
 
     return {
-      body: {
-        status: 'success',
-        message: 'password set',
-      },
+      status: 'success',
+      message: 'password set',
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error(error);
 
-    if (error.message === 'jwt expired' || error.message === 'invalid signature') {
-      return {
-        statusCode: 400,
-        body: {
-          status: 'error',
-          message: 'invalid token',
-        },
-      };
+    if (error instanceof jwt.TokenExpiredError || error instanceof jwt.JsonWebTokenError) {
+      throw new BadRequestError('Invalid token', error);
     }
 
-    return {
-      statusCode: 500,
-      body: {
-        status: 'failure',
-        message: 'Unknown error occurred',
-      },
-    };
+    if (error instanceof HttpError) {
+      throw error;
+    }
+
+    throw new InternalServerError('Failed to reset password', error);
   }
 }
