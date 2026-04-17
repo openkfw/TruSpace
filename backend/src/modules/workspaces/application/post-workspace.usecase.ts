@@ -3,11 +3,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { createWorkspacePasswordDb } from '../../../shared/clients/db';
 import { IpfsClient } from '../../../shared/clients/ipfs-client';
 import { config } from '../../../shared/config/config';
-import logger from '../../../shared/config/winston';
 import { encrypt, hashPassword } from '../../../shared/encryption';
 import { createPermission } from '../../../shared/handlers/userPermissions';
 import { WorkspaceRequest } from '../../../shared/types/interfaces';
-import { UseCaseResponse } from '../../../shared/types/usecase';
+import { WorkspaceConflictError } from '../errors/workspace-conflict.error';
 
 export async function postWorkspace(
   name: string,
@@ -16,18 +15,12 @@ export async function postWorkspace(
   creatorNodeId: string,
   creatorUserId: string,
   email: string,
-): Promise<UseCaseResponse> {
+) {
   const client = new IpfsClient();
   const workspaces = await client.getWorkspaceByName(name);
 
   if (workspaces.length > 0) {
-    logger.warn(`Could not create workspace. "${name}" already exists.`);
-    return {
-      statusCode: 409,
-      body: {
-        errors: 'Name already exists. Please choose a different name.',
-      },
-    };
+    throw new WorkspaceConflictError(name);
   }
 
   const workspaceId = uuidv4();
@@ -56,6 +49,5 @@ export async function postWorkspace(
 
   await createWorkspacePasswordDb(workspaceId, await encrypt(password, config.masterPassword as string));
 
-  const result = await client.createWorkspace(workspaceReq);
-  return { body: result };
+  return await client.createWorkspace(workspaceReq);
 }

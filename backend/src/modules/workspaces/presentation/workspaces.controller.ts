@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 
 import { AuthenticatedRequest } from '../../../shared/types';
 import { deleteWorkspaceById } from '../application/delete-workspace-by-id.usecase';
@@ -7,23 +7,15 @@ import { getWorkspaces } from '../application/get-workspaces.usecase';
 import { postWorkspace } from '../application/post-workspace.usecase';
 import { updateWorkspaceType } from '../application/update-workspace-type.usecase';
 
-const sendResponse = (
-  res: Response,
-  result: {
-    statusCode?: number;
-    body: unknown;
-  },
-) => res.status(result.statusCode ?? 200).json(result.body);
-
 export const WorkspacesController = {
   getWorkspaces: async (req: AuthenticatedRequest, res: Response) => {
     const result = await getWorkspaces(req.user?.email as string);
-    sendResponse(res, result);
+    res.json(result);
   },
 
   getWorkspaceContributors: async (req: AuthenticatedRequest, res: Response) => {
     const result = await getWorkspaceContributors(req.params.wId);
-    sendResponse(res, result);
+    res.json(result);
   },
 
   postWorkspace: async (req: AuthenticatedRequest, res: Response) => {
@@ -35,18 +27,16 @@ export const WorkspacesController = {
       req.user?.uiid as string,
       req.user?.email as string,
     );
-
-    sendResponse(res, result);
+    res.json(result);
   },
 
   deleteWorkspace: async (req: Request, res: Response) => {
     const result = await deleteWorkspaceById(req.params.wCID, req.params.wUID);
-    sendResponse(res, result);
+    res.json(result);
   },
 
   updateWorkspaceType: async (req: AuthenticatedRequest, res: Response) => {
     const result = await updateWorkspaceType(req.params.wUID, req.body.isPublic, req.user?.email as string);
-
-    sendResponse(res, result);
+    res.json(result);
   },
 };

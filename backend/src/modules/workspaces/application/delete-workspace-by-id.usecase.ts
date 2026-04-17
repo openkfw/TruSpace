@@ -1,37 +1,21 @@
 import axios from 'axios';
 
 import { IpfsClient } from '../../../shared/clients/ipfs-client';
-import logger from '../../../shared/config/winston';
+
 import { removePermissionsForWorkspace } from '../../../shared/handlers/userPermissions';
-import { UseCaseResponse } from '../../../shared/types/usecase';
+import { WorkspaceNotFoundError } from '../errors/workspace-not-found.error';
+import { InternalServerError } from '../../../shared/errors';
 
-export async function deleteWorkspaceById(wCID: string, wUID: string): Promise<UseCaseResponse> {
-  const client = new IpfsClient();
-
+export async function deleteWorkspaceById(wCID: string, wUID: string) {
   try {
     await removePermissionsForWorkspace(wUID);
+    const client = new IpfsClient();
     await client.deleteWorkspaceById(wCID, wUID);
-    return {
-      body: {
-        message: 'Workspace deleted successfully',
-      },
-    };
+    return 'Workspace deleted successfully';
   } catch (error) {
     if (axios.isAxiosError(error) && error.response?.status === 404) {
-      return {
-        statusCode: 404,
-        body: {
-          message: 'Workspace not found',
-        },
-      };
+      throw new WorkspaceNotFoundError(wUID, error);
     }
-
-    logger.error('Error deleting workspace:', error);
-    return {
-      statusCode: 500,
-      body: {
-        message: 'Internal Server Error',
-      },
-    };
+    throw new InternalServerError(`Failed to delete workspace (${wCID} ${wUID})`, error);
   }
 }
