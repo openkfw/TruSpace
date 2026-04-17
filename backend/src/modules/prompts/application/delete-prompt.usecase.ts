@@ -1,20 +1,16 @@
 import { deletePromptDb } from '../../../shared/clients/db';
-import { UseCaseResponse } from '../../../shared/types/usecase';
+import { InternalServerError } from '../../../shared/errors';
+import { PromptNotFoundError } from '../errors/prompt-not-found.error';
 
-export async function deletePrompt(title: string): Promise<UseCaseResponse> {
+export async function deletePrompt(title: string) {
   const result = await deletePromptDb(title);
 
-  if (!result) {
-    return {
-      statusCode: 404,
-      body: `Prompt with title "${title}" not found or could not be deleted.`,
-    };
+  if (!result.success) {
+    if (result.error === 'PROMPT_NOT_FOUND') {
+      throw new PromptNotFoundError(title, result.error);
+    }
+    throw new InternalServerError('Could not delete prompt', result.error);
   }
 
-  return {
-    body: {
-      success: true,
-      message: `Prompt "${title}" deleted successfully.`,
-    },
-  };
+  return `Prompt "${title}" deleted successfully.`;
 }

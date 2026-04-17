@@ -2,6 +2,8 @@ import db from '../../config/database';
 import logger from '../../config/winston';
 import { USER_STATUS } from '../../utility/constants';
 
+export const USER_EMAIL_TAKEN_ERROR = 'USER_EMAIL_TAKEN';
+
 export interface UserDb {
   id: number;
   username: string;
@@ -34,10 +36,10 @@ export const createUserDb = async (name: string, email: string, hash: string, st
   } catch (error: any) {
     logger.error('Error creating user:', error);
     if (error.message.includes('UNIQUE constraint failed: users.email')) {
-      throw new Error('email taken');
+      throw new Error(USER_EMAIL_TAKEN_ERROR);
     }
 
-    return undefined;
+    throw new Error('Failed to create user');
   }
 };
 
@@ -62,7 +64,7 @@ export const findUserByEmailDb = async (email: string) => {
     return user;
   } catch (error) {
     logger.error(`Error finding user ${email}:`, error);
-    return undefined;
+    throw new Error(`Failed to find user by email (${email})`);
   }
 };
 
@@ -86,7 +88,7 @@ export const findUserByUiidDb = async (uiid: string) => {
     return user;
   } catch (error) {
     logger.error(`Error finding user ${uiid}:`, error);
-    return undefined;
+    throw new Error(`Failed to find user by uiid (${uiid})`);
   }
 };
 
@@ -99,7 +101,7 @@ export const findUserByTokenDb = async (token: string) => {
     return user;
   } catch (error) {
     logger.error('Error finding user:', error);
-    return undefined;
+    throw new Error('Failed to find user by token');
   }
 };
 
@@ -109,7 +111,7 @@ export const getTotalUsersDb = async (): Promise<number> => {
     return typeof count === 'number' ? count : parseInt(count, 10);
   } catch (error) {
     logger.error('Error fetching total users:', error);
-    throw new Error('Failed to fetch total users');
+    throw new Error('Failed to fetch user statistics');
   }
 };
 
@@ -119,18 +121,19 @@ export const getTotalRecentlyAddedUsersDb = async (): Promise<number> => {
     return typeof count === 'number' ? count : parseInt(count, 10);
   } catch (error) {
     logger.error('Error fetching total users:', error);
-    throw new Error('Failed to fetch total users');
+    throw new Error('Failed to fetch user statistics');
   }
 };
 
-export const activateUserDb = async (userId: number): Promise<void> => {
+export const activateUserDb = async (userId: number): Promise<number> => {
   try {
-    await db('users').where({ id: userId }).update({
+    return await db('users').where({ id: userId }).update({
       status: USER_STATUS.active,
       updated_at: db.fn.now(),
     });
   } catch (error) {
     logger.error('Error activating user:', error);
+    throw new Error('Failed to activate user');
   }
 };
 
@@ -147,7 +150,7 @@ export const storeUserSettingsDb = async (
   } = {},
 ) => {
   try {
-    await db<UserDb>('users')
+    return await db<UserDb>('users')
       .update({
         avatar_cid: avatarCid,
         prefered_language: preferedLanguage,
@@ -157,22 +160,22 @@ export const storeUserSettingsDb = async (
       .where({ email: email });
   } catch (error) {
     logger.error('Error updating user', error);
-    throw new Error('Error updating user');
+    throw new Error(`Failed to update user settings (${email})`);
   }
 };
 
 export const updateUserName = async (email: string, name: string) => {
   try {
-    await db<UserDb>('users').update({ username: name }).where({ email: email });
+    return await db<UserDb>('users').update({ username: name }).where({ email: email });
   } catch (error) {
     logger.error('Error updating user', error);
-    throw new Error('Error updating user');
+    throw new Error(`Failed to update user name (${email})`);
   }
 };
 
 export const updateUserPassword = async (userId: number, passwordHash: string) => {
   try {
-    await db<UserDb>('users')
+    return await db<UserDb>('users')
       .update({
         password_hash: passwordHash,
         updated_at: db.fn.now(),
@@ -180,13 +183,13 @@ export const updateUserPassword = async (userId: number, passwordHash: string) =
       .where({ id: userId });
   } catch (error) {
     logger.error('Error updating user', error);
-    throw new Error('Error updating user');
+    throw new Error(`Failed to update user password (${userId})`);
   }
 };
 
 export const updateUserToken = async (userId: number, token: string) => {
   try {
-    await db<UserDb>('users')
+    return await db<UserDb>('users')
       .update({
         user_token: token,
         updated_at: db.fn.now(),
@@ -194,24 +197,24 @@ export const updateUserToken = async (userId: number, token: string) => {
       .where({ id: userId });
   } catch (error) {
     logger.error('Error updating user', error);
-    throw new Error('Error updating user');
+    throw new Error(`Failed to update user token (${userId})`);
   }
 };
 
 export const deleteUserByUiid = async (userId: string) => {
   try {
-    await db<UserDb>('users').delete().where({ uiid: userId });
+    return await db<UserDb>('users').delete().where({ uiid: userId });
   } catch (error) {
     logger.error('Error deleting user', error);
-    throw new Error('Error deleting user');
+    throw new Error(`Failed to delete user (${userId})`);
   }
 };
 
 export const updateUserFirstSignIn = async (userId: number, firstSignIn: string) => {
   try {
-    await db<UserDb>('users').update('first_sign_in', firstSignIn).where({ id: userId });
+    return await db<UserDb>('users').update('first_sign_in', firstSignIn).where({ id: userId });
   } catch (error) {
-    logger.error('Error deleting user', error);
-    throw new Error('Error deleting user');
+    logger.error('Error updating user first sign-in flag', error);
+    throw new Error(`Failed to update user first sign-in status (${userId})`);
   }
 };

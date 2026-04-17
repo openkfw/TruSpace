@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 
 import { AuthenticatedRequest } from '../../../shared/types';
-import logger from '../../../shared/config/winston';
 
 import { getDocumentsByWorkspaceId } from '../application/get-documents-by-workspace-id.usecase';
 import { deleteDocument } from '../application/delete-document.usecaste';
@@ -38,16 +37,8 @@ export const DocumentsController = {
   },
 
   getDocumentsStatistics: async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const result = await getDocumentsStatistics();
-      res.json(result);
-    } catch (err: any) {
-      logger.error(err);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to fetch document statistics',
-      });
-    }
+    const result = await getDocumentsStatistics();
+    res.json(result);
   },
 
   getDocumentsStatsByDocumentId: async (req: AuthenticatedRequest, res: Response) => {

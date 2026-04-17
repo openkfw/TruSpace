@@ -1,32 +1,20 @@
 import { IpfsClient } from '../../../shared/clients/ipfs-client';
 import logger from '../../../shared/config/winston';
+import { BadRequestError, HttpError, InternalServerError } from '../../../shared/errors';
 import { createPermission, UserPermissionDto } from '../../../shared/handlers/userPermissions';
 import { sendNotification } from '../../../shared/mailing/notifications';
-import { UseCaseResponse } from '../../../shared/types/usecase';
 
-export async function postPermission(email: string, workspaceId: string): Promise<UseCaseResponse> {
+export async function postPermission(email: string, workspaceId: string) {
   try {
     const client = new IpfsClient();
     const workspaces = await client.getWorkspaceById(workspaceId);
 
     if (!workspaces.length) {
-      return {
-        statusCode: 400,
-        body: {
-          status: 'failure',
-          message: 'Adding user to workspace failed, workspace does not exist',
-        },
-      };
+      throw new BadRequestError('Adding user to workspace failed, workspace does not exist');
     }
 
     if (workspaces[0].meta.is_public) {
-      return {
-        statusCode: 400,
-        body: {
-          status: 'failure',
-          message: 'Adding user to workspace failed, workspace is public',
-        },
-      };
+      throw new BadRequestError('Adding user to workspace failed, workspace is public');
     }
 
     const permission: UserPermissionDto = {
@@ -39,19 +27,14 @@ export async function postPermission(email: string, workspaceId: string): Promis
     sendNotification(email, 'addedToWorkspace', `/workspace/${workspaceId}`, workspaces[0].meta.name);
 
     return {
-      body: {
-        status: 'success',
-        message: 'User added to the workspace',
-      },
+      status: 'success',
+      message: 'User added to the workspace',
     };
   } catch (error) {
     logger.error('Adding permission error:', error);
-    return {
-      statusCode: 500,
-      body: {
-        status: 'failure',
-        message: 'Adding user to workspace failed',
-      },
-    };
+    if (error instanceof HttpError) {
+      throw error;
+    }
+    throw new InternalServerError('Adding user to workspace failed', error);
   }
 }

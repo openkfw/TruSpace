@@ -1,12 +1,12 @@
-import { Response } from 'express';
 import { IpfsClient } from '../../../shared/clients/ipfs-client';
+import { FileNotFoundError } from '../errors/file-not-found.error';
 
-export async function getLanguageByDocumentId(documentId: string, res: Response) {
+export async function getLanguageByDocumentId(documentId: string) {
   const ipfsClient = new IpfsClient();
   const result = await ipfsClient.getDocumentVersionDetailsByCid(documentId);
 
   if (!result || 'error' in result) {
-    return res.status(400).json({ error: result?.error || 'File retrieval failed' });
+    throw new FileNotFoundError(documentId, result?.error);
   }
 
   return result.meta.language;

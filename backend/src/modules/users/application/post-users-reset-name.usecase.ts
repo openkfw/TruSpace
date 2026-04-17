@@ -1,7 +1,8 @@
 import { IpfsClient } from '../../../shared/clients/ipfs-client';
 import { updateUserName } from '../../../shared/clients/db';
 import logger from '../../../shared/config/winston';
-import { UseCaseResponse } from '../../../shared/types/usecase';
+import { HttpError, InternalServerError, UnauthorizedError } from '../../../shared/errors';
+import { UserNotFoundError } from '../errors/user-not-found.error';
 
 const resolveNodeId = async (explicitNodeId?: string): Promise<string> => {
   if (explicitNodeId) {
@@ -22,18 +23,17 @@ export async function postUsersResetName(
   name: string,
   nodeId?: string,
   userId?: string,
-): Promise<UseCaseResponse> {
+) {
   try {
     if (!email) {
-      return {
-        statusCode: 401,
-        body: {
-          message: 'Unauthorized',
-        },
-      };
+      throw new UnauthorizedError();
     }
 
-    await updateUserName(email, name);
+    const updatedUsers = await updateUserName(email, name);
+
+    if (!updatedUsers) {
+      throw new UserNotFoundError(`email: ${email}`);
+    }
 
     const resolvedNodeId = await resolveNodeId(nodeId);
     if (resolvedNodeId && userId) {
@@ -49,19 +49,14 @@ export async function postUsersResetName(
     }
 
     return {
-      body: {
-        status: 'success',
-        message: 'Name updated successfully',
-      },
+      status: 'success',
+      message: 'Name updated successfully',
     };
   } catch (error) {
     logger.error(error);
-    return {
-      statusCode: 500,
-      body: {
-        status: 'failure',
-        message: 'Could not update name',
-      },
-    };
+    if (error instanceof HttpError) {
+      throw error;
+    }
+    throw new InternalServerError('Could not update name', error);
   }
 }

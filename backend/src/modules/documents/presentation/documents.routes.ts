@@ -7,7 +7,12 @@ import { DocumentsController } from './documents.controller';
 
 export const documentsRouter = express.Router();
 
-documentsRouter.delete('/documents/:docId', authenticateCookie, DocumentsValidator.validateDocumentId, DocumentsController.deleteDocument);
+documentsRouter.delete(
+  '/documents/:docId',
+  authenticateCookie,
+  DocumentsValidator.validateDocumentId,
+  DocumentsController.deleteDocument,
+);
 
 documentsRouter.get(
   '/documents',
@@ -39,6 +44,16 @@ documentsRouter.get(
   DocumentsController.getDocumentsVersionByCID,
 );
 
-documentsRouter.post('/documents', authenticateCookie, DocumentsValidator.postDocumentValidator, DocumentsController.postDocument);
+documentsRouter.post(
+  '/documents',
+  authenticateCookie,
+  DocumentsValidator.postDocumentValidator,
+  DocumentsController.postDocument,
+);
 
-documentsRouter.put('/documents/:docId', authenticateCookie, DocumentsValidator.putDocumentValidator, DocumentsController.putDocument);
+documentsRouter.put(
+  '/documents/:docId',
+  authenticateCookie,
+  DocumentsValidator.putDocumentValidator,
+  DocumentsController.putDocument,
+);

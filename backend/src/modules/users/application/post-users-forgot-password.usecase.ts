@@ -8,26 +8,20 @@ import { findUserByEmailDb } from '../../../shared/clients/db';
 import { createTokenDb } from '../../../shared/clients/db/resetPasswordTokens';
 import { config } from '../../../shared/config/config';
 import logger from '../../../shared/config/winston';
+import { HttpError, InternalServerError } from '../../../shared/errors';
 import { sendEmail } from '../../../shared/mailing/mailing';
 import { passwordReset } from '../../../shared/mailing/mailingConstants';
-import { UseCaseResponse } from '../../../shared/types/usecase';
 
 export async function postUsersForgotPassword(
   email: string,
   resetPasswordLink: string,
   lang: string,
-): Promise<UseCaseResponse> {
+) {
   const { smtpServer } = config;
 
   if (!smtpServer.host || !smtpServer.port) {
     logger.error('SMTP server not set');
-    return {
-      statusCode: 500,
-      body: {
-        status: 'error',
-        message: 'SMTP server not set',
-      },
-    };
+    throw new InternalServerError('SMTP server not set');
   }
 
   try {
@@ -36,10 +30,8 @@ export async function postUsersForgotPassword(
     if (!user) {
       logger.info('No such user');
       return {
-        body: {
-          status: 'success',
-          message: 'email sent',
-        },
+        status: 'success',
+        message: 'email sent',
       };
     }
 
@@ -66,19 +58,14 @@ export async function postUsersForgotPassword(
     await sendEmail(email, passwordReset[lang].subject, htmlTemplateToSend);
 
     return {
-      body: {
-        status: 'success',
-        message: 'email sent',
-      },
+      status: 'success',
+      message: 'email sent',
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error(error);
-    return {
-      statusCode: 500,
-      body: {
-        status: 'failure',
-        message: 'Unknown error occurred',
-      },
-    };
+    if (error instanceof HttpError) {
+      throw error;
+    }
+    throw new InternalServerError('Failed to process forgot password request', error);
   }
 }

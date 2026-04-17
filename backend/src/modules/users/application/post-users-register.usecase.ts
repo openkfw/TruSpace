@@ -1,17 +1,18 @@
 import path from 'path';
 import jwt from 'jsonwebtoken';
 import fs from 'fs';
-import { Response } from 'express';
 import { compile } from 'handlebars';
 
-import { createUserDb, findUserByEmailDb, deleteUserByUiid } from '../../../shared/clients/db';
+import { USER_EMAIL_TAKEN_ERROR, createUserDb, findUserByEmailDb, deleteUserByUiid } from '../../../shared/clients/db';
 import { IpfsClient } from '../../../shared/clients/ipfs-client';
 import { hashPassword } from '../../../shared/encryption';
+import { HttpError, InternalServerError } from '../../../shared/errors';
 import { sendEmail } from '../../../shared/mailing/mailing';
 import { registrationConfirmation } from '../../../shared/mailing/mailingConstants';
 import { CONFIRMATION_EMAIL_EXPIRATION, USER_STATUS } from '../../../shared/utility/constants';
 import { config } from '../../../shared/config/config';
 import logger from '../../../shared/config/winston';
+import { UserConflictError } from '../errors/user-conflict.error';
 
 const resolveNodeId = async (explicitNodeId?: string): Promise<string> => {
   if (explicitNodeId) {
@@ -33,9 +34,13 @@ export async function postUsersRegister(
   password: string,
   confirmationLink: string,
   lang: string | number,
-  res: Response,
 ) {
   const { registerUsersAsInactive, smtpServer } = config;
+
+  if (registerUsersAsInactive && (!smtpServer.host || !smtpServer.port)) {
+    logger.error('SMTP server not set');
+    throw new InternalServerError('SMTP server not set');
+  }
 
   const passwordHash = await hashPassword(password);
   const token = config.registerUsersAsInactive
@@ -43,15 +48,21 @@ export async function postUsersRegister(
         expiresIn: CONFIRMATION_EMAIL_EXPIRATION, // 20 minutes
       })
     : '';
+
+  const cleanupCreatedUser = async () => {
+    try {
+      const user = await findUserByEmailDb(email);
+
+      if (user) {
+        await deleteUserByUiid(user.uiid);
+      }
+    } catch (cleanupError) {
+      logger.error(`Error cleaning up user after failed registration (${email}):`, cleanupError);
+    }
+  };
+
   try {
     if (registerUsersAsInactive) {
-      if (!smtpServer.host || !smtpServer.port) {
-        logger.error('SMTP server not set');
-        return res.status(500).json({
-          status: 'error',
-          message: 'SMTP server not set',
-        });
-      }
       logger.info('Register user as inactive');
       const result = await createUserDb(
         name,
@@ -61,7 +72,7 @@ export async function postUsersRegister(
         token,
       );
       if (!result) {
-        throw Error('Unknown error');
+        throw new InternalServerError(`Failed to create user (${email})`);
       }
 
       const createdUser = await findUserByEmailDb(email);
@@ -108,7 +119,7 @@ export async function postUsersRegister(
         token,
       );
       if (!result) {
-        throw Error('Unknown error');
+        throw new InternalServerError(`Failed to create user (${email})`);
       }
 
       const createdUser = await findUserByEmailDb(email);
@@ -130,22 +141,19 @@ export async function postUsersRegister(
         message: 'Your registration request has been processed',
       };
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error(error);
-    if (error.message === 'email taken') {
-      res.status(400).json({
-        status: 'failure',
-        message: 'Email address is already registered',
-      });
-    } else {
-      const user = await findUserByEmailDb(email);
-      if (user) {
-        await deleteUserByUiid(user.uiid);
-      }
-      res.status(500).json({
-        status: 'failure',
-        message: 'Unknown error occurred',
-      });
+
+    if (error instanceof Error && error.message === USER_EMAIL_TAKEN_ERROR) {
+      throw new UserConflictError(email, error);
     }
+
+    await cleanupCreatedUser();
+
+    if (error instanceof HttpError) {
+      throw error;
+    }
+
+    throw new InternalServerError(`Failed to register user (${email})`, error);
   }
 }
