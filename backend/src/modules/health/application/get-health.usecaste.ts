@@ -80,7 +80,7 @@ export async function getHealth() {
     ]);
 
   return {
-    status: clusterStatus && pinSvcStatus && oiStatus && gatewayStatus && dbStatus,
+    status: config.disableAllAIFunctionality ? clusterStatus && pinSvcStatus && gatewayStatus && dbStatus : clusterStatus && pinSvcStatus && oiStatus && gatewayStatus && dbStatus,
     services: {
       Backend: true,
       Database: dbStatus,
