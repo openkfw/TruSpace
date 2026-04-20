@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 
 import {
+   AlertTriangle,
    CheckCircle2,
    Globe,
    Info,
@@ -16,6 +17,7 @@ import {
 import CopyToClipboardButton from "@/components/CopyToClipboardButton";
 import KPIBox from "@/components/KPIBox";
 import { Button } from "@/components/ui/button";
+import config from "@/config";
 
 import { useHealth, usePeers } from "@/lib/services";
 interface PeerNode {
@@ -93,6 +95,16 @@ export default function AppStatus() {
                         </span>
                      </div>
                   </div>
+                  {config.disableAllAIFunctionality ? (
+                     <div className="mb-4 p-3 rounded-md bg-gray-100 dark:bg-gray-700">
+                        <div className="flex items-center gap-2">
+                           <AlertTriangle className="w-5 h-5 text-yellow-700 dark:text-yellow-300" />
+                           <span className="font-semibold text-yellow-700 dark:text-yellow-300">
+                              {t("appStatus.warningAIDisabled")}
+                           </span>
+                        </div>
+                     </div>
+                  ) : null}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                      {health.services &&
                         Object.entries(health.services).map(

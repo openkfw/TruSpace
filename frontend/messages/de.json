@@ -541,6 +541,7 @@
       "overallSystemStatus": "Gesamtsystemstatus:",
       "healthy": "Gesund",
       "issuesDetected": "Probleme erkannt",
+      "warningAIDisabled": "TruSpace läuft ohne aktivierte KI-Dienste. Daher stehen die KI-Funktionen nicht zur Verfügung.",
       "online": "Online",
       "offline": "Offline",
       "failedToLoadHealthData": "Gesundheitsdaten konnten nicht geladen werden",

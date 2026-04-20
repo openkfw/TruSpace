@@ -541,6 +541,7 @@
     "overallSystemStatus": "Estado general del sistema:",
     "healthy": "Saludable",
     "issuesDetected": "Problemas identificados",
+    "warningAIDisabled": "TruSpace se está ejecutando sin los servicios de IA activados. Por lo tanto, las funciones de IA no están disponibles.",
     "online": "En línea",
     "offline": "Desconectado",
     "failedToLoadHealthData": "No se pudieron cargar los datos de salud",
