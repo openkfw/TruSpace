@@ -140,11 +140,11 @@ if [ -f "$TRUSPACE_VERSION_FILE" ]; then
 fi
 
 # Re-apply CLI overrides after loading .env
-if [ "$CLI_DEV" = "true" ]; then DEV="true"; fi
-if [ "$CLI_LOCAL_FRONTEND" = "true" ]; then LOCAL_FRONTEND="true"; fi
-if [ "$CLI_DISABLE_ALL_AI_FUNCTIONALITY" = "true" ]; then DISABLE_ALL_AI_FUNCTIONALITY="true"; fi
-if [ "$CLI_REMOVE_PEERS" = "true" ]; then REMOVE_PEERS="true"; fi
-if [ "$CLI_CONFIGURE_ENV" = "true" ]; then CONFIGURE_ENV="true"; fi
+if [ "$CLI_DEV" = "true" ]; then export DEV="true"; fi
+if [ "$CLI_LOCAL_FRONTEND" = "true" ]; then export LOCAL_FRONTEND="true"; fi
+if [ "$CLI_DISABLE_ALL_AI_FUNCTIONALITY" = "true" ]; then export DISABLE_ALL_AI_FUNCTIONALITY="true"; fi
+if [ "$CLI_REMOVE_PEERS" = "true" ]; then export REMOVE_PEERS="true"; fi
+if [ "$CLI_CONFIGURE_ENV" = "true" ]; then export CONFIGURE_ENV="true"; fi
 
 #------------------------#
 ###--- DOCKER SETUP ---###
