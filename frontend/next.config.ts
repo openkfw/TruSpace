@@ -18,7 +18,9 @@ const nextConfig: NextConfig = {
    },
    output: "standalone",
    env: {
-      TRUSPACE_VERSION: getTruSpaceVersion()
+      TRUSPACE_VERSION: getTruSpaceVersion(),
+      DISABLE_ALL_AI_FUNCTIONALITY:
+         process.env.DISABLE_ALL_AI_FUNCTIONALITY ?? "false"
    }
 };
 

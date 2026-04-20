@@ -1,6 +1,7 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import config from "@/config";
 
 import { useTranslations } from "next-intl";
 
@@ -480,13 +481,19 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                                     {t("createNewPerspectiveFromPrevious")}
                                  </div>
                               </SelectItem>
-                              <SelectItem value="custom">
+                              <SelectItem
+                                 value="custom"
+                                 disabled={config.disableAllAIFunctionality}
+                              >
                                  <div className="flex items-center">
                                     <MessageCircleQuestion className="mr-2 h-4 w-4" />
                                     {t("askCustomPrompt")}
                                  </div>
                               </SelectItem>
-                              <SelectItem value="generateFromPrevious">
+                              <SelectItem
+                                 value="generateFromPrevious"
+                                 disabled={config.disableAllAIFunctionality}
+                              >
                                  <div className="flex items-center">
                                     <MessageCircleQuestion className="mr-2 h-4 w-4" />
                                     {t("generateNewPerspectiveFromPrevious")}

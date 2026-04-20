@@ -39,11 +39,11 @@ echo "                                                                   "
 #-----------------------------#
 ###--- SET DEFAULT FLAGS ---###
 #-----------------------------#
-DEV="false"
-LOCAL_FRONTEND="false"
-DISABLE_ALL_AI_FUNCTIONALITY="false"
-REMOVE_PEERS="false"
-CONFIGURE_ENV="false"
+CLI_DEV="false"
+CLI_LOCAL_FRONTEND="false"
+CLI_DISABLE_ALL_AI_FUNCTIONALITY="false"
+CLI_REMOVE_PEERS="false"
+CLI_CONFIGURE_ENV="false"
 
 SCRIPT_DIR=$(dirname -- "$0")
 ENV_FILE="$SCRIPT_DIR/.env"
@@ -58,27 +58,27 @@ source "$SCRIPT_DIR/scripts/libs/logging.sh"
 while [[ "$#" -gt 0 ]]; do
   case "$1" in
     --dev)
-      DEV="true"
+      CLI_DEV="true"
       echo_info "Starting in development mode"
       shift
       ;;
     --local-frontend)
-      LOCAL_FRONTEND="true"
+      CLI_LOCAL_FRONTEND="true"
       echo_info "Frontend will be started locally for development"
       shift
       ;;
     --no-ai)
-      DISABLE_ALL_AI_FUNCTIONALITY="true"
+      CLI_DISABLE_ALL_AI_FUNCTIONALITY="true"
       echo_info "AI functionality (Ollama and Open-WebUI) will be disabled"
       shift
       ;;
     --remove-peers)
-      REMOVE_PEERS="true"
+      CLI_REMOVE_PEERS="true"
       echo_info "IPFS bootstrap peers will be removed after startup"
       shift
       ;;
     --configure-env)
-      CONFIGURE_ENV="true"
+      CLI_CONFIGURE_ENV="true"
       shift
       ;;
     -h|--help)
@@ -138,6 +138,13 @@ TRUSPACE_VERSION_FILE="$SCRIPT_DIR/VERSION"
 if [ -f "$TRUSPACE_VERSION_FILE" ]; then
   export TRUSPACE_VERSION="$(cat "$TRUSPACE_VERSION_FILE")"
 fi
+
+# Re-apply CLI overrides after loading .env
+if [ "$CLI_DEV" = "true" ]; then export DEV="true"; fi
+if [ "$CLI_LOCAL_FRONTEND" = "true" ]; then export LOCAL_FRONTEND="true"; fi
+if [ "$CLI_DISABLE_ALL_AI_FUNCTIONALITY" = "true" ]; then export DISABLE_ALL_AI_FUNCTIONALITY="true"; fi
+if [ "$CLI_REMOVE_PEERS" = "true" ]; then export REMOVE_PEERS="true"; fi
+if [ "$CLI_CONFIGURE_ENV" = "true" ]; then export CONFIGURE_ENV="true"; fi
 
 #------------------------#
 ###--- DOCKER SETUP ---###
