@@ -29,4 +29,6 @@ export const UsersValidator = {
   postUsersResetName: validate([body('name').isString().isLength({ min: 3 })]),
 
   postUsersResetPassword: validate([body('password').isString(), body('token').isString()]),
+
+  getUsersAvatar: validate([query('cid').isString().notEmpty()]),
 };

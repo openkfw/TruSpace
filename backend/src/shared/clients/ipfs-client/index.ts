@@ -80,7 +80,7 @@ export class IpfsClient implements IClient {
 
   async downloadAvatar(req: AuthenticatedRequest, res: Response, cid: string): Promise<any> {
     try {
-      const result = await this.#gatewayAxios.get(`/ipfs/${cid}`, {
+      const result = await this.#gatewayAxios.get(`/ipfs/${encodeURIComponent(cid)}`, {
         responseType: 'arraybuffer',
       });
 
@@ -96,6 +96,7 @@ export class IpfsClient implements IClient {
       res.status(404);
     }
   }
+
   async uploadAvatar(file: File): Promise<any> {
     try {
       const form = new FormData();
