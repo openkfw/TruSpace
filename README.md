@@ -84,51 +84,7 @@ If something doesn't work, check that all containers are running with `docker ps
 <br>
 
 > [!NOTE]
-> For more details on the local installation, feel free to check out one of the insallation guides [here](./doc/Admin%20Guide/Setup%20TruSpace/Installation.md). There are guides for a local dev setup, standalone server and raspberry pi.
-
-### FAQ - Local Installation
-
-<details>
-<summary>How do I customize the domain?</summary>
-
-If you plan on using another domain (e.g. on a local raspberry), make sure that the respective domains are updated from `localhost` to your `domain.local` in the `CORS` fields of the `.env` file (`CORS_ORIGIN` and `OI_CORS_ALLOW_ORIGIN`). This can be easily done in the `TruSpace` folder using the example environment:
-
-```bash
-sed 's|http://localhost|http://example.com|g' .env.example > .env
-```
-
-You can also use the `scripts/configure-env.sh` to configure your domains and some other settings interactively:
-
-```bash
-./scripts/configure-env.sh
-```
-
-</details>
-
-<details>
-<summary>Can I configure how I start the application?</summary>
-
-You have multiple options to configure the TruSpace installation before starting it. You can either edit the `.env` file directly (after copying it from `.env.example`). You can find a detailed description of all environment variables in [ENVIRONMENT_VARIABLES.md](./doc/ENVIRONMENT_VARIABLES.md).
-
-Alternatively, you can set flags in `start.sh` to enable certain behaviors:
-
-- `--dev` : starts the application in development mode (always build backend and frontend instead of pulling docker images (identical to `BUILD_OR_PULL_IMAGES=build`))
-- `--local-frontend`: start the frontend locally instead of in Docker
-- `--no-ai`: disable AI functionality (Ollama and Open-WebUI) when starting the application (identical to `DISABLE_ALL_AI_FUNCTIONALITY=true`)
-- `--remove-peers`: after IPFS starts, remove default bootstrap peers via the IPFS API
-
-</details>
-
-<details>
-<summary>What happens beneath the hood?</summary>
-
-The `start.sh` script creates a simple `.env` configuration, docker volumes and spins up `docker compose` containing backend api and IPFS and additionally NextJS frontend in dev mode. After startup, the frontend is available on `http://localhost:3000`. Register a user, login and create a workspace for documents!
-
-To enable AI analysis, TruSpace downloads a model configured in `.env`, as an example here is `gemma3:1b` and you can see the full list at the [ollama DB](https://ollama.com/library?q=mistral&sort=popular).
-
-Once the model is downloaded, AI analysis is executed upon each document upload automatically.
-
-</details>
+> For more details on the installation, feel free to check out our detailed installation guide [here](./doc/Admin%20Guide/Setup%20TruSpace/Installation.md).
 
 ## Connect to other TruSpace nodes
 
