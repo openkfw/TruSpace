@@ -116,15 +116,10 @@ You can find a detailed description of all environment variables in [ENVIRONMENT
 
 `configure-env.sh` computes `NEXT_PUBLIC_API_URL` from `API_DOMAIN` + `API_PORT`. Make sure these match your **public** API URL:
 
-- **Single domain + `/api` path** (common for reverse proxy):
+**Single domain + `/api` path** (common for reverse proxy):
   - Set `API_DOMAIN` to your main domain (e.g. `example.com`)
   - Set `API_PORT` to your public port (usually `443`)
   - Configure nginx to proxy `/api` → `http://localhost:8000`
-
-- **API subdomain** (e.g. `api.example.com`):
-  - Set `API_DOMAIN=api.example.com`
-  - Set `API_PORT=443`
-  - Configure nginx for that subdomain
 
 If you only want to test locally, keep defaults and use `localhost` URLs.
 
