@@ -160,14 +160,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
             );
          }
 
-         if (!avatarCid) {
-            // No avatar CID means user hasn't uploaded an avatar yet
-            return null;
-         }
-
          const response = await downloadAvatar(avatarCid);
 
          if (!response) {
+            // No avatar CID means user hasn't uploaded an avatar yet
             return null;
          }
 
