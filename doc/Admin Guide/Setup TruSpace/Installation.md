@@ -2,13 +2,23 @@
 
 ---
 
-Prerequisites are required for all environments. Make sure to complete those before proceeding.
+### Prerequisites
+[Prerequisites](#prerequisites) are required for all environments. Make sure to complete those before proceeding.
 
-Steps 1 to 3 cover the basic installation and startup process for any environment.
+### Basic setup steps:
+- [1) Clone the repository](#1-clone-the-repository)
+- [2) Configure the environment](#2-configure-the-environment)
+- [3) Start TruSpace](#3-start-truspace)
 
-Sections A to C provide environment-specific instructions for local development, standalone servers, and Raspberry Pi.
+### Environment-specific instructions:
+- [A) Local Development / Testing](#a-local-development--testing)
+- [B) Standalone Server / VM (Linux)](#b-standalone-server--vm-linux)
+- [C) Raspberry Pi](#c-raspberry-pi)
 
-Sections D to F include verification steps, helpful notes for all environments and troubleshooting tips when starting to run TruSpace.
+### Verification and troubleshooting:
+- [D) Verify installation (all environments)](#d-verify-installation-all-environments)
+- [E) Helpful notes](#e-helpful-notes)
+- [F) Troubleshooting when starting to run TruSpace](#f-troubleshooting-when-starting-to-run-truspace)
 
 ---
 
