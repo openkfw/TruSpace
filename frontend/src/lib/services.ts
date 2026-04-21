@@ -804,27 +804,24 @@ export const removeAllUserPermissions = async (email: string) => {
     }
 };
 
-export const downloadAvatar = async () => {
-   try {
-      const res = await fetch(`${USERS_ENDPOINT}/avatar`, {
+export const downloadAvatar = async (cid?: string) => {
+   if (!cid) {
+      return null;
+   }
+
+   const res = await fetch(
+      `${USERS_ENDPOINT}/avatar?cid=${encodeURIComponent(cid)}`,
+      {
          method: "GET",
          credentials: "include"
-      });
-
-      if (res.status === 404) {
-         // Avatar not found is expected for new users — return null
-         return null;
       }
+   );
 
-      if (!res.ok) {
-         throw new Error("Failed to download avatar");
-      }
-
-      return res;
-   } catch (error) {
-      console.error("Error downloading avatar:", error);
-      throw error;
+   if (!res.ok) {
+      throw new Error("Failed to download avatar");
    }
+
+   return res;
 };
 
 export const downloadUserSettings = async () => {

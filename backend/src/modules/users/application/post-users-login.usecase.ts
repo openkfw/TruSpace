@@ -113,6 +113,7 @@ export async function postUsersLogin(req: Request, res: Response) {
         uiid: user.uiid,
         nodeId,
         firstSignIn: user.first_sign_in === 'true',
+        avatarCid: user.avatar_cid,
         expires: decodedToken.exp,
       },
     });

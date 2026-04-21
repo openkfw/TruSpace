@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 
 import { IpfsClient } from '../../../shared/clients/ipfs-client';
 import { AuthenticatedRequest } from '../../../shared/types';
-import { getUsersAvatar } from '../application/get-users-avatar.usecase';
+
 import { getUsersStatistics } from '../application/get-users-statistics.usecase';
 import { getUsersUserSettings } from '../application/get-users-user-settings.usecase';
 import { postUsersLogin } from '../application/post-users-login.usecase';
@@ -65,7 +65,7 @@ export const UsersController = {
   },
 
   getUsersAvatar: async (req: AuthenticatedRequest, res: Response) => {
-    const cid = await getUsersAvatar(req.user?.email as string);
+    const cid = req.query.cid as string;
     return new IpfsClient().downloadAvatar(req, res, cid);
   },
 

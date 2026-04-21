@@ -33,6 +33,7 @@ interface User {
    email: string;
    uiid: string;
    avatar?: string;
+   avatarCid?: string;
    settings?: {
       preferedLanguage: string; // ISO 639-1 code, e.g., "en", "de"
       notificationSettings?: {
@@ -53,6 +54,7 @@ interface UserUpdates {
    name?: string;
    email?: string;
    avatar?: string;
+   avatarCid?: string;
    [key: string]: unknown;
 }
 
@@ -149,7 +151,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       [handleTokenExpiration, isTokenExpired]
    );
 
-   const fetchUserDetails = useCallback(async () => {
+   const fetchUserDetails = useCallback(async (avatarCid?: string) => {
       try {
          const userSettings = await downloadUserSettings();
          if (userSettings.status === "success") {
@@ -158,10 +160,14 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
             );
          }
 
-         const response = await downloadAvatar();
+         if (!avatarCid) {
+            // No avatar CID means user hasn't uploaded an avatar yet
+            return null;
+         }
+
+         const response = await downloadAvatar(avatarCid);
 
          if (!response) {
-            // No avatar uploaded yet — expected for new users
             return null;
          }
 
@@ -209,7 +215,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
          setupTokenCheck(userData.expires);
 
          try {
-            await fetchUserDetails();
+            await fetchUserDetails(userData.avatarCid);
          } catch (avatarError) {
             console.error("Error fetching avatar:", avatarError);
             // Don't fail the entire login process if avatar fails
