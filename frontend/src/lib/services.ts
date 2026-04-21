@@ -804,11 +804,7 @@ export const removeAllUserPermissions = async (email: string) => {
     }
 };
 
-export const downloadAvatar = async (cid?: string) => {
-   if (!cid) {
-      return null;
-   }
-
+export const downloadAvatar = async (cid: string) => {
    const res = await fetch(
       `${USERS_ENDPOINT}/avatar?cid=${encodeURIComponent(cid)}`,
       {
