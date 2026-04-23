@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 
-import { IpfsClient } from '../../../shared/clients/ipfs-client';
 import { AuthenticatedRequest } from '../../../shared/types';
 import { getUsersAvatar } from '../application/get-users-avatar.usecase';
 import { getUsersStatistics } from '../application/get-users-statistics.usecase';
@@ -13,6 +12,7 @@ import { postUsersResetName } from '../application/post-users-reset-name.usecase
 import { postUsersResetPassword } from '../application/post-users-reset-password.usecase';
 import { postUsersUserSettings } from '../application/post-users-user-settings.usecase';
 import { deleteUser } from '../application/delete-user.usecase';
+import { usersIpfsRepository } from '../infrastructure/users-ipfs.repository';
 
 export const UsersController = {
   postUsersRegister: async (req: Request, res: Response) => {
@@ -64,14 +64,14 @@ export const UsersController = {
     res.json(result);
   },
 
-   getUsersAvatarCid: async (req: AuthenticatedRequest, res: Response) => {
-      const cid = await getUsersAvatar(req.user?.email as string);
-      res.json({ cid });
-   },
+  getUsersAvatarCid: async (req: AuthenticatedRequest, res: Response) => {
+    const cid = await getUsersAvatar(req.user?.email as string);
+    res.json({ cid });
+  },
 
-   getUsersAvatar: async (req: AuthenticatedRequest, res: Response) => {
-     const cid = req.params.cid as string;
-     return new IpfsClient().downloadAvatar(req, res, cid);
+  getUsersAvatar: async (req: AuthenticatedRequest, res: Response) => {
+    const cid = req.params.cid as string;
+    return usersIpfsRepository.downloadAvatar(res, cid);
   },
 
   postUsersForgotPassword: async (req: Request, res: Response) => {

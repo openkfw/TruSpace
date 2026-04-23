@@ -1,28 +1,28 @@
 import { getHealthDb } from '../../../shared/clients/db';
-import { IpfsClient } from '../../../shared/clients/ipfs-client';
 import { oiClient } from '../../../shared/clients/oi-client';
 import { config } from '../../../shared/config/config';
+import { healthIpfsRepository } from '../infrastructure/health-ipfs.repository';
 
 export async function getHealth() {
   const [clusterStatus, pinSvcStatus, gatewayStatus, oiStatus, ollamaStatus, dbStatus, clusterId, ipifyResponse] =
     await Promise.all([
       (async () => {
         try {
-          return await new IpfsClient().clusterStatus();
+          return await healthIpfsRepository.clusterStatus();
         } catch {
           return false;
         }
       })(),
       (async () => {
         try {
-          return await new IpfsClient().pinSvcStatus();
+          return await healthIpfsRepository.pinSvcStatus();
         } catch {
           return false;
         }
       })(),
       (async () => {
         try {
-          return await new IpfsClient().gatewayStatus();
+          return await healthIpfsRepository.gatewayStatus();
         } catch {
           return false;
         }
@@ -50,7 +50,7 @@ export async function getHealth() {
       })(),
       (async () => {
         try {
-          return await new IpfsClient().clusterId();
+          return await healthIpfsRepository.clusterId();
         } catch {
           return {
             id: '',

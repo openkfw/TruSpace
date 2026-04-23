@@ -1,5 +1,5 @@
-import { IpfsClient } from '../../../shared/clients/ipfs-client';
+import { perspectivesIpfsRepository } from '../infrastructure/perspectives-ipfs.repository';
 
 export async function getPerspectivesByDocumentId(documentId: string) {
-  return new IpfsClient().getPerspectivesByDocumentId(documentId);
+  return perspectivesIpfsRepository.getPerspectivesByDocumentId(documentId);
 }

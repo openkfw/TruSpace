@@ -1,7 +1,8 @@
-import { IpfsClient } from '../../../shared/clients/ipfs-client';
 import { sendNotification } from '../../../shared/mailing/notifications';
 import { ChatMessageRequest } from '../../../shared/types/interfaces';
 import { getUserSettingsByUiid } from '../../../shared/utility/user';
+import { documentsIpfsRepository } from '../../documents/infrastructure/documents-ipfs.repository';
+import { chatsIpfsRepository } from '../infrastructure/chats-ipfs.repository';
 
 export async function postChat(
   creatorNodeId: string,
@@ -11,7 +12,6 @@ export async function postChat(
   docId: string,
   workspaceOrigin: string,
 ) {
-  const client = new IpfsClient();
   /* Create a json document and store it in IPFS */
   const chatReq: ChatMessageRequest = {
     meta: {
@@ -27,8 +27,8 @@ export async function postChat(
     },
   };
 
-  const result = await client.createMessage(chatReq);
-  const docInfo = await client.getDocumentDetailsById(docId);
+  const result = await chatsIpfsRepository.createMessage(chatReq);
+  const docInfo = await documentsIpfsRepository.getDocumentDetailsById(docId);
 
   docInfo.documentVersions
     .map((version) => version.meta.creatorUserId)

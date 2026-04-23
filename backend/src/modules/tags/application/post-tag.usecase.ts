@@ -1,8 +1,8 @@
 import { Response } from 'express';
 
-import { IpfsClient } from '../../../shared/clients/ipfs-client';
 import { TagRequest } from '../../../shared/types/interfaces';
 import { checkPermissionForWorkspace } from '../../../shared/utility/permissions';
+import { tagsIpfsRepository } from '../infrastructure/tags-ipfs.repository';
 
 export async function postTag(
   cid: string,
@@ -32,5 +32,5 @@ export async function postTag(
 
   await checkPermissionForWorkspace(email, res, workspaceOrigin);
 
-  return new IpfsClient().createTag(tagRequest);
+  return tagsIpfsRepository.createTag(tagRequest);
 }

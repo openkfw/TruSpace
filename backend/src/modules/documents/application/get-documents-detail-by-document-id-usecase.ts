@@ -1,10 +1,9 @@
 import { Response } from 'express';
-import { IpfsClient } from '../../../shared/clients/ipfs-client';
 import { checkPermissionForWorkspace } from '../../../shared/utility/permissions';
+import { documentsIpfsRepository } from '../infrastructure/documents-ipfs.repository';
 
 export async function getDocumentsDetailByDocumentId(documentId: string, email: string, res: Response) {
-  const client = new IpfsClient();
-  const documents = await client.getDocumentDetailsById(documentId);
+  const documents = await documentsIpfsRepository.getDocumentDetailsById(documentId);
   await checkPermissionForWorkspace(email, res, documents.meta.workspaceOrigin);
 
   return documents;

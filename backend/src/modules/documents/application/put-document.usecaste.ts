@@ -2,7 +2,6 @@ import { Response } from 'express';
 
 import { UploadedFile } from 'express-fileupload';
 
-import { IpfsClient } from '../../../shared/clients/ipfs-client';
 import { oiClient } from '../../../shared/clients/oi-client';
 import { encrypt } from '../../../shared/encryption';
 import { decodeFilename, createDocumentRequest, getWorkspacePassword } from '../../../shared/handlers/documents';
@@ -20,6 +19,7 @@ import {
 import { getUserSettingsByUiid } from '../../../shared/utility/user';
 import TaskQueue from '../../../shared/utility/jobQueue';
 import { NoFileUploadedError } from '../errors/no-file-uploaded.error';
+import { documentsIpfsRepository } from '../infrastructure/documents-ipfs.repository';
 
 export async function putDocument(req: AuthenticatedRequest, res: Response) {
   if (!req.files || !req.files.file) {
@@ -36,8 +36,7 @@ export async function putDocument(req: AuthenticatedRequest, res: Response) {
   const file = req.files.file as UploadedFile;
   const filename = decodeFilename(file.name);
 
-  const client = new IpfsClient();
-  const docInfo = await client.getDocumentDetailsById(docId);
+  const docInfo = await documentsIpfsRepository.getDocumentDetailsById(docId);
   const latestVersion = docInfo.documentVersions[0].meta.version;
 
   const docRequest = createDocumentRequest({
@@ -57,7 +56,7 @@ export async function putDocument(req: AuthenticatedRequest, res: Response) {
   file.data = await encrypt(file.data, workspacePassword);
 
   // store encrypted document. cid is derived from this encrypted version
-  const ipfsClusterResponse = await client.createDocument(docRequest, file);
+  const ipfsClusterResponse = await documentsIpfsRepository.createDocument(docRequest, file);
   const cid = ipfsClusterResponse.cid;
 
   file.data = fileDataClone;

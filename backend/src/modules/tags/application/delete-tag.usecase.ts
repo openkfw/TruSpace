@@ -1,6 +1,6 @@
-import { IpfsClient } from '../../../shared/clients/ipfs-client';
+import { tagsIpfsRepository } from '../infrastructure/tags-ipfs.repository';
 
 export async function deleteTag(tagId: string) {
-  const result = await new IpfsClient().deleteTag(tagId);
+  const result = await tagsIpfsRepository.deleteTag(tagId);
   return { result };
 }

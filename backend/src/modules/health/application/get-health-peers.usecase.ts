@@ -1,6 +1,6 @@
-import { IpfsClient } from '../../../shared/clients/ipfs-client';
+import { healthIpfsRepository } from '../infrastructure/health-ipfs.repository';
 
 export async function getHealthPeers() {
-  const peers = await new IpfsClient().getPeers();
+  const peers = await healthIpfsRepository.getPeers();
   return peers;
 }

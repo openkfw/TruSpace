@@ -1,15 +1,19 @@
-import { Response } from 'express';
 import PDFDocument from 'pdfkit';
 
-import { IpfsClient } from '../../../shared/clients/ipfs-client';
+import { chatsIpfsRepository } from '../infrastructure/chats-ipfs.repository';
+import { documentsIpfsRepository } from '../../documents/infrastructure/documents-ipfs.repository';
 
-export async function getChatsExportByDocumentId(documentId: string, res: Response) {
-  const client = new IpfsClient();
-  const document = await client.getDocumentDetailsById(documentId);
-  const result = await client.getMessagesByDocumentId(documentId);
+export interface ChatsExportFile {
+  contentType: string;
+  filename: string;
+  stream: NodeJS.ReadableStream;
+}
+
+export async function getChatsExportByDocumentId(documentId: string): Promise<ChatsExportFile> {
+  const document = await documentsIpfsRepository.getDocumentDetailsById(documentId);
+  const result = await chatsIpfsRepository.getMessagesByDocumentId(documentId);
 
   const doc = new PDFDocument();
-  doc.pipe(res);
   doc.fontSize(25).text(`Chat Messages for document "${document?.meta?.filename}"`);
   doc.fontSize(15).text(`Document ID: ${documentId}`);
   doc.fontSize(15).text(`Creator: ${document?.meta?.creatorName || 'UNKNOWN'}`);
@@ -34,4 +38,10 @@ export async function getChatsExportByDocumentId(documentId: string, res: Respon
   });
 
   doc.end();
+
+  return {
+    contentType: 'application/pdf',
+    filename: `chat-export-${documentId}.pdf`,
+    stream: doc,
+  };
 }

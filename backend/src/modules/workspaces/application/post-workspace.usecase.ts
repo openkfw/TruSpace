@@ -1,12 +1,12 @@
 import { v4 as uuidv4 } from 'uuid';
 
 import { createWorkspacePasswordDb } from '../../../shared/clients/db';
-import { IpfsClient } from '../../../shared/clients/ipfs-client';
 import { config } from '../../../shared/config/config';
 import { encrypt, hashPassword } from '../../../shared/encryption';
 import { createPermission } from '../../../shared/handlers/userPermissions';
 import { WorkspaceRequest } from '../../../shared/types/interfaces';
 import { WorkspaceConflictError } from '../errors/workspace-conflict.error';
+import { workspacesIpfsRepository } from '../infrastructure/workspaces-ipfs.repository';
 
 export async function postWorkspace(
   name: string,
@@ -16,8 +16,7 @@ export async function postWorkspace(
   creatorUserId: string,
   email: string,
 ) {
-  const client = new IpfsClient();
-  const workspaces = await client.getWorkspaceByName(name);
+  const workspaces = await workspacesIpfsRepository.getWorkspaceByName(name);
 
   if (workspaces.length > 0) {
     throw new WorkspaceConflictError(name);
@@ -49,5 +48,5 @@ export async function postWorkspace(
 
   await createWorkspacePasswordDb(workspaceId, await encrypt(password, config.masterPassword as string));
 
-  return await client.createWorkspace(workspaceReq);
+  return await workspacesIpfsRepository.createWorkspace(workspaceReq);
 }

@@ -1,4 +1,3 @@
-import { IpfsClient } from '../../../shared/clients/ipfs-client';
 import logger from '../../../shared/config/winston';
 import { InternalServerError } from '../../../shared/errors';
 import {
@@ -8,6 +7,8 @@ import {
   removePermission,
   selectNextOldestPermissionUser,
 } from '../../../shared/handlers/userPermissions';
+import { deleteWorkspaceById } from '../../workspaces/application/delete-workspace-by-id.usecase';
+import { workspacesIpfsRepository } from '../../workspaces/infrastructure/workspaces-ipfs.repository';
 
 export async function deletePermissionsRemoveAllByEmail(email: string) {
   try {
@@ -24,14 +25,13 @@ export async function deletePermissionsRemoveAllByEmail(email: string) {
       }
       await removePermission(permission.id);
 
-      const client = new IpfsClient();
-      const workspace = await client.getWorkspaceById(permission.workspaceId);
+      const workspace = await workspacesIpfsRepository.getWorkspaceById(permission.workspaceId);
       const users = await findUsersInWorkspace(permission.workspaceId);
 
       if (workspace.length > 0 && !workspace[0].meta.is_public) {
         if (users.length === 0) {
           const wCID = workspace[0].cid;
-          await client.deleteWorkspaceById(wCID, permission.workspaceId);
+          await deleteWorkspaceById(wCID, permission.workspaceId);
         } else if (permission.role === 'owner') {
           const nextOwner = selectNextOldestPermissionUser(users);
 

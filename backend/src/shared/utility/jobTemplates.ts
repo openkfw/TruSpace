@@ -1,8 +1,8 @@
-import { IpfsClient } from "../clients/ipfs-client";
 import { oiClient } from "../clients/oi-client";
 import logger from "../config/winston";
 import { createDocumentRequest } from "../handlers/documents";
 import { Prompt } from "../types/interfaces";
+import { documentsIpfsRepository } from "../../modules/documents/infrastructure/documents-ipfs.repository";
 
 type JobAttributes = { [key: string]: string | number | boolean | Prompt[] };
 
@@ -23,10 +23,8 @@ export const addPerspectivesTemplate = (taskQueue: JobTemplateRegistrar) =>
         requestId: string;
       };
 
-      const client = new IpfsClient();
-
-      const fileContent = await client.getDocumentVersionContentByCid(cid);
-      const fileDetails = await client.getDocumentVersionDetailsByCid(cid);
+      const fileContent = await documentsIpfsRepository.getDocumentVersionContentByCid(cid);
+      const fileDetails = await documentsIpfsRepository.getDocumentVersionDetailsByCid(cid);
 
       const file = {
         name: fileDetails.meta.filename,
@@ -75,10 +73,8 @@ export const addTagsTemplate = (taskQueue: JobTemplateRegistrar) =>
         prompts: Prompt[];
         requestId: string;
       };
-      const client = new IpfsClient();
-
-      const fileContent = await client.getDocumentVersionContentByCid(cid);
-      const fileDetails = await client.getDocumentVersionDetailsByCid(cid);
+      const fileContent = await documentsIpfsRepository.getDocumentVersionContentByCid(cid);
+      const fileDetails = await documentsIpfsRepository.getDocumentVersionDetailsByCid(cid);
 
       const file = {
         name: fileDetails.meta.filename,
@@ -126,10 +122,8 @@ export const addLanguageDetectionTemplate = (taskQueue: JobTemplateRegistrar) =>
         cid: string;
       };
 
-      const client = new IpfsClient();
-
-      const fileContent = await client.getDocumentVersionContentByCid(cid);
-      const fileDetails = await client.getDocumentVersionDetailsByCid(cid);
+      const fileContent = await documentsIpfsRepository.getDocumentVersionContentByCid(cid);
+      const fileDetails = await documentsIpfsRepository.getDocumentVersionDetailsByCid(cid);
 
       const file = {
         name: fileDetails.meta.filename,

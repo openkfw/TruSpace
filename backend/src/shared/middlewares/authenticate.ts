@@ -5,7 +5,7 @@ import { config } from '../config/config';
 import logger from '../config/winston';
 import { AuthenticatedRequest } from '../types';
 import { JwtPayload } from '../types/interfaces';
-import { IpfsClient } from '../clients/ipfs-client';
+import { healthIpfsRepository } from '../../modules/health/infrastructure/health-ipfs.repository';
 import { USER_STATUS } from '../utility/constants';
 
 export async function authenticateCookie(req: AuthenticatedRequest, res: Response, next: NextFunction) {
@@ -24,7 +24,7 @@ export async function authenticateCookie(req: AuthenticatedRequest, res: Respons
 
     if (!decoded.nodeId) {
       try {
-        const clusterId = await new IpfsClient().clusterId();
+        const clusterId = await healthIpfsRepository.clusterId();
         decoded.nodeId = clusterId?.ipfs?.id || '';
       } catch (error) {
         logger.error('Error resolving nodeId:', error);

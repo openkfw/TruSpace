@@ -2,7 +2,6 @@ import { Response } from 'express';
 import { UploadedFile } from 'express-fileupload';
 
 import { AuthenticatedRequest } from '../../../shared/types';
-import { IpfsClient } from '../../../shared/clients/ipfs-client';
 import { oiClient } from '../../../shared/clients/oi-client';
 import { encrypt } from '../../../shared/encryption';
 import { decodeFilename, createDocumentRequest, getWorkspacePassword } from '../../../shared/handlers/documents';
@@ -17,6 +16,7 @@ import {
 } from '../../../shared/utility/prompts';
 import TaskQueue from '../../../shared/utility/jobQueue';
 import { NoFileUploadedError } from '../errors/no-file-uploaded.error';
+import { documentsIpfsRepository } from '../infrastructure/documents-ipfs.repository';
 
 export async function postDocument(req: AuthenticatedRequest, res: Response) {
   if (!req.files || !req.files.file) {
@@ -46,8 +46,7 @@ export async function postDocument(req: AuthenticatedRequest, res: Response) {
   const workspacePassword = await getWorkspacePassword(workspace);
   file.data = await encrypt(file.data, workspacePassword);
 
-  const client = new IpfsClient();
-  const ipfsClusterResponse = await client.createDocument(docRequest, file);
+  const ipfsClusterResponse = await documentsIpfsRepository.createDocument(docRequest, file);
   const cid = ipfsClusterResponse.cid;
 
   // ollama obviously needs unencrypted document
