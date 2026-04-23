@@ -804,9 +804,32 @@ export const removeAllUserPermissions = async (email: string) => {
     }
 };
 
-export const downloadAvatar = async () => {
+export const downloadAvatarCid = async () => {
    try {
-      const res = await fetch(`${USERS_ENDPOINT}/avatar`, {
+      const res = await fetch(`${USERS_ENDPOINT}/avatar-cid`, {
+         method: "GET",
+         credentials: "include"
+      });
+
+      if (res.status === 404) {
+         return null;
+      }
+
+      if (!res.ok) {
+         throw new Error("Failed to download avatar CID");
+      }
+
+      const result = await res.json();
+      return result.cid;
+   } catch (error) {
+      console.error("Error downloading avatar CID:", error);
+      throw error;
+   }
+}
+
+export const downloadAvatar = async (avatarCid: string) => {
+   try {
+      const res = await fetch(`${USERS_ENDPOINT}/avatar/${encodeURIComponent(avatarCid)}`, {
          method: "GET",
          credentials: "include"
       });

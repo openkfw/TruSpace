@@ -64,8 +64,13 @@ export const UsersController = {
     res.json(result);
   },
 
-  getUsersAvatar: async (req: AuthenticatedRequest, res: Response) => {
+  getUsersAvatarCid: async (req: AuthenticatedRequest, res: Response) => {
     const cid = await getUsersAvatar(req.user?.email as string);
+    res.json({ cid });
+  },
+
+  getUsersAvatar: async (req: AuthenticatedRequest, res: Response) => {
+    const cid = req.params.cid as string;
     return usersIpfsRepository.downloadAvatar(res, cid);
   },
 

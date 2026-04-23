@@ -43,7 +43,7 @@ class UsersIpfsRepository {
 
   async downloadAvatar(res: Response, cid: string): Promise<void> {
     try {
-      const result = await gatewayClient.get(`/ipfs/${cid}`, {
+      const result = await gatewayClient.get(`/ipfs/${encodeURIComponent(cid)}`, {
         responseType: 'arraybuffer',
       });
 
@@ -103,9 +103,7 @@ class UsersIpfsRepository {
       const pins = await this.#getUserDataPins(nodeId, userId);
       if (!pins.length) return;
 
-      await Promise.all(
-        pins.map((pin) => clusterClient.delete(`/pins/${assertAndEncodeURIComponent(pin.pin.cid)}`)),
-      );
+      await Promise.all(pins.map((pin) => clusterClient.delete(`/pins/${assertAndEncodeURIComponent(pin.pin.cid)}`)));
     } catch (error) {
       logger.error(`Error deleting user data for nodeId=${nodeId}, userId=${userId}:`, error);
       throw error;

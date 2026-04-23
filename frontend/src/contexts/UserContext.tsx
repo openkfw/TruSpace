@@ -15,6 +15,7 @@ import Cookies from "js-cookie";
 
 import { COOKIE_NAME, deleteLoginCookie, setLoginCookie } from "@/lib";
 import {
+   downloadAvatarCid,
    downloadAvatar,
    downloadUserSettings,
    logout as apiLogout
@@ -158,7 +159,14 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
             );
          }
 
-         const response = await downloadAvatar();
+         const avatar_cid = await downloadAvatarCid();
+
+         if (!avatar_cid) {
+            // No avatar uploaded yet — expected for new users
+            return null;
+         }
+
+         const response = await downloadAvatar(avatar_cid);
 
          if (!response) {
             // No avatar uploaded yet — expected for new users
