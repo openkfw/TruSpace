@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-import { IpfsClient } from '../../../shared/clients/ipfs-client';
 import {
   createPermission,
   findUsersInWorkspace,
@@ -10,12 +9,11 @@ import { sendNotification } from '../../../shared/mailing/notifications';
 import { getUserSettings } from '../../../shared/utility/user';
 import { WorkspaceNotFoundError } from '../errors/workspace-not-found.error';
 import { InternalServerError } from '../../../shared/errors';
+import { workspacesIpfsRepository } from '../infrastructure/workspaces-ipfs.repository';
 
 export async function updateWorkspaceType(wUID: string, isPublic: boolean, currentUserEmail: string) {
-  const client = new IpfsClient();
-
   try {
-    await client.updateWorkspaceType(wUID, isPublic);
+    await workspacesIpfsRepository.updateWorkspaceType(wUID, isPublic);
 
     if (isPublic === false) {
       const currentPermissions = await findUsersInWorkspace(wUID);
@@ -30,7 +28,7 @@ export async function updateWorkspaceType(wUID: string, isPublic: boolean, curre
       }
     } else {
       const usersInWorkspace = await findUsersInWorkspace(wUID);
-      const workspaceDetails = await client.getWorkspaceById(wUID);
+      const workspaceDetails = await workspacesIpfsRepository.getWorkspaceById(wUID);
 
       usersInWorkspace.forEach(async (user) => {
         const { email } = user;

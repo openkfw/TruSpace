@@ -1,11 +1,11 @@
 import { Response } from 'express';
 import { Document } from '../../../shared/types/interfaces/truspace';
-import { IpfsClient } from '../../../shared/clients/ipfs-client';
 import { getContributorsDocument } from '../../../shared/handlers/documents';
 import { findPermissionsByEmail } from '../../../shared/handlers/userPermissions';
 import { checkPermissionForWorkspace } from '../../../shared/utility/permissions';
 import { chatsIpfsRepository } from '../../chats/infrastructure/chats-ipfs.repository';
 import { documentsIpfsRepository } from '../infrastructure/documents-ipfs.repository';
+import { workspacesIpfsRepository } from '../../workspaces/infrastructure/workspaces-ipfs.repository';
 
 export async function getDocumentsByWorkspaceId(
   workspaceId: string,
@@ -15,7 +15,7 @@ export async function getDocumentsByWorkspaceId(
   email: string,
   res: Response,
 ) {
-  const publicWorkspacesPromise = new IpfsClient().getPublicWorkspaces();
+  const publicWorkspacesPromise = workspacesIpfsRepository.getPublicWorkspaces();
 
   if (!workspaceId || workspaceId === 'undefined') {
     const [publicWorkspaces, { data: documents }, allowedWs] = await Promise.all([

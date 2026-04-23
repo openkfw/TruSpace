@@ -1,13 +1,12 @@
-import { IpfsClient } from '../../../shared/clients/ipfs-client';
 import logger from '../../../shared/config/winston';
 import { BadRequestError, HttpError, InternalServerError } from '../../../shared/errors';
 import { createPermission, UserPermissionDto } from '../../../shared/handlers/userPermissions';
 import { sendNotification } from '../../../shared/mailing/notifications';
+import { workspacesIpfsRepository } from '../../workspaces/infrastructure/workspaces-ipfs.repository';
 
 export async function postPermission(email: string, workspaceId: string) {
   try {
-    const client = new IpfsClient();
-    const workspaces = await client.getWorkspaceById(workspaceId);
+    const workspaces = await workspacesIpfsRepository.getWorkspaceById(workspaceId);
 
     if (!workspaces.length) {
       throw new BadRequestError('Adding user to workspace failed, workspace does not exist');
