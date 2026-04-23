@@ -3,17 +3,16 @@ import { Response } from 'express';
 import FormData from 'form-data';
 import { v4 as uuidv4 } from 'uuid';
 
-import { config } from '../../config/config';
 import logger from '../../config/winston';
 import { decrypt } from '../../encryption';
 import { getWorkspacePassword } from '../../handlers/documents';
+import { ipfsConfig, maxNumberOfFetchedPins } from '../../infrastructure/ipfs/core/config';
 import { AuthenticatedRequest } from '../../types';
 import {
   ChatMessageRequest,
   DocumentPin,
   DocumentPinningResponse,
   DocumentPinRequest,
-  IpfsClientConfig,
   Pin,
   PinningResponse,
   PinRequest,
@@ -42,14 +41,6 @@ import { assertAndEncodeURIComponent } from '../../utility/validation';
 import { deleteMultipleJobStatusesDb } from '../db';
 import { IClient } from './IClient';
 import { UserPermissionDto } from '../../handlers/userPermissions';
-
-const { ipfsPinningServiceHost, ipfsClusterHost, ipfsGatewayHost, maxNumberOfFetchedPins } = config;
-
-const ipfsConfig: IpfsClientConfig = {
-  pinSvcBaseUrl: ipfsPinningServiceHost,
-  clusterApiBaseUrl: ipfsClusterHost,
-  gatewayApiBaseUrl: ipfsGatewayHost,
-};
 
 // instance stores a reference to the Singleton
 let instance: IpfsClient;
