@@ -1,5 +1,5 @@
-import { IpfsClient } from '../../../shared/clients/ipfs-client';
 import { PerspectiveRequest } from '../../../shared/types/interfaces';
+import { perspectivesIpfsRepository } from '../infrastructure/perspectives-ipfs.repository';
 
 export async function postPerspective(
   perspectiveType: string,
@@ -26,5 +26,5 @@ export async function postPerspective(
     },
   };
 
-  return new IpfsClient().createPerspective(perspectiveRequest);
+  return perspectivesIpfsRepository.createPerspective(perspectiveRequest);
 }
