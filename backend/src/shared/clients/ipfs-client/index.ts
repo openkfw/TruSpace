@@ -29,11 +29,10 @@ import {
   WorkspaceRequest,
 } from '../../types/interfaces';
 import { UserPermissionDto } from '../../handlers/userPermissions';
-import { IClient } from './IClient';
 
 let instance: IpfsClient;
 
-export class IpfsClient implements IClient {
+export class IpfsClient {
   constructor() {
     if (!instance) {
       instance = this;
