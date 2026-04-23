@@ -8,6 +8,7 @@ import {
 } from '../clients/db/jobStatus';
 import logger from '../config/winston';
 import { Prompt } from '../types/interfaces';
+import { registerDefaultJobTemplates } from './jobTemplates';
 
 type JobStatus = 'pending' | 'processing' | 'completed' | 'failed' | null;
 
@@ -38,6 +39,7 @@ class JobQueue {
 
   constructor(useDatabase = false) {
     this.#useDatabase = useDatabase;
+    registerDefaultJobTemplates(this);
 
     if (this.#useDatabase) {
       getJobNotFinishedAndResetStatusesDb()
