@@ -27,7 +27,6 @@ export interface IClient {
   getWorkspaceById(wId: string): Promise<Workspace[]>;
   getPublicWorkspaces(): Promise<Workspace[]>;
   getWorkspaceById(wId: string): Promise<Workspace[]>;
-  deleteWorkspaceById(wCID: string, wUID: string): Promise<void>;
 
   // documents
   createDocument(

@@ -1,6 +1,6 @@
 import { Response } from 'express';
 
-import { deleteMultipleJobStatusesDb, getWorkspacePasswordDb } from '../../../shared/clients/db';
+import { getWorkspacePasswordDb } from '../../../shared/clients/db';
 import { config } from '../../../shared/config/config';
 import logger from '../../../shared/config/winston';
 import { decrypt } from '../../../shared/encryption';
@@ -249,12 +249,24 @@ class DocumentsIpfsRepository {
     }
   }
 
-  async deleteDocument(docId: string): Promise<void> {
+  async getEverythingByDocId(docId: string): Promise<GeneralTemplateOfItemInWorkspace[]> {
     try {
-      const documentsAndAssociatedItems = await this.#getEverythingByDocId(docId);
-      await this.#deleteDocumentsAndAssociatedItems(documentsAndAssociatedItems);
+      const pinRes: PinningResponse = (await pinSvcClient.get(`/pins?limit=1000&meta={"docId":"${docId}"}`)).data;
+
+      return pinRes.results.map((pinRequest: PinRequest) => transformPinToGeneralWorkspaceItem(pinRequest.pin));
     } catch (error) {
-      logger.error(`Error deleting document ${docId}:`, error);
+      logger.error(`Error getting everything by doc ID ${docId}:`, error);
+      throw error;
+    }
+  }
+
+  async deletePins(itemCids: string[]): Promise<void> {
+    try {
+      await Promise.all(
+        itemCids.map((itemCid) => clusterClient.delete(`/pins/${assertAndEncodeURIComponent(itemCid)}`)),
+      );
+    } catch (error) {
+      logger.error('Error deleting document-related pins:', error);
       throw error;
     }
   }
@@ -283,41 +295,6 @@ class DocumentsIpfsRepository {
     } catch (error) {
       logger.error(`Error fetching language for version CID ${versionCid}:`, error);
       return undefined;
-    }
-  }
-
-  async #getEverythingByDocId(docId: string): Promise<GeneralTemplateOfItemInWorkspace[]> {
-    try {
-      const pinRes: PinningResponse = (await pinSvcClient.get(`/pins?limit=1000&meta={"docId":"${docId}"}`)).data;
-
-      return pinRes.results.map((pinRequest: PinRequest) => transformPinToGeneralWorkspaceItem(pinRequest.pin));
-    } catch (error) {
-      logger.error(`Error getting everything by doc ID ${docId}:`, error);
-      throw error;
-    }
-  }
-
-  async #deleteDocumentsAndAssociatedItems(allItems: GeneralTemplateOfItemInWorkspace[]) {
-    try {
-      const allItemCids = allItems.map((item) => item.cid);
-
-      const allDocuments = allItems.filter((item) => item.meta.type === 'document');
-      const allDocumentCids = allDocuments.map((document) => document.cid);
-
-      const requestIds: string[] = [];
-      allDocumentCids.forEach((documentCid) => {
-        requestIds.push(`req_tags_${documentCid}`);
-        requestIds.push(`req_perspectives_${documentCid}`);
-      });
-
-      if (allItemCids.length) {
-        await Promise.all(allItemCids.map((itemCid) => clusterClient.delete(`/pins/${itemCid}`)));
-      }
-
-      await deleteMultipleJobStatusesDb(requestIds);
-    } catch (error) {
-      logger.error('Error deleting documents and associated items:', error);
-      throw error;
     }
   }
 

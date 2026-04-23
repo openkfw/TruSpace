@@ -9,6 +9,7 @@ import {
   WorkspaceCreateResponse,
   WorkspaceRequest,
 } from '../../../shared/types/interfaces/truspace';
+import { assertAndEncodeURIComponent } from '../../../shared/utility/validation';
 import { usersIpfsRepository } from '../../users/infrastructure/users-ipfs.repository';
 
 class WorkspacesIpfsRepository {
@@ -127,6 +128,15 @@ class WorkspacesIpfsRepository {
       return pinRes.results.map((pinRequest: PinRequest) => transformPinToGeneralWorkspaceItem(pinRequest.pin));
     } catch (error) {
       logger.error(`Error getting everything in workspace ${workspaceId}:`, error);
+      throw error;
+    }
+  }
+
+  async deleteWorkspacePin(workspaceCid: string): Promise<void> {
+    try {
+      await clusterClient.delete(`/pins/${assertAndEncodeURIComponent(workspaceCid)}`);
+    } catch (error) {
+      logger.error(`Error deleting workspace pin ${workspaceCid}:`, error);
       throw error;
     }
   }

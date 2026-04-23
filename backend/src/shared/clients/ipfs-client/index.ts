@@ -10,7 +10,6 @@ import {
   pinsToUniqueDocuments,
   transformPinToChatMessage,
   transformPinToDocument,
-  transformPinToGeneralWorkspaceItem,
   transformPinToPerspective,
   transformPinToTag,
   transformPinToWorkspace,
@@ -35,7 +34,6 @@ import {
   DocumentsResponse,
   DocumentWithVersions,
   File,
-  GeneralTemplateOfItemInWorkspace,
   LanguageRequest,
   Perspective,
   PerspectiveRequest,
@@ -48,7 +46,6 @@ import {
 } from '../../types/interfaces/truspace';
 import { checkPermissionForWorkspace } from '../../utility/permissions';
 import { assertAndEncodeURIComponent } from '../../utility/validation';
-import { deleteMultipleJobStatusesDb } from '../db';
 import { IClient } from './IClient';
 import { UserPermissionDto } from '../../handlers/userPermissions';
 
@@ -540,23 +537,6 @@ export class IpfsClient implements IClient {
     }
   }
 
-  /**
-   * Deletes everything associated with workspace, all file versions, tags, perspectives, chats and job status from DB
-   * @param wCID
-   * @param wUID
-   */
-  async deleteWorkspaceById(wCID: string, wUID: string): Promise<void> {
-    const workspace = await this.getWorkspaceById(wUID);
-    if (!workspace.length) {
-      throw new Error(`No workspace found for ID: ${wUID}`);
-    }
-
-    const everythingInWorkspace = await this.getEverythingInWorkspace(wUID);
-    await this.deleteDocumentsAndAssociatedItems(everythingInWorkspace);
-    const safeWCID = assertAndEncodeURIComponent(wCID);
-    await this.#clusterAxios.delete(`/pins/${safeWCID}`);
-  }
-
   async getWorkspaceById(wId: string): Promise<Workspace[]> {
     try {
       const pinRes: PinningResponse = (
@@ -942,46 +922,6 @@ export class IpfsClient implements IClient {
     }
   }
 
-  /**
-   * Returns everything associated with workspace, docs, their respective versions, tags, perspectives, chats
-   * @param workspaceId
-   */
-  async getEverythingInWorkspace(workspaceId: string): Promise<GeneralTemplateOfItemInWorkspace[]> {
-    try {
-      const pinRes: PinningResponse = (
-        await this.#pinSvcAxios.get(`/pins?limit=1000&meta={"workspaceOrigin":"${workspaceId}"}`)
-      ).data;
-
-      const everythingInWorkspace = pinRes.results.map((r: PinRequest) => {
-        return transformPinToGeneralWorkspaceItem(r.pin);
-      });
-
-      return everythingInWorkspace;
-    } catch (error) {
-      logger.error(`Error getting everything in workspace ${workspaceId}:`, error);
-      throw error;
-    }
-  }
-
-  /**
-   * Returns everything associated with document id, doc versions, tags, perspectives, chats
-   * @param workspaceId
-   */
-  async getEverythingByDocId(docId: string): Promise<GeneralTemplateOfItemInWorkspace[]> {
-    try {
-      const pinRes: PinningResponse = (await this.#pinSvcAxios.get(`/pins?limit=1000&meta={"docId":"${docId}"}`)).data;
-
-      const docsAndAssociatedItems = pinRes.results.map((r: PinRequest) => {
-        return transformPinToGeneralWorkspaceItem(r.pin);
-      });
-
-      return docsAndAssociatedItems;
-    } catch (error) {
-      logger.error(`Error getting everything by doc ID ${docId}:`, error);
-      throw error;
-    }
-  }
-
   async createTag(tag: TagRequest): Promise<string> {
     try {
       const form = createJsonFormData(tag);
@@ -1006,40 +946,6 @@ export class IpfsClient implements IClient {
       await this.#clusterAxios.delete(`/pins/${safeTagId}`);
     } catch (error) {
       logger.error(`Error deleting tag ${tagId}:`, error);
-      throw error;
-    }
-  }
-
-  async deleteDocument(docId: string): Promise<void> {
-    try {
-      const docsAndAssociatedItems = await this.getEverythingByDocId(docId);
-      this.deleteDocumentsAndAssociatedItems(docsAndAssociatedItems);
-    } catch (error) {
-      logger.error(`Error deleting document ${docId}:`, error);
-      throw error;
-    }
-  }
-
-  async deleteDocumentsAndAssociatedItems(allItems: GeneralTemplateOfItemInWorkspace[]) {
-    try {
-      const allItemCids = allItems.map((item) => item.cid);
-
-      const allDocuments = allItems.filter((item) => item.meta.type === 'document');
-      const allDocCids = allDocuments.map((doc) => doc.cid);
-
-      const requestIds: string[] = [];
-      allDocCids.forEach((docCid) => {
-        requestIds.push(`req_tags_${docCid}`);
-        requestIds.push(`req_perspectives_${docCid}`);
-      });
-
-      if (allItemCids.length) {
-        await Promise.all(allItemCids.map((itemCid) => this.#clusterAxios.delete(`/pins/${itemCid}`)));
-      }
-
-      await deleteMultipleJobStatusesDb(requestIds);
-    } catch (error) {
-      logger.error(`Error deleting documents and associated items:`, error);
       throw error;
     }
   }
