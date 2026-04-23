@@ -2,15 +2,21 @@ import { oiClient } from "../clients/oi-client";
 import logger from "../config/winston";
 import { createDocumentRequest } from "../handlers/documents";
 import { Prompt } from "../types/interfaces";
-import TaskQueue from "../utility/jobQueue";
 import { documentsIpfsRepository } from "../../modules/documents/infrastructure/documents-ipfs.repository";
 
-export const addPerspectivesTemplate = () =>
-  TaskQueue.addJobTemplate({
+type JobAttributes = { [key: string]: string | number | boolean | Prompt[] };
+
+type JobTemplateRegistrar = {
+  addJobTemplate(args: {
+    templateId: string;
+    job: (attributes: JobAttributes) => Promise<any>;
+  }): void;
+};
+
+export const addPerspectivesTemplate = (taskQueue: JobTemplateRegistrar) =>
+  taskQueue.addJobTemplate({
     templateId: "perspectives",
-    job: async (attributes: {
-      [key: string]: string | number | boolean | Prompt[];
-    }) => {
+    job: async (attributes: JobAttributes) => {
       const { cid, prompts, requestId } = attributes as {
         cid: string;
         prompts: Prompt[];
@@ -58,12 +64,10 @@ export const addPerspectivesTemplate = () =>
     },
   });
 
-export const addTagsTemplate = () =>
-  TaskQueue.addJobTemplate({
+export const addTagsTemplate = (taskQueue: JobTemplateRegistrar) =>
+  taskQueue.addJobTemplate({
     templateId: "tags",
-    job: async (attributes: {
-      [key: string]: string | number | boolean | Prompt[];
-    }) => {
+    job: async (attributes: JobAttributes) => {
       const { cid, prompts, requestId } = attributes as {
         cid: string;
         prompts: Prompt[];
@@ -110,12 +114,10 @@ export const addTagsTemplate = () =>
     },
   });
 
-export const addLanguageDetectionTemplate = () => {
-  TaskQueue.addJobTemplate({
+export const addLanguageDetectionTemplate = (taskQueue: JobTemplateRegistrar) => {
+  taskQueue.addJobTemplate({
     templateId: "language",
-    job: async (attributes: {
-      [key: string]: string | number | boolean | Prompt[];
-    }) => {
+    job: async (attributes: JobAttributes) => {
       const { cid } = attributes as {
         cid: string;
       };
@@ -158,4 +160,18 @@ export const addLanguageDetectionTemplate = () => {
       );
     },
   });
+};
+
+let defaultTemplatesRegistered = false;
+
+export const registerDefaultJobTemplates = (taskQueue: JobTemplateRegistrar) => {
+  if (defaultTemplatesRegistered) {
+    return;
+  }
+
+  addPerspectivesTemplate(taskQueue);
+  addTagsTemplate(taskQueue);
+  addLanguageDetectionTemplate(taskQueue);
+
+  defaultTemplatesRegistered = true;
 };
