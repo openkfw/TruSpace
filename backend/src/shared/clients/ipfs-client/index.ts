@@ -1,12 +1,12 @@
 import { AxiosInstance } from 'axios';
 import { Response } from 'express';
-import FormData from 'form-data';
 import { v4 as uuidv4 } from 'uuid';
 
 import logger from '../../config/winston';
 import { decrypt } from '../../encryption';
 import { getWorkspacePassword } from '../../handlers/documents';
 import { maxNumberOfFetchedPins } from '../../infrastructure/ipfs/core/config';
+import { buildMetadataQuery, createFileFormData, createJsonFormData } from '../../infrastructure/ipfs/core/helpers';
 import { clusterClient, gatewayClient, pinSvcClient } from '../../infrastructure/ipfs/core/transport';
 import { AuthenticatedRequest } from '../../types';
 import {
@@ -86,12 +86,7 @@ export class IpfsClient implements IClient {
   }
   async uploadAvatar(file: File): Promise<any> {
     try {
-      const form = new FormData();
-
-      form.append('file', file.data, {
-        filename: file.name,
-        contentType: file.mimetype,
-      });
+      const form = createFileFormData(file);
 
       const result = await this.#clusterAxios.post(`/add?stream-channels=false`, form, {
         headers: {
@@ -127,12 +122,8 @@ export class IpfsClient implements IClient {
 
   async createUserData(userData: UserData): Promise<void> {
     try {
-      const json = JSON.stringify(userData, null);
-      const form = new FormData();
-
-      form.append('file', json, {
+      const form = createJsonFormData(userData, {
         filename: 'userdata.json',
-        contentType: 'application/json',
       });
 
       const safeNodeId = encodeURIComponent(userData.nodeId);
@@ -509,23 +500,15 @@ export class IpfsClient implements IClient {
     try {
       const workspaceMeta = { ...workspace.meta };
       delete workspaceMeta.creatorName;
-      const json = JSON.stringify({ ...workspace, meta: workspaceMeta }, null);
-      const form = new FormData();
-
-      form.append('file', json, {
-        filename: workspace.uuid,
-        contentType: 'application/json',
+      const form = createJsonFormData(
+        { ...workspace, meta: workspaceMeta },
+        {
+          filename: workspace.uuid,
+        },
+      );
+      const metadataQuery = buildMetadataQuery(workspaceMeta, {
+        encodeValueKeys: ['name'],
       });
-
-      let metadataQuery = '';
-
-      for (const [key, value] of Object.entries(workspaceMeta)) {
-        if (key === 'name') {
-          metadataQuery += `&meta-${key}=${encodeURIComponent(value)}`;
-        } else {
-          metadataQuery += `&meta-${key}=${value}`;
-        }
-      }
 
       const result = await this.#clusterAxios.post(
         `/add?stream-channels=false&name=${workspace.uuid}${metadataQuery}`,
@@ -667,24 +650,13 @@ export class IpfsClient implements IClient {
    */
   async createDocument(doc: DocumentRequest, file: File): Promise<DocumentCreateResponse> {
     try {
-      const form = new FormData();
-
-      form.append('file', file.data, {
-        filename: file.name,
-        contentType: file.mimetype,
-      });
+      const form = createFileFormData(file);
 
       const docMeta = { ...doc.meta };
       delete docMeta.creatorName;
-      let metadataQuery = '';
-
-      for (const [key, value] of Object.entries(docMeta)) {
-        if (key === 'filename') {
-          metadataQuery += `&meta-${key}=${encodeURIComponent(value)}`;
-        } else {
-          metadataQuery += `&meta-${key}=${value}`;
-        }
-      }
+      const metadataQuery = buildMetadataQuery(docMeta, {
+        encodeValueKeys: ['filename'],
+      });
 
       const result = await this.#clusterAxios.post(
         `/add?stream-channels=false&name=${encodeURIComponent(file.name)}${metadataQuery}&meta-docId=${doc.docId}&meta-type=document`,
@@ -789,18 +761,8 @@ export class IpfsClient implements IClient {
     try {
       const messageMeta = { ...message.meta };
       delete messageMeta.creatorName;
-      const json = JSON.stringify({ ...message, meta: messageMeta }, null);
-      const form = new FormData();
-
-      form.append('file', json, {
-        contentType: 'application/json',
-      });
-
-      let metadataQuery = '';
-
-      for (const [key, value] of Object.entries(messageMeta)) {
-        metadataQuery += `&meta-${key}=${value}`;
-      }
+      const form = createJsonFormData({ ...message, meta: messageMeta });
+      const metadataQuery = buildMetadataQuery(messageMeta);
 
       const clusterResp = await this.#clusterAxios.post(`/add?stream-channels=false${metadataQuery}`, form, {
         headers: {
@@ -884,18 +846,8 @@ export class IpfsClient implements IClient {
     try {
       const perspectiveMeta = { ..._perspective.meta };
       delete perspectiveMeta.creatorName;
-      const json = JSON.stringify({ ..._perspective, meta: perspectiveMeta }, null);
-      const form = new FormData();
-
-      form.append('file', json, {
-        contentType: 'application/json',
-      });
-
-      let metadataQuery = '';
-
-      for (const [key, value] of Object.entries(perspectiveMeta)) {
-        metadataQuery += `&meta-${key}=${value}`;
-      }
+      const form = createJsonFormData({ ..._perspective, meta: perspectiveMeta });
+      const metadataQuery = buildMetadataQuery(perspectiveMeta);
 
       const clusterResp = await this.#clusterAxios.post(`/add?stream-channels=false${metadataQuery}`, form, {
         headers: {
@@ -1019,18 +971,8 @@ export class IpfsClient implements IClient {
 
   async createTag(tag: TagRequest): Promise<string> {
     try {
-      const json = JSON.stringify(tag, null);
-      const form = new FormData();
-
-      form.append('file', json, {
-        contentType: 'application/json',
-      });
-
-      let metadataQuery = '';
-
-      for (const [key, value] of Object.entries(tag.meta)) {
-        metadataQuery += `&meta-${key}=${value}`;
-      }
+      const form = createJsonFormData(tag);
+      const metadataQuery = buildMetadataQuery(tag.meta);
 
       const clusterResp = await this.#clusterAxios.post(`/add?stream-channels=false${metadataQuery}`, form, {
         headers: {
@@ -1358,18 +1300,8 @@ export class IpfsClient implements IClient {
 
   async createLanguage(langRequest: LanguageRequest) {
     try {
-      const json = JSON.stringify(langRequest, null);
-      const form = new FormData();
-
-      form.append('file', json, {
-        contentType: 'application/json',
-      });
-
-      let metadataQuery = '';
-
-      for (const [key, value] of Object.entries(langRequest.meta)) {
-        metadataQuery += `&meta-${key}=${value}`;
-      }
+      const form = createJsonFormData(langRequest);
+      const metadataQuery = buildMetadataQuery(langRequest.meta);
 
       const clusterResp = await this.#clusterAxios.post(`/add?stream-channels=false${metadataQuery}`, form, {
         headers: {
@@ -1391,17 +1323,12 @@ export class IpfsClient implements IClient {
       permission.created_at = permission.created_at ?? new Date().toISOString();
       const encodedId = encodeURIComponent(permission.id);
       const filename = `permissions/${encodedId}`;
-      const form = new FormData();
-
-      form.append('file', JSON.stringify(permission), {
-        filename: filename,
-        contentType: 'application/json',
+      const form = createJsonFormData(permission, {
+        filename,
       });
-
-      let metadataQuery = '';
-      for (const [key, value] of Object.entries(permission)) {
-        metadataQuery += `&meta-${key}=${encodeURIComponent(value)}`;
-      }
+      const metadataQuery = buildMetadataQuery(permission, {
+        encodeAllValues: true,
+      });
 
       await this.#clusterAxios.post(
         `/add?stream-channels=false&name=${filename}&meta-type=permission${metadataQuery}`,
