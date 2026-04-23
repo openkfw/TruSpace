@@ -7,6 +7,16 @@ import { decrypt } from '../../encryption';
 import { getWorkspacePassword } from '../../handlers/documents';
 import { maxNumberOfFetchedPins } from '../../infrastructure/ipfs/core/config';
 import { buildMetadataQuery, createFileFormData, createJsonFormData } from '../../infrastructure/ipfs/core/helpers';
+import {
+  pinsToUniqueDocuments,
+  transformPinToChatMessage,
+  transformPinToDocument,
+  transformPinToGeneralWorkspaceItem,
+  transformPinToPerspective,
+  transformPinToTag,
+  transformPinToWorkspace,
+} from '../../infrastructure/ipfs/core/mappers';
+import { parseMultipleJson } from '../../infrastructure/ipfs/core/parsers';
 import { clusterClient, gatewayClient, pinSvcClient } from '../../infrastructure/ipfs/core/transport';
 import { AuthenticatedRequest } from '../../types';
 import {
@@ -332,7 +342,7 @@ export class IpfsClient implements IClient {
 
       const documentVersionsPromises = documentPins.map(async (r: DocumentPinRequest) => {
         const language = await this.#getLanguageForVersion(r.pin.cid);
-        const doc = this.#transformPinToDocument(r.pin, language);
+        const doc = transformPinToDocument(r.pin, language);
         const userData = await this.getUserData(doc.meta.creatorNodeId, doc.meta.creatorUserId);
         return {
           ...doc,
@@ -381,7 +391,7 @@ export class IpfsClient implements IClient {
   async getDocumentsByDocumentId(docId: string): Promise<Document[]> {
     try {
       const res = await this.#pinSvcAxios.get(`/pins?limit=1000&meta={"type":"document","docId":"${docId}"}`);
-      const docs = res.data.results.map((r: DocumentPinRequest) => this.#transformPinToDocument(r.pin));
+      const docs = res.data.results.map((r: DocumentPinRequest) => transformPinToDocument(r.pin));
       return await Promise.all(
         docs.map(async (doc: Document) => {
           const userData = await this.getUserData(doc.meta.creatorNodeId, doc.meta.creatorUserId);
@@ -472,7 +482,7 @@ export class IpfsClient implements IClient {
         pinRes.results
           .sort((a, b) => a.pin.meta.name.localeCompare(b.pin.meta.name))
           .map(async (r: PinRequest) => {
-            const workspace = this.#transformPinToWorkspace(r.pin);
+            const workspace = transformPinToWorkspace(r.pin);
             const userData = await this.getUserData(workspace.meta.creatorNodeId, workspace.meta.creatorUserId);
             return {
               ...workspace,
@@ -551,7 +561,7 @@ export class IpfsClient implements IClient {
       ).data;
       const result = await Promise.all(
         pinRes.results.map(async (r: PinRequest) => {
-          const workspace = this.#transformPinToWorkspace(r.pin);
+          const workspace = transformPinToWorkspace(r.pin);
           const userData = await this.getUserData(workspace.meta.creatorNodeId, workspace.meta.creatorUserId);
           return {
             ...workspace,
@@ -577,7 +587,7 @@ export class IpfsClient implements IClient {
 
       const result = await Promise.all(
         pinRes.results.map(async (r: PinRequest) => {
-          const workspace = this.#transformPinToWorkspace(r.pin);
+          const workspace = transformPinToWorkspace(r.pin);
           const userData = await this.getUserData(workspace.meta.creatorNodeId, workspace.meta.creatorUserId);
           return {
             ...workspace,
@@ -603,7 +613,7 @@ export class IpfsClient implements IClient {
 
       const result = await Promise.all(
         pinRes.results.map(async (r: PinRequest) => {
-          const workspace = this.#transformPinToWorkspace(r.pin);
+          const workspace = transformPinToWorkspace(r.pin);
           const userData = await this.getUserData(workspace.meta.creatorNodeId, workspace.meta.creatorUserId);
           return {
             ...workspace,
@@ -684,7 +694,7 @@ export class IpfsClient implements IClient {
       ).data;
 
       const count = pinRes.count || 0;
-      const result = this.#pins2Docs(pinRes.results);
+      const result = pinsToUniqueDocuments(pinRes.results);
       const sliced = result.slice(from, from + limit);
       const data = await Promise.all(
         sliced.map(async (doc: Document) => {
@@ -724,7 +734,7 @@ export class IpfsClient implements IClient {
         )
       ).data;
 
-      const result = this.#pins2Docs(pinRes.results);
+      const result = pinsToUniqueDocuments(pinRes.results);
       const filteredResult = result.filter((doc) =>
         searchString && searchString.length > 0
           ? doc.meta.filename.toLowerCase().includes(searchString.toLowerCase())
@@ -780,7 +790,7 @@ export class IpfsClient implements IClient {
   async getPeers() {
     try {
       const response = await this.#clusterAxios.get('/peers');
-      const peers = this.#parseMultipleJSON(response.data);
+      const peers = parseMultipleJson(response.data);
       return peers;
     } catch (error) {
       logger.error(`Error getting peers:`, error);
@@ -795,7 +805,7 @@ export class IpfsClient implements IClient {
       const pins: PinningResponse = res.data;
       const result = await Promise.all(
         pins.results.map(async (el) => {
-          const chat = this.#transformPinToChatMessage(el.pin);
+          const chat = transformPinToChatMessage(el.pin);
           const userData = await this.getUserData(chat.meta.creatorNodeId, chat.meta.creatorUserId);
           return {
             ...chat,
@@ -822,7 +832,7 @@ export class IpfsClient implements IClient {
       const pins: PinningResponse = res.data;
       const result = await Promise.all(
         pins.results.map(async (el) => {
-          const chat = this.#transformPinToChatMessage(el.pin);
+          const chat = transformPinToChatMessage(el.pin);
           const userData = await this.getUserData(chat.meta.creatorNodeId, chat.meta.creatorUserId);
           return {
             ...chat,
@@ -869,7 +879,7 @@ export class IpfsClient implements IClient {
       ).data;
 
       const perspectives = pinRes.results.map((r: PinRequest) => {
-        return this.#transformPinToPerspective(r.pin);
+        return transformPinToPerspective(r.pin);
       });
       const fetched = await this.#fetchPerspectiveFiles(perspectives);
       const enriched = await Promise.all(
@@ -901,7 +911,7 @@ export class IpfsClient implements IClient {
       ).data;
 
       const perspectives = pinRes.results.map((r: PinRequest) => {
-        return this.#transformPinToPerspective(r.pin);
+        return transformPinToPerspective(r.pin);
       });
       const fetched = await this.#fetchPerspectiveFiles(perspectives);
       const enriched = await Promise.all(
@@ -940,7 +950,7 @@ export class IpfsClient implements IClient {
       ).data;
 
       const everythingInWorkspace = pinRes.results.map((r: PinRequest) => {
-        return this.#transformPinToGeneralWorkspaceItem(r.pin);
+        return transformPinToGeneralWorkspaceItem(r.pin);
       });
 
       return everythingInWorkspace;
@@ -959,7 +969,7 @@ export class IpfsClient implements IClient {
       const pinRes: PinningResponse = (await this.#pinSvcAxios.get(`/pins?limit=1000&meta={"docId":"${docId}"}`)).data;
 
       const docsAndAssociatedItems = pinRes.results.map((r: PinRequest) => {
-        return this.#transformPinToGeneralWorkspaceItem(r.pin);
+        return transformPinToGeneralWorkspaceItem(r.pin);
       });
 
       return docsAndAssociatedItems;
@@ -1039,7 +1049,7 @@ export class IpfsClient implements IClient {
 
       const result = await Promise.all(
         pinRes.results.map(async (r: PinRequest) => {
-          const tag = this.#transformPinToTag(r.pin);
+          const tag = transformPinToTag(r.pin);
           const userData = await this.getUserData(tag.meta.creatorNodeId, tag.meta.creatorUserId);
           return {
             ...tag,
@@ -1065,7 +1075,7 @@ export class IpfsClient implements IClient {
 
       const result = await Promise.all(
         pinRes.results.map(async (r: PinRequest) => {
-          const tag = this.#transformPinToTag(r.pin);
+          const tag = transformPinToTag(r.pin);
           const userData = await this.getUserData(tag.meta.creatorNodeId, tag.meta.creatorUserId);
           return {
             ...tag,
@@ -1089,7 +1099,7 @@ export class IpfsClient implements IClient {
         .data;
 
       const perspectives = pinRes.results.map((r: PinRequest) => {
-        return this.#transformPinToPerspective(r.pin);
+        return transformPinToPerspective(r.pin);
       });
       const fetched = await this.#fetchPerspectiveFiles(perspectives);
       const enriched = await Promise.all(
@@ -1112,161 +1122,6 @@ export class IpfsClient implements IClient {
       logger.error(`Error getting all perspectives:`, error);
       throw error;
     }
-  }
-
-  #transformPinToWorkspace(pin: Pin): Workspace {
-    // todo add check for all properties
-    const workspace: Workspace = {
-      cid: pin.cid,
-      uuid: pin.meta.workspace_uuid,
-      meta: {
-        creatorNodeId: pin.meta.creatorNodeId || pin.meta.creator_id || '',
-        creatorUserId: pin.meta.creatorUserId || '',
-        creatorName: pin.meta.creatorName || pin.meta.creator_name || pin.meta.creator || '',
-        created_at: pin.meta.created_at,
-        type: 'workspace',
-        workspace_uuid: pin.meta.workspace_uuid,
-        name: pin.meta.name,
-        is_public: pin.meta.is_public === 'true',
-      },
-    };
-    return workspace;
-  }
-
-  #transformPinToDocument(pin: DocumentPin, language?: string): Document {
-    const doc: Document = {
-      docId: pin.meta.docId,
-      cid: pin.cid,
-      meta: {
-        creatorNodeId: pin.meta.creatorNodeId || '',
-        creatorUserId: pin.meta.creatorUserId || '',
-        creatorName: pin.meta.creatorName || pin.meta.creator || '',
-        workspaceOrigin: pin.meta.workspaceOrigin,
-        filename: pin.meta.filename,
-        timestamp: pin.meta.timestamp,
-        version: pin.meta.version,
-        encrypted: pin.meta.encrypted || 'false',
-        size: pin.meta.size ? Number(pin.meta.size) : 0,
-        language: language,
-        versionTagName: pin.meta.versionTagName || '',
-        // mimetype: pin.meta.mimetype, // If available and needed
-      },
-    };
-    return doc;
-  }
-
-  #transformPinToChatMessage(pin: Pin): ChatMessage {
-    // todo add check for all properties
-    const chat: ChatMessage = {
-      cid: pin.cid,
-      meta: {
-        type: 'chat',
-        cid: pin.meta.cid,
-        timestamp: pin.meta.timestamp,
-        docId: pin.meta.docId,
-        perspectiveType: pin.meta.perspectiveType,
-        data: pin.meta.data,
-        creatorNodeId: pin.meta.creatorNodeId || '',
-        creatorUserId: pin.meta.creatorUserId || '',
-        creatorName: pin.meta.creatorName || pin.meta.creator || '',
-        workspaceOrigin: pin.meta.workspaceOrigin,
-      },
-    };
-    return chat;
-  }
-
-  #transformPinToPerspective(pin: Pin): Perspective {
-    const perspective: Perspective = {
-      cid: pin.cid,
-      meta: {
-        type: 'perspective',
-        perspectiveType: pin.meta.perspectiveType,
-        workspaceOrigin: pin.meta.workspaceOrigin,
-        docId: pin.meta.docId,
-        versionCid: pin.meta.versionCid,
-        timestamp: pin.meta.timestamp,
-        data: pin.meta.data,
-        creatorNodeId: pin.meta.creatorNodeId || '',
-        creatorUserId: pin.meta.creatorUserId || '',
-        creatorName: pin.meta.creatorName || pin.meta.creator || '',
-        creatorType: pin.meta.creatorType,
-        prompt: pin.meta.prompt,
-      },
-    };
-    return perspective;
-  }
-
-  #transformPinToTag(pin: Pin): Tag {
-    const tag: Tag = {
-      cid: pin.cid,
-      meta: {
-        type: 'tag',
-        workspaceOrigin: pin.meta.workspaceOrigin,
-        docId: pin.meta.docId,
-        versionCid: pin.meta.versionCid,
-        timestamp: pin.meta.timestamp,
-        name: pin.meta.name,
-        color: pin.meta.color,
-        creatorNodeId: pin.meta.creatorNodeId || '',
-        creatorUserId: pin.meta.creatorUserId || '',
-        creatorName: pin.meta.creatorName || pin.meta.creator || '',
-        creatorType: pin.meta.creatorType,
-      },
-    };
-    return tag;
-  }
-
-  #transformPinToGeneralWorkspaceItem(pin: Pin): GeneralTemplateOfItemInWorkspace {
-    const generalTemplate = {
-      cid: pin.cid,
-      meta: {
-        type: pin.meta.type,
-        workspaceOrigin: pin.meta.workspaceOrigin,
-        docId: pin.meta.docId,
-        timestamp: pin.meta.timestamp,
-        creatorNodeId: pin.meta.creatorNodeId || '',
-        creatorUserId: pin.meta.creatorUserId || '',
-        creatorName: pin.meta.creatorName || pin.meta.creator_name || pin.meta.creator || '',
-        creatorType: pin.meta.creatorType || 'user',
-      },
-    };
-    return generalTemplate;
-  }
-
-  #pins2Docs(pins: DocumentPinRequest[]) {
-    return (
-      pins
-        // sort by timestamp from most recent
-        .sort((a: DocumentPinRequest, b: DocumentPinRequest) => {
-          return Number(b.pin.meta.timestamp) - Number(a.pin.meta.timestamp);
-        })
-        // unique by docId
-        .filter((v, i, a) => a.findIndex((t) => t.pin.meta.docId === v.pin.meta.docId) === i)
-        .map((el) => this.#transformPinToDocument(el.pin))
-    );
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  #parseMultipleJSON(data: any) {
-    if (!data) return [];
-
-    const str = data.toString();
-
-    const objects = [];
-    let depth = 0;
-    let start = 0;
-
-    for (let i = 0; i < str.length; i++) {
-      if (str[i] === '{') depth++;
-      if (str[i] === '}') depth--;
-
-      if (depth === 0 && str[i] === '}') {
-        objects.push(JSON.parse(str.slice(start, i + 1)));
-        start = i + 1;
-      }
-    }
-
-    return objects;
   }
 
   /** If `data` field is too large, IPFS pinning service won't return it. It is necessary to get the files themselves */
