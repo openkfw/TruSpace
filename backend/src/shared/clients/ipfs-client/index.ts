@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from 'axios';
+import { AxiosInstance } from 'axios';
 import { Response } from 'express';
 import FormData from 'form-data';
 import { v4 as uuidv4 } from 'uuid';
@@ -6,7 +6,8 @@ import { v4 as uuidv4 } from 'uuid';
 import logger from '../../config/winston';
 import { decrypt } from '../../encryption';
 import { getWorkspacePassword } from '../../handlers/documents';
-import { ipfsConfig, maxNumberOfFetchedPins } from '../../infrastructure/ipfs/core/config';
+import { maxNumberOfFetchedPins } from '../../infrastructure/ipfs/core/config';
+import { clusterClient, gatewayClient, pinSvcClient } from '../../infrastructure/ipfs/core/transport';
 import { AuthenticatedRequest } from '../../types';
 import {
   ChatMessageRequest,
@@ -56,13 +57,9 @@ export class IpfsClient implements IClient {
 
   constructor() {
     if (!instance) {
-      this.#pinSvcAxios = axios.create({ baseURL: ipfsConfig.pinSvcBaseUrl });
-      this.#clusterAxios = axios.create({
-        baseURL: ipfsConfig.clusterApiBaseUrl,
-      });
-      this.#gatewayAxios = axios.create({
-        baseURL: ipfsConfig.gatewayApiBaseUrl,
-      });
+      this.#pinSvcAxios = pinSvcClient;
+      this.#clusterAxios = clusterClient;
+      this.#gatewayAxios = gatewayClient;
       // eslint-disable-next-line @typescript-eslint/no-this-alias
       instance = this;
     }
