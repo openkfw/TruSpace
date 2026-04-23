@@ -1,4 +1,3 @@
-import { AxiosInstance } from 'axios';
 import { Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -60,16 +59,20 @@ let instance: IpfsClient;
  * Facade for IPFS, Gateway API, Pinning Service clients
  */
 export class IpfsClient implements IClient {
-  // separate axios instances for isolation
-  #pinSvcAxios!: AxiosInstance;
-  #clusterAxios!: AxiosInstance;
-  #gatewayAxios!: AxiosInstance;
+  get #pinSvcAxios() {
+    return pinSvcClient;
+  }
+
+  get #clusterAxios() {
+    return clusterClient;
+  }
+
+  get #gatewayAxios() {
+    return gatewayClient;
+  }
 
   constructor() {
     if (!instance) {
-      this.#pinSvcAxios = pinSvcClient;
-      this.#clusterAxios = clusterClient;
-      this.#gatewayAxios = gatewayClient;
       // eslint-disable-next-line @typescript-eslint/no-this-alias
       instance = this;
     }
