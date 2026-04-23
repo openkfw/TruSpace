@@ -43,6 +43,8 @@ usersRouter.get('/users/statistics', authenticateCookie, UsersController.getUser
 
 usersRouter.get('/users/user-settings', authenticateCookie, UsersController.getUsersUserSettings);
 
-usersRouter.get('/users/avatar', authenticateCookie, UsersController.getUsersAvatar);
+usersRouter.get('/users/avatar-cid', authenticateCookie, UsersController.getUsersAvatarCid);
+
+usersRouter.get('/users/avatar/:cid', authenticateCookie, UsersValidator.getUsersAvatar, UsersController.getUsersAvatar);
 
 usersRouter.delete('/users/delete-user', authenticateCookie, UsersController.deleteUser);

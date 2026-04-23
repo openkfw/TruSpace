@@ -64,9 +64,14 @@ export const UsersController = {
     res.json(result);
   },
 
-  getUsersAvatar: async (req: AuthenticatedRequest, res: Response) => {
-    const cid = await getUsersAvatar(req.user?.email as string);
-    return new IpfsClient().downloadAvatar(req, res, cid);
+   getUsersAvatarCid: async (req: AuthenticatedRequest, res: Response) => {
+      const cid = await getUsersAvatar(req.user?.email as string);
+      res.json({ cid });
+   },
+
+   getUsersAvatar: async (req: AuthenticatedRequest, res: Response) => {
+     const cid = req.params.cid as string;
+     return new IpfsClient().downloadAvatar(req, res, cid);
   },
 
   postUsersForgotPassword: async (req: Request, res: Response) => {
