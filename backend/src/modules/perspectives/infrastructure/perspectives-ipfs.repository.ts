@@ -4,7 +4,7 @@ import { transformPinToPerspective } from '../../../shared/infrastructure/ipfs/c
 import { clusterClient, gatewayClient, pinSvcClient } from '../../../shared/infrastructure/ipfs/core/transport';
 import { PinRequest, PinningResponse } from '../../../shared/types/interfaces';
 import { Perspective, PerspectiveRequest } from '../../../shared/types/interfaces/truspace';
-import { IpfsClient } from '../../../shared/clients/ipfs-client';
+import { usersIpfsRepository } from '../../users/infrastructure/users-ipfs.repository';
 
 class PerspectivesIpfsRepository {
   async createPerspective(perspective: PerspectiveRequest): Promise<string> {
@@ -77,11 +77,13 @@ class PerspectivesIpfsRepository {
 
   async #enrichPerspectives(perspectives: Perspective[]): Promise<Perspective[]> {
     const fetched = await this.#fetchPerspectiveFiles(perspectives);
-    const client = new IpfsClient();
 
     return await Promise.all(
       fetched.map(async (perspective) => {
-        const userData = await client.getUserData(perspective.meta.creatorNodeId, perspective.meta.creatorUserId);
+        const userData = await usersIpfsRepository.getUserData(
+          perspective.meta.creatorNodeId,
+          perspective.meta.creatorUserId,
+        );
 
         return {
           ...perspective,

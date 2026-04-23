@@ -1,10 +1,10 @@
 import logger from '../../../shared/config/winston';
-import { IpfsClient } from '../../../shared/clients/ipfs-client';
 import { buildMetadataQuery, createJsonFormData } from '../../../shared/infrastructure/ipfs/core/helpers';
 import { transformPinToChatMessage } from '../../../shared/infrastructure/ipfs/core/mappers';
 import { clusterClient, pinSvcClient } from '../../../shared/infrastructure/ipfs/core/transport';
 import { ChatMessageRequest, PinningResponse } from '../../../shared/types/interfaces';
 import { ChatMessage } from '../../../shared/types/interfaces/truspace';
+import { usersIpfsRepository } from '../../users/infrastructure/users-ipfs.repository';
 
 class ChatsIpfsRepository {
   async createMessage(message: ChatMessageRequest): Promise<string> {
@@ -51,12 +51,10 @@ class ChatsIpfsRepository {
   }
 
   async #enrichAndSortMessages(pinningResponse: PinningResponse): Promise<ChatMessage[]> {
-    const client = new IpfsClient();
-
     const result = await Promise.all(
       pinningResponse.results.map(async (element) => {
         const chat = transformPinToChatMessage(element.pin);
-        const userData = await client.getUserData(chat.meta.creatorNodeId, chat.meta.creatorUserId);
+        const userData = await usersIpfsRepository.getUserData(chat.meta.creatorNodeId, chat.meta.creatorUserId);
 
         return {
           ...chat,

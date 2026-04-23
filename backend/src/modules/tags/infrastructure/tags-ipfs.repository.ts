@@ -4,8 +4,8 @@ import { transformPinToTag } from '../../../shared/infrastructure/ipfs/core/mapp
 import { clusterClient, pinSvcClient } from '../../../shared/infrastructure/ipfs/core/transport';
 import { PinRequest, PinningResponse } from '../../../shared/types/interfaces';
 import { Tag, TagRequest } from '../../../shared/types/interfaces/truspace';
-import { IpfsClient } from '../../../shared/clients/ipfs-client';
 import { assertAndEncodeURIComponent } from '../../../shared/utility/validation';
+import { usersIpfsRepository } from '../../users/infrastructure/users-ipfs.repository';
 
 class TagsIpfsRepository {
   async createTag(tag: TagRequest): Promise<string> {
@@ -63,12 +63,10 @@ class TagsIpfsRepository {
   }
 
   async #enrichTags(pinRequests: PinRequest[]): Promise<Tag[]> {
-    const client = new IpfsClient();
-
     return await Promise.all(
       pinRequests.map(async (pinRequest) => {
         const tag = transformPinToTag(pinRequest.pin);
-        const userData = await client.getUserData(tag.meta.creatorNodeId, tag.meta.creatorUserId);
+        const userData = await usersIpfsRepository.getUserData(tag.meta.creatorNodeId, tag.meta.creatorUserId);
 
         return {
           ...tag,
