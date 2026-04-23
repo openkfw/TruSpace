@@ -1,4 +1,4 @@
-import { body, query } from 'express-validator';
+import { body, param, query } from 'express-validator';
 
 import validate from '../../../shared/middlewares/validate';
 
@@ -28,5 +28,7 @@ export const UsersValidator = {
 
   postUsersResetName: validate([body('name').isString().isLength({ min: 3 })]),
 
-  postUsersResetPassword: validate([body('password').isString(), body('token').isString()]),
+   postUsersResetPassword: validate([body('password').isString(), body('token').isString()]),
+
+   getUsersAvatar: validate([param('cid').isString().notEmpty()]),
 };
