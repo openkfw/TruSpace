@@ -1,15 +1,14 @@
 import { Response } from 'express';
 
 import { Document } from '../../../shared/types/interfaces/truspace';
-import { IpfsClient } from '../../../shared/clients/ipfs-client';
 import { checkPermissionForWorkspace } from '../../../shared/utility/permissions';
+import { chatsIpfsRepository } from '../../chats/infrastructure/chats-ipfs.repository';
+import { documentsIpfsRepository } from '../infrastructure/documents-ipfs.repository';
 
 export async function getDocumentsStatsByDocumentId(documentId: string, email: string, res: Response) {
-  const client = new IpfsClient();
-
   const [chats, document] = await Promise.all([
-    client.getMessagesByDocumentId(documentId),
-    client.getDocumentDetailsById(documentId),
+    chatsIpfsRepository.getMessagesByDocumentId(documentId),
+    documentsIpfsRepository.getDocumentDetailsById(documentId),
   ]);
 
   const documentDetails = document.documentVersions;

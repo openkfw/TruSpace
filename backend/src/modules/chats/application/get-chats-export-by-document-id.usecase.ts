@@ -1,7 +1,7 @@
 import PDFDocument from 'pdfkit';
 
-import { IpfsClient } from '../../../shared/clients/ipfs-client';
 import { chatsIpfsRepository } from '../infrastructure/chats-ipfs.repository';
+import { documentsIpfsRepository } from '../../documents/infrastructure/documents-ipfs.repository';
 
 export interface ChatsExportFile {
   contentType: string;
@@ -10,8 +10,7 @@ export interface ChatsExportFile {
 }
 
 export async function getChatsExportByDocumentId(documentId: string): Promise<ChatsExportFile> {
-  const client = new IpfsClient();
-  const document = await client.getDocumentDetailsById(documentId);
+  const document = await documentsIpfsRepository.getDocumentDetailsById(documentId);
   const result = await chatsIpfsRepository.getMessagesByDocumentId(documentId);
 
   const doc = new PDFDocument();
