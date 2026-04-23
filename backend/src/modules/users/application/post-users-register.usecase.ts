@@ -4,7 +4,6 @@ import fs from 'fs';
 import { compile } from 'handlebars';
 
 import { USER_EMAIL_TAKEN_ERROR, createUserDb, findUserByEmailDb, deleteUserByUiid } from '../../../shared/clients/db';
-import { IpfsClient } from '../../../shared/clients/ipfs-client';
 import { hashPassword } from '../../../shared/encryption';
 import { HttpError, InternalServerError } from '../../../shared/errors';
 import { sendEmail } from '../../../shared/mailing/mailing';
@@ -13,6 +12,7 @@ import { CONFIRMATION_EMAIL_EXPIRATION, USER_STATUS } from '../../../shared/util
 import { config } from '../../../shared/config/config';
 import logger from '../../../shared/config/winston';
 import { UserConflictError } from '../errors/user-conflict.error';
+import { usersIpfsRepository } from '../infrastructure/users-ipfs.repository';
 
 const resolveNodeId = async (explicitNodeId?: string): Promise<string> => {
   if (explicitNodeId) {
@@ -20,8 +20,7 @@ const resolveNodeId = async (explicitNodeId?: string): Promise<string> => {
   }
 
   try {
-    const clusterId = await new IpfsClient().clusterId();
-    return clusterId?.ipfs?.id || '';
+    return await usersIpfsRepository.resolveNodeId();
   } catch (error) {
     logger.error('Error resolving nodeId:', error);
     return '';
@@ -79,7 +78,7 @@ export async function postUsersRegister(
       const nodeId = await resolveNodeId();
       if (createdUser?.uiid && nodeId) {
         try {
-          await new IpfsClient().createUserData({
+          await usersIpfsRepository.createUserData({
             nodeId,
             userId: createdUser.uiid,
             userName: name,
@@ -126,7 +125,7 @@ export async function postUsersRegister(
       const nodeId = await resolveNodeId();
       if (createdUser?.uiid && nodeId) {
         try {
-          await new IpfsClient().createUserData({
+          await usersIpfsRepository.createUserData({
             nodeId,
             userId: createdUser.uiid,
             userName: name,

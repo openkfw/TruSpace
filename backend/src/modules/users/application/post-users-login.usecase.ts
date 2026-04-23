@@ -5,10 +5,10 @@ import jwt from 'jsonwebtoken';
 import { findUserByEmailDb, updateUserFirstSignIn } from '../../../shared/clients/db/users';
 import { verifyPassword } from '../../../shared/encryption';
 import { USER_STATUS } from '../../../shared/utility/constants';
-import { IpfsClient } from '../../../shared/clients/ipfs-client';
 import logger from '../../../shared/config/winston';
 import { JwtPayload } from '../../../shared/types/interfaces';
 import { config } from '../../../shared/config/config';
+import { usersIpfsRepository } from '../infrastructure/users-ipfs.repository';
 
 const resolveNodeId = async (explicitNodeId?: string): Promise<string> => {
   if (explicitNodeId) {
@@ -16,8 +16,7 @@ const resolveNodeId = async (explicitNodeId?: string): Promise<string> => {
   }
 
   try {
-    const clusterId = await new IpfsClient().clusterId();
-    return clusterId?.ipfs?.id || '';
+    return await usersIpfsRepository.resolveNodeId();
   } catch (error) {
     logger.error('Error resolving nodeId:', error);
     return '';
@@ -87,12 +86,12 @@ export async function postUsersLogin(req: Request, res: Response) {
 
     if (user.uiid && nodeId) {
       try {
-        const userData = await new IpfsClient().getUserData(nodeId, user.uiid);
+        const userData = await usersIpfsRepository.getUserData(nodeId, user.uiid);
         if (userData?.userName && userData.userName !== 'UNKNOWN') {
           logger.info('User data exists in IPFS');
         } else {
           logger.warn('User data is missing or invalid in IPFS, creating new user data');
-          await new IpfsClient().createUserData({
+          await usersIpfsRepository.createUserData({
             nodeId,
             userId: user.uiid,
             userName: user.username,

@@ -1,8 +1,8 @@
-import { IpfsClient } from '../../../shared/clients/ipfs-client';
 import { updateUserName } from '../../../shared/clients/db';
 import logger from '../../../shared/config/winston';
 import { HttpError, InternalServerError, UnauthorizedError } from '../../../shared/errors';
 import { UserNotFoundError } from '../errors/user-not-found.error';
+import { usersIpfsRepository } from '../infrastructure/users-ipfs.repository';
 
 const resolveNodeId = async (explicitNodeId?: string): Promise<string> => {
   if (explicitNodeId) {
@@ -10,8 +10,7 @@ const resolveNodeId = async (explicitNodeId?: string): Promise<string> => {
   }
 
   try {
-    const clusterId = await new IpfsClient().clusterId();
-    return clusterId?.ipfs?.id || '';
+    return await usersIpfsRepository.resolveNodeId();
   } catch (error) {
     logger.error('Error resolving nodeId:', error);
     return '';
@@ -38,7 +37,7 @@ export async function postUsersResetName(
     const resolvedNodeId = await resolveNodeId(nodeId);
     if (resolvedNodeId && userId) {
       try {
-        await new IpfsClient().modifyUserData({
+        await usersIpfsRepository.modifyUserData({
           nodeId: resolvedNodeId,
           userId,
           userName: name,

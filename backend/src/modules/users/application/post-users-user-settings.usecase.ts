@@ -1,11 +1,11 @@
 import { UploadedFile } from 'express-fileupload';
 
 import { storeUserSettingsDb } from '../../../shared/clients/db';
-import { IpfsClient } from '../../../shared/clients/ipfs-client';
 import logger from '../../../shared/config/winston';
 import { HttpError, InternalServerError } from '../../../shared/errors';
 import { AuthenticatedRequest } from '../../../shared/types';
 import { UserNotFoundError } from '../errors/user-not-found.error';
+import { usersIpfsRepository } from '../infrastructure/users-ipfs.repository';
 
 export async function postUsersUserSettings(req: AuthenticatedRequest) {
   try {
@@ -13,7 +13,7 @@ export async function postUsersUserSettings(req: AuthenticatedRequest) {
 
     let avatarCid: string | undefined;
     if (file) {
-      avatarCid = await new IpfsClient().uploadAvatar(file);
+      avatarCid = await usersIpfsRepository.uploadAvatar(file);
     }
 
     const notificationSettings = {

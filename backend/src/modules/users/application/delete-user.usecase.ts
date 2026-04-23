@@ -1,8 +1,8 @@
-import { IpfsClient } from '../../../shared/clients/ipfs-client';
 import logger from '../../../shared/config/winston';
 import { deleteUserByUiid } from '../../../shared/clients/db';
 import { BadRequestError, InternalServerError } from '../../../shared/errors';
 import { UserNotFoundError } from '../errors/user-not-found.error';
+import { usersIpfsRepository } from '../infrastructure/users-ipfs.repository';
 
 const resolveNodeId = async (explicitNodeId?: string): Promise<string> => {
   if (explicitNodeId) {
@@ -10,8 +10,7 @@ const resolveNodeId = async (explicitNodeId?: string): Promise<string> => {
   }
 
   try {
-    const clusterId = await new IpfsClient().clusterId();
-    const resolvedNodeId = clusterId?.ipfs?.id;
+    const resolvedNodeId = await usersIpfsRepository.resolveNodeId();
 
     if (!resolvedNodeId) {
       throw new InternalServerError('Failed to resolve node ID');
@@ -31,8 +30,7 @@ export async function deleteUser(userId: string, nodeId?: string) {
 
   const resolvedNodeId = await resolveNodeId(nodeId);
 
-  const client = new IpfsClient();
-  await client.deleteUserData(resolvedNodeId, userId);
+  await usersIpfsRepository.deleteUserData(resolvedNodeId, userId);
 
   const deletedUsers = await deleteUserByUiid(userId);
   if (!deletedUsers) {
