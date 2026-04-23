@@ -1,14 +1,62 @@
+import { Response } from 'express';
+
+import { deleteMultipleJobStatusesDb, getWorkspacePasswordDb } from '../../../shared/clients/db';
+import { config } from '../../../shared/config/config';
 import logger from '../../../shared/config/winston';
+import { decrypt } from '../../../shared/encryption';
 import { maxNumberOfFetchedPins } from '../../../shared/infrastructure/ipfs/core/config';
-import { pinsToUniqueDocuments, transformPinToDocument } from '../../../shared/infrastructure/ipfs/core/mappers';
-import { clusterClient, pinSvcClient } from '../../../shared/infrastructure/ipfs/core/transport';
-import { DocumentPinRequest, DocumentPinningResponse } from '../../../shared/types/interfaces';
-import { Document, DocumentsResponse, DocumentWithVersions } from '../../../shared/types/interfaces/truspace';
+import { buildMetadataQuery, createFileFormData } from '../../../shared/infrastructure/ipfs/core/helpers';
+import {
+  pinsToUniqueDocuments,
+  transformPinToDocument,
+  transformPinToGeneralWorkspaceItem,
+} from '../../../shared/infrastructure/ipfs/core/mappers';
+import { clusterClient, gatewayClient, pinSvcClient } from '../../../shared/infrastructure/ipfs/core/transport';
+import { AuthenticatedRequest } from '../../../shared/types';
+import { DocumentPinRequest, DocumentPinningResponse, PinRequest, PinningResponse } from '../../../shared/types/interfaces';
+import {
+  Document,
+  DocumentCreateResponse,
+  DocumentRequest,
+  DocumentsResponse,
+  DocumentWithVersions,
+  File,
+  GeneralTemplateOfItemInWorkspace,
+} from '../../../shared/types/interfaces/truspace';
+import { checkPermissionForWorkspace } from '../../../shared/utility/permissions';
 import { assertAndEncodeURIComponent } from '../../../shared/utility/validation';
 import { languagesIpfsRepository } from '../../languages/infrastructure/languages-ipfs.repository';
 import { usersIpfsRepository } from '../../users/infrastructure/users-ipfs.repository';
 
 class DocumentsIpfsRepository {
+  async createDocument(doc: DocumentRequest, file: File): Promise<DocumentCreateResponse> {
+    try {
+      const form = createFileFormData(file);
+      const docMeta = { ...doc.meta };
+      delete docMeta.creatorName;
+      const metadataQuery = buildMetadataQuery(docMeta, {
+        encodeValueKeys: ['filename'],
+      });
+
+      const result = await clusterClient.post(
+        `/add?stream-channels=false&name=${encodeURIComponent(file.name)}${metadataQuery}&meta-docId=${doc.docId}&meta-type=document`,
+        form,
+        {
+          headers: {
+            ...form.getHeaders(),
+          },
+          timeout: 30000,
+          maxContentLength: Infinity,
+        },
+      );
+      const data = result.data[0];
+      return { cid: data.cid, uuid: doc.docId };
+    } catch (error) {
+      logger.error('Error creating document:', error);
+      throw error;
+    }
+  }
+
   async getDocumentVersionDetailsByCid(cid: string): Promise<Document> {
     try {
       const safeCid = assertAndEncodeURIComponent(cid);
@@ -38,6 +86,59 @@ class DocumentsIpfsRepository {
       };
     } catch (error) {
       logger.error(`Error getting document version details for CID ${cid}:`, error);
+      throw error;
+    }
+  }
+
+  async downloadDocumentVersionByCid(req: AuthenticatedRequest, res: Response, cid: string): Promise<void> {
+    try {
+      const document = await this.getDocumentVersionDetailsByCid(cid);
+      const metadata = document.meta;
+
+      await checkPermissionForWorkspace(req.user?.email as string, res, metadata.workspaceOrigin);
+
+      const safeCid = assertAndEncodeURIComponent(cid);
+      const result = await gatewayClient.get(`/ipfs/${safeCid}`, {
+        responseType: 'arraybuffer',
+      });
+
+      const fileBuffer = Buffer.from(result.data);
+      let modifiedBuffer = fileBuffer;
+      if (metadata.encrypted === 'true') {
+        modifiedBuffer = await decrypt(fileBuffer, await this.#getWorkspacePassword(metadata.workspaceOrigin));
+      }
+
+      res.setHeader('Content-Type', result.headers['content-type']);
+      res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(metadata.filename) || cid}"`);
+      res.end(modifiedBuffer);
+    } catch (error) {
+      logger.error(error);
+      res.status(404);
+    }
+  }
+
+  async getDocumentVersionContentByCid(cid: string): Promise<{ data: Buffer; size: number }> {
+    try {
+      const document = await this.getDocumentVersionDetailsByCid(cid);
+      const metadata = document.meta;
+
+      const safeCid = assertAndEncodeURIComponent(cid);
+      const result = await gatewayClient.get(`/ipfs/${safeCid}`, {
+        responseType: 'arraybuffer',
+      });
+      const fileBuffer = Buffer.from(result.data);
+
+      let modifiedBuffer = fileBuffer;
+      if (metadata.encrypted === 'true') {
+        modifiedBuffer = await decrypt(fileBuffer, metadata.workspaceOrigin);
+      }
+
+      return {
+        data: modifiedBuffer,
+        size: Number(metadata.size),
+      };
+    } catch (error) {
+      logger.error(`Error getting document version content for CID ${cid}:`, error);
       throw error;
     }
   }
@@ -148,6 +249,16 @@ class DocumentsIpfsRepository {
     }
   }
 
+  async deleteDocument(docId: string): Promise<void> {
+    try {
+      const documentsAndAssociatedItems = await this.#getEverythingByDocId(docId);
+      await this.#deleteDocumentsAndAssociatedItems(documentsAndAssociatedItems);
+    } catch (error) {
+      logger.error(`Error deleting document ${docId}:`, error);
+      throw error;
+    }
+  }
+
   async #createDetailedDocumentFromPin(pinRequest: DocumentPinRequest): Promise<Document> {
     const language = await this.#getLanguageForVersion(pinRequest.pin.cid);
     const document = transformPinToDocument(pinRequest.pin, language);
@@ -173,6 +284,52 @@ class DocumentsIpfsRepository {
       logger.error(`Error fetching language for version CID ${versionCid}:`, error);
       return undefined;
     }
+  }
+
+  async #getEverythingByDocId(docId: string): Promise<GeneralTemplateOfItemInWorkspace[]> {
+    try {
+      const pinRes: PinningResponse = (await pinSvcClient.get(`/pins?limit=1000&meta={"docId":"${docId}"}`)).data;
+
+      return pinRes.results.map((pinRequest: PinRequest) => transformPinToGeneralWorkspaceItem(pinRequest.pin));
+    } catch (error) {
+      logger.error(`Error getting everything by doc ID ${docId}:`, error);
+      throw error;
+    }
+  }
+
+  async #deleteDocumentsAndAssociatedItems(allItems: GeneralTemplateOfItemInWorkspace[]) {
+    try {
+      const allItemCids = allItems.map((item) => item.cid);
+
+      const allDocuments = allItems.filter((item) => item.meta.type === 'document');
+      const allDocumentCids = allDocuments.map((document) => document.cid);
+
+      const requestIds: string[] = [];
+      allDocumentCids.forEach((documentCid) => {
+        requestIds.push(`req_tags_${documentCid}`);
+        requestIds.push(`req_perspectives_${documentCid}`);
+      });
+
+      if (allItemCids.length) {
+        await Promise.all(allItemCids.map((itemCid) => clusterClient.delete(`/pins/${itemCid}`)));
+      }
+
+      await deleteMultipleJobStatusesDb(requestIds);
+    } catch (error) {
+      logger.error('Error deleting documents and associated items:', error);
+      throw error;
+    }
+  }
+
+  async #getWorkspacePassword(workspaceId: string): Promise<string> {
+    const encryptedWorkspacePassword = await getWorkspacePasswordDb(workspaceId);
+    if (!encryptedWorkspacePassword?.encrypted_password) {
+      logger.warn('Missing encryption password. Trying workspaceId ...');
+      return workspaceId;
+    }
+
+    const workspacePassword = await decrypt(encryptedWorkspacePassword.encrypted_password, config.masterPassword);
+    return workspacePassword.toString();
   }
 }
 

@@ -1,7 +1,7 @@
 import { Response } from 'express';
-import { IpfsClient } from '../../../shared/clients/ipfs-client';
 import { AuthenticatedRequest } from '../../../shared/types';
+import { documentsIpfsRepository } from '../infrastructure/documents-ipfs.repository';
 
 export async function getDocumentsVersionByCID(cid: string, req: AuthenticatedRequest, res: Response) {
-  return new IpfsClient().downloadDocumentVersionByCid(req, res, cid);
+  return documentsIpfsRepository.downloadDocumentVersionByCid(req, res, cid);
 }
