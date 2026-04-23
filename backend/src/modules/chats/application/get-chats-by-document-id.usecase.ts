@@ -1,6 +1,5 @@
-import { IpfsClient } from '../../../shared/clients/ipfs-client';
+import { chatsIpfsRepository } from '../infrastructure/chats-ipfs.repository';
 
 export async function getChatsByDocumentId(documentId: string) {
-  const client = new IpfsClient();
-  return await client.getMessagesByDocumentId(documentId);
+  return await chatsIpfsRepository.getMessagesByDocumentId(documentId);
 }

@@ -2,6 +2,7 @@ import { IpfsClient } from '../../../shared/clients/ipfs-client';
 import { sendNotification } from '../../../shared/mailing/notifications';
 import { ChatMessageRequest } from '../../../shared/types/interfaces';
 import { getUserSettingsByUiid } from '../../../shared/utility/user';
+import { chatsIpfsRepository } from '../infrastructure/chats-ipfs.repository';
 
 export async function postChat(
   creatorNodeId: string,
@@ -27,7 +28,7 @@ export async function postChat(
     },
   };
 
-  const result = await client.createMessage(chatReq);
+  const result = await chatsIpfsRepository.createMessage(chatReq);
   const docInfo = await client.getDocumentDetailsById(docId);
 
   docInfo.documentVersions
