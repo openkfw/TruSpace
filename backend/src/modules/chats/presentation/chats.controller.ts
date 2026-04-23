@@ -14,7 +14,12 @@ export const ChatsController = {
   },
 
   getChatsExportByDocumentId: async (req: Request, res: Response) => {
-    await getChatsExportByDocumentId(req.params.docId, res);
+    const file = await getChatsExportByDocumentId(req.params.docId);
+
+    res.setHeader('Content-Type', file.contentType);
+    res.setHeader('Content-Disposition', `attachment; filename="${file.filename}"`);
+
+    file.stream.pipe(res);
   },
 
   getRecentChats: async (req: AuthenticatedRequest, res: Response) => {
