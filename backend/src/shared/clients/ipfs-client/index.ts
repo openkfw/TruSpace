@@ -1451,18 +1451,6 @@ export class IpfsClient implements IClient {
           updated_at: element.pin.meta.updated_at,
         }),
       );
-      console.log(
-        JSON.stringify(
-          {
-            fetch: `/pins?limit=${maxNumberOfFetchedPins}&meta={"type":"permission","${key}":"${encodedValue}"}`,
-            key,
-            value,
-            results,
-          },
-          null,
-          2,
-        ),
-      );
       return results;
     } catch (error) {
       logger.error('Error getting event data:', error);
