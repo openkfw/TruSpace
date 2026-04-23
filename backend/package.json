@@ -52,7 +52,7 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3",
     "undici": "^7.3.0",
-    "uuid": "^11.0.5",
+    "uuid": "^14.0.0",
     "winston": "^3.17.0"
   },
   "devDependencies": {
