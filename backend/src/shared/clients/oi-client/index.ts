@@ -1,6 +1,9 @@
 import axios, { AxiosInstance } from "axios";
 import { UploadedFile } from "express-fileupload";
 import { v4 as uuidv4 } from "uuid";
+import { languagesIpfsRepository } from "../../../modules/languages/infrastructure/languages-ipfs.repository";
+import { perspectivesIpfsRepository } from "../../../modules/perspectives/infrastructure/perspectives-ipfs.repository";
+import { tagsIpfsRepository } from "../../../modules/tags/infrastructure/tags-ipfs.repository";
 import { config } from "../../config/config";
 import logger from "../../config/winston";
 import {
@@ -13,7 +16,6 @@ import {
 } from "../../types/interfaces";
 import TaskQueue from "../../utility/jobQueue";
 import { languagePrompt, tagsPrompt } from "../../utility/prompts";
-import { IpfsClient } from "../ipfs-client";
 import {
   AuthsModule,
   ChatsModule,
@@ -473,7 +475,7 @@ export class OpenWebUIClient {
 
         logger.debug(`#SUMMARY:\n ${perspectiveRequest.meta.data}`);
 
-        return new IpfsClient().createPerspective(perspectiveRequest);
+        return perspectivesIpfsRepository.createPerspective(perspectiveRequest);
       });
       TaskQueue.updateJobStatus(requestId, "completed");
     } catch (error) {
@@ -530,7 +532,7 @@ export class OpenWebUIClient {
             creatorType: "ai",
           },
         };
-        return new IpfsClient().createTag(tagRequest);
+        return tagsIpfsRepository.createTag(tagRequest);
       });
       await TaskQueue.updateJobStatus(requestId, "completed");
     } catch (error) {
@@ -613,7 +615,7 @@ export class OpenWebUIClient {
           creatorType: "ai",
         },
       };
-      await new IpfsClient().createLanguage(langRequest);
+      await languagesIpfsRepository.createLanguage(langRequest);
 
       await TaskQueue.updateJobStatus(requestId, "completed");
 
