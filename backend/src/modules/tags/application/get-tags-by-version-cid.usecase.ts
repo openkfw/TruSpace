@@ -1,5 +1,5 @@
-import { IpfsClient } from '../../../shared/clients/ipfs-client';
+import { tagsIpfsRepository } from '../infrastructure/tags-ipfs.repository';
 
 export async function getTagsByVersionCid(cid: string) {
-  return new IpfsClient().getTagsByVersionCid(cid);
+  return tagsIpfsRepository.getTagsByVersionCid(cid);
 }
