@@ -106,7 +106,7 @@ if [[ "$CONFIGURE_ENV" = "true" || ! -f "$ENV_FILE" ]]; then
   chmod +x "$CONFIGURE_ENV_SCRIPT"
 
   # Execute script and wait for completion
-  if [ "$DEV" = "true" ]; then
+  if [ "$CLI_DEV" = "true" ]; then
     if ! $CONFIGURE_ENV_SCRIPT --dev; then
     echo_error "Failed to generate .env file."
     exit 1
