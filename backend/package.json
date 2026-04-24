@@ -42,7 +42,7 @@
     "morgan": "^1.10.0",
     "multer": "^2.0.2",
     "node-fetch": "^3.3.2",
-    "nodemailer": "^7.0.3",
+    "nodemailer": "^8.0.5",
     "nodemon": "^3.1.9",
     "ollama": "^0.5.12",
     "pdfkit": "^0.16.0",
@@ -52,7 +52,7 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3",
     "undici": "^7.3.0",
-    "uuid": "^11.0.5",
+    "uuid": "^14.0.0",
     "winston": "^3.17.0"
   },
   "devDependencies": {
