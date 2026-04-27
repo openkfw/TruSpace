@@ -36,8 +36,8 @@ jobs:
       - name: Create Release
         uses: actions/create-release@v1
         with:
-          tag_name: ${{ github.event.workflow_run.head_branch }}-v${{ steps.get_version.outputs.VERSION }}
-          release_name: Release ${{ github.event.workflow_run.head_branch }}-v${{ steps.get_version.outputs.VERSION }}
+          tag_name: ${{ steps.get_version.outputs.VERSION }}
+          release_name: Release ${{ steps.get_version.outputs.VERSION }}
           body: |
             Auto-generated release
           draft: false
