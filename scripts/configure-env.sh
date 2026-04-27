@@ -304,9 +304,9 @@ echo_info "You may also manually edit the generated .env file after setup if pre
 # PROFILES
 #──────────────────────────────────────────────────────────────────────────────
 echo_section "Profile"
-PROFILE_DEVELOPMENT="development - Prefills everything for a local environment"
-PROFILE_PRODUCTION="production - Prefills stable, reliable defaults that work in most standalone environments."
-PROFILE_CUSTOM="custom - No defaults; you can specify every value"
+PROFILE_DEVELOPMENT=$'\e[1mdevelopment\e[0m - Prefills defaults optimized for local development and testing, including verbose logging and auto-reloading. The services will be run locally, without the need for external dependencies like a SMTP server or a custom domain. This is the recommended profile for getting started and testing new features.'
+PROFILE_PRODUCTION=$'\e[1mproduction\e[0m - Prefills defaults optimized for production use, including secure settings and optimized performance. The services will be configured to run in a production-ready setup with a custom domain and SMTP server. Choose this if you want to quickly set up a production environment with sensible defaults, but make sure to review all settings before deploying!'
+PROFILE_CUSTOM=$'\e[1mcustom\e[0m - No defaults are set, you will be prompted to fill in all values. Choose this if you want to customize all settings or have specific requirements not covered by the other profiles.'
 
 # PROFILE
 # Do not prompt if --dev flag is set (then development profile is used automatically)

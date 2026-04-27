@@ -8,7 +8,7 @@ url: 'https://github.com/openkfw/TruSpace'
 landingURL: 'https://web.truspace.dev'
 releaseDate: '2025-08-17'
 logo: publiccodeLogo.svg
-softwareVersion: v0.11
+softwareVersion: v0.12
 developmentStatus: beta
 softwareType: standalone/iot
 platforms:
@@ -43,6 +43,6 @@ description:
       - Sovereign Articifial Intelligence
     screenshots:
       - >-
-        https://github.com/openkfw/TruSpace/blob/main/doc/screenshot_dashboard.png
+        https://github.com/openkfw/TruSpace/blob/main/doc/images/screenshot_dashboard.png
     videos:
       - 'https://www.youtube.com/watch?v=dpo_D3NJpqE'

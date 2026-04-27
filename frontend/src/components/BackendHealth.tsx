@@ -8,7 +8,6 @@ import { getHealth } from "@/lib/services";
 
 const READY = "🟢";
 const ERROR = "🔴";
-const LIMITED_AI = "🍊";
 
 const defaultState = {
    status: false,
@@ -33,9 +32,7 @@ export function BackendHealth() {
    }, []);
 
    const overallStatus = () => {
-      if (health.services?.Backend && health.services["Open WebUI"] !== true) {
-         return LIMITED_AI;
-      } else if (health.status === true) {
+      if (health.status === true) {
          return READY;
       }
       return ERROR;

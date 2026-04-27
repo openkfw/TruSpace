@@ -156,7 +156,17 @@
       "notificationRemovedFromWorkspace": "Ich aus einem Arbeitsbereich entfernt werde",
       "notificationDocumentChanged": "Ein Dokument, an dem ich arbeite, geändert wird",
       "notificationDocumentChat": "Eine neue Chat-Nachricht zu einem Dokument, an dem ich arbeite, hinzugefügt wird",
-      "notificationWorkspaceChanged": "Die Berechtigungen des Arbeitsbereichs, an dem ich arbeite, geändert werden"
+      "notificationWorkspaceChanged": "Die Berechtigungen des Arbeitsbereichs, an dem ich arbeite, geändert werden",
+      "deleteUserButton": "Konto löschen",
+      "deleteUserDialogTitle": "Konto wirklich löschen?",
+      "deleteUserDialogDescription": "Bitte bestätige, dass du dein Konto dauerhaft löschen möchtest. Dadurch werden sofort alle persönlichen Kontodaten sowie alle Daten aus privaten Arbeitsbereichen, für die nur dein Konto Zugriffsrechte besitzt, gelöscht. Alle anderen Daten bleiben im Netzwerk erhalten. Diese Aktion kann nicht rückgängig gemacht werden.",
+      "deleteUserPasswordLabel": "Passwort",
+      "deleteUserPasswordPlaceholder": "Gib dein Passwort ein",
+      "deleteUserConfirm": "Konto löschen",
+      "deleteUserPasswordRequired": "Passwort ist erforderlich",
+      "deleteUserPasswordInvalid": "Das eingegebene Passwort ist falsch",
+      "deleteUserSuccess": "Dein Konto wurde erfolgreich gelöscht",
+      "deleteUserError": "Beim Löschen deines Kontos ist ein Fehler aufgetreten"
    },
    "homePage": {
       "documentName": "Name",
@@ -219,6 +229,7 @@
    "documentPreview": {
       "preview": "Vorschau",
       "noPreview": "Keine Vorschau verfügbar",
+      "editor": "Editor",
       "unsupportedFormat": "Dieses Dateiformat wird für die Vorschau nicht unterstützt",
       "page": "Seite",
       "of": "von"
@@ -381,14 +392,11 @@
       "customPerspectiveCreated": "Benutzerdefinierte Perspektive wird erstellt. Dies kann mehrere Minuten dauern."
    },
    "documentEditable": {
-      "cancel": "Abbrechen",
-      "creator": "AutorIn",
-      "creatorPlaceholder": "AutorIn eingeben",
-      "send": "Senden",
       "save": "Speichern",
-      "saveNewVersion": "Neue Version speichern",
       "uploading": "Wird hochgeladen...",
-      "uploadError": "Upload fehlgeschlagen"
+      "uploadError": "Upload fehlgeschlagen",
+      "versionTagDefault": "Setze ein Versionstag",
+      "versionTagTip": "Füge ein Versionstag hinzu um die Änderungen dieser Version zu klarifizieren."
    },
    "tags": {
       "aiTag": "Tag von KI generiert",
@@ -533,6 +541,7 @@
       "overallSystemStatus": "Gesamtsystemstatus:",
       "healthy": "Gesund",
       "issuesDetected": "Probleme erkannt",
+      "warningAIDisabled": "TruSpace läuft ohne aktivierte KI-Dienste. Daher stehen die KI-Funktionen nicht zur Verfügung.",
       "online": "Online",
       "offline": "Offline",
       "failedToLoadHealthData": "Gesundheitsdaten konnten nicht geladen werden",

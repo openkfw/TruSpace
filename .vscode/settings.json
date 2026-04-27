@@ -6,6 +6,10 @@
     "source.organizeImports": "never",
     "source.fixAll.ts": "always"
   },
+  "editor.tabSize": 2,
+  "[typescript]": {
+    "editor.tabSize": 2
+  },
   "cSpell.words": ["uuidv"],
   "sarif-viewer.connectToGithubCodeScanning": "off"
 }

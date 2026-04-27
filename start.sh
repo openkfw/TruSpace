@@ -39,11 +39,11 @@ echo "                                                                   "
 #-----------------------------#
 ###--- SET DEFAULT FLAGS ---###
 #-----------------------------#
-DEV="false"
-LOCAL_FRONTEND="false"
-DISABLE_ALL_AI_FUNCTIONALITY="false"
-REMOVE_PEERS="false"
-CONFIGURE_ENV="false"
+CLI_DEV="false"
+CLI_LOCAL_FRONTEND="false"
+CLI_DISABLE_ALL_AI_FUNCTIONALITY="false"
+CLI_REMOVE_PEERS="false"
+CLI_CONFIGURE_ENV="false"
 
 SCRIPT_DIR=$(dirname -- "$0")
 ENV_FILE="$SCRIPT_DIR/.env"
@@ -58,27 +58,27 @@ source "$SCRIPT_DIR/scripts/libs/logging.sh"
 while [[ "$#" -gt 0 ]]; do
   case "$1" in
     --dev)
-      DEV="true"
+      CLI_DEV="true"
       echo_info "Starting in development mode"
       shift
       ;;
     --local-frontend)
-      LOCAL_FRONTEND="true"
+      CLI_LOCAL_FRONTEND="true"
       echo_info "Frontend will be started locally for development"
       shift
       ;;
     --no-ai)
-      DISABLE_ALL_AI_FUNCTIONALITY="true"
+      CLI_DISABLE_ALL_AI_FUNCTIONALITY="true"
       echo_info "AI functionality (Ollama and Open-WebUI) will be disabled"
       shift
       ;;
     --remove-peers)
-      REMOVE_PEERS="true"
+      CLI_REMOVE_PEERS="true"
       echo_info "IPFS bootstrap peers will be removed after startup"
       shift
       ;;
     --configure-env)
-      CONFIGURE_ENV="true"
+      CLI_CONFIGURE_ENV="true"
       shift
       ;;
     -h|--help)
@@ -106,7 +106,7 @@ if [[ "$CONFIGURE_ENV" = "true" || ! -f "$ENV_FILE" ]]; then
   chmod +x "$CONFIGURE_ENV_SCRIPT"
 
   # Execute script and wait for completion
-  if [ "$DEV" = "true" ]; then
+  if [ "$CLI_DEV" = "true" ]; then
     if ! $CONFIGURE_ENV_SCRIPT --dev; then
     echo_error "Failed to generate .env file."
     exit 1
@@ -133,6 +133,19 @@ fi
 
 echo_success "Environment variables loaded"
 
+# Always export TruSpace version for docker build/runtime (override if set)
+TRUSPACE_VERSION_FILE="$SCRIPT_DIR/VERSION"
+if [ -f "$TRUSPACE_VERSION_FILE" ]; then
+  export TRUSPACE_VERSION="$(cat "$TRUSPACE_VERSION_FILE")"
+fi
+
+# Re-apply CLI overrides after loading .env
+if [ "$CLI_DEV" = "true" ]; then export DEV="true"; fi
+if [ "$CLI_LOCAL_FRONTEND" = "true" ]; then export LOCAL_FRONTEND="true"; fi
+if [ "$CLI_DISABLE_ALL_AI_FUNCTIONALITY" = "true" ]; then export DISABLE_ALL_AI_FUNCTIONALITY="true"; fi
+if [ "$CLI_REMOVE_PEERS" = "true" ]; then export REMOVE_PEERS="true"; fi
+if [ "$CLI_CONFIGURE_ENV" = "true" ]; then export CONFIGURE_ENV="true"; fi
+
 #------------------------#
 ###--- DOCKER SETUP ---###
 #------------------------#
@@ -142,13 +155,14 @@ echo_section "Docker Setup"
 # Ensure necessary Docker volume directories exist
 dirs=(
   "./volumes"
+  "./volumes/cluster0"
+  "./volumes/cluster1"
   "./volumes/db"
   "./volumes/db0"
   "./volumes/db1"
+  ".volumes/general"
   "./volumes/ipfs0"
-  "./volumes/cluster0"
   "./volumes/ipfs1"
-  "./volumes/cluster1"
   "./volumes/ollama"
   "./volumes/open-webui"
 )
@@ -162,6 +176,25 @@ done
 # Capture current user/group IDs for Docker
 export LUID=$(id -u)
 export LGID=$(id -g)
+
+# If non-existent yet, duplicate default terms and conditions from frontend/default_terms into volumes/general/terms
+DEFAULT_TERMS_DIR="$SCRIPT_DIR/frontend/default_terms"
+PUBLIC_TERMS_DIR="$SCRIPT_DIR/frontend/public/terms"
+LOCAL_TERMS_DIR="$SCRIPT_DIR/volumes/general/terms"
+
+if [ ! -d "$LOCAL_TERMS_DIR" ]; then
+    echo_info "Copying default terms and conditions to $LOCAL_TERMS_DIR"
+    mkdir -p "$LOCAL_TERMS_DIR"
+    cp "$DEFAULT_TERMS_DIR"/* "$LOCAL_TERMS_DIR"/
+fi
+
+# Ensure frontend/public/terms points to the volume-backed terms as symlink
+# These terms are then accessed in the frontend
+ABS_LOCAL_TERMS_DIR="$(cd "$LOCAL_TERMS_DIR" && pwd)"
+rm -rf "$PUBLIC_TERMS_DIR"
+mkdir -p "$PUBLIC_TERMS_DIR"
+cp "$LOCAL_TERMS_DIR"/* "$PUBLIC_TERMS_DIR"/
+## ln -s "$ABS_LOCAL_TERMS_DIR" "$PUBLIC_TERMS_DIR"
 
 
 #----------------------#

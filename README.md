@@ -62,13 +62,13 @@ cd TruSpace
 <summary>Please open to see the expected results with screenshots</summary>
 
 1. Open frontend in your browser at [http://localhost:3000](http://localhost:3000) to see the login screen:
-   ![Screenshot of login screen](./doc/screenshot_login.png)
+   ![Screenshot of login screen](./doc/images/screenshot_login.png)
 
 2. Click on "Register" to create a new user account. Fill out the required fields. The user account is local, your data is not going anywhere.
-   ![Screenshot of register screen](./doc/screenshot_register.png)
+   ![Screenshot of register screen](./doc/images/screenshot_register.png)
 
 3. After the submission, the app takes you back to the login screen, and from there to the dashboard.
-   ![Screenshot of dashboard](./doc/screenshot_dashboard.png)
+   ![Screenshot of dashboard](./doc/images/screenshot_dashboard.png)
 
 If something doesn't work, check that all containers are running with `docker ps`. They should show these containers:
 | CONTAINER ID | IMAGE | COMMAND | CREATED | STATUS | PORTS | NAMES |
@@ -84,51 +84,7 @@ If something doesn't work, check that all containers are running with `docker ps
 <br>
 
 > [!NOTE]
-> For more details on the local installation, feel free to check out one of the insallation guides [here](./doc/Admin%20Guide/Setup%20TruSpace/Installation.md). There are guides for a local dev setup, standalone server and raspberry pi.
-
-### FAQ - Local Installation
-
-<details>
-<summary>How do I customize the domain?</summary>
-
-If you plan on using another domain (e.g. on a local raspberry), make sure that the respective domains are updated from `localhost` to your `domain.local` in the `CORS` fields of the `.env` file (`CORS_ORIGIN` and `OI_CORS_ALLOW_ORIGIN`). This can be easily done in the `TruSpace` folder using the example environment:
-
-```bash
-sed 's|http://localhost|http://example.com|g' .env.example > .env
-```
-
-You can also use the `scripts/configure-env.sh` to configure your domains and some other settings interactively:
-
-```bash
-./scripts/configure-env.sh
-```
-
-</details>
-
-<details>
-<summary>Can I configure how I start the application?</summary>
-
-You have multiple options to configure the TruSpace installation before starting it. You can either edit the `.env` file directly (after copying it from `.env.example`). You can find a detailed description of all environment variables in [ENVIRONMENT_VARIABLES.md](./doc/ENVIRONMENT_VARIABLES.md).
-
-Alternatively, you can set flags in `start.sh` to enable certain behaviors:
-
-- `--dev` : starts the application in development mode (always build backend and frontend instead of pulling docker images (identical to `BUILD_OR_PULL_IMAGES=build`))
-- `--local-frontend`: start the frontend locally instead of in Docker
-- `--no-ai`: disable AI functionality (Ollama and Open-WebUI) when starting the application (identical to `DISABLE_ALL_AI_FUNCTIONALITY=true`)
-- `--remove-peers`: after IPFS starts, remove default bootstrap peers via the IPFS API
-
-</details>
-
-<details>
-<summary>What happens beneath the hood?</summary>
-
-The `start.sh` script creates a simple `.env` configuration, docker volumes and spins up `docker compose` containing backend api and IPFS and additionally NextJS frontend in dev mode. After startup, the frontend is available on `http://localhost:3000`. Register a user, login and create a workspace for documents!
-
-To enable AI analysis, TruSpace downloads a model configured in `.env`, as an example here is `gemma3:1b` and you can see the full list at the [ollama DB](https://ollama.com/library?q=mistral&sort=popular).
-
-Once the model is downloaded, AI analysis is executed upon each document upload automatically.
-
-</details>
+> For more details on the installation, feel free to check out our detailed installation guide [here](./doc/Admin%20Guide/Setup%20TruSpace/Installation.md).
 
 ## Connect to other TruSpace nodes
 
@@ -194,11 +150,11 @@ For a complete reference and description of all variables, see [ENVIRONMENT_VARI
 
 In the overview, you can see how the components work together. The UI and API is part of this repository and provides the interface and the translation to other services. Once you start TruSpace, it pulls and connects to containers from Open Web UI (for AI processing) and IPFS/IPFS-Cluster to persist the data. The respective ports are outlined in the image.
 
-![Architecture](./doc/tech-arch-diagram.PNG "Tech Architecture overview")
+![Architecture](./doc/images/tech-arch-diagram.PNG "Tech Architecture overview")
 
 ### Data model for workspaces in IPFS
 
-The data model has a hierarchical structure of workspaces, documents and metadata. They are linked using UUIDs in the metadata-fields of the IPFS files. Each data entry is a single (small) file to avoid merge conflicts in the IPFS network, e.g. in case of network split. The concept is outlined in the visual representation of the [Data model](./doc/datamodel.png "Data model")
+The data model has a hierarchical structure of workspaces, documents and metadata. They are linked using UUIDs in the metadata-fields of the IPFS files. Each data entry is a single (small) file to avoid merge conflicts in the IPFS network, e.g. in case of network split. The concept is outlined in the visual representation of the [Data model](./doc/images/datamodel.png "Data model")
 
 The specific fields are described in [backend/src/types/interfaces/truspace.ts](backend/src/types/interfaces/truspace.ts)
 
@@ -223,6 +179,9 @@ We welcome contributions! Please read the [CONTRIBUTING.md](CONTRIBUTING.md) and
 - Setting up a development environment
 - Reporting issues and submitting pull requests
 - Code style guidelines
+
+To inspire contributers and make it easier to get started, we have visualized our 2 main goals for TruSpace in the near future and respective features that will help us get there:
+![WhatsNext](./doc/images/WhatsNext.jpg)
 
 ## 📜 License
 

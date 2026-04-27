@@ -1,1 +1,0 @@
-# Folder with SQLLite database

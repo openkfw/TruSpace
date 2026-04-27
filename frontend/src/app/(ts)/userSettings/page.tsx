@@ -8,6 +8,15 @@ import { useTranslations } from "next-intl";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+   Dialog,
+   DialogContent,
+   DialogDescription,
+   DialogFooter,
+   DialogHeader,
+   DialogTitle,
+   DialogTrigger
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -18,11 +27,24 @@ import {
    SelectValue
 } from "@/components/ui/select";
 import { useUser } from "@/contexts/UserContext";
-import { updateUserSettings, updateUserName } from "@/lib/services";
+import {
+   deleteUser,
+   loginUser,
+   removeAllUserPermissions,
+   updateUserSettings,
+   updateUserName
+} from "@/lib/services";
 
 export default function UserSettings() {
-   const { user, loading, updatePreferedLanguage, updateUser, updateAvatar, refreshUser } =
-      useUser();
+   const {
+      user,
+      loading,
+      logout,
+      updatePreferedLanguage,
+      updateUser,
+      updateAvatar,
+      refreshUser
+   } = useUser();
    const [file, setFile] = useState<File>();
    const [selectedLanguage, setSelectedLanguage] = useState<string>();
    const [notificationAddedToWorkspace, setNotificationAddedToWorkspace] =
@@ -38,6 +60,9 @@ export default function UserSettings() {
    const [notificationWorkspaceChange, setNotificationWorkspaceChange] =
       useState<boolean>(false);
    const [settingChanged, setSettingChanged] = useState<boolean>(false);
+   const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
+   const [deletePassword, setDeletePassword] = useState<string>("");
+   const [isDeletingUser, setIsDeletingUser] = useState<boolean>(false);
 
    useEffect(() => {
       if (user) {
@@ -143,10 +168,51 @@ export default function UserSettings() {
       }
    };
 
+   const handleDeleteUser = async (
+      event: React.FormEvent<HTMLFormElement>
+   ) => {
+      event.preventDefault();
+
+      if (!user?.email) {
+         return;
+      }
+
+      if (!deletePassword) {
+         toast.error(settingsTranslations("deleteUserPasswordRequired"));
+         return;
+      }
+
+      setIsDeletingUser(true);
+      try {
+         const loginResult = await loginUser({
+            email: user.email,
+            password: deletePassword
+         });
+
+         if (loginResult?.status !== "success") {
+            toast.error(settingsTranslations("deleteUserPasswordInvalid"));
+            return;
+         }
+
+         await removeAllUserPermissions(user.email);
+         await deleteUser();
+
+         setDeleteDialogOpen(false);
+         setDeletePassword("");
+         toast.success(settingsTranslations("deleteUserSuccess"));
+         await logout();
+      } catch (err) {
+         console.error("Deleting user failed: ", err);
+         toast.error(settingsTranslations("deleteUserError"));
+      } finally {
+         setIsDeletingUser(false);
+      }
+   };
+
    if (loading || !user) return <div>{generalTranslations("loading")}</div>;
 
    return (
-      <div className="max-w-md mx-auto mt-16 p-6 space-y-8">
+      <div className="max-w-md mx-auto mt-16 p-6 space-y-6">
          <div className="flex flex-col items-center gap-3">
             <Button
                variant="ghost"
@@ -183,7 +249,7 @@ export default function UserSettings() {
                <Input
                   id="name"
                   type="text"
-                  className="p-2 bg-slate-50 dark:bg-slate-800 dark:text-white dark:placeholder:text-white"
+                  className="mt-1 p-2 bg-slate-50 dark:bg-slate-800 dark:text-white dark:placeholder:text-white"
                   defaultValue={user.name}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
@@ -197,7 +263,7 @@ export default function UserSettings() {
                <Input
                   id="email"
                   type="email"
-                  className="p-2 bg-slate-50 dark:bg-slate-800 dark:text-white dark:placeholder:text-white"
+                  className="mt-1 p-2 bg-slate-50 dark:bg-slate-800 dark:text-white dark:placeholder:text-white"
                   defaultValue={user.email}
                   disabled
                />
@@ -210,7 +276,7 @@ export default function UserSettings() {
                   value={selectedLanguage}
                   onValueChange={handlePreferedLanguageChange}
                >
-                  <SelectTrigger className="w-[50%] bg-slate-50 dark:bg-slate-800 dark:text-white dark:placeholder:text-white">
+                  <SelectTrigger className="mt-1 w-[50%] bg-slate-50 dark:bg-slate-800 dark:text-white dark:placeholder:text-white">
                      <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -302,10 +368,75 @@ export default function UserSettings() {
                </Label>
             </div>
          </div>
-         <div className="space-y-2">
+         <div className="space-y-4">
             <Button type="submit" onClick={handleSubmit} className="w-full">
                {generalTranslations("saveSettings")}
             </Button>
+
+            <Dialog
+               open={deleteDialogOpen}
+               onOpenChange={(open) => {
+                  if (!open) {
+                     setDeletePassword("");
+                  }
+                  setDeleteDialogOpen(open);
+               }}
+            >
+               <DialogTrigger asChild>
+                  <Button
+                     type="button"
+                     variant="outline"
+                     className="w-full border-red-600 text-red-600 bg-transparent hover:bg-red-600 hover:text-white"
+                  >
+                     {settingsTranslations("deleteUserButton")}
+                  </Button>
+               </DialogTrigger>
+               <DialogContent
+                  className="sm:max-w-md"
+                  onEscapeKeyDown={(e) => e.preventDefault()}
+                  onInteractOutside={(e) => e.preventDefault()}
+               >
+                  <DialogHeader>
+                     <DialogTitle>
+                        {settingsTranslations("deleteUserDialogTitle")}
+                     </DialogTitle>
+                  </DialogHeader>
+                  <DialogDescription>
+                     {settingsTranslations("deleteUserDialogDescription")}
+                  </DialogDescription>
+                  <form onSubmit={handleDeleteUser}>
+                     <div className="grid gap-4 py-4">
+                        <div className="grid gap-2">
+                           <Label htmlFor="deleteUserPassword">
+                              {settingsTranslations("deleteUserPasswordLabel")}
+                           </Label>
+                           <Input
+                              id="deleteUserPassword"
+                              type="password"
+                              value={deletePassword}
+                              onChange={(e) =>
+                                 setDeletePassword(e.target.value)
+                              }
+                              placeholder={settingsTranslations(
+                                 "deleteUserPasswordPlaceholder"
+                              )}
+                           />
+                        </div>
+                     </div>
+                     <DialogFooter>
+                        <Button
+                           type="submit"
+                           className="w-full bg-red-600 text-white hover:bg-red-700"
+                           disabled={isDeletingUser}
+                        >
+                           {isDeletingUser
+                              ? generalTranslations("loading")
+                              : settingsTranslations("deleteUserConfirm")}
+                        </Button>
+                     </DialogFooter>
+                  </form>
+               </DialogContent>
+            </Dialog>
          </div>
       </div>
    );

@@ -156,7 +156,17 @@
     "notificationRemovedFromWorkspace": "Me han eliminado de un espacio de trabajo",
     "notificationDocumentChanged": "Se ha modificado un documento en el que estoy trabajando.",
     "notificationDocumentChat": "Se agrega un nuevo mensaje de chat a un documento en el que estoy trabajando",
-    "notificationWorkspaceChanged": "Se cambian los permisos del espacio de trabajo en el que estoy trabajando."
+    "notificationWorkspaceChanged": "Se cambian los permisos del espacio de trabajo en el que estoy trabajando.",
+    "deleteUserButton": "Eliminar cuenta",
+    "deleteUserDialogTitle": "¿Eliminar cuenta?",
+    "deleteUserDialogDescription": "Confirma que deseas eliminar tu cuenta de forma definitiva. Al hacerlo, se eliminarán inmediatamente todos los datos personales de tu cuenta, así como todos los datos de los espacios de trabajo privados a los que solo tu cuenta tiene acceso. El resto de datos permanecerán en la red. Esta acción no se puede revertir.",
+    "deleteUserPasswordLabel": "Contraseña",
+    "deleteUserPasswordPlaceholder": "Introduce tu contraseña",
+    "deleteUserConfirm": "Eliminar cuenta",
+    "deleteUserPasswordRequired": "La contraseña es obligatoria",
+    "deleteUserPasswordInvalid": "La contraseña que ingresaste es incorrecta",
+    "deleteUserSuccess": "Tu cuenta se eliminó correctamente",
+    "deleteUserError": "Se produjo un error al eliminar tu cuenta"
   },
   "homePage": {
     "documentName": "nombre",
@@ -219,6 +229,7 @@
   "documentPreview": {
     "preview": "Avance",
     "noPreview": "No hay vista previa disponible",
+    "editor": "Editor",
     "unsupportedFormat": "Este formato de archivo no es compatible con la vista previa",
     "page": "Página",
     "of": "de"
@@ -381,14 +392,11 @@
     "customPerspectiveCreated": "Se crea una perspectiva personalizada. Esto puede tardar varios minutos."
   },
   "documentEditable": {
-    "cancel": "Cancelar",
-    "creator": "Autor",
-    "creatorPlaceholder": "Introduzca el autor",
-    "send": "Enviar",
     "save": "Ahorrar",
-    "saveNewVersion": "Guardar nueva versión",
     "uploading": "Subiendo...",
-    "uploadError": "Error al subir"
+    "uploadError": "Error al subir",
+    "versionTagDefault": "Añadir etiqueta de versión",
+    "versionTagTip": "Añade aquí una nota sobre la versión para explicar los cambios que incluye."
   },
   "tags": {
     "aiTag": "Día generado por IA",
@@ -533,6 +541,7 @@
     "overallSystemStatus": "Estado general del sistema:",
     "healthy": "Saludable",
     "issuesDetected": "Problemas identificados",
+    "warningAIDisabled": "TruSpace se está ejecutando sin los servicios de IA activados. Por lo tanto, las funciones de IA no están disponibles.",
     "online": "En línea",
     "offline": "Desconectado",
     "failedToLoadHealthData": "No se pudieron cargar los datos de salud",

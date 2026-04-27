@@ -21,3 +21,8 @@ services:
     volumes:
       - ./volumes/open-webui:/app/backend/data
       - ./volumes/ollama:/root/.ollama/models
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
