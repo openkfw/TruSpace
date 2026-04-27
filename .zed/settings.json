@@ -1,4 +1,7 @@
-
 {
-  "tab_size": 3
+  "languages": {
+    "TypeScript": {
+      "tab_size": 3
+    }
+  }
 }
