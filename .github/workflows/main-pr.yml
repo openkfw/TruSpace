@@ -87,7 +87,7 @@ jobs:
   npm_audit_frontend:
     name: Scan frontend for npm vulnerabilities
     runs-on: ubuntu-latest
-    needs: restrict_pr
+    needs: new_version
     steps:
       - uses: actions/checkout@v4
 
