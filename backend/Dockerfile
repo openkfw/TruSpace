@@ -32,7 +32,7 @@ COPY --from=builder --chown=node:node /app/src ./src
 COPY --from=builder --chown=node:node /app/package*.json ./
 COPY --from=builder --chown=node:node /app/entrypoint.sh ./
 COPY --from=builder --chown=node:node /app/knexfile.ts ./
-COPY --from=builder --chown=node:node /app/src/db/migrations ./migrations
+COPY --from=builder --chown=node:node /app/src/shared/db/migrations ./migrations
 RUN mkdir -p /app/data && chown -R node:node /app/data
 
 RUN chmod +x entrypoint.sh
