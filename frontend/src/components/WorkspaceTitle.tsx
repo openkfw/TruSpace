@@ -42,7 +42,7 @@ export default function WorkspaceTitle() {
          <h1 className="text-2xl/7 font-bold break-words sm:text-3xl sm:tracking-tight">
             {workspace?.meta?.name}
          </h1>
-         <div className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
+         <div className="w-max mt-1 grid grid-cols-2 gap-x-6 gap-y-2 sm:mt-0 sm:flex sm:flex-row sm:flex-wrap sm:space-x-6 sm:gap-x-0">
             <div className="mt-2 flex items-center text-sm text-gray-500">
                {workspace?.meta?.is_public ? (
                   <LockOpen className="mr-1.5 size-5 shrink-0 text-gray-500 dark:text-gray-400" />
