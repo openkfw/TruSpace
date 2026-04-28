@@ -98,7 +98,7 @@ export default function AppStatus() {
                   {config.disableAllAIFunctionality ? (
                      <div className="mb-4 p-3 rounded-md bg-gray-100 dark:bg-gray-700">
                         <div className="flex items-center gap-2">
-                           <AlertTriangle className="w-5 h-5 text-yellow-700 dark:text-yellow-300" />
+                           <AlertTriangle className="w-14 h-14 sm:w-5 sm:h-5 text-yellow-700 dark:text-yellow-300" />
                            <span className="font-semibold text-yellow-700 dark:text-yellow-300">
                               {t("appStatus.warningAIDisabled")}
                            </span>
