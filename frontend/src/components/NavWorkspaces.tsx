@@ -57,7 +57,7 @@ export function NavWorkspaces({
    workspaces: Workspace[];
    setWorkspaces: React.Dispatch<React.SetStateAction<Workspace[]>>;
 }) {
-   const { isMobile } = useSidebar();
+   const { isMobile, setOpenMobile } = useSidebar();
    const translations = useTranslations("navbar");
    const [isDialogOpen, setIsDialogOpen] = useState(false);
    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -67,6 +67,22 @@ export function NavWorkspaces({
    const [wCID, setwCID] = useState<string>("");
    const [wUID, setwUID] = useState<string>("");
    const { user } = useUser();
+
+   const closeMobileSidebar = () => {
+      if (isMobile) {
+         setOpenMobile(false);
+      }
+   };
+
+   const navigateAndClose = (path: string) => {
+      router.push(path);
+      closeMobileSidebar();
+   };
+
+   const handleWorkspaceSwitch = (workspace: Workspace) => {
+      onSwitch(workspace);
+      closeMobileSidebar();
+   };
 
    const publicWorkspaces = workspaces
       .filter((w) => w.meta.is_public)
@@ -116,7 +132,7 @@ export function NavWorkspaces({
                               >
                                  <SidebarMenuSubButton
                                     asChild
-                                    onClick={() => onSwitch(workspace)}
+                                    onClick={() => handleWorkspaceSwitch(workspace)}
                                     isActive={activePath.startsWith(
                                        `/workspace/${workspace.uuid}`
                                     )}
@@ -164,7 +180,7 @@ export function NavWorkspaces({
                                        <DropdownMenuItem
                                           className="cursor-pointer"
                                           onClick={() =>
-                                             router.push(
+                                             navigateAndClose(
                                                 `/workspace/${workspace.uuid}`
                                              )
                                           }
@@ -177,7 +193,7 @@ export function NavWorkspaces({
                                        <DropdownMenuItem
                                           className="cursor-pointer"
                                           onClick={() =>
-                                             router.push(
+                                             navigateAndClose(
                                                 `/workspace/${workspace.uuid}/share`
                                              )
                                           }
@@ -232,7 +248,7 @@ export function NavWorkspaces({
                               >
                                  <SidebarMenuSubButton
                                     asChild
-                                    onClick={() => onSwitch(workspace)}
+                                    onClick={() => handleWorkspaceSwitch(workspace)}
                                     isActive={activePath.startsWith(
                                        `/workspace/${workspace.uuid}`
                                     )}
@@ -278,7 +294,7 @@ export function NavWorkspaces({
                                        <DropdownMenuItem
                                           className="cursor-pointer"
                                           onClick={() =>
-                                             router.push(
+                                             navigateAndClose(
                                                 `/workspace/${workspace.uuid}`
                                              )
                                           }
@@ -291,7 +307,7 @@ export function NavWorkspaces({
                                        <DropdownMenuItem
                                           className="cursor-pointer"
                                           onClick={() =>
-                                             router.push(
+                                             navigateAndClose(
                                                 `/workspace/${workspace.uuid}/share`
                                              )
                                           }

@@ -8,12 +8,14 @@ import { Button } from "@/components/ui/button";
 import {
    SidebarMenu,
    SidebarMenuButton,
-   SidebarMenuItem
+   SidebarMenuItem,
+   useSidebar
 } from "@/components/ui/sidebar";
 
 export function NavDashboard({ activePath }: { activePath: string }) {
    const translations = useTranslations("navbar");
    const router = useRouter();
+   const { isMobile, setOpenMobile } = useSidebar();
 
    return (
       <SidebarMenu>
@@ -26,7 +28,12 @@ export function NavDashboard({ activePath }: { activePath: string }) {
                <Button
                   variant="ghost"
                   className="flex justify-start"
-                  onClick={() => router.push("/dashboard")}
+                  onClick={() => {
+                     router.push("/dashboard");
+                     if (isMobile) {
+                        setOpenMobile(false);
+                     }
+                  }}
                >
                   <LayoutDashboard />
                   {translations("dashboard")}
