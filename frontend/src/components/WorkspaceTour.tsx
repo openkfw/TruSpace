@@ -4,11 +4,13 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 
 import { Button } from "./ui/button";
+import { useIsMobile } from "../hooks/use-mobile";
 
 export default function WorkspaceTour() {
    const [show, setShow] = useState(false);
    const [menuRect, setMenuRect] = useState<DOMRect | null>(null);
    const tourTranslations = useTranslations("tour");
+   const isMobile = useIsMobile();
 
    const updateMenuRect = () => {
       const menu = document.getElementById("workspace-menu-tour-target");
@@ -17,6 +19,13 @@ export default function WorkspaceTour() {
          setMenuRect(rect);
       }
    };
+
+   useEffect(() => {
+      if (isMobile) {
+         setShow(false);
+         localStorage.setItem("seenWorkspaceTour", "true");
+      }
+   }, [isMobile]);
 
    useEffect(() => {
       const hasSeenTour = localStorage.getItem("seenWorkspaceTour");
