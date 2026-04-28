@@ -182,7 +182,7 @@ export default function DocumentData({
                )}
             </div>
             <div className="font-bold">{translations("docLink")}</div>
-            <div className="break-words flex gap-2 mr-2">
+            <div className="break-words flex flex-col sm:flex-row gap-2 mr-2">
                <Input
                   type="text"
                   value={`${window.location.origin}/workspace/${workspaceOrigin}/document/${docId}`}
