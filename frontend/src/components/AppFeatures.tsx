@@ -139,7 +139,7 @@ export default function AppFeatures() {
             {translations("description")}
             <span className="font-bold">{t("addWorkspace")}</span>
          </p>
-         <div className="grid sm:grid-cols-3 gap-4 mt-6">
+         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-6">
             {templates.map((feature, index) => {
                const isFlipped = flippedCards.includes(index);
                return (
