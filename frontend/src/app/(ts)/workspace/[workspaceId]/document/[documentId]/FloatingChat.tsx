@@ -106,7 +106,7 @@ export default function FloatingChat({
          {isOpen && (
             <div
                ref={chatRef}
-               className="absolute bottom-14 right-0 w-[400px] h-[600px] bg-card rounded-md shadow-md"
+               className="absolute bottom-14 right-0 w-[calc(100vw-3rem)] max-w-[400px] h-[600px] bg-card rounded-md shadow-md"
             >
                <Button
                   variant="ghost"

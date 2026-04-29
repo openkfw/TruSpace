@@ -24,7 +24,7 @@ import {
 import { useUser } from "@/contexts/UserContext";
 
 export function NavUser() {
-   const { isMobile } = useSidebar();
+   const { isMobile, setOpenMobile } = useSidebar();
    const { user, logout } = useUser();
    const translations = useTranslations("navbar");
    const router = useRouter();
@@ -84,7 +84,12 @@ export function NavUser() {
                   <DropdownMenuSeparator />
                   <DropdownMenuGroup>
                      <DropdownMenuItem
-                        onClick={() => router.push("/userSettings")}
+                        onClick={() => {
+                           router.push("/userSettings");
+                           if (isMobile) {
+                              setOpenMobile(false);
+                           }
+                        }}
                      >
                         <UserRoundCog />
                         {translations("userSettings")}

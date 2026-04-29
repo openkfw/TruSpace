@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import { ChevronLeft, ChevronRight, StickyNote } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { DOCUMENTS_ENDPOINT } from "@/lib/services";
 
 import "react-pdf/dist/Page/AnnotationLayer.css";
@@ -33,8 +34,11 @@ export default function DocumentPreviewPDF({
 }) {
    const [numPages, setNumPages] = useState<number>();
    const translations = useTranslations("documentPreview");
+   const isMobile = useIsMobile();
+   const [containerWidth, setContainerWidth] = useState(0);
 
    const previewContainer = useRef(null);
+   const containerRef = useRef<HTMLDivElement | null>(null);
 
    function onDocumentLoadSuccess({ numPages }: { numPages: number }): void {
       setNumPages(numPages);
@@ -123,6 +127,39 @@ export default function DocumentPreviewPDF({
       };
    }, [numPages, pageNumber, addCanvasClickListener, handleClick]);
 
+   useEffect(() => {
+      if (!isMobile) {
+         setContainerWidth(0);
+         return;
+      }
+
+      if (!containerRef.current) {
+         return;
+      }
+
+      const updateWidth = () => {
+         setContainerWidth(containerRef.current?.clientWidth ?? 0);
+      };
+
+      updateWidth();
+
+      const resizeObserver =
+         typeof ResizeObserver !== "undefined"
+            ? new ResizeObserver(() => updateWidth())
+            : null;
+
+      if (resizeObserver && containerRef.current) {
+         resizeObserver.observe(containerRef.current);
+      }
+
+      window.addEventListener("resize", updateWidth);
+
+      return () => {
+         resizeObserver?.disconnect();
+         window.removeEventListener("resize", updateWidth);
+      };
+   }, [isMobile]);
+
    const documentOptions = useMemo(
       () => ({
          withCredentials: true
@@ -133,7 +170,7 @@ export default function DocumentPreviewPDF({
    // check if name is a pdf file
    if (!cid || filename.split(".").pop() === "pdf") {
       return (
-         <div>
+         <div ref={containerRef} className={isMobile ? "w-full" : ""}>
             <div className="flex justify-center items-center gap-4 mb-2">
                <Button
                   className="h-8 w-8"
@@ -162,7 +199,11 @@ export default function DocumentPreviewPDF({
                onLoadSuccess={onDocumentLoadSuccess}
                options={documentOptions}
             >
-               <Page pageNumber={pageNumber} className="relative">
+               <Page
+                  pageNumber={pageNumber}
+                  className="relative"
+                  width={isMobile && containerWidth ? containerWidth : undefined}
+               >
                   <div
                      className={`absolute ${newNoteVisible ? "block" : "hidden"} text-red-500 z-50`}
                      style={{
