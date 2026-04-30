@@ -339,7 +339,6 @@ case "$PROFILE" in
     PROTOCOL="$DEFAULT_PROTOCOL"
     DOMAIN="$DEFAULT_DOMAIN"
     FRONTEND_PORT="$DEFAULT_FRONTEND_PORT"
-    API_DOMAIN="$DOMAIN/api"
     API_PORT="$DEFAULT_API_PORT"
     # SMTP Configuration
     SMTP_HOST="$DEFAULT_SMTP_HOST"
@@ -470,14 +469,13 @@ prompt_var DOMAIN text "Your Public DOMAIN (e.g. example.com)" "$DEFAULT_DOMAIN"
 prompt_var FRONTEND_PORT text "Port for your Frontend" "$DEFAULT_FRONTEND_PORT" validate_port
 FRONTEND_URL="${PROTOCOL}://${DOMAIN}:${FRONTEND_PORT}"
 echo_success "FRONTEND_URL auto-set to $FRONTEND_URL"
-prompt_var API_DOMAIN text "Your API DOMAIN (e.g. api.example.com)" "api.${DOMAIN}" validate_domain
 prompt_var API_PORT text "Port for your API" "$DEFAULT_API_PORT" validate_port
-NEXT_PUBLIC_API_URL="${PROTOCOL}://${API_DOMAIN}:${API_PORT}/api"
+NEXT_PUBLIC_API_URL="${PROTOCOL}://${DOMAIN}:${API_PORT}/api"
 echo_success "NEXT_PUBLIC_API_URL auto-set to $NEXT_PUBLIC_API_URL"
 
 # CORS
-CORS_ORIGIN_ARRAY=("${PROTOCOL}://${DOMAIN}:${FRONTEND_PORT}" "${PROTOCOL}://${API_DOMAIN}:${API_PORT}")
-OI_CORS_ALLOW_ORIGIN_ARRAY=("${PROTOCOL}://${DOMAIN}:${FRONTEND_PORT}" "${PROTOCOL}://${API_DOMAIN}:${API_PORT}" "${PROTOCOL}://backend:${API_PORT}")
+CORS_ORIGIN_ARRAY=("${PROTOCOL}://${DOMAIN}:${FRONTEND_PORT}" "${PROTOCOL}://${DOMAIN}:${API_PORT}")
+OI_CORS_ALLOW_ORIGIN_ARRAY=("${PROTOCOL}://${DOMAIN}:${FRONTEND_PORT}" "${PROTOCOL}://${DOMAIN}:${API_PORT}" "${PROTOCOL}://backend:${API_PORT}")
 # Add localhost entries only in development
 if [[ "$NODE_ENV" == "development" ]]; then
   CORS_ORIGIN_ARRAY=("${CORS_ORIGIN_ARRAY[@]}" "http://localhost:${FRONTEND_PORT}")
