@@ -111,7 +111,8 @@ class DocumentsIpfsRepository {
         modifiedBuffer = await decrypt(fileBuffer, await this.#getWorkspacePassword(metadata.workspaceOrigin));
       }
 
-      res.setHeader('Content-Type', result.headers['content-type']);
+      const contentType = result.headers['content-type'];
+      res.setHeader('Content-Type', typeof contentType === 'string' ? contentType : 'application/octet-stream');
       res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(metadata.filename) || cid}"`);
       res.end(modifiedBuffer);
     } catch (error) {
