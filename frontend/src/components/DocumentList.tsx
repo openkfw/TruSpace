@@ -59,6 +59,7 @@ import {
 } from "./ui/tooltip";
 import PaginationComponent from "./Pagination";
 import DocumentTags from "../app/(ts)/workspace/[workspaceId]/document/[documentId]/DocumentTags";
+import MalwareScanIndicator from "./MalwareScanIndicator";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
    "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -141,7 +142,7 @@ const DocumentList = ({ workspaceId }) => {
                           docId={row.original.docId}
                           status={row.original.status}
                       />
-                     <div className="font-semibold flex flex-inline mb-3">
+                     <div className="font-semibold flex flex-inline flex-wrap items-center mb-3">
                         {row.original.meta.creatorName} <Dot className="-mt-0.5" />{" "}
                         {fileSize} <Dot className="-mt-0.5" />{" "}
                         {version ? (
@@ -165,6 +166,12 @@ const DocumentList = ({ workspaceId }) => {
                               </TooltipContent>
                            </Tooltip>
                         </TooltipProvider>
+                        <Dot className="-mt-0.5" />{" "}
+                        <MalwareScanIndicator
+                           status={row.original.meta.malwareScanStatus}
+                           provider={row.original.meta.malwareScanProvider}
+                           timestamp={row.original.meta.malwareScanTimestamp}
+                        />
                      </div>
                   </div>
                );

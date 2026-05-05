@@ -259,6 +259,14 @@
       "generatingAILanguage": "Sprachanalyse...",
       "languageGenerationError": "Bei der Bestimmung der Sprache ist ein Fehler aufgetreten"
    },
+   "malwareScan": {
+      "secure": "Sicher",
+      "notScanned": "Nicht gescannt",
+      "scannedBy": "Gescannt von {provider}",
+      "scannedAt": "Gescannt am {timestamp}",
+      "notScannedTooltip": "Keine Malware-Scan-Daten verfügbar",
+      "unknownProvider": "Unbekannter Anbieter"
+   },
    "documentVersion": {
       "version": "Version",
       "versionName": "Versionsname",

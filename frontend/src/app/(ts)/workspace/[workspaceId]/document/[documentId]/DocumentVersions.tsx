@@ -9,6 +9,8 @@ import {
 } from "@tanstack/react-table";
 import { Dot, MoreVertical } from "lucide-react";
 
+import MalwareScanIndicator from "@/components/MalwareScanIndicator";
+
 import {
    DropdownMenu,
    DropdownMenuContent,
@@ -94,7 +96,7 @@ export default function DocumentVersions({ documentVersions }) {
                         </span>
                      )}
                   </div>
-                  <div className="font-semibold flex flex-inline mb-3">
+                  <div className="font-semibold flex flex-inline flex-wrap items-center mb-3">
                      {row.original?.meta?.creatorName} <Dot className="-mt-0.5" />{" "}
                      {fileSize} <Dot className="-mt-0.5" />{" "}
                      <TooltipProvider>
@@ -111,6 +113,12 @@ export default function DocumentVersions({ documentVersions }) {
                            </TooltipContent>
                         </Tooltip>
                      </TooltipProvider>
+                     <Dot className="-mt-0.5" />{" "}
+                     <MalwareScanIndicator
+                        status={row.original?.meta?.malwareScanStatus}
+                        provider={row.original?.meta?.malwareScanProvider}
+                        timestamp={row.original?.meta?.malwareScanTimestamp}
+                     />
                   </div>
                </div>
             );

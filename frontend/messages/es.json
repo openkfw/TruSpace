@@ -259,6 +259,14 @@
     "generatingAILanguage": "Análisis del discurso...",
     "languageGenerationError": "Se produjo un error al determinar el idioma."
   },
+  "malwareScan": {
+    "secure": "Seguro",
+    "notScanned": "No escaneado",
+    "scannedBy": "Escaneado por {provider}",
+    "scannedAt": "Escaneado el {timestamp}",
+    "notScannedTooltip": "No hay datos de análisis de malware",
+    "unknownProvider": "Proveedor desconocido"
+  },
   "documentVersion": {
     "version": "Versión",
     "versionName": "Nombre de la versión",

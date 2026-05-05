@@ -259,6 +259,14 @@
       "generatingAILanguage": "Analyzing language...",
       "languageGenerationError": "An error occurred while analyzing the language"
    },
+   "malwareScan": {
+      "secure": "Secure",
+      "notScanned": "Not scanned",
+      "scannedBy": "Scanned by {provider}",
+      "scannedAt": "Scanned on {timestamp}",
+      "notScannedTooltip": "No malware scan data available",
+      "unknownProvider": "Unknown provider"
+   },
    "documentVersion": {
       "version": "Version",
       "versionName": "Version name",
