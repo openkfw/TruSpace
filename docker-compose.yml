@@ -20,6 +20,10 @@ services:
       ADMIN_USER_PASSWORD: ${ADMIN_USER_PASSWORD}
       AUTO_DOWNLOAD: ${AUTO_DOWNLOAD}
       DISABLE_ALL_AI_FUNCTIONALITY: ${DISABLE_ALL_AI_FUNCTIONALITY}
+      MALWARE_SCANNING_ENABLED: ${MALWARE_SCANNING_ENABLED}
+      CLAMAV_HOST: ${CLAMAV_HOST}
+      CLAMAV_PORT: ${CLAMAV_PORT}
+      CLAMAV_TIMEOUT_MS: ${CLAMAV_TIMEOUT_MS}
       DATABASE_PATH: /app/data/truspace.db
       JWT_SECRET: ${JWT_SECRET}
       JWT_MAX_AGE: ${JWT_MAX_AGE}
@@ -37,6 +41,7 @@ services:
     entrypoint: sh ./entrypoint.sh
     volumes:
       - ./volumes/db:/app/data
+      - ./volumes/clamav-scan:/scan
     logging:
       driver: json-file
       options:

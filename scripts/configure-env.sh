@@ -286,6 +286,11 @@ DEFAULT_IPFS_GATEWAY_PORT=8080
 DEFAULT_DISABLE_ALL_AI_FUNCTIONALITY=false
 DEFAULT_OLLAMA_MODEL="gemma3:1b"
 DEFAULT_AUTO_DOWNLOAD=true
+# Malware Scanning
+DEFAULT_MALWARE_SCANNING_ENABLED=false
+DEFAULT_CLAMAV_HOST="clamav"
+DEFAULT_CLAMAV_PORT=3310
+DEFAULT_CLAMAV_TIMEOUT_MS=15000
 # OpenWebUI Configuration
 DEFAULT_OPENWEBUI_HOST="http://webui:8080"
 DEFAULT_OPEN_WEBUI_PORT=3333
@@ -377,6 +382,11 @@ case "$PROFILE" in
     DISABLE_ALL_AI_FUNCTIONALITY="$DEFAULT_DISABLE_ALL_AI_FUNCTIONALITY"
     OLLAMA_MODEL="$DEFAULT_OLLAMA_MODEL"
     AUTO_DOWNLOAD="$DEFAULT_AUTO_DOWNLOAD"
+    # Malware Scanning
+    MALWARE_SCANNING_ENABLED="$DEFAULT_MALWARE_SCANNING_ENABLED"
+    CLAMAV_HOST="$DEFAULT_CLAMAV_HOST"
+    CLAMAV_PORT="$DEFAULT_CLAMAV_PORT"
+    CLAMAV_TIMEOUT_MS="$DEFAULT_CLAMAV_TIMEOUT_MS"
     # OpenWebUI Configuration
     OPENWEBUI_HOST="$DEFAULT_OPENWEBUI_HOST"
     OPEN_WEBUI_PORT="$DEFAULT_OPEN_WEBUI_PORT"
@@ -422,6 +432,11 @@ case "$PROFILE" in
     DISABLE_ALL_AI_FUNCTIONALITY="$DEFAULT_DISABLE_ALL_AI_FUNCTIONALITY"
     OLLAMA_MODEL="$DEFAULT_OLLAMA_MODEL"
     AUTO_DOWNLOAD="$DEFAULT_AUTO_DOWNLOAD"
+    # Malware Scanning
+    MALWARE_SCANNING_ENABLED="$DEFAULT_MALWARE_SCANNING_ENABLED"
+    CLAMAV_HOST="$DEFAULT_CLAMAV_HOST"
+    CLAMAV_PORT="$DEFAULT_CLAMAV_PORT"
+    CLAMAV_TIMEOUT_MS="$DEFAULT_CLAMAV_TIMEOUT_MS"
     # OpenWebUI Configuration
     OPENWEBUI_HOST="$DEFAULT_OPENWEBUI_HOST"
     OPEN_WEBUI_PORT="$DEFAULT_OPEN_WEBUI_PORT"
@@ -545,6 +560,16 @@ prompt_var OLLAMA_MODEL text "AI model used by the backend, a complete list is a
 prompt_var AUTO_DOWNLOAD bool "Auto download" "$DEFAULT_AUTO_DOWNLOAD"
 
 #──────────────────────────────────────────────────────────────────────────────
+# Malware Scanning
+#──────────────────────────────────────────────────────────────────────────────
+echo_section "Malware Scanning"
+
+prompt_var MALWARE_SCANNING_ENABLED bool "Enable malware scanning for uploaded documents (ClamAV)" "$DEFAULT_MALWARE_SCANNING_ENABLED"
+prompt_var CLAMAV_HOST text "ClamAV daemon host" "$DEFAULT_CLAMAV_HOST"
+prompt_var CLAMAV_PORT text "ClamAV daemon port" "$DEFAULT_CLAMAV_PORT" validate_port
+prompt_var CLAMAV_TIMEOUT_MS text "ClamAV scan timeout in ms" "$DEFAULT_CLAMAV_TIMEOUT_MS"
+
+#──────────────────────────────────────────────────────────────────────────────
 # OpenWebUI Configuration
 #──────────────────────────────────────────────────────────────────────────────
 echo_section "OpenWebUI Configuration"
@@ -635,9 +660,6 @@ OPENWEBUI_HOST=${OPENWEBUI_HOST}
 # If true, AI models configured in this file will be auto-downloaded if missing in the docker volume
 AUTO_DOWNLOAD=${AUTO_DOWNLOAD}
 
-# If true, disables all AI-related functionality, i.e. if a document is uploaded, no AI processing will be executed
-DISABLE_ALL_AI_FUNCTIONALITY=${DISABLE_ALL_AI_FUNCTIONALITY}
-
 # Path to the backend SQLite database file
 DATABASE_PATH=${DATABASE_PATH}
 
@@ -659,6 +681,21 @@ RATE_LIMIT_PER_MINUTE=${RATE_LIMIT_PER_MINUTE}
 
 # If true, new users must be approved before activation. You need to either change it in the sqlite DB or configure the SMTP server to get the activation email!
 REGISTER_USERS_AS_INACTIVE=${REGISTER_USERS_AS_INACTIVE}
+
+#──────────────────────────────────────────────────────────────────────────────
+# 🧩 Adapters
+#──────────────────────────────────────────────────────────────────────────────
+
+# If true, disables all AI-related functionality, i.e. if a document is uploaded, no AI processing will be executed
+DISABLE_ALL_AI_FUNCTIONALITY=${DISABLE_ALL_AI_FUNCTIONALITY}
+
+# If true, uploads are scanned for malware before storage
+MALWARE_SCANNING_ENABLED=${MALWARE_SCANNING_ENABLED}
+
+# ClamAV daemon host/port used for malware scanning
+CLAMAV_HOST=${CLAMAV_HOST}
+CLAMAV_PORT=${CLAMAV_PORT}
+CLAMAV_TIMEOUT_MS=${CLAMAV_TIMEOUT_MS}
 
 #──────────────────────────────────────────────────────────────────────────────
 # 📧 SMTP Email Settings

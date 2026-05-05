@@ -23,6 +23,9 @@ export function createDocumentRequest({
   size,
   mimetype,
   versionTagName,
+  malwareScanStatus,
+  malwareScanProvider,
+  malwareScanTimestamp,
 }: {
   filename: string;
   docId?: string;
@@ -33,6 +36,9 @@ export function createDocumentRequest({
   size?: number;
   mimetype?: string;
   versionTagName?: string;
+  malwareScanStatus?: string;
+  malwareScanProvider?: string;
+  malwareScanTimestamp?: string;
 }): DocumentRequest {
   const docRequest: DocumentRequest = {
     docId: docId || uuidv4(),
@@ -49,6 +55,19 @@ export function createDocumentRequest({
       versionTagName,
     },
   };
+
+  if (malwareScanStatus) {
+    docRequest.meta.malwareScanStatus = malwareScanStatus;
+  }
+
+  if (malwareScanProvider) {
+    docRequest.meta.malwareScanProvider = malwareScanProvider;
+  }
+
+  if (malwareScanTimestamp) {
+    docRequest.meta.malwareScanTimestamp = malwareScanTimestamp;
+  }
+
   return docRequest;
 }
 

@@ -1,10 +1,13 @@
 import { Response } from 'express';
 import { UploadedFile } from 'express-fileupload';
 
-import { AuthenticatedRequest } from '../../../shared/types';
+import { scanBufferForMalware } from '../../../shared/adapters/malware-scanning';
 import { oiClient } from '../../../shared/clients/oi-client';
+import { config } from '../../../shared/config/config';
 import { encrypt } from '../../../shared/encryption';
+import { BadRequestError } from '../../../shared/errors';
 import { decodeFilename, createDocumentRequest, getWorkspacePassword } from '../../../shared/handlers/documents';
+import { AuthenticatedRequest } from '../../../shared/types';
 import { Prompt } from '../../../shared/types/interfaces';
 import { checkPermissionForWorkspace } from '../../../shared/utility/permissions';
 import {
@@ -32,6 +35,30 @@ export async function postDocument(req: AuthenticatedRequest, res: Response) {
   const file = req.files.file as UploadedFile;
   const filename = decodeFilename(file.name);
 
+  let malwareScanMeta:
+    | {
+        status: string;
+        provider: string;
+        timestamp: string;
+      }
+    | undefined;
+
+  if (config.malwareScanning.enabled) {
+    const scanResult = await scanBufferForMalware(file.data);
+    if (scanResult.status === 'infected') {
+      throw new BadRequestError('Malware detected in uploaded document', {
+        signature: scanResult.signature,
+        provider: scanResult.provider,
+      });
+    }
+
+    malwareScanMeta = {
+      status: scanResult.status,
+      provider: scanResult.provider,
+      timestamp: scanResult.scannedAt,
+    };
+  }
+
   const docRequest = createDocumentRequest({
     filename,
     creatorNodeId,
@@ -39,6 +66,9 @@ export async function postDocument(req: AuthenticatedRequest, res: Response) {
     workspaceOrigin: workspace,
     size: file.size,
     mimetype: file.mimetype,
+    malwareScanStatus: malwareScanMeta?.status,
+    malwareScanProvider: malwareScanMeta?.provider,
+    malwareScanTimestamp: malwareScanMeta?.timestamp,
   });
 
   const fileDataClone = Buffer.from(file.data);

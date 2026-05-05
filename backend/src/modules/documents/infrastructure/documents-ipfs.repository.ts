@@ -82,6 +82,9 @@ class DocumentsIpfsRepository {
           language,
           size: clusterRes.metadata.size ? Number(clusterRes.metadata.size) : undefined,
           versionTagName: clusterRes.metadata.versionTagName || '',
+          malwareScanStatus: clusterRes.metadata.malwareScanStatus,
+          malwareScanProvider: clusterRes.metadata.malwareScanProvider,
+          malwareScanTimestamp: clusterRes.metadata.malwareScanTimestamp,
         },
       };
     } catch (error) {
@@ -170,6 +173,9 @@ class DocumentsIpfsRepository {
             size: 0,
             encrypted: 'false',
             versionTagName: '',
+            malwareScanStatus: undefined,
+            malwareScanProvider: undefined,
+            malwareScanTimestamp: undefined,
           },
           documentVersions: [],
         };
