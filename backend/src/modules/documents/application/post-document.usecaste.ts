@@ -82,10 +82,12 @@ export async function postDocument(req: AuthenticatedRequest, res: Response) {
   // ollama obviously needs unencrypted document
   file.data = fileDataClone;
 
-  // process file with AI if it is a PDF or DOCX
+  const aiDisabled = config.disableAllAIFunctionality;
+
+  // process file with AI if it is a PDF or DOCX and AI is enabled
   let fileProcessableWithAI = false;
   const fileExtension = filename.split('.').pop();
-  if (fileExtension === 'pdf' || fileExtension === 'docx') {
+  if (!aiDisabled && (fileExtension === 'pdf' || fileExtension === 'docx')) {
     fileProcessableWithAI = true;
   }
 
@@ -121,6 +123,10 @@ export async function postDocument(req: AuthenticatedRequest, res: Response) {
     });
   }
 
+  const noAiMessage = aiDisabled
+    ? 'AI functionality disabled. No task created.'
+    : 'File not processable with AI. No task created.';
+
   const { summariesInitialResponse, tagsInitialResponse, languageInitialResponse } = fileProcessableWithAI
     ? {
         summariesInitialResponse: {
@@ -142,17 +148,17 @@ export async function postDocument(req: AuthenticatedRequest, res: Response) {
     : {
         summariesInitialResponse: {
           requestId: null,
-          message: 'File not processable with AI. No task created.',
+          message: noAiMessage,
           statusEndpoint: null,
         },
         tagsInitialResponse: {
           requestId: null,
-          message: 'File not processable with AI. No task created.',
+          message: noAiMessage,
           statusEndpoint: null,
         },
         languageInitialResponse: {
           requestId: null,
-          message: 'File not processable with AI. No task created.',
+          message: noAiMessage,
           statusEndpoint: null,
         },
       };
