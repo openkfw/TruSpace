@@ -15,15 +15,15 @@ Deploy TruSpace on a Raspberry Pi for always-on, low-power edge deployments.
 
 ## Supported Hardware
 
-| Model | RAM | Support | Notes |
-|-------|-----|---------|-------|
-| Pi 5 | 4GB+ | :white_check_mark: Full | Recommended |
-| Pi 4 | 4GB+ | :white_check_mark: Full | Good performance |
-| Pi 4 | 2GB | :warning: Limited | No AI features |
-| Pi 3 | Any | :x: Not supported | Insufficient resources |
+| Model | RAM  | Support                 | Notes                  |
+| ----- | ---- | ----------------------- | ---------------------- |
+| Pi 5  | 4GB+ | :white_check_mark: Full | Recommended            |
+| Pi 4  | 4GB+ | :white_check_mark: Full | Good performance       |
+| Pi 4  | 2GB  | :warning: Limited       | No AI features         |
+| Pi 3  | Any  | :x: Not supported       | Insufficient resources |
 
 !!! warning "AI Features on Raspberry Pi"
-    AI features require significant resources. On Pi 4 (4GB), use lightweight models like `tinyllama` or disable AI entirely with `--no-ai`.
+AI features require significant resources. On Pi 4 (4GB), use lightweight models like `tinyllama` or disable AI entirely with `--no-ai`.
 
 ## Prerequisites
 
@@ -53,16 +53,6 @@ sudo usermod -aG docker $USER
 docker --version
 ```
 
-### Install Docker Compose
-
-```bash
-# Install compose plugin
-sudo apt install docker-compose-plugin -y
-
-# Verify
-docker compose version
-```
-
 ## Step 2: Clone and Configure
 
 ```bash
@@ -70,33 +60,11 @@ docker compose version
 git clone https://github.com/openkfw/TruSpace.git
 cd TruSpace
 
-# Create environment file
-cp .env.example .env
+# Execute configuration script
+./start.sh
 ```
 
-### Configure for Local Network
-
-Edit `.env` to use your Pi's hostname:
-
-```bash
-# Find your Pi's IP
-hostname -I
-
-# Update .env with your domain
-nano .env
-```
-
-```env title=".env"
-# Replace localhost with your Pi's hostname or IP
-CORS_ORIGIN=http://raspberrypi.local:3000
-OI_CORS_ALLOW_ORIGIN=http://raspberrypi.local:3000
-```
-
-Or use the helper script:
-
-```bash
-sed 's|http://localhost|http://raspberrypi.local|g' .env.example > .env
-```
+The configuration wizard guides you through a number of questions about your desired setup. The basic scenarios are a `development` setup on `localhost` or a `production` setup. If you access your raspberry remotely and it has a (local) domain, choose `production`. If you don't know what to enter for a value or you are in doubt - you can change any values later, so don't stop installing.
 
 ## Step 3: Start TruSpace
 
@@ -115,7 +83,7 @@ sed 's|http://localhost|http://raspberrypi.local|g' .env.example > .env
     ```
 
 !!! tip "First Start Takes Time"
-    The first start will pull Docker images, which can take 10-30 minutes depending on your network speed.
+The first start will pull Docker images, which can take 10-30 minutes depending on your network speed.
 
 ## Step 4: Access TruSpace
 
@@ -162,14 +130,14 @@ sudo systemctl start docker
 Create `docker-compose.override.yml`:
 
 ```yaml
-version: '3.8'
+version: "3.8"
 services:
   backend:
     deploy:
       resources:
         limits:
           memory: 256M
-  
+
   ipfs0:
     deploy:
       resources:
@@ -177,7 +145,7 @@ services:
           memory: 512M
     environment:
       - IPFS_PROFILE=lowpower
-  
+
   frontend:
     deploy:
       resources:
@@ -240,7 +208,7 @@ vcgencmd measure_temp
 ```
 
 !!! warning "Thermal Throttling"
-    If temperatures exceed 80°C, consider adding a heatsink or fan. Throttling will impact performance.
+If temperatures exceed 80°C, consider adding a heatsink or fan. Throttling will impact performance.
 
 ## Troubleshooting
 
