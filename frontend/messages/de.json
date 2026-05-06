@@ -423,6 +423,8 @@
       "documentUploaded": "Dokument erfolgreich hochgeladen",
       "documentUploadeNoAI": "Dokument erfolgreich hochgeladen, KI-Verarbeitung wegen fehlendem Textinhalt übersprungen",
       "documentUploadError": "Beim Hochladen des Dokuments ist ein Fehler aufgetreten",
+      "documentUploadInfected": "Schadsoftware im hochgeladenen Dokument erkannt. Es kann aus Sicherheitsgründen nicht in TruSpace gespeichert werden.",
+      "documentUploadInfectedWithReason": "Schadsoftware im hochgeladenen Dokument erkannt ({reason}). Es kann aus Sicherheitsgründen nicht in TruSpace gespeichert werden.",
       "documentVersionUploaded": "Dokumentenversion erfolgreich hochgeladen",
       "documentVersionUploadError": "Beim Hochladen der Dokumentenversion ist ein Fehler aufgetreten",
       "documentDeleted": "Dokument erfolgreich gelöscht",

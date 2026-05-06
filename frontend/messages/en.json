@@ -423,6 +423,8 @@
       "documentUploaded": "Document uploaded successfully",
       "documentUploadeNoAI": "Document uploaded successfully, AI processing skipped due to no text content",
       "documentUploadError": "An error occurred while uploading the document",
+      "documentUploadInfected": "Malware detected in the uploaded document. It cannot be stored in TruSpace for security reasons.",
+      "documentUploadInfectedWithReason": "Malware detected in the uploaded document ({reason}). It cannot be stored in TruSpace for security reasons.",
       "documentVersionUploaded": "Document version uploaded successfully",
       "documentVersionUploadError": "An error occurred while uploading the document version",
       "documentCreated": "Document created successfully",
