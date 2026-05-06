@@ -14,67 +14,80 @@ The standard way to deploy TruSpace using Docker Compose.
 
 ## Prerequisites
 
-- **Docker** 20.10+ 
+- **Docker** 20.10+
 - **Docker Compose** 2.0+
 - **Git**
-- 4 GB RAM minimum (8 GB recommended with AI)
+- 4 GB RAM minimum (8 GB recommended with AI features)
 
-## Quick Installation
+## Installation
 
 ```bash
-# Clone repository
-git clone git@github.com:openkfw/TruSpace.git
+# Clone repository (HTTPS)
+git clone https://github.com/openkfw/TruSpace.git
 cd TruSpace
 
 # Start TruSpace
 ./start.sh
 ```
 
-That's it! TruSpace will be available at [http://localhost:3000](http://localhost:3000).
+On the **first run**, `./start.sh` detects that no `.env` file exists and launches the interactive configuration wizard before starting the containers. The wizard asks you to choose a deployment profile and prompts for the values specific to your setup — you can press ENTER to accept the defaults for everything else.
 
-## Custom Configuration
+Once configured, TruSpace is available at [http://localhost:3000](http://localhost:3000) (or whatever domain and port you chose).
 
-### Using Environment Variables
+## Configuration
 
-```bash
-# Copy and edit environment file
-cp .env.example .env
-nano .env  # or your preferred editor
+### Interactive wizard (recommended)
 
-# Then start
-./start.sh
-```
-
-### Interactive Configuration
-
-Use the configuration script for guided setup:
+The wizard is the standard way to create or update the `.env` file:
 
 ```bash
+# Runs automatically on first start, or explicitly at any time:
+./start.sh --configure-env
+# or directly:
 ./scripts/configure-env.sh
 ```
 
-This will prompt you for:
+The wizard walks you through a deployment profile selection and then prompts for the values relevant to that profile:
 
-- Domain configuration
-- Port settings
-- AI model selection
-- CORS origins
+| Profile        | Use case                                                           |
+| -------------- | ------------------------------------------------------------------ |
+| `local-dev`    | Developing on this machine (localhost, http, relaxed security)     |
+| `local-server` | LAN/home server with a hostname or IP, accessed over http directly |
+| `production`   | Internet-facing server with https and a reverse proxy              |
+| `custom`       | Configure all settings manually                                    |
+
+### Manual `.env` editing
+
+You can also edit the generated `.env` file directly at any time — run `./start.sh --configure-env` once to generate it, then open it in your editor. All variables are documented with inline comments.
+
+## `start.sh` Flags
+
+| Flag               | Effect                                                                            |
+| ------------------ | --------------------------------------------------------------------------------- |
+| _(none)_           | Configure (if no `.env`), then start all services                                 |
+| `--configure-env`  | Re-run the configuration wizard, then start                                       |
+| `--no-ai`          | Disable Ollama and Open WebUI (equivalent to `DISABLE_ALL_AI_FUNCTIONALITY=true`) |
+| `--dev`            | Build images locally instead of pulling; run frontend in dev mode                 |
+| `--local-frontend` | Run the Next.js frontend locally (outside Docker) instead of in a container       |
+| `--remove-peers`   | Remove default IPFS bootstrap peers after startup (for private networks)          |
 
 ## Docker Compose Files
 
-TruSpace uses multiple compose files:
+TruSpace assembles its Docker Compose setup from several files:
 
-| File | Purpose |
-|------|---------|
-| `docker-compose.yml` | Core services (IPFS, backend) |
-| `docker-compose-frontend.yml` | Frontend service |
-| `docker-compose-ai.yml` | AI services (Ollama, Open Web UI) |
-| `docker-compose.build.yml` | Local image building |
-| `docker-compose.pull.yml` | Pre-built images |
+| File                          | Purpose                                                           |
+| ----------------------------- | ----------------------------------------------------------------- |
+| `docker-compose.yml`          | Core services: IPFS node (`ipfs0`), Cluster (`cluster0`), backend |
+| `docker-compose-frontend.yml` | Frontend service                                                  |
+| `docker-compose-ai.yml`       | AI services: Ollama, Open WebUI                                   |
+| `docker-compose.build.yml`    | Overrides for building images locally                             |
+| `docker-compose.pull.yml`     | Overrides for pulling pre-built images                            |
 
-### Starting Specific Services
+`start.sh` selects the right combination automatically based on your `.env` and flags.
 
-=== "All Services"
+### Starting specific services
+
+=== "All services"
 
     ```bash
     ./start.sh
@@ -86,7 +99,7 @@ TruSpace uses multiple compose files:
     ./start.sh --no-ai
     ```
 
-=== "Only Infrastructure"
+=== "Core infrastructure only"
 
     ```bash
     docker compose up ipfs0 cluster0 -d
@@ -94,160 +107,204 @@ TruSpace uses multiple compose files:
 
 ## Container Management
 
-### View Running Containers
+### View running containers
 
 ```bash
 docker ps
 ```
 
-### View Logs
+### View logs
 
 ```bash
-# All containers
+# Follow all container logs
 docker compose logs -f
 
-# Specific container
+# Follow a specific container
 docker compose logs -f backend
 docker compose logs -f ipfs0
 ```
 
-### Restart Services
+### Restart services
 
 ```bash
 # Restart all
 docker compose restart
 
-# Restart specific service
+# Restart one service
 docker compose restart backend
 ```
 
-### Stop Services
+### Stop services
 
 ```bash
-# Stop all (keep data)
+# Stop all containers, keep data
 docker compose down
 
-# Stop and remove volumes (⚠️ deletes data)
+# Stop and delete all data volumes (⚠️ irreversible)
 docker compose down -v
 ```
 
 ## Data Persistence
 
-TruSpace stores data in Docker volumes:
+TruSpace stores all persistent data in a `./volumes/` directory inside the project folder using **bind mounts** — not named Docker volumes. This makes the data easy to inspect, back up, and restore.
 
-| Volume | Purpose |
-|--------|---------|
-| `truspace_ipfs_data` | IPFS datastore |
-| `truspace_cluster_data` | IPFS Cluster config |
-| `truspace_sqlite_data` | SQLite database |
-| `truspace_ollama_data` | AI models |
+| Path                  | Contents                                        |
+| --------------------- | ----------------------------------------------- |
+| `./volumes/ipfs0/`    | IPFS (Kubo) datastore and config                |
+| `./volumes/cluster0/` | IPFS Cluster config (`service.json`, peer keys) |
+| `./volumes/db/`       | SQLite database (`truspace.db`)                 |
+| `./volumes/ollama/`   | Downloaded AI models                            |
 
-### Backup Volumes
+### Backup
+
+Stop TruSpace first to ensure the database is not mid-write, then copy the volumes directory and your `.env`:
 
 ```bash
-# Backup IPFS data
-docker run --rm -v truspace_ipfs_data:/data -v $(pwd):/backup \
-  alpine tar czf /backup/ipfs-backup.tar.gz -C /data .
+docker compose down
 
-# Backup SQLite
-docker run --rm -v truspace_sqlite_data:/data -v $(pwd):/backup \
-  alpine tar czf /backup/sqlite-backup.tar.gz -C /data .
+# Backup all data and configuration
+tar czf truspace-backup-$(date +%Y%m%d).tar.gz ./volumes .env
+
+docker compose up -d
 ```
 
-### Restore Volumes
+### Restore
 
 ```bash
-# Restore IPFS data
-docker run --rm -v truspace_ipfs_data:/data -v $(pwd):/backup \
-  alpine tar xzf /backup/ipfs-backup.tar.gz -C /data
+docker compose down
+
+# Remove current data
+rm -rf ./volumes
+
+# Restore from backup archive
+tar xzf truspace-backup-<date>.tar.gz
+
+# Fix ownership if needed (containers run as UID 1000)
+sudo chown -R 1000:1000 ./volumes
+
+docker compose up -d
 ```
 
 ## Updating TruSpace
 
 ```bash
-# Pull latest changes
+# Pull the latest source
 git pull origin main
 
-# Rebuild and restart
 docker compose down
-docker compose build --no-cache
-./start.sh
 ```
+
+=== "If BUILD_OR_PULL_IMAGES=pull (default for production)"
+
+    ```bash
+    # Pull updated images and restart
+    docker compose pull
+    ./start.sh
+    ```
+
+=== "If BUILD_OR_PULL_IMAGES=build (default for dev)"
+
+    ```bash
+    # Rebuild from source and restart
+    docker compose build --no-cache
+    ./start.sh
+    ```
+
+!!! warning "Database migrations"
+If an update includes schema changes, you may need to delete `./volumes/db/truspace.db` to let the backend recreate it. Check the release notes before upgrading.
 
 ## Resource Limits
 
-For constrained environments, you can limit container resources in a `docker-compose.override.yml`:
+For constrained environments, create a `docker-compose.override.yml` in the project root:
 
 ```yaml
-version: '3.8'
+version: "3.8"
 services:
   backend:
     deploy:
       resources:
         limits:
-          cpus: '1'
+          cpus: "1"
           memory: 512M
-  
+
   ipfs0:
     deploy:
       resources:
         limits:
-          cpus: '2'
+          cpus: "2"
           memory: 1G
-  
+
   ollama:
     deploy:
       resources:
         limits:
-          cpus: '4'
+          cpus: "4"
           memory: 4G
 ```
 
 ## Health Checks
 
-Check service health:
+TruSpace exposes a unified health endpoint through the backend that reports the status of all internal services:
 
 ```bash
-# Backend health
+# Via the frontend proxy (production / local-server)
+curl http://<your-domain>/health
+
+# Direct backend check (local-dev)
 curl http://localhost:8000/health
 
-# IPFS health
+# IPFS node identity check
 curl http://localhost:5001/api/v0/id
 
-# Frontend health
-curl http://localhost:3000
+# IPFS Cluster status
+docker exec cluster0 ipfs-cluster-ctl status
 ```
+
+The `/health` endpoint is also what drives the status indicators in the top-right corner of the TruSpace UI.
 
 ## Troubleshooting
 
-### Container Won't Start
+### Container won't start
 
 ```bash
-# Check logs
+# Check what went wrong
 docker compose logs <service-name>
 
-# Check resource usage
+# Check host resource usage
 docker stats
 ```
 
-### Network Issues
+### Network issues between containers
 
 ```bash
-# Inspect network
+# Inspect the Docker network
 docker network inspect truspace_default
 
-# Recreate network
+# Recreate the network
 docker compose down
 docker network prune
 docker compose up -d
 ```
 
-### Permission Issues
+### Volume permission errors
+
+Containers run as UID 1000. If you see permission-denied errors in the logs:
 
 ```bash
-# Fix volume permissions
-sudo chown -R 1000:1000 ./data
+sudo chown -R 1000:1000 ./volumes
 ```
+
+### Database errors after an update
+
+If the backend fails to start with a migration error, the schema may have changed incompatibly:
+
+```bash
+# ⚠️ This deletes all user accounts and workspace metadata
+rm ./volumes/db/truspace.db
+docker compose restart backend
+```
+
+Documents stored in IPFS are unaffected by a database reset.
 
 ## Next Steps
 
