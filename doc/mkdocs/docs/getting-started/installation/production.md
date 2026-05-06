@@ -94,7 +94,14 @@ When prompted, select profile **`3) production`**. The wizard will pre-configure
 
 Secrets (JWT, WebUI session key) are auto-generated. Everything else can be confirmed with ENTER.
 
-!!! tip "What the production profile configures automatically" - `NODE_ENV=production`, `LOG_LEVEL=INFO` - `USE_REVERSE_PROXY=true` → URLs without port numbers (`https://yourdomain.com` and `https://yourdomain.com/api`) - `REGISTER_USERS_AS_INACTIVE=true` — new accounts need admin activation - `RATE_LIMIT_PER_MINUTE=60` - `START_PRIVATE_NETWORK=true` — IPFS does not connect to the public network - `BUILD_OR_PULL_IMAGES=pull` — uses published container images
+!!! tip "What the production profile configures automatically"
+
+    - `NODE_ENV=production`, `LOG_LEVEL=INFO`
+    - `USE_REVERSE_PROXY=true` — URLs without port numbers (`https://yourdomain.com` and `https://yourdomain.com/api`)
+    - `REGISTER_USERS_AS_INACTIVE=true` — new accounts need admin activation
+    - `RATE_LIMIT_PER_MINUTE=60`
+    - `START_PRIVATE_NETWORK=true` — IPFS does not connect to the public network
+    - `BUILD_OR_PULL_IMAGES=pull` — uses published container images
 
 ## Step 3: Configure nginx
 
