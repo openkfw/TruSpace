@@ -6,6 +6,7 @@ import { oiClient } from '../../../shared/clients/oi-client';
 import { config } from '../../../shared/config/config';
 import { encrypt } from '../../../shared/encryption';
 import { BadRequestError } from '../../../shared/errors';
+import { MalwareDetectedError } from '../errors/malware-detected.error';
 import { decodeFilename, createDocumentRequest, getWorkspacePassword } from '../../../shared/handlers/documents';
 import { AuthenticatedRequest } from '../../../shared/types';
 import { Prompt } from '../../../shared/types/interfaces';
@@ -46,7 +47,7 @@ export async function postDocument(req: AuthenticatedRequest, res: Response) {
   if (config.malwareScanning.enabled) {
     const scanResult = await scanBufferForMalware(file.data);
     if (scanResult.status === 'infected') {
-      throw new BadRequestError('Malware detected in uploaded document', {
+      throw new MalwareDetectedError({
         signature: scanResult.signature,
         provider: scanResult.provider,
       });
