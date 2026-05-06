@@ -1,11 +1,10 @@
 import { Response } from 'express';
 import { UploadedFile } from 'express-fileupload';
 
-import { scanBufferForMalware } from '../../../shared/adapters/malware-scanning';
+import { scanBufferForMalware } from '../../../shared/adapters/malware-scanning/index';
 import { oiClient } from '../../../shared/clients/oi-client';
 import { config } from '../../../shared/config/config';
 import { encrypt } from '../../../shared/encryption';
-import { BadRequestError } from '../../../shared/errors';
 import { MalwareDetectedError } from '../errors/malware-detected.error';
 import { decodeFilename, createDocumentRequest, getWorkspacePassword } from '../../../shared/handlers/documents';
 import { AuthenticatedRequest } from '../../../shared/types';

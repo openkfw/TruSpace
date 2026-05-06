@@ -2,7 +2,9 @@ import { Response } from 'express';
 
 import { UploadedFile } from 'express-fileupload';
 
+import { scanBufferForMalware } from '../../../shared/adapters/malware-scanning/index';
 import { oiClient } from '../../../shared/clients/oi-client';
+import { config } from '../../../shared/config/config';
 import { encrypt } from '../../../shared/encryption';
 import { decodeFilename, createDocumentRequest, getWorkspacePassword } from '../../../shared/handlers/documents';
 import { sendNotification } from '../../../shared/mailing/notifications';
@@ -19,6 +21,7 @@ import {
 import { getUserSettingsByUiid } from '../../../shared/utility/user';
 import TaskQueue from '../../../shared/utility/jobQueue';
 import { NoFileUploadedError } from '../errors/no-file-uploaded.error';
+import { MalwareDetectedError } from '../errors/malware-detected.error';
 import { documentsIpfsRepository } from '../infrastructure/documents-ipfs.repository';
 
 export async function putDocument(req: AuthenticatedRequest, res: Response) {
@@ -36,6 +39,30 @@ export async function putDocument(req: AuthenticatedRequest, res: Response) {
   const file = req.files.file as UploadedFile;
   const filename = decodeFilename(file.name);
 
+  let malwareScanMeta:
+    | {
+        status: string;
+        provider: string;
+        timestamp: string;
+      }
+    | undefined;
+
+  if (config.malwareScanning.enabled) {
+    const scanResult = await scanBufferForMalware(file.data);
+    if (scanResult.status === 'infected') {
+      throw new MalwareDetectedError({
+        signature: scanResult.signature,
+        provider: scanResult.provider,
+      });
+    }
+
+    malwareScanMeta = {
+      status: scanResult.status,
+      provider: scanResult.provider,
+      timestamp: scanResult.scannedAt,
+    };
+  }
+
   const docInfo = await documentsIpfsRepository.getDocumentDetailsById(docId);
   const latestVersion = docInfo.documentVersions[0].meta.version;
 
@@ -49,6 +76,9 @@ export async function putDocument(req: AuthenticatedRequest, res: Response) {
     workspaceOrigin: workspace,
     docId,
     versionTagName,
+    malwareScanStatus: malwareScanMeta?.status,
+    malwareScanProvider: malwareScanMeta?.provider,
+    malwareScanTimestamp: malwareScanMeta?.timestamp,
   });
   const fileDataClone = Buffer.from(file.data); // => clone unencrypted file for LLM processing
 
