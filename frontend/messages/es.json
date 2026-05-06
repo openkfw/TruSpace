@@ -260,7 +260,7 @@
     "languageGenerationError": "Se produjo un error al determinar el idioma."
   },
   "malwareScan": {
-    "secure": "Seguro",
+    "secure": "Escaneado",
     "notScanned": "No escaneado",
     "scannedBy": "Escaneado por {provider}",
     "scannedAt": "Escaneado el {timestamp}",

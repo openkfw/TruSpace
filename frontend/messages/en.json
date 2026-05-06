@@ -260,7 +260,7 @@
       "languageGenerationError": "An error occurred while analyzing the language"
    },
    "malwareScan": {
-      "secure": "Secure",
+      "secure": "Scanned",
       "notScanned": "Not scanned",
       "scannedBy": "Scanned by {provider}",
       "scannedAt": "Scanned on {timestamp}",
