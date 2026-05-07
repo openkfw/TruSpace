@@ -156,6 +156,13 @@ sudo ln -s /etc/nginx/sites-available/truspace /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
 ```
 
+If there is an existing `default` installation of nginx, remove it
+
+```bash
+sudo rm /etc/nginx/sites-available/truspace /etc/nginx/sites-available/default
+sudo nginx -t && sudo systemctl reload nginx
+```
+
 ## Step 4: Obtain SSL Certificate
 
 ```bash
