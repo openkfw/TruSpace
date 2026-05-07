@@ -19,7 +19,7 @@ In the overview, you can see how the components work together. The UI and API is
 
 The data model has a hierarchical structure of workspaces, documents and metadata. They are linked using UUIDs in the metadata-fields of the IPFS files. Each data entry is a single (small) file to avoid merge conflicts in the IPFS network, e.g. in case of network split. The concept is outlined in the visual representation of the [Data model](./../../doc/images/datamodel.png "Data model")
 
-The specific fields are described in [backend/src/types/interfaces/truspace.ts](../../backend/src/types/interfaces/truspace.ts)
+The specific fields are described in [backend/src/shared/types/interfaces/truspace.ts](../../backend/src/shared/types/interfaces/truspace.ts)
 
 ### 🔄 IPFS Sync for the decentralization of data
 
