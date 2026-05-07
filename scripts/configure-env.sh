@@ -249,14 +249,11 @@ echo_info ""
 echo_info "  1) local-dev    — On THIS machine only"
 echo_info "                    (localhost, http, relaxed security, for development)"
 echo_info ""
-echo_info "  2) local-server — On a LAN/home server accessed over http directly"
-echo_info "                    (e.g. Raspberry Pi at smartspace.local or 192.168.1.10)"
-echo_info "                    No reverse proxy, ports are exposed directly."
+echo_info "  2) production   — Any server deployment: LAN/home server or internet-facing"
+echo_info "                    (e.g. Raspberry Pi at smartspace.local, or truspace.example.com)"
+echo_info "                    You choose http or https, with or without a reverse proxy."
 echo_info ""
-echo_info "  3) production   — Internet-facing server with https"
-echo_info "                    Requires a reverse proxy (nginx, Caddy, Traefik) for SSL."
-echo_info ""
-echo_info "  4) custom       — Configure everything manually (advanced)"
+echo_info "  3) custom       — Configure everything manually (advanced)"
 echo_info ""
 
 _select_profile() {
@@ -264,9 +261,8 @@ _select_profile() {
   prompt "Select profile [1]: " choice
   case "${choice:-1}" in
     1) echo "local-dev" ;;
-    2) echo "local-server" ;;
-    3) echo "production" ;;
-    4) echo "custom" ;;
+    2) echo "production" ;;
+    3) echo "custom" ;;
     *) echo_warn "Invalid — defaulting to local-dev."; echo "local-dev" ;;
   esac
 }
@@ -358,52 +354,9 @@ case "$PROFILE_KEY" in
     echo_success "All local-dev defaults applied — no further prompts needed."
     ;;
 
-  local-server)
-    # ── Pre-set everything except domain and passwords ────────────────────────
-    NODE_ENV="production"
-    LOG_LEVEL="INFO"
-    BUILD_OR_PULL_IMAGES="build"
-    VERSION_BACKEND="$DEFAULT_VERSION_BACKEND"
-    VERSION_FRONTEND="$DEFAULT_VERSION_FRONTEND"
-    VERSION_IPFS="$DEFAULT_VERSION_IPFS"
-    VERSION_IPFS_CLUSTER="$DEFAULT_VERSION_IPFS_CLUSTER"
-    VERSION_WEBUI="$DEFAULT_VERSION_WEBUI"
-    DATABASE_PATH="$DEFAULT_DATABASE_PATH"
-    _gen_secret JWT_SECRET
-    JWT_MAX_AGE="$DEFAULT_JWT_MAX_AGE"
-    REGISTER_USERS_AS_INACTIVE=false
-    RATE_LIMIT_PER_MINUTE=200
-    PROTOCOL="http"
-    USE_REVERSE_PROXY=false
-    FRONTEND_PORT="$DEFAULT_FRONTEND_PORT"
-    API_PORT="$DEFAULT_API_PORT"
-    # SMTP defaults (user may not have an SMTP server on LAN)
-    SMTP_USER="$EMPTY"
-    SMTP_PASSWORD="$EMPTY"
-    SMTP_PORT=25
-    SMTP_SSL=false
-    SMTP_TLS=false
-    CONTENT_SECURITY_POLICY_DEFAULT_URLS="$EMPTY"
-    CONTENT_SECURITY_POLICY_IMG_URLS="$EMPTY"
-    CONTENT_SECURITY_POLICY_FRAME_URLS="$EMPTY"
-    CONTENT_SECURITY_POLICY_SCRIPT_URLS="$EMPTY"
-    CONTENT_SECURITY_POLICY_WORKER_URLS="$EMPTY"
-    START_PRIVATE_NETWORK=false
-    _preset_ipfs_defaults
-    DISABLE_ALL_AI_FUNCTIONALITY=false
-    OLLAMA_MODEL="$DEFAULT_OLLAMA_MODEL"
-    AUTO_DOWNLOAD=true
-    OPENWEBUI_HOST="$DEFAULT_OPENWEBUI_HOST"
-    OPEN_WEBUI_PORT="$DEFAULT_OPEN_WEBUI_PORT"
-    _gen_secret WEBUI_SECRET_KEY
-    # Left unset → will be prompted:
-    #   DOMAIN, SMTP_HOST, MASTER_PASSWORD, ADMIN_USER_EMAIL, ADMIN_USER_PASSWORD
-    echo_success "Most local-server defaults applied."
-    echo_info "You will be prompted for: domain/hostname, passwords."
-    ;;
-
   production)
-    # ── Pre-set everything except domain, SMTP, and passwords ────────────────
+    # ── Pre-set everything except domain, protocol, proxy, SMTP, and passwords ─
+    # NOTE: NODE_ENV and LOG_LEVEL may be overridden below if HTTP is chosen.
     NODE_ENV="production"
     LOG_LEVEL="INFO"
     BUILD_OR_PULL_IMAGES="pull"
@@ -415,15 +368,12 @@ case "$PROFILE_KEY" in
     DATABASE_PATH="$DEFAULT_DATABASE_PATH"
     _gen_secret JWT_SECRET
     JWT_MAX_AGE="$DEFAULT_JWT_MAX_AGE"
-    REGISTER_USERS_AS_INACTIVE=true
     RATE_LIMIT_PER_MINUTE=60
-    PROTOCOL="https"
-    USE_REVERSE_PROXY=true      # reverse proxy handles SSL termination
     FRONTEND_PORT="$DEFAULT_FRONTEND_PORT"
     API_PORT="$DEFAULT_API_PORT"
-    SMTP_PORT=587
-    SMTP_SSL=false
-    SMTP_TLS=true
+    # SMTP defaults — left unset so STARTTLS/SSL can follow the protocol choice
+    SMTP_USER="$EMPTY"
+    SMTP_PASSWORD="$EMPTY"
     CONTENT_SECURITY_POLICY_DEFAULT_URLS="$EMPTY"
     CONTENT_SECURITY_POLICY_IMG_URLS="$EMPTY"
     CONTENT_SECURITY_POLICY_FRAME_URLS="$EMPTY"
@@ -438,10 +388,12 @@ case "$PROFILE_KEY" in
     OPEN_WEBUI_PORT="$DEFAULT_OPEN_WEBUI_PORT"
     _gen_secret WEBUI_SECRET_KEY
     # Left unset → will be prompted:
-    #   DOMAIN, MASTER_PASSWORD, SMTP_HOST, SMTP_USER, SMTP_PASSWORD, EMAIL_SENDER,
-    #   ADMIN_USER_EMAIL, ADMIN_USER_PASSWORD
+    #   PROTOCOL, USE_REVERSE_PROXY, DOMAIN,
+    #   REGISTER_USERS_AS_INACTIVE,
+    #   SMTP_HOST, SMTP_PORT, SMTP_SSL, SMTP_TLS, EMAIL_SENDER,
+    #   MASTER_PASSWORD, ADMIN_USER_EMAIL, ADMIN_USER_PASSWORD
     echo_success "Production defaults applied."
-    echo_info "You will be prompted for: domain, passwords, SMTP settings."
+    echo_info "You will be prompted for: protocol (http/https), domain, reverse proxy, passwords, SMTP settings."
     ;;
 
   custom)
@@ -494,7 +446,29 @@ prompt_var RATE_LIMIT_PER_MINUTE text \
 
 echo_section "Domain & URL Configuration"
 
-prompt_var PROTOCOL bool "Use HTTPS?" "https" "https" "http"
+prompt_var PROTOCOL bool \
+  "Use HTTPS? (Choose No for LAN/local deployments without a certificate)" \
+  "https" "https" "http"
+
+# ── Override NODE_ENV and related settings when HTTP is chosen in production ──
+# Plain HTTP cannot support secure cookies, HSTS, or other production-grade
+# security mechanisms. Downgrade to NODE_ENV=development so the application
+# behaves correctly and validators do not block sensible LAN defaults.
+if [[ "$PROFILE_KEY" == "production" && "$PROTOCOL" == "http" ]]; then
+  NODE_ENV="development"
+  LOG_LEVEL="DEBUG"
+  RATE_LIMIT_PER_MINUTE=200
+  echo_warn "┌─────────────────────────────────────────────────────────────────┐"
+  echo_warn "│  HTTP selected on the production profile.                       │"
+  echo_warn "│                                                                 │"
+  echo_warn "│  NODE_ENV        → development  (secure cookies require HTTPS) │"
+  echo_warn "│  LOG_LEVEL       → DEBUG                                        │"
+  echo_warn "│  RATE_LIMIT      → 200/min      (relaxed for LAN use)          │"
+  echo_warn "│                                                                 │"
+  echo_warn "│  Only use this on a trusted private network.                   │"
+  echo_warn "└─────────────────────────────────────────────────────────────────┘"
+fi
+# ─────────────────────────────────────────────────────────────────────────────
 
 if [[ "$PROFILE_KEY" != "local-dev" ]]; then
   prompt_var DOMAIN text \
@@ -505,7 +479,7 @@ fi
 prompt_var FRONTEND_PORT text "Frontend container port" "$DEFAULT_FRONTEND_PORT" validate_port
 prompt_var API_PORT       text "Backend API container port" "$DEFAULT_API_PORT" validate_port
 
-# For custom mode, USE_REVERSE_PROXY is empty — prompt for it
+# For production and custom modes, USE_REVERSE_PROXY is unset — prompt for it
 if [[ -z "${USE_REVERSE_PROXY-}" ]]; then
   prompt_var USE_REVERSE_PROXY bool \
     "Are you using a reverse proxy (nginx, Caddy, Traefik) that terminates SSL and routes traffic?" \
@@ -654,6 +628,12 @@ prompt_var WEBUI_SECRET_KEY text \
 
 echo_section "Writing .env File"
 
+# Determine a human-readable note for the HTTP+production override case
+_env_note=""
+if [[ "$PROFILE_KEY" == "production" && "$PROTOCOL" == "http" ]]; then
+  _env_note="  # overridden from 'production' — HTTP does not support secure cookies"
+fi
+
 cat > "$ENVFILE" <<EOF
 # Generated by configure-env.sh  |  Profile: ${PROFILE_KEY}
 # Reconfigure anytime: ./start.sh --configure-env
@@ -663,7 +643,7 @@ cat > "$ENVFILE" <<EOF
 #──────────────────────────────────────────────────────────────────────────────
 
 # Application environment: development | production
-NODE_ENV=${NODE_ENV}
+NODE_ENV=${NODE_ENV}${_env_note}
 
 # AI model for document analysis (https://ollama.com/search)
 # Examples: gemma3:1b  llama3.2  mistral  phi4-mini
@@ -835,19 +815,23 @@ case "$PROFILE_KEY" in
     echo_info " • API:              http://localhost:${API_PORT}/api"
     echo_info " • Open WebUI:       http://localhost:${OPEN_WEBUI_PORT}"
     ;;
-  local-server)
-    echo_info " • Ensure ports ${FRONTEND_PORT} and ${API_PORT} are open in your server's firewall."
-    echo_info " • Start TruSpace:   ./start.sh"
-    echo_info " • Frontend:         http://${DOMAIN}:${FRONTEND_PORT}"
-    echo_info " • API:              http://${DOMAIN}:${API_PORT}/api"
-    echo_info " • Open WebUI:       http://${DOMAIN}:${OPEN_WEBUI_PORT}"
-    ;;
   production)
-    echo_info " • Configure your reverse proxy:"
-    echo_info "     /api  →  localhost:${API_PORT}   (backend)"
-    echo_info "     /     →  localhost:${FRONTEND_PORT}  (frontend)"
-    echo_info " • Start TruSpace:   ./start.sh"
-    echo_info " • Site:             https://${DOMAIN}"
+    if [[ "$USE_REVERSE_PROXY" == "true" ]]; then
+      echo_info " • Configure your reverse proxy:"
+      echo_info "     /api  →  localhost:${API_PORT}   (backend)"
+      echo_info "     /     →  localhost:${FRONTEND_PORT}  (frontend)"
+      echo_info " • Start TruSpace:   ./start.sh"
+      echo_info " • Site:             ${PROTOCOL}://${DOMAIN}"
+    else
+      echo_info " • Ensure ports ${FRONTEND_PORT} and ${API_PORT} are open in your server's firewall."
+      echo_info " • Start TruSpace:   ./start.sh"
+      echo_info " • Frontend:         ${PROTOCOL}://${DOMAIN}:${FRONTEND_PORT}"
+      echo_info " • API:              ${PROTOCOL}://${DOMAIN}:${API_PORT}/api"
+      echo_info " • Open WebUI:       ${PROTOCOL}://${DOMAIN}:${OPEN_WEBUI_PORT}"
+    fi
+    if [[ "$PROTOCOL" == "http" ]]; then
+      echo_warn " ⚠  Running over HTTP on a trusted LAN. Do not expose this server to the internet."
+    fi
     echo_info " • Review CONTENT_SECURITY_POLICY_* in $ENVFILE if you load external resources."
     ;;
   custom)
