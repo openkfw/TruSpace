@@ -491,18 +491,31 @@ fi
 if [[ "$USE_REVERSE_PROXY" == "true" ]]; then
   FRONTEND_URL="${PROTOCOL}://${DOMAIN}"
   NEXT_PUBLIC_API_URL="${PROTOCOL}://${DOMAIN}/api"
-  CORS_ORIGIN="${PROTOCOL}://${DOMAIN}"
-  OI_CORS_ALLOW_ORIGIN="${PROTOCOL}://${DOMAIN};${PROTOCOL}://backend:${API_PORT}"
+  # Include the Open WebUI port so browser requests from http://domain:OPEN_WEBUI_PORT
+  # to the TruSpace backend are not CORS-blocked.
+  CORS_ORIGIN="${PROTOCOL}://${DOMAIN},${PROTOCOL}://${DOMAIN}:${OPEN_WEBUI_PORT}"
+  # OI_CORS_ALLOW_ORIGIN controls which browser origins may call Open WebUI.
+  # Only real browser-facing origins belong here — Docker-internal hostnames (backend:8000)
+  # are never sent as Origin headers and must not be included.
+  OI_CORS_ALLOW_ORIGIN="${PROTOCOL}://${DOMAIN};${PROTOCOL}://${DOMAIN}:${OPEN_WEBUI_PORT}"
   echo_info "ℹ️  Reverse proxy mode: URLs contain no port numbers."
   echo_info "   Your proxy must route  /api  →  backend:${API_PORT}"
   echo_info "                          /     →  frontend:${FRONTEND_PORT}"
 else
-  _cors_origins=("${PROTOCOL}://${DOMAIN}:${FRONTEND_PORT}" "${PROTOCOL}://${DOMAIN}:${API_PORT}")
-  _oi_origins=("${PROTOCOL}://${DOMAIN}:${FRONTEND_PORT}" "${PROTOCOL}://${DOMAIN}:${API_PORT}" "${PROTOCOL}://backend:${API_PORT}")
+  _cors_origins=(
+    "${PROTOCOL}://${DOMAIN}:${FRONTEND_PORT}"
+    "${PROTOCOL}://${DOMAIN}:${API_PORT}"
+    "${PROTOCOL}://${DOMAIN}:${OPEN_WEBUI_PORT}"
+  )
+  # Only real browser-facing origins — no Docker-internal hostnames.
+  _oi_origins=(
+    "${PROTOCOL}://${DOMAIN}:${FRONTEND_PORT}"
+    "${PROTOCOL}://${DOMAIN}:${OPEN_WEBUI_PORT}"
+  )
   # Add localhost variants in development to avoid CORS errors when running the frontend locally
   if [[ "${NODE_ENV}" == "development" ]]; then
-    _cors_origins+=("http://localhost:${FRONTEND_PORT}" "http://localhost:${API_PORT}")
-    _oi_origins+=("http://localhost:${FRONTEND_PORT}" "http://localhost:${API_PORT}")
+    _cors_origins+=("http://localhost:${FRONTEND_PORT}" "http://localhost:${API_PORT}" "http://localhost:${OPEN_WEBUI_PORT}")
+    _oi_origins+=("http://localhost:${FRONTEND_PORT}" "http://localhost:${OPEN_WEBUI_PORT}")
   fi
   FRONTEND_URL="${PROTOCOL}://${DOMAIN}:${FRONTEND_PORT}"
   NEXT_PUBLIC_API_URL="${PROTOCOL}://${DOMAIN}:${API_PORT}/api"
