@@ -13,11 +13,7 @@ import { BadRequestError, HttpError, InternalServerError } from '../../../shared
 import { CONFIRMATION_EMAIL_EXPIRATION } from '../../../shared/utility/constants';
 import { UserNotFoundError } from '../errors/user-not-found.error';
 
-export async function postUsersConfirmRegistration(
-  token: string,
-  lang: string,
-  confirmationLink: string,
-) {
+export async function postUsersConfirmRegistration(token: string, lang: string, confirmationLink: string) {
   try {
     jwt.verify(token, Buffer.from(config.jwt.secret)) as jwt.JwtPayload;
     const user = await findUserByTokenDb(token);
@@ -58,7 +54,7 @@ export async function postUsersConfirmRegistration(
           throw new UserNotFoundError(`id: ${user.id}`);
         }
 
-        const filePath = path.join(process.cwd(), 'src/mailing/templates/registrationConfirmation.html');
+        const filePath = path.join(process.cwd(), 'src/shared/mailing/templates/registrationConfirmation.html');
         const source = fs.readFileSync(filePath, 'utf-8');
         const template = compile(source);
         const replacements = {
