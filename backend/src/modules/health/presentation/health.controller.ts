@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { getHealth } from '../application/get-health.usecaste';
+import { getHealth } from '../application/get-health.usecase';
 import { getHealthPeers } from '../application/get-health-peers.usecase';
 
 export const HealthController = {

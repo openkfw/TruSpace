@@ -1,7 +1,7 @@
 import { Response } from 'express';
 
 import { checkPermissionForWorkspace } from '../../../shared/utility/permissions';
-import { deleteDocumentsAndAssociatedItems } from './delete-documents-and-associated-items';
+import { deleteDocumentsAndAssociatedItems } from './delete-documents-and-associated-items.usecase';
 import { documentsIpfsRepository } from '../infrastructure/documents-ipfs.repository';
 
 export async function deleteDocument(documentId: string, email: string, res: Response) {
