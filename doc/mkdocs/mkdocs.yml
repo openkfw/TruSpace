@@ -175,6 +175,7 @@ nav:
           - getting-started/installation/index.md
           - Local Deployment: getting-started/installation/local.md
           - Remote Deployment: getting-started/installation/remote.md
+          - Connect a node: guides/admin/connecting-nodes.md
       - First Steps: getting-started/first-steps.md
       - FAQ: getting-started/faq.md
 
