@@ -41,6 +41,9 @@ export function transformPinToDocument(pin: DocumentPin, language?: string): Doc
       size: pin.meta.size ? Number(pin.meta.size) : 0,
       language,
       versionTagName: pin.meta.versionTagName || '',
+      malwareScanStatus: pin.meta.malwareScanStatus,
+      malwareScanProvider: pin.meta.malwareScanProvider,
+      malwareScanTimestamp: pin.meta.malwareScanTimestamp,
     },
   };
 }

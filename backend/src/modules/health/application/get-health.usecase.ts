@@ -1,11 +1,21 @@
+import { checkMalwareScannerHealth } from '../../../shared/adapters/malware-scanning';
 import { getHealthDb } from '../../../shared/clients/db';
 import { oiClient } from '../../../shared/clients/oi-client';
 import { config } from '../../../shared/config/config';
 import { healthIpfsRepository } from '../infrastructure/health-ipfs.repository';
 
 export async function getHealth() {
-  const [clusterStatus, pinSvcStatus, gatewayStatus, oiStatus, ollamaStatus, dbStatus, clusterId, ipifyResponse] =
-    await Promise.all([
+  const [
+    clusterStatus,
+    pinSvcStatus,
+    gatewayStatus,
+    oiStatus,
+    ollamaStatus,
+    dbStatus,
+    malwareStatus,
+    clusterId,
+    ipifyResponse,
+  ] = await Promise.all([
       (async () => {
         try {
           return await healthIpfsRepository.clusterStatus();
@@ -50,6 +60,13 @@ export async function getHealth() {
       })(),
       (async () => {
         try {
+          return config.malwareScanning.enabled ? await checkMalwareScannerHealth() : false;
+        } catch {
+          return false;
+        }
+      })(),
+      (async () => {
+        try {
           return await healthIpfsRepository.clusterId();
         } catch {
           return {
@@ -79,16 +96,21 @@ export async function getHealth() {
       })(),
     ]);
 
+  const malwareEnabled = config.malwareScanning.enabled;
+  const malwareOk = malwareEnabled ? malwareStatus : true;
+  const aiOk = config.disableAllAIFunctionality ? true : oiStatus && ollamaStatus;
+
   return {
-    status: config.disableAllAIFunctionality ? clusterStatus && pinSvcStatus && gatewayStatus && dbStatus : clusterStatus && pinSvcStatus && oiStatus && gatewayStatus && dbStatus,
+    status: clusterStatus && pinSvcStatus && gatewayStatus && dbStatus && aiOk && malwareOk,
     services: {
       Backend: true,
       Database: dbStatus,
       'IPFS Cluster': clusterStatus,
       'IPFS Pinning Service': pinSvcStatus,
       'IPFS Gateway': gatewayStatus,
-      'Open WebUI': oiStatus,
-      Ollama: ollamaStatus,
+      'Open WebUI': config.disableAllAIFunctionality ? false : oiStatus,
+      Ollama: config.disableAllAIFunctionality ? false : ollamaStatus,
+      ...(malwareEnabled ? { 'Malware Scanner': malwareStatus } : {}),
     },
     version: config.version,
     nodeId: clusterId?.ipfs?.id || '',

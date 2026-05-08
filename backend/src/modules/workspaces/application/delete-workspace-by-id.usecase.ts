@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 import { removePermissionsForWorkspace } from '../../../shared/handlers/userPermissions';
-import { deleteDocumentsAndAssociatedItems } from '../../documents/application/delete-documents-and-associated-items';
+import { deleteDocumentsAndAssociatedItems } from '../../documents/application/delete-documents-and-associated-items.usecase';
 import { workspacesIpfsRepository } from '../infrastructure/workspaces-ipfs.repository';
 import { WorkspaceNotFoundError } from '../errors/workspace-not-found.error';
 import { InternalServerError } from '../../../shared/errors';

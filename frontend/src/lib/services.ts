@@ -117,7 +117,7 @@ export const loadDocumentBlob = async (cid: string) => {
    return data;
 };
 
-export const documentUpload = async (formData, docId, _errorText) => {
+export const documentUpload = async (formData, docId, errorText) => {
    const url = docId
       ? `${DOCUMENTS_ENDPOINT}/${docId}`
       : `${DOCUMENTS_ENDPOINT}`;
@@ -130,7 +130,23 @@ export const documentUpload = async (formData, docId, _errorText) => {
    if (res.status === 413 || res.statusText === "Payload Too Large") {
       throw new Error("Payload Too Large");
    }
-   const data = await res.json();
+   const data = await res.json().catch(() => null);
+   if (!res.ok) {
+      const error = new Error(data?.message || errorText) as Error & {
+         code?: string;
+         details?: unknown;
+      };
+      if (data?.error) {
+         error.code = data.error;
+      }
+      if (data?.details) {
+         error.details = data.details;
+      }
+      throw error;
+   }
+   if (!data) {
+      throw new Error(errorText);
+   }
    return data;
 };
 

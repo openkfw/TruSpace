@@ -31,6 +31,16 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 
 const MAX_FILE_SIZE_MB = 110;
 
+type UploadErrorDetails = {
+   provider?: string;
+   signature?: string;
+};
+
+type UploadError = Error & {
+   code?: string;
+   details?: UploadErrorDetails;
+};
+
 interface DocumentUploadProps {
    docId?: string;
    open?: boolean;
@@ -56,6 +66,49 @@ export default function DocumentUpload({
 
    const translations = useTranslations("homePage");
    const documentTranslations = useTranslations("document");
+
+   const isMalwareError = (error: unknown): error is UploadError => {
+      if (!(error instanceof Error)) {
+         return false;
+      }
+      const message = error.message.toLowerCase();
+      const code = (error as UploadError).code;
+      return message.includes("malware") || code === "MALWARE_DETECTED";
+   };
+
+   const getMalwareReason = (error: UploadError) => {
+      const details = error.details;
+      if (!details) {
+         return undefined;
+      }
+      const parts: string[] = [];
+      if (details.provider) {
+         parts.push(details.provider);
+      }
+      if (details.signature) {
+         parts.push(details.signature);
+      }
+      return parts.length > 0 ? parts.join(", ") : undefined;
+   };
+
+   const getUploadErrorMessage = (error: unknown) => {
+      if (isMalwareError(error)) {
+         const reason = getMalwareReason(error);
+         return reason
+            ? documentTranslations("documentUploadInfectedWithReason", {
+                 reason
+              })
+            : documentTranslations("documentUploadInfected");
+      }
+
+      if (error instanceof Error && error.message === "Payload Too Large") {
+         return documentTranslations("documentTooLargeError");
+      }
+
+      return docId
+         ? documentTranslations("documentVersionUploadError")
+         : documentTranslations("documentUploadError");
+   };
 
    const handleFileChange = async (fileList: FileList | null) => {
       if (!fileList || fileList.length === 0) return;
@@ -166,6 +219,9 @@ export default function DocumentUpload({
             );
             return;
          }
+
+         const uploadToastId = toast.loading(translations("uploading"));
+
          try {
             const formData = new FormData();
             formData.append("workspace", workspace?.uuid);
@@ -183,18 +239,22 @@ export default function DocumentUpload({
             }
             await fetchDocuments(workspace?.uuid);
 
-            toast.success(
-               docId
+            toast.update(uploadToastId, {
+               render: docId
                   ? documentTranslations("documentVersionUploaded")
-                  : documentTranslations("documentUploaded")
-            );
+                  : documentTranslations("documentUploaded"),
+               type: "success",
+               isLoading: false,
+               autoClose: 5000
+            });
          } catch (err) {
             console.error(err);
-            toast.error(
-               docId
-                  ? documentTranslations("documentVersionUploadError")
-                  : documentTranslations("documentUploadError")
-            );
+            toast.update(uploadToastId, {
+               render: getUploadErrorMessage(err),
+               type: "error",
+               isLoading: false,
+               autoClose: 8000
+            });
          }
       });
 

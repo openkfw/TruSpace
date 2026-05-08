@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 
 import { FileLock2, Link, Loader2, Share2, UserCircle } from "lucide-react";
 
+import MalwareScanIndicator from "@/components/MalwareScanIndicator";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -236,11 +237,16 @@ export default function DocumentData({
                ))}
             </div>
             <div className="font-bold">{translations("documentSecurity")}</div>
-            <div>
+            <div className="flex flex-wrap gap-2">
                <Badge className="bg-violet-600">
                   <FileLock2 className="mr-2" />
                   {translations("encrypted")}
                </Badge>
+               <MalwareScanIndicator
+                  status={meta?.malwareScanStatus}
+                  provider={meta?.malwareScanProvider}
+                  timestamp={meta?.malwareScanTimestamp}
+               />
             </div>
             <div className="font-bold">{translations("creator")}</div>
             <div>{meta?.creatorName || translations("unknownCreator")}</div>

@@ -259,6 +259,14 @@
       "generatingAILanguage": "Sprachanalyse...",
       "languageGenerationError": "Bei der Bestimmung der Sprache ist ein Fehler aufgetreten"
    },
+   "malwareScan": {
+      "secure": "Gescannt",
+      "notScanned": "Nicht gescannt",
+      "scannedBy": "Gescannt von {provider}",
+      "scannedAt": "Gescannt am {timestamp}",
+      "notScannedTooltip": "Keine Malware-Scan-Daten verfügbar",
+      "unknownProvider": "Unbekannter Anbieter"
+   },
    "documentVersion": {
       "version": "Version",
       "versionName": "Versionsname",
@@ -415,6 +423,8 @@
       "documentUploaded": "Dokument erfolgreich hochgeladen",
       "documentUploadeNoAI": "Dokument erfolgreich hochgeladen, KI-Verarbeitung wegen fehlendem Textinhalt übersprungen",
       "documentUploadError": "Beim Hochladen des Dokuments ist ein Fehler aufgetreten",
+      "documentUploadInfected": "Schadsoftware im hochgeladenen Dokument erkannt. Es kann aus Sicherheitsgründen nicht in TruSpace gespeichert werden.",
+      "documentUploadInfectedWithReason": "Schadsoftware im hochgeladenen Dokument erkannt ({reason}). Es kann aus Sicherheitsgründen nicht in TruSpace gespeichert werden.",
       "documentVersionUploaded": "Dokumentenversion erfolgreich hochgeladen",
       "documentVersionUploadError": "Beim Hochladen der Dokumentenversion ist ein Fehler aufgetreten",
       "documentDeleted": "Dokument erfolgreich gelöscht",

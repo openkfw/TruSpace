@@ -226,6 +226,15 @@ DEFAULT_SWARM_PORT=4001
 DEFAULT_IPFS_API_PORT=5001
 DEFAULT_IPFS_GATEWAY_PORT=8080
 DEFAULT_OLLAMA_MODEL="gemma3:1b"
+DEFAULT_AUTO_DOWNLOAD=true
+
+# Malware Scanning
+DEFAULT_MALWARE_SCANNING_ENABLED=false
+DEFAULT_CLAMAV_HOST="clamav"
+DEFAULT_CLAMAV_PORT=3310
+DEFAULT_CLAMAV_TIMEOUT_MS=15000
+
+# OpenWebUI Configuration
 DEFAULT_OPENWEBUI_HOST="http://webui:8080"
 DEFAULT_OPEN_WEBUI_PORT=3333
 DEFAULT_ADMIN_USER_PASSWORD="Kennwort123"
@@ -344,8 +353,15 @@ case "$PROFILE_KEY" in
     # AI
     DISABLE_ALL_AI_FUNCTIONALITY=false
     OLLAMA_MODEL="$DEFAULT_OLLAMA_MODEL"
-    AUTO_DOWNLOAD=true
-    # Open WebUI
+    AUTO_DOWNLOAD="$DEFAULT_AUTO_DOWNLOAD"
+    
+    # Malware Scanning
+    MALWARE_SCANNING_ENABLED="$DEFAULT_MALWARE_SCANNING_ENABLED"
+    CLAMAV_HOST="$DEFAULT_CLAMAV_HOST"
+    CLAMAV_PORT="$DEFAULT_CLAMAV_PORT"
+    CLAMAV_TIMEOUT_MS="$DEFAULT_CLAMAV_TIMEOUT_MS"
+    
+    # OpenWebUI Configuration
     OPENWEBUI_HOST="$DEFAULT_OPENWEBUI_HOST"
     OPEN_WEBUI_PORT="$DEFAULT_OPEN_WEBUI_PORT"
     ADMIN_USER_EMAIL="admin@localhost"
@@ -383,7 +399,15 @@ case "$PROFILE_KEY" in
     _preset_ipfs_defaults
     DISABLE_ALL_AI_FUNCTIONALITY=false
     OLLAMA_MODEL="$DEFAULT_OLLAMA_MODEL"
-    AUTO_DOWNLOAD=true
+    AUTO_DOWNLOAD="$DEFAULT_AUTO_DOWNLOAD"
+    
+    # Malware Scanning
+    MALWARE_SCANNING_ENABLED="$DEFAULT_MALWARE_SCANNING_ENABLED"
+    CLAMAV_HOST="$DEFAULT_CLAMAV_HOST"
+    CLAMAV_PORT="$DEFAULT_CLAMAV_PORT"
+    CLAMAV_TIMEOUT_MS="$DEFAULT_CLAMAV_TIMEOUT_MS"
+    
+    # OpenWebUI Configuration
     OPENWEBUI_HOST="$DEFAULT_OPENWEBUI_HOST"
     OPEN_WEBUI_PORT="$DEFAULT_OPEN_WEBUI_PORT"
     _gen_secret WEBUI_SECRET_KEY
@@ -616,7 +640,17 @@ prompt_var AUTO_DOWNLOAD bool \
   "Automatically download the model if it is not present in the Docker volume?" true
 
 #──────────────────────────────────────────────────────────────────────────────
-# OPEN WEBUI CONFIGURATION
+# Malware Scanning
+#──────────────────────────────────────────────────────────────────────────────
+echo_section "Malware Scanning"
+
+prompt_var MALWARE_SCANNING_ENABLED bool "Enable malware scanning for uploaded documents (ClamAV)" "$DEFAULT_MALWARE_SCANNING_ENABLED"
+prompt_var CLAMAV_HOST text "ClamAV daemon host" "$DEFAULT_CLAMAV_HOST"
+prompt_var CLAMAV_PORT text "ClamAV daemon port" "$DEFAULT_CLAMAV_PORT" validate_port
+prompt_var CLAMAV_TIMEOUT_MS text "ClamAV scan timeout in ms" "$DEFAULT_CLAMAV_TIMEOUT_MS"
+
+#──────────────────────────────────────────────────────────────────────────────
+# OpenWebUI Configuration
 #──────────────────────────────────────────────────────────────────────────────
 
 echo_section "Open WebUI Configuration"
@@ -731,7 +765,22 @@ API_PORT=${API_PORT}
 LOG_LEVEL=${LOG_LEVEL}
 
 #──────────────────────────────────────────────────────────────────────────────
-# 📧 SMTP — Email delivery
+# 🧩 Adapters
+#──────────────────────────────────────────────────────────────────────────────
+
+# If true, disables all AI-related functionality, i.e. if a document is uploaded, no AI processing will be executed
+DISABLE_ALL_AI_FUNCTIONALITY=${DISABLE_ALL_AI_FUNCTIONALITY}
+
+# If true, uploads are scanned for malware before storage
+MALWARE_SCANNING_ENABLED=${MALWARE_SCANNING_ENABLED}
+
+# ClamAV daemon host/port used for malware scanning
+CLAMAV_HOST=${CLAMAV_HOST}
+CLAMAV_PORT=${CLAMAV_PORT}
+CLAMAV_TIMEOUT_MS=${CLAMAV_TIMEOUT_MS}
+
+#──────────────────────────────────────────────────────────────────────────────
+# 📧 SMTP Email Settings
 #──────────────────────────────────────────────────────────────────────────────
 
 SMTP_HOST=${SMTP_HOST}

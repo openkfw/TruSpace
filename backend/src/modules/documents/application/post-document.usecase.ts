@@ -1,10 +1,13 @@
 import { Response } from 'express';
 import { UploadedFile } from 'express-fileupload';
 
-import { AuthenticatedRequest } from '../../../shared/types';
+import { scanBufferForMalware } from '../../../shared/adapters/malware-scanning/index';
 import { oiClient } from '../../../shared/clients/oi-client';
+import { config } from '../../../shared/config/config';
 import { encrypt } from '../../../shared/encryption';
+import { MalwareDetectedError } from '../errors/malware-detected.error';
 import { decodeFilename, createDocumentRequest, getWorkspacePassword } from '../../../shared/handlers/documents';
+import { AuthenticatedRequest } from '../../../shared/types';
 import { Prompt } from '../../../shared/types/interfaces';
 import { checkPermissionForWorkspace } from '../../../shared/utility/permissions';
 import {
@@ -32,6 +35,30 @@ export async function postDocument(req: AuthenticatedRequest, res: Response) {
   const file = req.files.file as UploadedFile;
   const filename = decodeFilename(file.name);
 
+  let malwareScanMeta:
+    | {
+        status: string;
+        provider: string;
+        timestamp: string;
+      }
+    | undefined;
+
+  if (config.malwareScanning.enabled) {
+    const scanResult = await scanBufferForMalware(file.data);
+    if (scanResult.status === 'infected') {
+      throw new MalwareDetectedError({
+        signature: scanResult.signature,
+        provider: scanResult.provider,
+      });
+    }
+
+    malwareScanMeta = {
+      status: scanResult.status,
+      provider: scanResult.provider,
+      timestamp: scanResult.scannedAt,
+    };
+  }
+
   const docRequest = createDocumentRequest({
     filename,
     creatorNodeId,
@@ -39,6 +66,9 @@ export async function postDocument(req: AuthenticatedRequest, res: Response) {
     workspaceOrigin: workspace,
     size: file.size,
     mimetype: file.mimetype,
+    malwareScanStatus: malwareScanMeta?.status,
+    malwareScanProvider: malwareScanMeta?.provider,
+    malwareScanTimestamp: malwareScanMeta?.timestamp,
   });
 
   const fileDataClone = Buffer.from(file.data);
@@ -52,10 +82,12 @@ export async function postDocument(req: AuthenticatedRequest, res: Response) {
   // ollama obviously needs unencrypted document
   file.data = fileDataClone;
 
-  // process file with AI if it is a PDF or DOCX
+  const aiDisabled = config.disableAllAIFunctionality;
+
+  // process file with AI if it is a PDF or DOCX and AI is enabled
   let fileProcessableWithAI = false;
   const fileExtension = filename.split('.').pop();
-  if (fileExtension === 'pdf' || fileExtension === 'docx') {
+  if (!aiDisabled && (fileExtension === 'pdf' || fileExtension === 'docx')) {
     fileProcessableWithAI = true;
   }
 
@@ -91,6 +123,10 @@ export async function postDocument(req: AuthenticatedRequest, res: Response) {
     });
   }
 
+  const noAiMessage = aiDisabled
+    ? 'AI functionality disabled. No task created.'
+    : 'File not processable with AI. No task created.';
+
   const { summariesInitialResponse, tagsInitialResponse, languageInitialResponse } = fileProcessableWithAI
     ? {
         summariesInitialResponse: {
@@ -112,17 +148,17 @@ export async function postDocument(req: AuthenticatedRequest, res: Response) {
     : {
         summariesInitialResponse: {
           requestId: null,
-          message: 'File not processable with AI. No task created.',
+          message: noAiMessage,
           statusEndpoint: null,
         },
         tagsInitialResponse: {
           requestId: null,
-          message: 'File not processable with AI. No task created.',
+          message: noAiMessage,
           statusEndpoint: null,
         },
         languageInitialResponse: {
           requestId: null,
-          message: 'File not processable with AI. No task created.',
+          message: noAiMessage,
           statusEndpoint: null,
         },
       };

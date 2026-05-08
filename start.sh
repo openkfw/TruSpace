@@ -160,12 +160,18 @@ dirs=(
   "./volumes/db"
   "./volumes/db0"
   "./volumes/db1"
-  ".volumes/general"
+  "./volumes/general"
   "./volumes/ipfs0"
   "./volumes/ipfs1"
   "./volumes/ollama"
   "./volumes/open-webui"
 )
+
+# Create clamav and clamav-scan volume directories if malware scanning is enabled
+if [ "$MALWARE_SCANNING_ENABLED" = true ]; then
+  dirs+=("./volumes/clamav" "./volumes/clamav-scan")
+fi
+
 for d in "${dirs[@]}"; do
   if [ ! -d "$d" ]; then
     echo_info "Creating volume directory $d"
@@ -238,6 +244,21 @@ else
   AI_DOCKER_COMPOSE_FILE="-f docker-compose-ai.yml"
 fi
 
+# Malware Scanning (ClamAV)
+if [ "$MALWARE_SCANNING_ENABLED" = true ]; then
+  if [ "$CLAMAV_HOST" = "clamav" ]; then
+    pull_containers+=(clamav)
+    MALWARE_DOCKER_COMPOSE_FILE="-f docker-compose-malware.yml"
+  else
+    skip_containers+=(clamav)
+    MALWARE_DOCKER_COMPOSE_FILE=""
+    echo_info "Malware scanning enabled with external ClamAV host ($CLAMAV_HOST). Skipping ClamAV container."
+  fi
+else
+  skip_containers+=(clamav)
+  MALWARE_DOCKER_COMPOSE_FILE=""
+fi
+
 # Pretty print results
 if [ ${#build_containers[@]} -gt 0 ]; then
   echo_info "\n🛠️  To be built containers:"
@@ -281,7 +302,7 @@ fi
 # THEN PULL OR START THE REST
 echo_info "Pulling necessary Docker images and starting containers..."
 docker compose --env-file "$SCRIPT_DIR/.env" \
-    -f docker-compose.yml $FRONTEND_DOCKER_COMPOSE_FILE $AI_DOCKER_COMPOSE_FILE \
+    -f docker-compose.yml $FRONTEND_DOCKER_COMPOSE_FILE $AI_DOCKER_COMPOSE_FILE $MALWARE_DOCKER_COMPOSE_FILE \
     -f docker-compose.build.yml up -d "${pull_containers[@]}" "${build_containers[@]}"
 
 

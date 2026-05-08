@@ -19,6 +19,9 @@ export interface DocumentMeta {
    size?: number;
    mimetype?: string;
    versionTagName?: string;
+   malwareScanStatus?: string;
+   malwareScanProvider?: string;
+   malwareScanTimestamp?: string;
 }
 
 export interface DocumentRequest {

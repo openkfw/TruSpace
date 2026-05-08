@@ -259,6 +259,14 @@
     "generatingAILanguage": "Análisis del discurso...",
     "languageGenerationError": "Se produjo un error al determinar el idioma."
   },
+  "malwareScan": {
+    "secure": "Escaneado",
+    "notScanned": "No escaneado",
+    "scannedBy": "Escaneado por {provider}",
+    "scannedAt": "Escaneado el {timestamp}",
+    "notScannedTooltip": "No hay datos de análisis de malware",
+    "unknownProvider": "Proveedor desconocido"
+  },
   "documentVersion": {
     "version": "Versión",
     "versionName": "Nombre de la versión",
@@ -415,6 +423,8 @@
     "documentUploaded": "Documento cargado exitosamente",
     "documentUploadeNoAI": "El documento se cargó correctamente, el procesamiento de IA se omitió debido a que faltaba contenido de texto",
     "documentUploadError": "Se produjo un error al cargar el documento.",
+    "documentUploadInfected": "Se detectó malware en el documento cargado. No se puede almacenar en TruSpace por motivos de seguridad.",
+    "documentUploadInfectedWithReason": "Se detectó malware en el documento cargado ({reason}). No se puede almacenar en TruSpace por motivos de seguridad.",
     "documentVersionUploaded": "La versión del documento se cargó correctamente",
     "documentVersionUploadError": "Se produjo un error al cargar la versión del documento.",
     "documentDeleted": "Documento eliminado exitosamente",

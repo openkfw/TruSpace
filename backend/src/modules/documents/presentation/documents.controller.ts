@@ -3,13 +3,13 @@ import { Request, Response } from 'express';
 import { AuthenticatedRequest } from '../../../shared/types';
 
 import { getDocumentsByWorkspaceId } from '../application/get-documents-by-workspace-id.usecase';
-import { deleteDocument } from '../application/delete-document.usecaste';
-import { getDocumentsDetailByDocumentId } from '../application/get-documents-detail-by-document-id-usecase';
+import { deleteDocument } from '../application/delete-document.usecase';
+import { getDocumentsDetailByDocumentId } from '../application/get-documents-detail-by-document-id.usecase';
 import { getDocumentsStatistics } from '../application/get-documents-statistics.usecaste';
 import { getDocumentsStatsByDocumentId } from '../application/get-documents-stats-by-document-id.usecase';
 import { getDocumentsVersionByCID } from '../application/get-documents-version-by-cid.usecase';
-import { postDocument } from '../application/post-document.usecaste';
-import { putDocument } from '../application/put-document.usecaste';
+import { postDocument } from '../application/post-document.usecase';
+import { putDocument } from '../application/put-document.usecase';
 
 export const DocumentsController = {
   deleteDocument: async (req: AuthenticatedRequest, res: Response) => {
