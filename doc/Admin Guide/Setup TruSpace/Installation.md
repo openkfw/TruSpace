@@ -518,7 +518,64 @@ If needed:
 
 ---
 
-## C2) Clone and start
+## C2) Reverse Proxy without SSL
+
+Install:
+
+```bash
+sudo apt update && sudo apt upgrade -y
+sudo apt install nginx -y
+```
+
+Enable nginx:
+
+```bash
+sudo systemctl enable nginx
+sudo systemctl start nginx
+```
+
+### Create nginx config
+
+Replace `EXAMPLE.COM` in all examples with your actual domain (e.g. `truspace.dev`).
+
+```bash
+sudo nano /etc/nginx/sites-available/EXAMPLE.COM
+```
+
+Place this content inside, adjusting domains and proxy targets as needed:
+
+```nginx
+server {
+    listen 80;
+    server_name EXAMPLE.COM;
+    client_max_body_size 100M;
+
+    location /api {
+        proxy_pass http://localhost:8000;
+    }
+
+    location / {
+        proxy_pass http://localhost:3000;
+    }
+}
+
+server {
+    listen 80;
+    server_name oi.EXAMPLE.COM;
+    location / {
+        proxy_pass http://localhost:3333;
+    }
+}
+```
+
+Enable and test & reload:
+
+```bash
+sudo ln -s /etc/nginx/sites-available/EXAMPLE.COM /etc/nginx/sites-enabled/
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+## C3) Clone and start
 
 ```bash
 git clone https://github.com/openkfw/TruSpace.git
