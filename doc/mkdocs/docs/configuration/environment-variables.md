@@ -14,13 +14,14 @@ Complete reference for all TruSpace configuration options.
 
 ## Quick Reference
 
-| Category | Variables |
-|----------|-----------|
-| [Core](#core-settings) | `NODE_ENV`, `LOG_LEVEL` |
-| [Network](#network-settings) | `CORS_ORIGIN`, `FRONTEND_PORT`, `BACKEND_PORT` |
-| [IPFS](#ipfs-settings) | `IPFS_*`, `CLUSTER_*` |
-| [AI](#ai-settings) | `OLLAMA_*`, `DISABLE_ALL_AI_FUNCTIONALITY` |
-| [Security](#security-settings) | `JWT_SECRET`, `CLUSTER_SECRET` |
+| Category                       | Variables                                              |
+| ------------------------------ | ------------------------------------------------------ |
+| [Core](#core-settings)         | `NODE_ENV`, `LOG_LEVEL`                                |
+| [Network](#network-settings)   | `CORS_ORIGIN`, `FRONTEND_PORT`, `BACKEND_PORT`         |
+| [IPFS](#ipfs-settings)         | `IPFS_*`, `CLUSTER_*`                                  |
+| [AI](#ai-settings)             | `OLLAMA_*`, `DISABLE_ALL_AI_FUNCTIONALITY`             |
+| [Security](#security-settings) | `JWT_SECRET`, `CLUSTER_SECRET`                         |
+| [Email](#email-settings)       | `SMTP_*`, `EMAIL_SENDER`, `REGISTER_USERS_AS_INACTIVE` |
 
 ---
 
@@ -30,10 +31,10 @@ Complete reference for all TruSpace configuration options.
 
 Application environment mode.
 
-| Value | Description |
-|-------|-------------|
-| `development` | Development mode with verbose logging |
-| `production` | Production mode with optimized settings |
+| Value         | Description                             |
+| ------------- | --------------------------------------- |
+| `development` | Development mode with verbose logging   |
+| `production`  | Production mode with optimized settings |
 
 ```env
 NODE_ENV=production
@@ -43,12 +44,12 @@ NODE_ENV=production
 
 Logging verbosity level.
 
-| Value | Description |
-|-------|-------------|
-| `debug` | All messages including debug |
-| `info` | Informational messages and above |
-| `warn` | Warnings and errors only |
-| `error` | Errors only |
+| Value   | Description                      |
+| ------- | -------------------------------- |
+| `debug` | All messages including debug     |
+| `info`  | Informational messages and above |
+| `warn`  | Warnings and errors only         |
+| `error` | Errors only                      |
 
 ```env
 LOG_LEVEL=info
@@ -102,9 +103,9 @@ OI_CORS_ALLOW_ORIGIN=http://localhost:3000
 
 IPFS configuration profile.
 
-| Value | Description |
-|-------|-------------|
-| `server` | Optimized for servers (default) |
+| Value      | Description                            |
+| ---------- | -------------------------------------- |
+| `server`   | Optimized for servers (default)        |
 | `lowpower` | Reduced resource usage for Pi/embedded |
 
 ```env
@@ -136,10 +137,10 @@ IPFS_PATH=/custom/ipfs/path
 Shared secret for cluster authentication. **Must be the same on all connected nodes.**
 
 !!! danger "Security"
-    Generate a unique secret for production:
-    ```bash
+Generate a unique secret for production:
+`bash
     openssl rand -hex 32
-    ```
+    `
 
 ```env
 CLUSTER_SECRET=your-32-byte-hex-secret-here
@@ -189,13 +190,13 @@ DISABLE_ALL_AI_FUNCTIONALITY=true
 
 Default LLM model for AI analysis.
 
-| Model | Size | Quality | Speed |
-|-------|------|---------|-------|
-| `tinyllama` | 637 MB | Basic | Fast |
-| `phi3` | 2.2 GB | Good | Medium |
-| `llama3.2:3b` | 2.0 GB | Good | Medium |
-| `llama3.2:7b` | 4.7 GB | Better | Slower |
-| `mistral` | 4.1 GB | Better | Slower |
+| Model         | Size   | Quality | Speed  |
+| ------------- | ------ | ------- | ------ |
+| `tinyllama`   | 637 MB | Basic   | Fast   |
+| `phi3`        | 2.2 GB | Good    | Medium |
+| `llama3.2:3b` | 2.0 GB | Good    | Medium |
+| `llama3.2:7b` | 4.7 GB | Better  | Slower |
+| `mistral`     | 4.1 GB | Better  | Slower |
 
 ```env
 OLLAMA_MODEL=llama3.2:3b
@@ -230,10 +231,10 @@ OLLAMA_GPU=cpu
 Secret key for JWT token signing.
 
 !!! danger "Security"
-    Generate a unique secret for production:
-    ```bash
+Generate a unique secret for production:
+`bash
     openssl rand -hex 64
-    ```
+    `
 
 ```env
 JWT_SECRET=your-very-long-secret-key-here
@@ -257,16 +258,106 @@ BCRYPT_ROUNDS=12
 
 ---
 
+## Email Settings
+
+TruSpace uses SMTP to send transactional emails such as password resets and, optionally, registration confirmation emails.
+
+!!! note
+Email settings are optional. If not configured, password reset and user activation emails will not be sent.
+
+### `SMTP_HOST`
+
+Address of the SMTP server.
+
+```env
+SMTP_HOST=smtp.example.com
+```
+
+### `SMTP_PORT`
+
+Port used to connect to the SMTP server.
+
+| Port  | Typical use                                            |
+| ----- | ------------------------------------------------------ |
+| `465` | SMTP over SSL (`SMTP_SSL=true`)                        |
+| `587` | SMTP with STARTTLS (`SMTP_TLS=true`, `SMTP_SSL=false`) |
+| `25`  | Unencrypted (not recommended)                          |
+
+```env
+SMTP_PORT=587
+```
+
+### `SMTP_USER`
+
+Username for authenticating with the SMTP server.
+
+```env
+SMTP_USER=noreply@example.com
+```
+
+### `SMTP_PASSWORD`
+
+Password for authenticating with the SMTP server.
+
+!!! danger "Security"
+Never commit this value to version control. Use a dedicated app password or service account credential.
+
+```env
+SMTP_PASSWORD=your-smtp-password
+```
+
+### `SMTP_SSL`
+
+Enable SSL/TLS from the start of the connection (typically used on port 465).
+
+```env
+# Enable SSL (port 465)
+SMTP_SSL=true
+
+# Disable SSL — use with SMTP_TLS=true on port 587
+SMTP_SSL=false
+```
+
+### `SMTP_TLS`
+
+Upgrade an initially unencrypted connection to TLS using STARTTLS (typically on port 587). Set `SMTP_SSL=false` when using this option.
+
+```env
+SMTP_TLS=true
+```
+
+### `EMAIL_SENDER`
+
+The email address that appears as the sender in outgoing notification and system emails.
+
+```env
+EMAIL_SENDER=noreply@example.com
+```
+
+### `REGISTER_USERS_AS_INACTIVE`
+
+When set to `true`, newly registered users are created as inactive and must confirm their email address before they can log in. Requires SMTP to be configured.
+
+```env
+# Require email confirmation on registration
+REGISTER_USERS_AS_INACTIVE=true
+
+# Allow immediate login after registration (default)
+REGISTER_USERS_AS_INACTIVE=false
+```
+
+---
+
 ## Build Settings
 
 ### `BUILD_OR_PULL_IMAGES`
 
 Whether to build images locally or pull from registry.
 
-| Value | Description |
-|-------|-------------|
-| `pull` | Pull pre-built images (default, faster) |
-| `build` | Build images locally |
+| Value   | Description                             |
+| ------- | --------------------------------------- |
+| `pull`  | Pull pre-built images (default, faster) |
+| `build` | Build images locally                    |
 
 ```env
 BUILD_OR_PULL_IMAGES=pull
@@ -299,6 +390,14 @@ JWT_SECRET=<generated-secret>
 CLUSTER_SECRET=<generated-secret>
 OLLAMA_MODEL=llama3.2:7b
 BUILD_OR_PULL_IMAGES=pull
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_USER=noreply@example.com
+SMTP_PASSWORD=<smtp-password>
+SMTP_SSL=false
+SMTP_TLS=true
+EMAIL_SENDER=noreply@example.com
+REGISTER_USERS_AS_INACTIVE=true
 ```
 
 ### Raspberry Pi

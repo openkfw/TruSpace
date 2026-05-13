@@ -10,37 +10,45 @@ Customize TruSpace to fit your needs.
 
 <div class="grid cards" markdown>
 
--   :material-file-cog:{ .lg .middle } **Environment Variables**
+- :material-file-cog:{ .lg .middle } **Environment Variables**
 
-    ---
+  ***
 
-    Complete reference for all configuration options.
+  Complete reference for all configuration options.
 
-    [:octicons-arrow-right-24: Environment Variables](environment-variables.md)
+  [:octicons-arrow-right-24: Environment Variables](environment-variables.md)
 
--   :material-rocket-launch:{ .lg .middle } **Startup Options**
+- :material-rocket-launch:{ .lg .middle } **Startup Options**
 
-    ---
+  ***
 
-    Command-line flags for start.sh.
+  Command-line flags for start.sh.
 
-    [:octicons-arrow-right-24: Startup Options](startup-options.md)
+  [:octicons-arrow-right-24: Startup Options](startup-options.md)
 
--   :material-lan:{ .lg .middle } **Network Configuration**
+- :material-lan:{ .lg .middle } **Network Configuration**
 
-    ---
+  ***
 
-    IPFS and networking settings.
+  IPFS and networking settings.
 
-    [:octicons-arrow-right-24: Network](network.md)
+  [:octicons-arrow-right-24: Network](network.md)
 
--   :material-brain:{ .lg .middle } **AI Configuration**
+- :material-brain:{ .lg .middle } **AI Configuration**
 
-    ---
+  ***
 
-    Configure Ollama and AI features.
+  Configure Ollama and AI features.
 
-    [:octicons-arrow-right-24: AI Config](ai-config.md)
+  [:octicons-arrow-right-24: AI Config](ai-config.md)
+
+- :material-email-outline:{ .lg .middle } **Email Configuration**
+
+  ***
+
+  SMTP settings for password resets and notifications.
+
+  [:octicons-arrow-right-24: Email Config](environment-variables.md#email-settings)
 
 </div>
 
