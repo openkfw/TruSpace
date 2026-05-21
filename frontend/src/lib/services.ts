@@ -12,37 +12,11 @@ import {
    USERS_ENDPOINT,
    WORKSPACES_ENDPOINT
 } from "@/shared/config";
-
-const fetcher = (url) =>
-   fetch(url, {
-      credentials: "include"
-   }).then((res) => res.json());
-
-const CSRF_COOKIE_NAME = "XSRF-TOKEN";
-
-const getCsrfToken = (): string | null => {
-   if (typeof document === "undefined") {
-      return null;
-   }
-   const match = document.cookie.match(
-      new RegExp(`(?:^|; )${CSRF_COOKIE_NAME}=([^;]*)`)
-   );
-   return match ? decodeURIComponent(match[1]) : null;
-};
-
-const withCsrf = (options: RequestInit): RequestInit => {
-   const method = (options.method || "GET").toUpperCase();
-   if (method === "GET" || method === "HEAD" || method === "OPTIONS") {
-      return options;
-   }
-   const token = getCsrfToken();
-   if (!token) {
-      return options;
-   }
-   const headers = new Headers(options.headers || {});
-   headers.set("X-CSRF-Token", token);
-   return { ...options, headers };
-};
+import {
+   fetchWithCredentials,
+   swrJsonFetcher,
+   withCsrf
+} from "@/shared/infrastructure/http";
 
 // Documents api
 export const loadAllDocuments = async (errorText: string) => {
@@ -53,7 +27,7 @@ export const loadAllDocuments = async (errorText: string) => {
       method: "GET",
       credentials: "include"
    };
-   const response = await fetch(url, options);
+   const response = await fetchWithCredentials(url, options);
    if (!response.ok) {
       if (response.status === 401) {
          throw new Error("unauthorized");
@@ -78,7 +52,7 @@ export const loadDocuments = async (
       method: "GET",
       credentials: "include"
    };
-   const response = await fetch(url, options);
+   const response = await fetchWithCredentials(url, options);
    if (!response.ok) {
       if (response.status === 401) {
          throw new Error("unauthorized");
@@ -96,7 +70,7 @@ export const loadDocumentDetail = async (documentId, errorText) => {
       method: "GET",
       credentials: "include"
    };
-   const response = await fetch(url, options);
+   const response = await fetchWithCredentials(url, options);
    if (!response.ok) {
       throw new Error(errorText);
    }
@@ -105,7 +79,7 @@ export const loadDocumentDetail = async (documentId, errorText) => {
 };
 
 export const loadDocumentBlob = async (cid: string) => {
-   const res = await fetch(`${DOCUMENTS_ENDPOINT}/version/${cid}`, {
+   const res = await fetchWithCredentials(`${DOCUMENTS_ENDPOINT}/version/${cid}`, {
       credentials: "include"
    });
    const data = res.blob();
@@ -121,7 +95,7 @@ export const documentUpload = async (formData, docId, errorText) => {
       body: formData,
       credentials: "include"
    };
-   const res = await fetch(url, withCsrf(options));
+   const res = await fetchWithCredentials(url, withCsrf(options));
    if (res.status === 413 || res.statusText === "Payload Too Large") {
       throw new Error("Payload Too Large");
    }
@@ -151,7 +125,7 @@ export const deleteDocument = async (docId: string, errorText) => {
       method: "DELETE",
       credentials: "include"
    };
-   const response = await fetch(url, withCsrf(options));
+   const response = await fetchWithCredentials(url, withCsrf(options));
    if (!response.ok) {
       throw new Error(errorText);
    }
@@ -160,7 +134,7 @@ export const deleteDocument = async (docId: string, errorText) => {
 // Workspace api
 
 export const loadWorkspaces = async (): Promise<Workspace[]> => {
-   const res = await fetch(WORKSPACES_ENDPOINT, {
+   const res = await fetchWithCredentials(WORKSPACES_ENDPOINT, {
       credentials: "include"
    });
    const data = await res.json();
@@ -176,7 +150,7 @@ export const createWorkspace = async (formData, errorText) => {
       },
       credentials: "include"
    };
-   const res = await fetch(WORKSPACES_ENDPOINT, withCsrf(options));
+   const res = await fetchWithCredentials(WORKSPACES_ENDPOINT, withCsrf(options));
    if (res.status === 409) {
       return res;
    } else if (!res.ok) {
@@ -198,7 +172,7 @@ export const updateWorkspaceType = async (
       },
       credentials: "include"
    };
-   const res = await fetch(`${WORKSPACES_ENDPOINT}/${wUID}`, withCsrf(options));
+   const res = await fetchWithCredentials(`${WORKSPACES_ENDPOINT}/${wUID}`, withCsrf(options));
    if (!res.ok) {
       throw new Error(errorText);
    }
@@ -211,7 +185,7 @@ export const loadWorkspaceContributors = async (
    count: number;
    contributors: string[];
 }> => {
-   const res = await fetch(`${WORKSPACES_ENDPOINT}/contributors/${wId}`, {
+   const res = await fetchWithCredentials(`${WORKSPACES_ENDPOINT}/contributors/${wId}`, {
       credentials: "include"
    });
    const data = await res.json();
@@ -228,7 +202,7 @@ export const deleteWorkspace = async (
       method: "DELETE",
       credentials: "include"
    };
-   const response = await fetch(url, withCsrf(options));
+   const response = await fetchWithCredentials(url, withCsrf(options));
    if (!response.ok) {
       throw new Error(errorText);
    }
@@ -243,7 +217,7 @@ export const createPerspective = async (formData, errorText) => {
       body: formData,
       credentials: "include"
    };
-   const response = await fetch(url, withCsrf(options));
+   const response = await fetchWithCredentials(url, withCsrf(options));
    if (!response.ok) {
       throw new Error(errorText);
    }
@@ -258,7 +232,7 @@ export const customPerspective = async (formData, errorText) => {
       body: formData,
       credentials: "include"
    };
-   const response = await fetch(url, withCsrf(options));
+   const response = await fetchWithCredentials(url, withCsrf(options));
    if (!response.ok) {
       throw new Error(errorText);
    }
@@ -269,7 +243,7 @@ export const customPerspective = async (formData, errorText) => {
 export const usePerspectives = (cid: string) => {
    const { data, error, isLoading, isValidating, mutate } = useSWR(
       `${PERSPECTIVES_ENDPOINT}/version/${cid}`,
-      fetcher
+      swrJsonFetcher
    );
 
    return {
@@ -303,7 +277,7 @@ export function usePerspectivesStatus(cid: string) {
       `${PERSPECTIVES_ENDPOINT}/status/req_perspectives_${cid}`,
       async (url) => {
          if (cid) {
-            const res = await fetch(url, { credentials: "include" });
+            const res = await fetchWithCredentials(url, { credentials: "include" });
             if (!res.ok) throw new Error("Failed to fetch status");
             return res.json();
          }
@@ -331,7 +305,7 @@ export function useLanguageStatus(cid: string) {
       `${LANGUAGE_ENDPOINT}/status/req_language_${cid}`,
       async (url) => {
          if (cid) {
-            const res = await fetch(url, { credentials: "include" });
+            const res = await fetchWithCredentials(url, { credentials: "include" });
             if (!res.ok) throw new Error("Failed to fetch status");
             return res.json();
          }
@@ -357,7 +331,7 @@ export function useLanguageStatus(cid: string) {
 export const useLanguage = (cid: string) => {
    const { data, error, mutate } = useSWR(
       cid ? `${LANGUAGE_ENDPOINT}/${cid}` : null,
-      fetcher
+      swrJsonFetcher
    );
 
    return {
@@ -376,7 +350,7 @@ export const loadChats = async (docId: string, errorText) => {
       credentials: "include"
    };
 
-   const response = await fetch(url, options);
+   const response = await fetchWithCredentials(url, options);
    if (!response.ok) {
       throw new Error(errorText);
    }
@@ -386,7 +360,7 @@ export const loadChats = async (docId: string, errorText) => {
 
 export const getChatsPdfExportUrl = async (docId: string) => {
    try {
-      const response = await fetch(`${CHATS_ENDPOINT}/export/${docId}`, {
+      const response = await fetchWithCredentials(`${CHATS_ENDPOINT}/export/${docId}`, {
          credentials: "include"
       });
       if (!response.ok) {
@@ -409,7 +383,7 @@ export const postChat = async (formData, errorText) => {
       body: formData,
       credentials: "include"
    };
-   const res = await fetch(url, withCsrf(options));
+   const res = await fetchWithCredentials(url, withCsrf(options));
    if (!res.ok) {
       throw new Error(errorText);
    }
@@ -424,7 +398,7 @@ export const loadTags = async (cid: string) => {
       credentials: "include"
    };
 
-   const response = await fetch(url, options);
+   const response = await fetchWithCredentials(url, options);
    if (!response.ok) {
       throw new Error("Failed to fetch tags");
    }
@@ -447,7 +421,7 @@ export const postTag = async (formData, cid: string) => {
       }),
       credentials: "include"
    };
-   const response = await fetch(url, withCsrf(options));
+   const response = await fetchWithCredentials(url, withCsrf(options));
    if (!response.ok) {
       throw new Error("Failed to add tag");
    }
@@ -461,7 +435,7 @@ export const deleteTag = async (tagId: string) => {
       method: "DELETE",
       credentials: "include"
    };
-   const response = await fetch(url, withCsrf(options));
+   const response = await fetchWithCredentials(url, withCsrf(options));
    if (!response.ok) {
       throw new Error("Failed to delete tag");
    }
@@ -474,7 +448,7 @@ export function useTagsStatus(cid: string) {
       `${TAGS_ENDPOINT}/status/req_tags_${cid}`,
       async (url) => {
          if (cid) {
-            const res = await fetch(url, { credentials: "include" });
+            const res = await fetchWithCredentials(url, { credentials: "include" });
             if (!res.ok) throw new Error("Failed to fetch status");
             return res.json();
          }
@@ -514,7 +488,7 @@ export const registerUser = async (data: Record<string, string>) => {
       }),
       credentials: "include"
    };
-   const response = await fetch(url, withCsrf(options));
+   const response = await fetchWithCredentials(url, withCsrf(options));
    const result = await response.json();
    return result;
 };
@@ -532,14 +506,14 @@ export const loginUser = async (data: Record<string, string>) => {
       }),
       credentials: "include"
    };
-   const response = await fetch(url, withCsrf(options));
+   const response = await fetchWithCredentials(url, withCsrf(options));
    const result = await response.json();
    return result;
 };
 
 export async function getHealth() {
    const url = `${HEALTH_ENDPOINT}`;
-   const response = await fetch(url, { credentials: "include" });
+   const response = await fetchWithCredentials(url, { credentials: "include" });
    const data = await response.json();
    return data;
 }
@@ -559,7 +533,7 @@ export const postPermission = async (formData: {
       }),
       credentials: "include"
    };
-   const response = await fetch(PERMISSIONS_ENDPOINT, withCsrf(options));
+   const response = await fetchWithCredentials(PERMISSIONS_ENDPOINT, withCsrf(options));
    if (!response.ok) {
       throw new Error("Failed to add user to the workspace");
    }
@@ -576,7 +550,7 @@ export const getUsersInWorkspace = async (workspaceId: string | string[]) => {
       },
       credentials: "include"
    };
-   const response = await fetch(url, options);
+   const response = await fetchWithCredentials(url, options);
    if (!response.ok) {
       throw new Error("Failed to add user to the workspace");
    }
@@ -593,7 +567,7 @@ export const deleteUserPermission = async (permissionId: number) => {
       },
       credentials: "include"
    };
-   const response = await fetch(url, withCsrf(options));
+   const response = await fetchWithCredentials(url, withCsrf(options));
    if (!response.ok) {
       throw new Error("Failed to remove user from the workspace");
    }
@@ -602,7 +576,7 @@ export const deleteUserPermission = async (permissionId: number) => {
 export function useDocumentsStatistics() {
    const { data, error, isLoading, isValidating, mutate } = useSWR(
       `${DOCUMENTS_ENDPOINT}/statistics`,
-      fetcher
+      swrJsonFetcher
    );
    return {
       statistics: data,
@@ -616,7 +590,7 @@ export function useDocumentsStatistics() {
 export function useUsersStatistics() {
    const { data, error, isLoading, isValidating, mutate } = useSWR(
       `${USERS_ENDPOINT}/statistics`,
-      fetcher
+      swrJsonFetcher
    );
    return {
       statistics: data?.data,
@@ -630,7 +604,7 @@ export function useUsersStatistics() {
 export function usePeers() {
    const { data, error, isLoading, isValidating, mutate } = useSWR(
       `${HEALTH_ENDPOINT}/peers`,
-      fetcher
+      swrJsonFetcher
    );
    return {
       peers: data,
@@ -644,7 +618,7 @@ export function usePeers() {
 export function useHealth() {
    const { data, error, isLoading, isValidating, mutate } = useSWR(
       `${HEALTH_ENDPOINT}`,
-      fetcher
+      swrJsonFetcher
    );
    return {
       health: data,
@@ -658,7 +632,7 @@ export function useHealth() {
 export function useRecentChats() {
    const { data, error, isLoading, isValidating, mutate } = useSWR(
       `${CHATS_ENDPOINT}/recent`,
-      fetcher
+      swrJsonFetcher
    );
    return {
       chats: data,
@@ -674,7 +648,7 @@ export const logout = async (): Promise<{
    message: string;
 }> => {
    try {
-      const response = await fetch(
+      const response = await fetchWithCredentials(
          `${USERS_ENDPOINT}/logout`,
          withCsrf({
             method: "POST",
@@ -716,7 +690,7 @@ export const confirmRegistration = async (
          }),
          credentials: "include"
       };
-      const response = await fetch(url, withCsrf(options));
+      const response = await fetchWithCredentials(url, withCsrf(options));
 
       return await response.json();
    } catch (error) {
@@ -727,7 +701,7 @@ export const confirmRegistration = async (
 
 export const updateUserSettings = async (formData: FormData) => {
    try {
-      const res = await fetch(
+      const res = await fetchWithCredentials(
          `${USERS_ENDPOINT}/user-settings`,
          withCsrf({
             method: "POST",
@@ -748,7 +722,7 @@ export const updateUserSettings = async (formData: FormData) => {
 
 export const updateUserName = async (name: string) => {
     try {
-        const res = await fetch(
+        const res = await fetchWithCredentials(
             `${USERS_ENDPOINT}/reset-name`,
             withCsrf({
                 method: "POST",
@@ -773,7 +747,7 @@ export const updateUserName = async (name: string) => {
 
 export const deleteUser = async () => {
     try {
-        const res = await fetch(
+        const res = await fetchWithCredentials(
             `${USERS_ENDPOINT}/delete-user`,
             withCsrf({
                 method: "DELETE",
@@ -795,7 +769,7 @@ export const deleteUser = async () => {
 
 export const removeAllUserPermissions = async (email: string) => {
     try {
-        const res = await fetch(
+        const res = await fetchWithCredentials(
             `${PERMISSIONS_ENDPOINT}/user/remove-all/${encodeURIComponent(email)}`,
             withCsrf({
                 method: "DELETE",
@@ -817,7 +791,7 @@ export const removeAllUserPermissions = async (email: string) => {
 
 export const downloadAvatarCid = async () => {
    try {
-      const res = await fetch(`${USERS_ENDPOINT}/avatar-cid`, {
+      const res = await fetchWithCredentials(`${USERS_ENDPOINT}/avatar-cid`, {
          method: "GET",
          credentials: "include"
       });
@@ -840,7 +814,7 @@ export const downloadAvatarCid = async () => {
 
 export const downloadAvatar = async (avatarCid: string) => {
    try {
-      const res = await fetch(`${USERS_ENDPOINT}/avatar/${encodeURIComponent(avatarCid)}`, {
+      const res = await fetchWithCredentials(`${USERS_ENDPOINT}/avatar/${encodeURIComponent(avatarCid)}`, {
          method: "GET",
          credentials: "include"
       });
@@ -863,7 +837,7 @@ export const downloadAvatar = async (avatarCid: string) => {
 
 export const downloadUserSettings = async () => {
    try {
-      const res = await fetch(`${USERS_ENDPOINT}/user-settings`, {
+      const res = await fetchWithCredentials(`${USERS_ENDPOINT}/user-settings`, {
          method: "GET",
          credentials: "include"
       });
@@ -898,7 +872,7 @@ export const forgotPassword = async (data: Record<string, string>) => {
       }),
       credentials: "include"
    };
-   const response = await fetch(url, withCsrf(options));
+   const response = await fetchWithCredentials(url, withCsrf(options));
    const result = await response.json();
    return result;
 };
@@ -916,7 +890,7 @@ export const resetPassword = async (data: Record<string, string>) => {
       }),
       credentials: "include"
    };
-   const response = await fetch(url, withCsrf(options));
+   const response = await fetchWithCredentials(url, withCsrf(options));
    const result = await response.json();
    return result;
 };
