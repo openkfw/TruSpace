@@ -1,6 +1,5 @@
 import useSWR from "swr";
 
-import { Workspace } from "@/modules/workspaces/domain";
 import {
    CHATS_ENDPOINT,
    DOCUMENTS_ENDPOINT,
@@ -9,204 +8,28 @@ import {
    PERMISSIONS_ENDPOINT,
    PERSPECTIVES_ENDPOINT,
    TAGS_ENDPOINT,
-   USERS_ENDPOINT,
-   WORKSPACES_ENDPOINT
+   USERS_ENDPOINT
 } from "@/shared/config";
 import {
    fetchWithCredentials,
    swrJsonFetcher,
    withCsrf
 } from "@/shared/infrastructure/http";
-
-// Documents api
-export const loadAllDocuments = async (errorText: string) => {
-   const from = 0;
-   const limit = 100;
-   const url = `${DOCUMENTS_ENDPOINT}?from=${from}&limit=${limit}`;
-   const options: RequestInit = {
-      method: "GET",
-      credentials: "include"
-   };
-   const response = await fetchWithCredentials(url, options);
-   if (!response.ok) {
-      if (response.status === 401) {
-         throw new Error("unauthorized");
-      } else {
-         throw new Error(errorText);
-      }
-   }
-   const data = await response.json();
-   return data;
-};
-
-export const loadDocuments = async (
-   workspaceId,
-   errorText,
-   from = 0,
-   limit = 10,
-   searchString = ""
-) => {
-   const query = workspaceId ? `&workspace=${workspaceId}` : "";
-   const url = `${DOCUMENTS_ENDPOINT}?from=${from}&limit=${limit}${query}&search=${searchString}`;
-   const options: RequestInit = {
-      method: "GET",
-      credentials: "include"
-   };
-   const response = await fetchWithCredentials(url, options);
-   if (!response.ok) {
-      if (response.status === 401) {
-         throw new Error("unauthorized");
-      } else {
-         throw new Error(errorText);
-      }
-   }
-   const data = await response.json();
-   return data;
-};
-
-export const loadDocumentDetail = async (documentId, errorText) => {
-   const url = `${DOCUMENTS_ENDPOINT}/detail/${documentId}`;
-   const options: RequestInit = {
-      method: "GET",
-      credentials: "include"
-   };
-   const response = await fetchWithCredentials(url, options);
-   if (!response.ok) {
-      throw new Error(errorText);
-   }
-   const data = await response.json();
-   return data;
-};
-
-export const loadDocumentBlob = async (cid: string) => {
-   const res = await fetchWithCredentials(`${DOCUMENTS_ENDPOINT}/version/${cid}`, {
-      credentials: "include"
-   });
-   const data = res.blob();
-   return data;
-};
-
-export const documentUpload = async (formData, docId, errorText) => {
-   const url = docId
-      ? `${DOCUMENTS_ENDPOINT}/${docId}`
-      : `${DOCUMENTS_ENDPOINT}`;
-   const options: RequestInit = {
-      method: docId ? "PUT" : "POST",
-      body: formData,
-      credentials: "include"
-   };
-   const res = await fetchWithCredentials(url, withCsrf(options));
-   if (res.status === 413 || res.statusText === "Payload Too Large") {
-      throw new Error("Payload Too Large");
-   }
-   const data = await res.json().catch(() => null);
-   if (!res.ok) {
-      const error = new Error(data?.message || errorText) as Error & {
-         code?: string;
-         details?: unknown;
-      };
-      if (data?.error) {
-         error.code = data.error;
-      }
-      if (data?.details) {
-         error.details = data.details;
-      }
-      throw error;
-   }
-   if (!data) {
-      throw new Error(errorText);
-   }
-   return data;
-};
-
-export const deleteDocument = async (docId: string, errorText) => {
-   const url = `${DOCUMENTS_ENDPOINT}/${docId}`;
-   const options: RequestInit = {
-      method: "DELETE",
-      credentials: "include"
-   };
-   const response = await fetchWithCredentials(url, withCsrf(options));
-   if (!response.ok) {
-      throw new Error(errorText);
-   }
-};
-
-// Workspace api
-
-export const loadWorkspaces = async (): Promise<Workspace[]> => {
-   const res = await fetchWithCredentials(WORKSPACES_ENDPOINT, {
-      credentials: "include"
-   });
-   const data = await res.json();
-   return data;
-};
-
-export const createWorkspace = async (formData, errorText) => {
-   const options: RequestInit = {
-      method: "POST",
-      body: JSON.stringify(formData),
-      headers: {
-         "Content-Type": "application/json"
-      },
-      credentials: "include"
-   };
-   const res = await fetchWithCredentials(WORKSPACES_ENDPOINT, withCsrf(options));
-   if (res.status === 409) {
-      return res;
-   } else if (!res.ok) {
-      throw new Error(errorText);
-   }
-   return res;
-};
-
-export const updateWorkspaceType = async (
-   wUID: string,
-   formData: { isPublic: boolean },
-   errorText: string
-) => {
-   const options: RequestInit = {
-      method: "PUT",
-      body: JSON.stringify(formData),
-      headers: {
-         "Content-Type": "application/json"
-      },
-      credentials: "include"
-   };
-   const res = await fetchWithCredentials(`${WORKSPACES_ENDPOINT}/${wUID}`, withCsrf(options));
-   if (!res.ok) {
-      throw new Error(errorText);
-   }
-   return res;
-};
-
-export const loadWorkspaceContributors = async (
-   wId
-): Promise<{
-   count: number;
-   contributors: string[];
-}> => {
-   const res = await fetchWithCredentials(`${WORKSPACES_ENDPOINT}/contributors/${wId}`, {
-      credentials: "include"
-   });
-   const data = await res.json();
-   return data;
-};
-
-export const deleteWorkspace = async (
-   wCID: string,
-   wUID: string,
-   errorText
-) => {
-   const url = `${WORKSPACES_ENDPOINT}/${wCID}/${wUID}`;
-   const options: RequestInit = {
-      method: "DELETE",
-      credentials: "include"
-   };
-   const response = await fetchWithCredentials(url, withCsrf(options));
-   if (!response.ok) {
-      throw new Error(errorText);
-   }
-};
+export {
+   deleteDocument,
+   documentUpload,
+   loadAllDocuments,
+   loadDocumentBlob,
+   loadDocumentDetail,
+   loadDocuments
+} from "@/modules/documents/infrastructure";
+export {
+   createWorkspace,
+   deleteWorkspace,
+   loadWorkspaceContributors,
+   loadWorkspaces,
+   updateWorkspaceType
+} from "@/modules/workspaces/infrastructure";
 
 // Perspectives api
 
