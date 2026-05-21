@@ -5,25 +5,23 @@ import {
    type Dispatch,
    type ReactNode,
    type SetStateAction,
-   useCallback,
-   useContext,
-   useEffect,
-   useState
+   useContext
 } from "react";
 
 import { useParams, usePathname } from "next/navigation";
 
-import { loadWorkspaces } from "@/lib/services";
-import { Workspace } from "@/modules/workspaces/domain";
+import {
+   useWorkspaceState,
+   type Workspace} from "@/modules/workspaces";
 
 interface WorkspaceContextType {
    workspace: Workspace | null;
    setWorkspace: Dispatch<SetStateAction<Workspace | null>>;
-   availableWorkspaces: Workspace[] | null;
-   setAvailableWorkspaces: (workspaces: Workspace[]) => void;
+   availableWorkspaces: Workspace[];
+   setAvailableWorkspaces: Dispatch<SetStateAction<Workspace[]>>;
    workspacesLoading: boolean;
    setWorkspacesLoading: Dispatch<SetStateAction<boolean>>;
-   refresh: (workspaceName: string) => Promise<() => void>;
+   refresh: (workspaceName: string) => Promise<void>;
 }
 
 export const WorkspaceContext = createContext<WorkspaceContextType>({
@@ -47,82 +45,20 @@ export const useWorkspaceContext = () => {
 export const WorkspaceProvider = ({ children }: { children: ReactNode }) => {
    const pathname = usePathname();
    const params = useParams();
-   const [workspace, setWorkspace] = useState<Workspace | null>(null);
-   const [workspacesLoading, setWorkspacesLoading] = useState(true);
-   const [availableWorkspaces, setAvailableWorkspaces] = useState<Workspace[]>(
-      []
-   );
-
-   useEffect(() => {
-      if (pathname.split("/").filter((el) => el !== "")[0] === "workspace") {
-         const workspaceId = params?.workspaceId;
-         if (
-            workspaceId &&
-            typeof workspaceId === "string" &&
-            availableWorkspaces.length > 0
-         ) {
-            const found = availableWorkspaces.find(
-               (w) => w.uuid === workspaceId
-            );
-            if (found) {
-               setWorkspace(found);
-            }
-         }
-      }
-   }, [pathname, params?.workspaceId, availableWorkspaces]);
-
-   const refresh = useCallback(
-      async (workspaceName: string) => {
-         setWorkspacesLoading(true);
-
-         const findWorkspace = (workspaces) => {
-            return workspaces.find(
-               (workspace) =>
-                  workspace.meta && workspace.meta.name === workspaceName
-            );
-         };
-
-         let workspaces = await loadWorkspaces();
-         let foundWorkspace = findWorkspace(workspaces);
-
-         setAvailableWorkspaces(workspaces);
-
-         if (!foundWorkspace) {
-            const pollInterval = setInterval(async () => {
-               try {
-                  workspaces = await loadWorkspaces();
-                  foundWorkspace = findWorkspace(workspaces);
-
-                  setAvailableWorkspaces(workspaces);
-
-                  if (foundWorkspace) {
-                     clearInterval(pollInterval);
-                     setWorkspacesLoading(false);
-                  }
-               } catch (error) {
-                  console.error("Error polling for workspaces:", error);
-                  clearInterval(pollInterval);
-                  setWorkspacesLoading(false);
-               }
-            }, 2000);
-
-            setTimeout(() => {
-               if (pollInterval) {
-                  clearInterval(pollInterval);
-                  setWorkspacesLoading(false);
-               }
-            }, 30000);
-
-            return () => {
-               clearInterval(pollInterval);
-               setWorkspacesLoading(false);
-            };
-         } else {
-            setWorkspacesLoading(false);
-         }
-      },
-      [setAvailableWorkspaces, setWorkspacesLoading]
-   );
+   const workspaceId =
+      typeof params?.workspaceId === "string" ? params.workspaceId : undefined;
+   const {
+      workspace,
+      setWorkspace,
+      availableWorkspaces,
+      setAvailableWorkspaces,
+      workspacesLoading,
+      setWorkspacesLoading,
+      refresh
+   } = useWorkspaceState({
+      pathname,
+      workspaceId
+   });
 
    return (
       <WorkspaceContext.Provider
