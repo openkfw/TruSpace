@@ -8,8 +8,8 @@ import { GeistMono } from "geist/font/mono"; // eslint-disable-line import/no-un
 import { GeistSans } from "geist/font/sans"; // eslint-disable-line import/no-unresolved
 
 import { DocumentsProvider } from "@/contexts/DocumentsContext";
-import { WorkspaceProvider } from "@/contexts/WorkspaceContext";
 import { UserProvider } from "@/modules/users";
+import { WorkspaceProvider } from "@/modules/workspaces";
 
 import { ThemeProvider } from "../components/theme-provider";
 
