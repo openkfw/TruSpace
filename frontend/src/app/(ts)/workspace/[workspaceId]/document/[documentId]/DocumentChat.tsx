@@ -15,8 +15,8 @@ import {
    TooltipProvider,
    TooltipTrigger
 } from "@/components/ui/tooltip";
-import { ChatMessage as Chat } from "@/interfaces";
 import { getChatsPdfExportUrl, loadChats, postChat } from "@/lib/services";
+import { ChatMessage as Chat } from "@/modules/chats/domain";
 
 export default function DocumentChat({
    cid,
