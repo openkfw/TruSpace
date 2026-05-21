@@ -1,29 +1,7 @@
 "use client";
 
-import {
-   createContext,
-   type ReactNode,
-   useContext
-} from "react";
-
-import {
-   useUserSession,
-   type UseUserSessionResult} from "@/modules/users";
-
-const UserContext = createContext<UseUserSessionResult | undefined>(undefined);
-
-export const useUser = (): UseUserSessionResult => {
-   const context = useContext(UserContext);
-
-   if (!context) {
-      throw new Error("useUser must be used within a UserProvider");
-   }
-
-   return context;
-};
-
-export const UserProvider = ({ children }: { children: ReactNode }) => {
-   const value = useUserSession();
-
-   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
-};
+export type { UseUserSessionResult } from "@/modules/users";
+export {
+   UserProvider,
+   useUser
+} from "@/modules/users";
