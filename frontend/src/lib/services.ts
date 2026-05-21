@@ -11,9 +11,13 @@ import {
 } from "@/shared/config";
 import {
    fetchWithCredentials,
-   swrJsonFetcher,
-   withCsrf
+   swrJsonFetcher
 } from "@/shared/infrastructure/http";
+export {
+   getChatsPdfExportUrl,
+   loadChats,
+   postChat
+} from "@/modules/chats/infrastructure";
 export {
    deleteDocument,
    documentUpload,
@@ -23,6 +27,18 @@ export {
    loadDocuments
 } from "@/modules/documents/infrastructure";
 export {
+   getHealth
+} from "@/modules/health/infrastructure";
+export {
+   createPerspective,
+   customPerspective
+} from "@/modules/perspectives/infrastructure";
+export {
+   deleteTag,
+   loadTags,
+   postTag
+} from "@/modules/tags/infrastructure";
+export {
    createWorkspace,
    deleteWorkspace,
    loadWorkspaceContributors,
@@ -31,36 +47,6 @@ export {
 } from "@/modules/workspaces/infrastructure";
 
 // Perspectives api
-
-export const createPerspective = async (formData, errorText) => {
-   const url = `${PERSPECTIVES_ENDPOINT}`;
-   const options: RequestInit = {
-      method: "POST",
-      body: formData,
-      credentials: "include"
-   };
-   const response = await fetchWithCredentials(url, withCsrf(options));
-   if (!response.ok) {
-      throw new Error(errorText);
-   }
-   const data = await response.json();
-   return data;
-};
-
-export const customPerspective = async (formData, errorText) => {
-   const url = `${PERSPECTIVES_ENDPOINT}/generate-custom`;
-   const options: RequestInit = {
-      method: "POST",
-      body: formData,
-      credentials: "include"
-   };
-   const response = await fetchWithCredentials(url, withCsrf(options));
-   if (!response.ok) {
-      throw new Error(errorText);
-   }
-   const data = await response.json();
-   return data;
-};
 
 export const usePerspectives = (cid: string) => {
    const { data, error, isLoading, isValidating, mutate } = useSWR(
@@ -163,108 +149,6 @@ export const useLanguage = (cid: string) => {
    };
 };
 
-// Chats api
-
-export const loadChats = async (docId: string, errorText) => {
-   const url = `${CHATS_ENDPOINT}/${docId}`;
-   const options: RequestInit = {
-      method: "GET",
-      credentials: "include"
-   };
-
-   const response = await fetchWithCredentials(url, options);
-   if (!response.ok) {
-      throw new Error(errorText);
-   }
-   const data = await response.json();
-   return data;
-};
-
-export const getChatsPdfExportUrl = async (docId: string) => {
-   try {
-      const response = await fetchWithCredentials(`${CHATS_ENDPOINT}/export/${docId}`, {
-         credentials: "include"
-      });
-      if (!response.ok) {
-         throw new Error("Failed to generate PDF");
-      }
-      // Create a blob from the response
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      return url;
-   } catch (err) {
-      console.error(err);
-      throw new Error("Failed to generate PDF");
-   }
-};
-
-export const postChat = async (formData, errorText) => {
-   const url = CHATS_ENDPOINT;
-   const options: RequestInit = {
-      method: "POST",
-      body: formData,
-      credentials: "include"
-   };
-   const res = await fetchWithCredentials(url, withCsrf(options));
-   if (!res.ok) {
-      throw new Error(errorText);
-   }
-};
-
-// Tags api
-
-export const loadTags = async (cid: string) => {
-   const url = `${TAGS_ENDPOINT}/version/${cid}`;
-   const options: RequestInit = {
-      method: "GET",
-      credentials: "include"
-   };
-
-   const response = await fetchWithCredentials(url, options);
-   if (!response.ok) {
-      throw new Error("Failed to fetch tags");
-   }
-   const data = await response.json();
-   return data;
-};
-
-export const postTag = async (formData, cid: string) => {
-   const url = `${TAGS_ENDPOINT}/version/${cid}`;
-   const options: RequestInit = {
-      method: "POST",
-      headers: {
-         "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-         name: formData.name,
-         color: formData.color,
-         workspaceOrigin: formData.workspaceOrigin,
-         docId: formData.docId
-      }),
-      credentials: "include"
-   };
-   const response = await fetchWithCredentials(url, withCsrf(options));
-   if (!response.ok) {
-      throw new Error("Failed to add tag");
-   }
-   const data = await response.json();
-   return data;
-};
-
-export const deleteTag = async (tagId: string) => {
-   const url = `${TAGS_ENDPOINT}/${tagId}`;
-   const options: RequestInit = {
-      method: "DELETE",
-      credentials: "include"
-   };
-   const response = await fetchWithCredentials(url, withCsrf(options));
-   if (!response.ok) {
-      throw new Error("Failed to delete tag");
-   }
-   const data = await response.json();
-   return data;
-};
-
 export function useTagsStatus(cid: string) {
    const { data, error, mutate } = useSWR(
       `${TAGS_ENDPOINT}/status/req_tags_${cid}`,
@@ -313,13 +197,6 @@ export {
    updateUserName,
    updateUserSettings
 } from "@/modules/users/infrastructure";
-
-export async function getHealth() {
-   const url = `${HEALTH_ENDPOINT}`;
-   const response = await fetchWithCredentials(url, { credentials: "include" });
-   const data = await response.json();
-   return data;
-}
 
 export function useDocumentsStatistics() {
    const { data, error, isLoading, isValidating, mutate } = useSWR(
