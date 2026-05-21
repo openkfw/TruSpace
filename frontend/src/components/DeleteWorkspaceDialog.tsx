@@ -17,8 +17,8 @@ import {
    DialogTitle
 } from "@/components/ui/dialog";
 import { useWorkspaceContext } from "@/contexts/WorkspaceContext";
-import { Workspace } from "@/interfaces";
 import { deleteWorkspace } from "@/lib/services";
+import { Workspace } from "@/modules/workspaces/domain";
 
 import { Button } from "./ui/button";
 

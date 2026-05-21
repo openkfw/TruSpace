@@ -13,8 +13,8 @@ import {
 
 import { useParams, usePathname } from "next/navigation";
 
-import { Workspace } from "@/interfaces";
 import { loadWorkspaces } from "@/lib/services";
+import { Workspace } from "@/modules/workspaces/domain";
 
 interface WorkspaceContextType {
    workspace: Workspace | null;

@@ -1,6 +1,6 @@
 import useSWR from "swr";
 
-import { Workspace } from "@/interfaces";
+import { Workspace } from "@/modules/workspaces/domain";
 import {
    CHATS_ENDPOINT,
    DOCUMENTS_ENDPOINT,

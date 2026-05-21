@@ -40,7 +40,7 @@ import {
    useSidebar
 } from "@/components/ui/sidebar";
 import { useUser } from "@/contexts/UserContext";
-import { Workspace } from "@/interfaces";
+import { Workspace } from "@/modules/workspaces/domain";
 
 import DeleteWorkspaceDialog from "./DeleteWorkspaceDialog";
 import WorkspaceDialog from "./WorkspaceDialog";
