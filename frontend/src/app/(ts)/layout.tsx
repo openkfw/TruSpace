@@ -1,6 +1,6 @@
 import { AppSidebar } from "@/components/Sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import WorkspaceLoader from "@/components/WorkspaceLoader";
+import { WorkspaceLoader } from "@/modules/workspaces";
 
 import App from "./App";
 
