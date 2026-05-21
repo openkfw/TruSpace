@@ -7,7 +7,7 @@ import { useTranslations } from "next-intl";
 import { ChevronDown, MessageCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Document } from "@/interfaces";
+import { Document } from "@/modules/documents/domain";
 
 import DocumentChat from "./DocumentChat";
 

@@ -10,12 +10,12 @@ import {
 
 import { useTranslations } from "next-intl";
 
-import { Document, DocumentWithVersions } from "@/interfaces";
 import {
    loadAllDocuments,
    loadDocumentDetail,
    loadDocuments
 } from "@/lib/services";
+import { Document, DocumentWithVersions } from "@/modules/documents/domain";
 
 interface DocumentsContextType {
    count: number;

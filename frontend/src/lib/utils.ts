@@ -2,7 +2,7 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-import { PdfJs, TextItem } from "@/interfaces";
+import { PdfJs, TextItem } from "@/modules/documents/domain";
 
 export function cn(...inputs: ClassValue[]) {
    return twMerge(clsx(inputs));
