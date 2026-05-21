@@ -3,19 +3,16 @@
 import {
    createContext,
    type ReactNode,
-   useCallback,
-   useContext,
-   useState
+   useContext
 } from "react";
 
 import { useTranslations } from "next-intl";
 
 import {
-   loadAllDocuments,
-   loadDocumentDetail,
-   loadDocuments
-} from "@/lib/services";
-import { Document, DocumentWithVersions } from "@/modules/documents/domain";
+   type Document,
+   type DocumentWithVersions,
+   useDocumentsState
+} from "@/modules/documents";
 
 interface DocumentsContextType {
    count: number;
@@ -29,13 +26,13 @@ interface DocumentsContextType {
       from?: number,
       limit?: number,
       searchString?: string
-   ) => void;
-   fetchAllDocuments: () => void;
-   fetchDocumentDetails: (documentID: string) => void;
+   ) => Promise<void>;
+   fetchAllDocuments: () => Promise<void>;
+   fetchDocumentDetails: (documentID: string) => Promise<void>;
    refreshUntilVersionFound: (
       docId: string,
       cid: string
-   ) => Promise<() => void>;
+   ) => Promise<void | (() => void)>;
 }
 
 export const DocumentsContext = createContext<DocumentsContextType>({
@@ -45,121 +42,28 @@ export const DocumentsContext = createContext<DocumentsContextType>({
    document: null,
    limit: 10,
    setDocuments: () => null,
-   fetchDocuments: () => null,
-   fetchAllDocuments: () => null,
-   fetchDocumentDetails: () => null,
-   refreshUntilVersionFound: () => null
+   fetchDocuments: async () => undefined,
+   fetchAllDocuments: async () => undefined,
+   fetchDocumentDetails: async () => undefined,
+   refreshUntilVersionFound: async () => undefined
 });
 
 export const useDocuments = () => {
    const context = useContext(DocumentsContext);
    if (!context) {
-      throw new Error("useWorkspace must be used within a WorkspaceProvider");
+      throw new Error("useDocuments must be used within a DocumentsProvider");
    }
    return context;
 };
 
 export const DocumentsProvider = ({ children }: { children: ReactNode }) => {
-   const [allDocuments, setAllDocuments] = useState<Document[]>([]);
-   const [documents, setDocuments] = useState<Document[]>([]);
-   const [count, setCount] = useState<number>(0);
-   const [limit, setLimit] = useState<number>(10);
-   const [document, setDocument] = useState<DocumentWithVersions>(null);
    const translations = useTranslations("homePage");
-
-   const fetchAllDocuments = async () => {
-      const { data } = await loadAllDocuments(translations("failedToFetch"));
-      setAllDocuments(data);
-   };
-
-   const fetchDocuments = async (workspaceId, from, limitTo, searchString) => {
-      const { data, count, limit } = await loadDocuments(
-         workspaceId,
-         translations("failedToFetch"),
-         from,
-         limitTo,
-         searchString
-      );
-      setDocuments(data);
-      setCount(count);
-      setLimit(limit);
-   };
-
-   const fetchDocumentDetails = useCallback(
-      async (documentId) => {
-         const data = await loadDocumentDetail(
-            documentId,
-            translations("failedToFetch")
-         );
-         setDocument(data);
-      },
-      [translations]
-   );
-
-   const refreshUntilVersionFound = useCallback(
-      async (docId: string, cid: string) => {
-         const findDocumentVersion = (document) => {
-            return document?.documentVersions.find((d) => d.cid === cid);
-         };
-
-         if (!docId) return;
-
-         const data = await loadDocumentDetail(
-            docId,
-            translations("failedToFetch")
-         );
-         let foundDocumentVersion = findDocumentVersion(data);
-
-         if (!foundDocumentVersion) {
-            const pollInterval = setInterval(async () => {
-               try {
-                  const data = await loadDocumentDetail(
-                     docId,
-                     translations("failedToFetch")
-                  );
-                  foundDocumentVersion = findDocumentVersion(data);
-                  if (foundDocumentVersion) {
-                     clearInterval(pollInterval);
-                     setDocument(data);
-                  }
-               } catch (error) {
-                  console.error("Error polling for document version:", error);
-                  clearInterval(pollInterval);
-               }
-            }, 5000);
-
-            setTimeout(() => {
-               if (pollInterval) {
-                  clearInterval(pollInterval);
-                  console.log(`Document version "${cid}" not found.`);
-               }
-            }, 30000);
-
-            return () => {
-               clearInterval(pollInterval);
-            };
-         } else {
-            setDocument(data);
-         }
-      },
-      [translations]
-   );
+   const value = useDocumentsState({
+      failedToFetchText: translations("failedToFetch")
+   });
 
    return (
-      <DocumentsContext.Provider
-         value={{
-            count,
-            allDocuments,
-            document,
-            documents,
-            limit,
-            setDocuments,
-            fetchDocuments,
-            fetchAllDocuments,
-            fetchDocumentDetails,
-            refreshUntilVersionFound
-         }}
-      >
+      <DocumentsContext.Provider value={value}>
          {children}
       </DocumentsContext.Provider>
    );
