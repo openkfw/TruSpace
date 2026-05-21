@@ -43,12 +43,11 @@ import { useDocuments } from "@/contexts/DocumentsContext";
 import { useWorkspaceContext } from "@/contexts/WorkspaceContext";
 import { useDebounce } from "@/hooks/useDebounce";
 import { formatDate, formatDateDays } from "@/lib/formatDate";
-import {
-   deleteDocument,
-   DOCUMENTS_ENDPOINT,
-   documentUpload
-} from "@/lib/services";
+import { deleteDocument, documentUpload } from "@/lib/services";
 import { isPdfBlank } from "@/lib/utils";
+import { DOCUMENTS_ENDPOINT } from "@/shared/config";
+
+import DocumentTags from "../app/(ts)/workspace/[workspaceId]/document/[documentId]/DocumentTags";
 
 import { Badge } from "./ui/badge";
 import {
@@ -57,9 +56,8 @@ import {
    TooltipProvider,
    TooltipTrigger
 } from "./ui/tooltip";
-import PaginationComponent from "./Pagination";
-import DocumentTags from "../app/(ts)/workspace/[workspaceId]/document/[documentId]/DocumentTags";
 import MalwareScanIndicator from "./MalwareScanIndicator";
+import PaginationComponent from "./Pagination";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
    "pdfjs-dist/build/pdf.worker.min.mjs",

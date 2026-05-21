@@ -8,7 +8,7 @@ import { ChevronLeft, ChevronRight, StickyNote } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { DOCUMENTS_ENDPOINT } from "@/lib/services";
+import { DOCUMENTS_ENDPOINT } from "@/shared/config";
 
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";

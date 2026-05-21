@@ -10,7 +10,6 @@ import {
 import { Dot, MoreVertical } from "lucide-react";
 
 import MalwareScanIndicator from "@/components/MalwareScanIndicator";
-
 import {
    DropdownMenu,
    DropdownMenuContent,
@@ -32,7 +31,7 @@ import {
    TooltipTrigger
 } from "@/components/ui/tooltip";
 import { formatDate, formatDateDays } from "@/lib/formatDate";
-import { DOCUMENTS_ENDPOINT } from "@/lib/services";
+import { DOCUMENTS_ENDPOINT } from "@/shared/config";
 
 import { Button } from "../../../../../../components/ui/button";
 

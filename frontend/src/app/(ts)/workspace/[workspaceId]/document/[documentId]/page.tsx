@@ -18,7 +18,8 @@ import {
    TooltipTrigger
 } from "@/components/ui/tooltip";
 import { useDocuments } from "@/contexts/DocumentsContext";
-import { DOCUMENTS_ENDPOINT, useTagsStatus } from "@/lib/services";
+import { useTagsStatus } from "@/lib/services";
+import { DOCUMENTS_ENDPOINT } from "@/shared/config";
 
 import DocumentData from "./DocumentData";
 import DocumentEditable from "./DocumentEditable";

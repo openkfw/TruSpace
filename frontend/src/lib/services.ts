@@ -1,6 +1,17 @@
 import useSWR from "swr";
 
 import { Workspace } from "@/interfaces";
+import {
+   CHATS_ENDPOINT,
+   DOCUMENTS_ENDPOINT,
+   HEALTH_ENDPOINT,
+   LANGUAGE_ENDPOINT,
+   PERMISSIONS_ENDPOINT,
+   PERSPECTIVES_ENDPOINT,
+   TAGS_ENDPOINT,
+   USERS_ENDPOINT,
+   WORKSPACES_ENDPOINT
+} from "@/shared/config";
 
 const fetcher = (url) =>
    fetch(url, {
@@ -32,22 +43,6 @@ const withCsrf = (options: RequestInit): RequestInit => {
    headers.set("X-CSRF-Token", token);
    return { ...options, headers };
 };
-
-export const getApiUrl = (): string => {
-   return process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
-};
-
-const API_URL = getApiUrl();
-
-export const DOCUMENTS_ENDPOINT = `${API_URL}/documents`;
-const PERSPECTIVES_ENDPOINT = `${API_URL}/perspectives`;
-export const CHATS_ENDPOINT = `${API_URL}/chats`;
-const TAGS_ENDPOINT = `${API_URL}/tags`;
-const WORKSPACES_ENDPOINT = `${API_URL}/workspaces`;
-export const USERS_ENDPOINT = `${API_URL}/users`;
-const HEALTH_ENDPOINT = `${API_URL}/health`;
-const PERMISSIONS_ENDPOINT = `${API_URL}/permissions`;
-const LANGUAGE_ENDPOINT = `${API_URL}/language`;
 
 // Documents api
 export const loadAllDocuments = async (errorText: string) => {
