@@ -213,6 +213,8 @@ nav:
           - Contributing: guides/developer/contributing.md
           - API Reference: guides/developer/api.md
           - Testing: guides/developer/testing.md
+          - Code of Conduct: guides/developer/code-of-conduct.md
+          - Logging: guides/developer/logging.md
 
   - Reference:
       - reference/index.md
