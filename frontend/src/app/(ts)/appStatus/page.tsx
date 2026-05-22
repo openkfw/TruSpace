@@ -245,7 +245,7 @@ export default function AppStatus() {
                   <span>{t("appStatus.loadingPeerInformation")}</span>
                </div>
             ) : peers && peers.length > 0 ? (
-               <div className="space-y-3">
+               <div className="grid grid-cols-2 gap-3">
                   {peers.slice(0, 5).map((peer: PeerNode, index: number) => (
                      <div
                         key={index}
