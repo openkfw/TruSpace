@@ -36,9 +36,9 @@ The purpose of TruSpace is to make collaboration on documents between several st
 ## Quick start, I want to..
 
 - 🧪 [Play around in a sandbox demo environment](#play-around-in-an-online-sandbox-demo-environment)
-- 💻 [Install TruSpace locally](#install-truspace-locally)
-- 🌐 [Connect to other TruSpace nodes](#connect-to-other-truspace-nodes)
-- 📚 [Check out architecture, guides, details](#check-out-architecture-guides-details)
+- 💻 [Install TruSpace locally](https://web.truspace.dev/site/getting-started/installation/local/)
+- 🌐 [Connect to other TruSpace nodes](https://web.truspace.dev/site/getting-started/installation/local/)
+- 📚 [Check out architecture, guides, details](https://web.truspace.dev/site/architecture/)
 
 ## Play around in an online sandbox demo environment
 
@@ -85,56 +85,6 @@ If something doesn't work, check that all containers are running with `docker ps
 
 > [!NOTE]
 > For more details on the installation, feel free to check out our detailed installation guide [here](./doc/Admin%20Guide/Setup%20TruSpace/Installation.md).
-
-## Connect to other TruSpace nodes
-
-You have a TruSpace node running and would like to connect to another (private) network to sync the TruSpace data? It's simple - but you need to exchange some configuration values in order to have a secure private connection.
-
-We have created an **automated** way to connect your TruSpace IPFS node to another TruSpace IPFS node using 2 scripts:
-
-- `scripts/fetch-connection.sh`: This script fetches the necessary connection details from the target node ([find the script here](../../../scripts/fetch-connection.sh))
-- `scripts/connectPeer-automatic.sh`: This script connects your local TruSpace IPFS node to the target node using the fetched details ([find the script here](../../../scripts/connectPeer-automatic.sh))
-
-In an ideal environment, these commands are all you need to connect to another TruSpace node:
-
-```bash
-# On you target node, run and create encrypted connection details:
-./scripts/fetch-connection.sh -e
-
-# On your local node, store the received connection files in the root TruSpace directory, then run:
-./scripts/connectPeer-automatic.sh .connection .connection.password
-```
-
-<video src="https://github.com/user-attachments/assets/3d670619-b047-4d63-a736-f2ac94a7d0ad" title="TruSpace Connection Demo"></video>
-
-For more **manual** control, we also provide a manual setup option further with `scripts/connectPeer-manually.sh`
-
-```bash
-./scripts/connectPeer-manually.sh <peer_ip> <ipfs_peer_id> <cluster_peer_id> <ipfs_container_id> <cluster_container_id> [swarm_key_path] [cluster_secret_path]
-```
-
-> [!NOTE]
-> For more details on the how the connection to other IPFS nodes works, please read the detailed guide [here](./doc/Admin%20Guide/Setup%20TruSpace/Connecting%20to%20other%20nodes.md).
-
-## Check out architecture, guides, details...
-
-### 🧑‍💻 User Guide
-
-An extensive user guide with screenshots is available in the folder [User Guide](./doc/User%20Guide/). You can also check out our demo video on [YouTube](https://www.youtube.com/watch?v=dpo_D3NJpqE)!
-
-### ⚗️ Developer Guide
-
-For a guide on how to set up a development environment, contribute code, report issues and submit pull requests, please refer to the [Developer Guide](./doc/Developer%20Guide/README.md).
-
-### 🛠️ Admin Guide
-
-An extensive admin guide with screenshots is available in the folder [Admin Guide](./doc/Admin%20Guide/)
-
-### ⚙️ Environment Variables
-
-This project uses a set of environment variables to configure its frontend, backend, IPFS, and AI components.
-
-For a complete reference and description of all variables, see [ENVIRONMENT_VARIABLES.md](./doc/ENVIRONMENT_VARIABLES.md)
 
 ### 🧰 Tech Stack and Architecture overview
 
