@@ -1,4 +1,4 @@
-import { DocumentList } from "@/modules/documents";
+import DocumentList from "@/modules/documents/presentation/DocumentList";
 
 import WorkspaceMenu from "./WorkspaceMenu";
 import WorkspaceTitle from "./WorkspaceTitle";
