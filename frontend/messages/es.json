@@ -571,7 +571,6 @@
     "loadingPeerInformation": "Cargando información de pares...",
     "peer": "Par",
     "connected": "Atados juntos",
-    "clusterPeersCount": "Pares del clúster: {count}",
     "andMorePeers": "... y {count} otros compañeros",
     "noPeersConnected": "No hay compañeros conectados",
     "networkConnectivityIssues": "Esto podría indicar problemas de conexión de red.",

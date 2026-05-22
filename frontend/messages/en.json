@@ -571,7 +571,6 @@
       "loadingPeerInformation": "Loading peer information...",
       "peer": "Peer",
       "connected": "Connected",
-      "clusterPeersCount": "Cluster peers: {count}",
       "andMorePeers": "... and {count} more peers",
       "noPeersConnected": "No peers connected",
       "networkConnectivityIssues": "This might indicate network connectivity issues",

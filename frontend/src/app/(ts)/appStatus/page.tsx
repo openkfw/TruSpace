@@ -270,14 +270,6 @@ export default function AppStatus() {
                         <div className="font-mono text-sm text-gray-600 dark:text-gray-400 break-all">
                            {peer.id}
                         </div>
-                        {peer.cluster_peers &&
-                           peer.cluster_peers.length > 0 && (
-                              <div className="mt-2 text-sm text-gray-500">
-                                 {t("appStatus.clusterPeersCount", {
-                                    count: peer.cluster_peers.length
-                                 })}
-                              </div>
-                           )}
                         {peer.error && peer.error.length > 0 && (
                            <div className="mt-2 text-sm text-red-500">
                               <XCircle className="inline w-4 h-4 mr-1" />
