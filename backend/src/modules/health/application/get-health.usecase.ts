@@ -114,6 +114,7 @@ export async function getHealth() {
     },
     version: config.version,
     nodeId: clusterId?.ipfs?.id || '',
+    clusterId: clusterId?.id || '',
     clusterMultiaddress: `/ip4/${ipifyResponse?.ip}/tcp/9096/p2p/${clusterId?.id}`,
     nodeMultiaddress: `/ip4/${ipifyResponse?.ip}/tcp/4001/p2p/${clusterId?.ipfs?.id}`,
   };
