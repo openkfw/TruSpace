@@ -155,7 +155,9 @@ export default function AppStatus() {
                         <span className="font-semibold flex items-center gap-2 flex-1 min-w-0">
                            {health?.nodeId ? (
                               <span className="flex items-center gap-2 flex-1 min-w-0">
-                                 <span className="truncate">{health.nodeId}</span>
+                                 <span className="truncate" title={health.nodeId}>
+                                    {health.nodeId}
+                                 </span>
                                  <CopyToClipboardButton value={health.nodeId} />
                               </span>
                            ) : (
@@ -172,7 +174,9 @@ export default function AppStatus() {
                         <span className="font-semibold flex items-center gap-2 flex-1 min-w-0">
                             {health?.clusterId ? (
                               <span className="flex items-center gap-2 flex-1 min-w-0">
-                                  <span className="truncate">{health.clusterId}</span>
+                                  <span className="truncate" title={health.clusterId}>
+                                     {health.clusterId}
+                                  </span>
                                   <CopyToClipboardButton value={health.clusterId} />
                               </span>
                             ) : (
@@ -205,7 +209,12 @@ export default function AppStatus() {
                         <span className="font-normal flex items-center gap-2 flex-1 min-w-0">
                             {health?.nodeMultiaddress ? (
                               <span className="flex items-center gap-2 flex-1 min-w-0">
-                                  <span className="truncate">{health.nodeMultiaddress}</span>
+                                  <span
+                                     className="truncate"
+                                     title={health.nodeMultiaddress}
+                                  >
+                                     {health.nodeMultiaddress}
+                                  </span>
                                   <CopyToClipboardButton value={health.nodeMultiaddress} />
                               </span>
                             ) : (
@@ -222,7 +231,12 @@ export default function AppStatus() {
                         <span className="font-normal flex items-center gap-2 flex-1 min-w-0">
                             {health?.clusterMultiaddress ? (
                               <span className="flex items-center gap-2 flex-1 min-w-0">
-                                  <span className="truncate">{health.clusterMultiaddress}</span>
+                                  <span
+                                     className="truncate"
+                                     title={health.clusterMultiaddress}
+                                  >
+                                     {health.clusterMultiaddress}
+                                  </span>
                                   <CopyToClipboardButton value={health.clusterMultiaddress} />
                               </span>
                             ) : (
@@ -249,7 +263,9 @@ export default function AppStatus() {
                                              key={index}
                                              className="flex items-center gap-2 text-xs font-mono text-gray-600 dark:text-gray-400 break-all"
                                           >
-                                             <span className="truncate">{address}</span>
+                                             <span className="truncate" title={address}>
+                                                {address}
+                                             </span>
                                              <CopyToClipboardButton value={address} />
                                           </div>
                                        ))}
