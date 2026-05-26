@@ -139,13 +139,13 @@ export default function AppStatus() {
          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md border">
             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
                <Globe className="w-6 h-6 text-purple-500" />
-               Node Information
+               {t("appStatus.nodeInformation")}
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 md:divide-x md:divide-gray-200 dark:md:divide-gray-700">
                <div className="space-y-4 md:pr-6">
                   <div className="text-lg font-semibold text-gray-700 dark:text-gray-300">
-                     Identity
+                     {t("appStatus.nodeIdentity")}
                   </div>
                   <div>
                      <div className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-md text-sm flex items-center gap-3">
@@ -167,7 +167,7 @@ export default function AppStatus() {
                   <div>
                       <div className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-md text-sm flex items-center gap-3">
                         <span className="font-normal  text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                            Cluster ID:
+                            {t("appStatus.clusterId")}:
                         </span>
                         <span className="font-semibold flex items-center gap-2 flex-1 min-w-0">
                             {health?.clusterId ? (
@@ -195,12 +195,12 @@ export default function AppStatus() {
 
                <div className="space-y-4 md:pl-6">
                   <div className="text-lg font-semibold text-gray-700 dark:text-gray-300">
-                     Network
+                     {t("appStatus.nodeNetwork")}
                   </div>
                   <div>
                       <div className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-md text-sm flex items-center gap-3">
                         <span className="font-normal  text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                            IPFS Address:
+                            {t("appStatus.nodeMultiaddress")}:
                         </span>
                         <span className="font-normal flex items-center gap-2 flex-1 min-w-0">
                             {health?.nodeMultiaddress ? (
@@ -217,7 +217,7 @@ export default function AppStatus() {
                   <div>
                       <div className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-md text-sm flex items-center gap-3">
                         <span className="font-normal  text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                            Cluster Address:
+                            {t("appStatus.clusterMultiaddress")}:
                         </span>
                         <span className="font-normal flex items-center gap-2 flex-1 min-w-0">
                             {health?.clusterMultiaddress ? (
@@ -234,14 +234,14 @@ export default function AppStatus() {
                   <div>
                       <div className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-md text-sm flex items-center gap-3">
                         <span className="font-normal  text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                          {t("appStatus.nodeAddresses")}:
+                          {t("appStatus.allClusterAddresses")}:
                         </span>
                         {peers && peers.length > 0 && peers[0].addresses ? (
                            <div className="space-y-2">
                               {peers[0].addresses.length > 0 ? (
                                  <details className="p-2 bg-gray-100 dark:bg-gray-700 rounded-md">
                                     <summary className="cursor-pointer text-sm font-medium text-gray-700 dark:text-gray-300">
-                                       {peers[0].addresses.length} {t("appStatus.nodeAddresses")}...
+                                       {peers[0].addresses.length} {t("appStatus.addresses")}...
                                     </summary>
                                     <div className="mt-2 space-y-1">
                                        {peers[0].addresses.map((address, index) => (
