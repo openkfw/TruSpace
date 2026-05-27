@@ -579,7 +579,7 @@
       "nodeMultiaddress": "IPFS Address",
       "clusterMultiaddress": "Cluster Address",
       "allClusterAddresses": "All Cluster Addresses",
-      "addresses": "addresses",
+      "addresses": "Addresses",
       "peerError": "There is an error with this peer connection: \"{error}\"",
       "error": "Error"
    }
