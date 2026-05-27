@@ -25,6 +25,19 @@ interface PeerNode {
    error?: string;
 }
 
+// Test dataset for cluster adresses to display in UI when developing
+const TEST_PEERS_DATASET: PeerNode[] = [
+   {
+      id: "12D3KooWNEABPmoSCyKVhFKUT1yzvZbnjaNedCLWbfZR65rPmtT7",
+      peername: "Test Peer",
+      addresses: [
+         "/ip4/127.0.0.1/tcp/9096/p2p/12D3KooWNEABPmoSCyKVhFKUT1yzvZbnjaNedCLWbfZR65rPmtT7",
+         "/ip4/127.0.0.1/tcp/9097/p2p/12D3KooWNEABPmoSCyKVhFKUT1yzvZbnjaNedCLWbfZR65rPmtT7",
+         "/ip4/127.0.0.1/tcp/9098/p2p/12D3KooWNEABPmoSCyKVhFKUT1yzvZbnjaNedCLWbfZR65rPmtT7"
+      ]
+   }
+];
+
 export default function AppStatus() {
    const t = useTranslations();
    const {
@@ -33,6 +46,7 @@ export default function AppStatus() {
       mutate: refreshHealth
    } = useHealth();
    const { peers, isLoading: peersLoading, mutate: refreshPeers } = usePeers();
+   const peersTestset = TEST_PEERS_DATASET;  // Use this instead of peers below for testing UI with cluster addresses
    const handleRefresh = () => {
       refreshHealth();
       refreshPeers();
@@ -154,10 +168,11 @@ export default function AppStatus() {
                         </span>
                         <span className="font-semibold flex items-center gap-2 flex-1 min-w-0">
                            {health?.nodeId ? (
-                              <span className="flex items-center gap-2 flex-1 min-w-0">
+                              <span className="flex items-center flex-1 min-w-0">
                                  <span className="truncate" title={health.nodeId}>
-                                    {health.nodeId}
+                                    {health.nodeId.slice(0, -4)}
                                  </span>
+                                 <span className="shrink-0" title={health.nodeId}>{health.nodeId.slice(-4)}</span>
                                  <CopyToClipboardButton value={health.nodeId} />
                               </span>
                            ) : (
@@ -173,11 +188,12 @@ export default function AppStatus() {
                         </span>
                         <span className="font-semibold flex items-center gap-2 flex-1 min-w-0">
                             {health?.clusterId ? (
-                              <span className="flex items-center gap-2 flex-1 min-w-0">
-                                  <span className="truncate" title={health.clusterId}>
-                                     {health.clusterId}
-                                  </span>
-                                  <CopyToClipboardButton value={health.clusterId} />
+                              <span className="flex items-center flex-1 min-w-0">
+                                 <span className="truncate" title={health.clusterId}>
+                                    {health.clusterId.slice(0, -4)}
+                                 </span>
+                                 <span className="shrink-0" title={health.clusterId}>{health.clusterId.slice(-4)}</span>
+                                 <CopyToClipboardButton value={health.clusterId} />
                               </span>
                             ) : (
                               t("appStatus.notAvailable")
@@ -208,14 +224,12 @@ export default function AppStatus() {
                         </span>
                         <span className="font-normal flex items-center gap-2 flex-1 min-w-0">
                             {health?.nodeMultiaddress ? (
-                              <span className="flex items-center gap-2 flex-1 min-w-0">
-                                  <span
-                                     className="truncate"
-                                     title={health.nodeMultiaddress}
-                                  >
-                                     {health.nodeMultiaddress}
-                                  </span>
-                                  <CopyToClipboardButton value={health.nodeMultiaddress} />
+                              <span className="flex items-center flex-1 min-w-0">
+                                 <span className="truncate" title={health.nodeMultiaddress}>
+                                    {health.nodeMultiaddress.slice(0, -4)}
+                                 </span>
+                                 <span className="shrink-0" title={health.nodeMultiaddress}>{health.nodeMultiaddress.slice(-4)}</span>
+                                 <CopyToClipboardButton value={health.nodeMultiaddress} />
                               </span>
                             ) : (
                               t("appStatus.notAvailable")
@@ -230,14 +244,12 @@ export default function AppStatus() {
                         </span>
                         <span className="font-normal flex items-center gap-2 flex-1 min-w-0">
                             {health?.clusterMultiaddress ? (
-                              <span className="flex items-center gap-2 flex-1 min-w-0">
-                                  <span
-                                     className="truncate"
-                                     title={health.clusterMultiaddress}
-                                  >
-                                     {health.clusterMultiaddress}
-                                  </span>
-                                  <CopyToClipboardButton value={health.clusterMultiaddress} />
+                              <span className="flex items-center flex-1 min-w-0">
+                                 <span className="truncate" title={health.clusterMultiaddress}>
+                                    {health.clusterMultiaddress.slice(0, -4)}
+                                 </span>
+                                 <span className="shrink-0" title={health.clusterMultiaddress}>{health.clusterMultiaddress.slice(-4)}</span>
+                                 <CopyToClipboardButton value={health.clusterMultiaddress} />
                               </span>
                             ) : (
                               t("appStatus.notAvailable")
@@ -251,26 +263,29 @@ export default function AppStatus() {
                           {t("appStatus.allClusterAddresses")}:
                         </span>
                         {peers && peers.length > 0 && peers[0].addresses ? (
-                           <div className="space-y-2">
+                           <div className="font-normal flex items-center gap-2 flex-1 min-w-0">
                               {peers[0].addresses.length > 0 ? (
-                                 <details className="p-2 bg-gray-100 dark:bg-gray-700 rounded-md">
-                                    <summary className="cursor-pointer text-sm font-medium text-gray-700 dark:text-gray-300">
-                                       {peers[0].addresses.length} {t("appStatus.addresses")}...
-                                    </summary>
-                                    <div className="mt-2 space-y-1">
-                                       {peers[0].addresses.map((address, index) => (
-                                          <div
-                                             key={index}
-                                             className="flex items-center gap-2 text-xs font-mono text-gray-600 dark:text-gray-400 break-all"
-                                          >
-                                             <span className="truncate" title={address}>
-                                                {address}
-                                             </span>
-                                             <CopyToClipboardButton value={address} />
-                                          </div>
-                                       ))}
-                                    </div>
-                                 </details>
+                                <details className="p-2 bg-gray-100 dark:bg-gray-700 rounded-md w-full min-w-0">
+                                  <summary className="cursor-pointer text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    {peers[0].addresses.length} {t("appStatus.addresses")}...
+                                  </summary>
+
+                                  <div className="mt-2 space-y-1 w-full min-w-0">
+                                    {peers[0].addresses.map((address, index) => (
+                                      <div key={index} className="w-full min-w-0">
+                                        <span className="flex items-center gap-2 w-full min-w-0">
+                                          <span className="truncate flex-1 min-w-0" title={address}>
+                                            {address.slice(0, -4)}
+                                          </span>
+                                          <span className="shrink-0" title={address}>
+                                            {address.slice(-4)}
+                                          </span>
+                                          <CopyToClipboardButton value={address} />
+                                        </span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </details>
                               ) : (
                                  t("appStatus.notAvailable")
                               )}
