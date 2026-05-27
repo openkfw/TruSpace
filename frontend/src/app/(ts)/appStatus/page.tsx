@@ -172,7 +172,7 @@ export default function AppStatus() {
                                  <span className="truncate" title={health.nodeId}>
                                     {health.nodeId.slice(0, -4)}
                                  </span>
-                                 <span className="shrink-0" title={health.nodeId}>{health.nodeId.slice(-4)}</span>
+                                 <span className="shrink-0 pr-2" title={health.nodeId}>{health.nodeId.slice(-4)}</span>
                                  <CopyToClipboardButton value={health.nodeId} />
                               </span>
                            ) : (
@@ -192,7 +192,7 @@ export default function AppStatus() {
                                  <span className="truncate" title={health.clusterId}>
                                     {health.clusterId.slice(0, -4)}
                                  </span>
-                                 <span className="shrink-0" title={health.clusterId}>{health.clusterId.slice(-4)}</span>
+                                 <span className="shrink-0 pr-2" title={health.clusterId}>{health.clusterId.slice(-4)}</span>
                                  <CopyToClipboardButton value={health.clusterId} />
                               </span>
                             ) : (
@@ -228,7 +228,7 @@ export default function AppStatus() {
                                  <span className="truncate" title={health.nodeMultiaddress}>
                                     {health.nodeMultiaddress.slice(0, -4)}
                                  </span>
-                                 <span className="shrink-0" title={health.nodeMultiaddress}>{health.nodeMultiaddress.slice(-4)}</span>
+                                 <span className="shrink-0 pr-2" title={health.nodeMultiaddress}>{health.nodeMultiaddress.slice(-4)}</span>
                                  <CopyToClipboardButton value={health.nodeMultiaddress} />
                               </span>
                             ) : (
@@ -248,7 +248,7 @@ export default function AppStatus() {
                                  <span className="truncate" title={health.clusterMultiaddress}>
                                     {health.clusterMultiaddress.slice(0, -4)}
                                  </span>
-                                 <span className="shrink-0" title={health.clusterMultiaddress}>{health.clusterMultiaddress.slice(-4)}</span>
+                                 <span className="shrink-0 pr-2" title={health.clusterMultiaddress}>{health.clusterMultiaddress.slice(-4)}</span>
                                  <CopyToClipboardButton value={health.clusterMultiaddress} />
                               </span>
                             ) : (
@@ -273,11 +273,11 @@ export default function AppStatus() {
                                   <div className="mt-2 space-y-1 w-full min-w-0">
                                     {peers[0].addresses.map((address, index) => (
                                       <div key={index} className="w-full min-w-0">
-                                        <span className="flex items-center gap-2 w-full min-w-0">
-                                          <span className="truncate flex-1 min-w-0" title={address}>
+                                        <span className="flex items-center w-full min-w-0">
+                                          <span className="truncate" title={address}>
                                             {address.slice(0, -4)}
                                           </span>
-                                          <span className="shrink-0" title={address}>
+                                          <span className="shrink-0 pr-2" title={address}>
                                             {address.slice(-4)}
                                           </span>
                                           <CopyToClipboardButton value={address} />
