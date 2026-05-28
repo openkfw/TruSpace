@@ -10,7 +10,7 @@ interface GraphResponse {
 }
 
 function shortId(id: string): string {
-  return id.slice(0, 8);
+  return `${id.slice(0, 3)}...${id.slice(-4)}`;
 }
 
 export async function getHealthGraph(): Promise<string> {
