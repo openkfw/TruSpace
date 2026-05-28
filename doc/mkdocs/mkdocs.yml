@@ -198,6 +198,7 @@ nav:
       - Startup Options: configuration/startup-options.md
       - Network Configuration: configuration/network.md
       - AI Configuration: configuration/ai-config.md
+      - eMail Configuration: configuration/environment-variables.md
 
   - Guides:
       - guides/index.md
