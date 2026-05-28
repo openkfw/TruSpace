@@ -6,16 +6,14 @@ import {
    AlertTriangle,
    CheckCircle2,
    Globe,
-   Info,
    Network,
    RefreshCw,
-   Server,
    Users,
    XCircle
 } from "lucide-react";
 
 import CopyToClipboardButton from "@/components/CopyToClipboardButton";
-import KPIBox from "@/components/KPIBox";
+import NetworkTopologyDialog from "@/components/NetworkTopologyDialog";
 import { Button } from "@/components/ui/button";
 import config from "@/config";
 
@@ -28,6 +26,19 @@ interface PeerNode {
    error?: string;
 }
 
+// Test dataset for cluster adresses to display in UI when developing
+const TEST_PEERS_DATASET: PeerNode[] = [
+   {
+      id: "12D3KooWNEABPmoSCyKVhFKUT1yzvZbnjaNedCLWbfZR65rPmtT7",
+      peername: "Test Peer",
+      addresses: [
+         "/ip4/127.0.0.1/tcp/9096/p2p/12D3KooWNEABPmoSCyKVhFKUT1yzvZbnjaNedCLWbfZR65rPmtT7",
+         "/ip4/127.0.0.1/tcp/9097/p2p/12D3KooWNEABPmoSCyKVhFKUT1yzvZbnjaNedCLWbfZR65rPmtT7",
+         "/ip4/127.0.0.1/tcp/9098/p2p/12D3KooWNEABPmoSCyKVhFKUT1yzvZbnjaNedCLWbfZR65rPmtT7"
+      ]
+   }
+];
+
 export default function AppStatus() {
    const t = useTranslations();
    const {
@@ -36,6 +47,7 @@ export default function AppStatus() {
       mutate: refreshHealth
    } = useHealth();
    const { peers, isLoading: peersLoading, mutate: refreshPeers } = usePeers();
+   const peersTestset = TEST_PEERS_DATASET;  // Use this instead of peers below for testing UI with cluster addresses
    const handleRefresh = () => {
       refreshHealth();
       refreshPeers();
@@ -138,123 +150,180 @@ export default function AppStatus() {
                </div>
             )}
          </div>
-         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <KPIBox
-               kpi={t("appStatus.truSpaceVersion")}
-               value={truSpaceVersion}
-               valueLabel=""
-               icon={<Info className="w-16 h-16 dark:text-white" />}
-            />
-            <KPIBox
-               kpi={t("appStatus.ipfsNodeId")}
-               value={
-                  health?.nodeId ? `${health.nodeId.substring(0, 8)}...` : "N/A"
-               }
-               valueTooltip={health?.nodeId}
-               icon={<Globe className="w-16 h-16 dark:text-white" />}
-            />
-            <KPIBox
-               kpi={t("appStatus.connectedNodes")}
-               value={connectedNodes.toString()}
-               valueLabel={t("appStatus.peers")}
-               icon={<Network className="w-16 h-16 dark:text-white" />}
-            />
-            <KPIBox
-               kpi={t("appStatus.clusterPeers")}
-               value={connectedNodes.toString()}
-               valueLabel={t("appStatus.nodes")}
-               icon={<Server className="w-16 h-16 dark:text-white" />}
-            />
-         </div>
+
          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md border">
             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
                <Globe className="w-6 h-6 text-purple-500" />
-               {t("appStatus.ipfsNodeInformation")}
+               {t("appStatus.nodeInformation")}
             </h2>
 
-            <div className="space-y-4">
-               <div>
-                  <div className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                     {t("appStatus.clusterMultiaddress")}
+            <div className="grid grid-cols-1 md:grid-cols-2 md:divide-x md:divide-gray-200 dark:md:divide-gray-700">
+               <div className="space-y-4 md:pr-6">
+                  <div className="text-lg font-semibold text-gray-700 dark:text-gray-300">
+                     {t("appStatus.nodeIdentity")}
                   </div>
-                  <div className="px-2 py-1 mb-2 bg-gray-100 dark:bg-gray-700 rounded-md font-mono text-sm break-all">
-                     {health?.clusterMultiaddress ? (
-                        <span className="flex items-center gap-2">
-                           <span>{health.clusterMultiaddress}</span>
-                           <CopyToClipboardButton
-                              value={health.clusterMultiaddress}
-                           />
+                  <div>
+                     <div className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-md text-sm flex items-center gap-3">
+                        <span className="font-normal  text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                           {t("appStatus.ipfsNodeId")}:
                         </span>
-                     ) : (
-                        t("appStatus.notAvailable")
-                     )}
-                  </div>
-                  <div className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                     {t("appStatus.nodeMultiaddress")}
-                  </div>
-                  <div className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-md font-mono text-sm break-all">
-                     {health?.nodeMultiaddress ? (
-                        <span className="flex items-center gap-2">
-                           <span>{health.nodeMultiaddress}</span>
-                           <CopyToClipboardButton
-                              value={health.nodeMultiaddress}
-                           />
+                        <span className="font-semibold flex items-center gap-2 flex-1 min-w-0">
+                           {health?.nodeId ? (
+                              <span className="flex items-center flex-1 min-w-0">
+                                 <span className="truncate" title={health.nodeId}>
+                                    {health.nodeId.slice(0, -4)}
+                                 </span>
+                                 <span className="shrink-0 pr-2" title={health.nodeId}>{health.nodeId.slice(-4)}</span>
+                                 <CopyToClipboardButton value={health.nodeId} />
+                              </span>
+                           ) : (
+                              t("appStatus.notAvailable")
+                           )}
                         </span>
-                     ) : (
-                        t("appStatus.notAvailable")
-                     )}
+                     </div>
+                  </div>
+                  <div>
+                      <div className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-md text-sm flex items-center gap-3">
+                        <span className="font-normal  text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                            {t("appStatus.clusterId")}:
+                        </span>
+                        <span className="font-semibold flex items-center gap-2 flex-1 min-w-0">
+                            {health?.clusterId ? (
+                              <span className="flex items-center flex-1 min-w-0">
+                                 <span className="truncate" title={health.clusterId}>
+                                    {health.clusterId.slice(0, -4)}
+                                 </span>
+                                 <span className="shrink-0 pr-2" title={health.clusterId}>{health.clusterId.slice(-4)}</span>
+                                 <CopyToClipboardButton value={health.clusterId} />
+                              </span>
+                            ) : (
+                              t("appStatus.notAvailable")
+                            )}
+                        </span>
+                      </div>
+                  </div>
+                  <div>
+                      <div className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-md text-sm flex items-center gap-3">
+                        <span className="font-normal  text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                          {t("appStatus.truSpaceVersion")}:
+                        </span>
+                        <span className="font-semibold flex items-center gap-2 flex-1 min-w-0">
+                          {truSpaceVersion}
+                        </span>
+                      </div>
                   </div>
                </div>
-               {peers && peers.length > 0 && peers[0].addresses && (
-                  <div>
-                     <div className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        {t("appStatus.nodeAddresses")} (
-                        {peers[0].addresses.length} {t("appStatus.total")})
-                     </div>
-                     <div className="space-y-2">
-                        {peers[0].addresses
-                           .slice(0, 3)
-                           .map((address, index) => (
-                              <div
-                                 key={index}
-                                 className="p-2 bg-gray-100 dark:bg-gray-700 rounded-md font-mono text-xs break-all"
-                              >
-                                 {address}
-                              </div>
-                           ))}
-                        {peers[0].addresses.length > 3 && (
-                           <div className="text-sm text-gray-500">
-                              {t("appStatus.andMoreAddresses", {
-                                 count: peers[0].addresses.length - 3
-                              })}
-                           </div>
-                        )}
-                     </div>
+
+               <div className="space-y-4 md:pl-6">
+                  <div className="text-lg font-semibold text-gray-700 dark:text-gray-300">
+                     {t("appStatus.nodeNetwork")}
                   </div>
-               )}
+                  <div>
+                      <div className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-md text-sm flex items-center gap-3">
+                        <span className="font-normal  text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                            {t("appStatus.nodeMultiaddress")}:
+                        </span>
+                        <span className="font-normal flex items-center gap-2 flex-1 min-w-0">
+                            {health?.nodeMultiaddress ? (
+                              <span className="flex items-center flex-1 min-w-0">
+                                 <span className="truncate" title={health.nodeMultiaddress}>
+                                    {health.nodeMultiaddress.slice(0, -4)}
+                                 </span>
+                                 <span className="shrink-0 pr-2" title={health.nodeMultiaddress}>{health.nodeMultiaddress.slice(-4)}</span>
+                                 <CopyToClipboardButton value={health.nodeMultiaddress} />
+                              </span>
+                            ) : (
+                              t("appStatus.notAvailable")
+                            )}
+                        </span>
+                      </div>
+                  </div>
+                  <div>
+                      <div className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-md text-sm flex items-center gap-3">
+                        <span className="font-normal  text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                            {t("appStatus.clusterMultiaddress")}:
+                        </span>
+                        <span className="font-normal flex items-center gap-2 flex-1 min-w-0">
+                            {health?.clusterMultiaddress ? (
+                              <span className="flex items-center flex-1 min-w-0">
+                                 <span className="truncate" title={health.clusterMultiaddress}>
+                                    {health.clusterMultiaddress.slice(0, -4)}
+                                 </span>
+                                 <span className="shrink-0 pr-2" title={health.clusterMultiaddress}>{health.clusterMultiaddress.slice(-4)}</span>
+                                 <CopyToClipboardButton value={health.clusterMultiaddress} />
+                              </span>
+                            ) : (
+                              t("appStatus.notAvailable")
+                            )}
+                        </span>
+                      </div>
+                  </div>
+                  <div>
+                      <div className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-md text-sm flex items-center gap-3">
+                        <span className="font-normal  text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                          {t("appStatus.allClusterAddresses")}:
+                        </span>
+                        {peers && peers.length > 0 && peers[0].addresses ? (
+                           <div className="font-normal flex items-center gap-2 flex-1 min-w-0">
+                              {peers[0].addresses.length > 0 ? (
+                                <details className="p-2 bg-gray-100 dark:bg-gray-700 rounded-md w-full min-w-0">
+                                  <summary className="cursor-pointer text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    {peers[0].addresses.length} {t("appStatus.addresses")}...
+                                  </summary>
+
+                                  <div className="mt-2 space-y-1 w-full min-w-0">
+                                    {peers[0].addresses.map((address, index) => (
+                                      <div key={index} className="w-full min-w-0">
+                                        <span className="flex items-center w-full min-w-0">
+                                          <span className="truncate" title={address}>
+                                            {address.slice(0, -4)}
+                                          </span>
+                                          <span className="shrink-0 pr-2" title={address}>
+                                            {address.slice(-4)}
+                                          </span>
+                                          <CopyToClipboardButton value={address} />
+                                        </span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </details>
+                              ) : (
+                                 t("appStatus.notAvailable")
+                              )}
+                           </div>
+                        ) : (
+                          t("appStatus.notAvailable")
+                        )}
+                      </div>
+                  </div>
+               </div>
             </div>
          </div>
          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md border">
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-               <Users className="text-green-500" />
-               {t("appStatus.connectedPeers")} ({connectedNodes})
-            </h2>
+            <div className="flex items-center justify-between mb-4">
+               <h2 className="text-xl font-semibold flex items-center gap-2">
+                  <Users className="text-green-500" />
+                  {t("appStatus.connectedPeers")} ({connectedNodes})
+               </h2>
+               <NetworkTopologyDialog />
+            </div>
             {peersLoading ? (
                <div className="flex items-center justify-center py-8 gap-2">
                   <RefreshCw className="animate-spin text-blue-500" />
                   <span>{t("appStatus.loadingPeerInformation")}</span>
                </div>
             ) : peers && peers.length > 0 ? (
-               <div className="space-y-3">
+               <div className="grid grid-cols-2 gap-4">
                   {peers.slice(0, 5).map((peer: PeerNode, index: number) => (
                      <div
                         key={index}
                         className="px-2 py-1 border rounded-md bg-gray-100 dark:bg-gray-700 transition-colors"
                      >
                         <div className="flex items-center justify-between mb-2">
-                           <span className="font-medium">
-                              {t("appStatus.peer")} {index + 1}: {peer.peername}
-                           </span>
+                          <span className="font-medium">
+                            <span className="font-semibold">{t("appStatus.peer")} {index + 1}:</span>{" "}
+                            {peer.peername}
+                          </span>
                            {peer.error && peer.error.length > 0 ? (
                               <span className="text-red-500 text-sm flex items-center gap-1">
                                  <XCircle className=" w-4 h-4" />
@@ -270,14 +339,6 @@ export default function AppStatus() {
                         <div className="font-mono text-sm text-gray-600 dark:text-gray-400 break-all">
                            {peer.id}
                         </div>
-                        {peer.cluster_peers &&
-                           peer.cluster_peers.length > 0 && (
-                              <div className="mt-2 text-sm text-gray-500">
-                                 {t("appStatus.clusterPeersCount", {
-                                    count: peer.cluster_peers.length
-                                 })}
-                              </div>
-                           )}
                         {peer.error && peer.error.length > 0 && (
                            <div className="mt-2 text-sm text-red-500">
                               <XCircle className="inline w-4 h-4 mr-1" />
