@@ -186,6 +186,11 @@ nav:
       - Data Model: architecture/data-model.md
       - Security: architecture/security.md
       - IPFS Network: architecture/ipfs-network.md
+      - Workflows: architecture/workflows.md
+      - Architecture Decisions:
+          - architecture/decisions/index.md
+          - ADR-001 – IPFS Event Bus: architecture/decisions/adr-001-ipfs-event-bus.md
+          - ADR-002 – Email as Global ID: architecture/decisions/adr-002-email-global-id.md
 
   - Configuration:
       - configuration/index.md
@@ -207,12 +212,16 @@ nav:
           - Workspace Management: guides/admin/workspace-management.md
           - Connecting Nodes: guides/admin/connecting-nodes.md
           - Backup & Recovery: guides/admin/backup-recovery.md
+          - Maintenance: guides/admin/maintenance.md
+          - Resource Requirements: guides/admin/resource-requirements.md
       - Developer Guide:
           - guides/developer/index.md
           - Development Setup: guides/developer/setup.md
           - Contributing: guides/developer/contributing.md
           - API Reference: guides/developer/api.md
           - Testing: guides/developer/testing.md
+          - Code of Conduct: guides/developer/code-of-conduct.md
+          - Logging: guides/developer/logging.md
 
   - Reference:
       - reference/index.md
