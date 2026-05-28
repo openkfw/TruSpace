@@ -581,6 +581,10 @@
       "allClusterAddresses": "Alle Cluster-Adressen",
       "addresses": "Adressen",
       "peerError": "Es gibt einen Fehler mit dieser Peer-Verbindung: \"{error}\"",
-      "error": "Fehler"
+      "error": "Fehler",
+      "networkTopology": "Netzwerktopologie anzeigen",
+      "networkTopologyTitle": "Netzwerktopologie",
+      "loadingNetworkTopology": "Netzwerktopologie wird geladen...",
+      "failedToLoadNetworkTopology": "Netzwerktopologie konnte nicht geladen werden"
    }
 }

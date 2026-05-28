@@ -8,3 +8,5 @@ export const healthRouter = express.Router();
 healthRouter.get('/health', authenticateCookie, HealthController.getHealth);
 
 healthRouter.get('/health/peers', authenticateCookie, HealthController.getHealthPeers);
+
+healthRouter.get('/health/graph', authenticateCookie, HealthController.getHealthGraph);

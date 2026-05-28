@@ -582,6 +582,10 @@
     "allClusterAddresses": "Todas las direcciones del clúster",
     "addresses": "Direcciones",
     "peerError": "Hay un error con esta conexión de igual a igual: \"{error}\"",
-    "error": "Error"
+    "error": "Error",
+    "networkTopology": "Mostrar topología de red",
+    "networkTopologyTitle": "Topología de red",
+    "loadingNetworkTopology": "Cargando topología de red...",
+    "failedToLoadNetworkTopology": "No se pudo cargar la topología de red"
   }
 }

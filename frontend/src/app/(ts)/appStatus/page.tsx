@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 
 import CopyToClipboardButton from "@/components/CopyToClipboardButton";
+import NetworkTopologyDialog from "@/components/NetworkTopologyDialog";
 import { Button } from "@/components/ui/button";
 import config from "@/config";
 
@@ -299,10 +300,13 @@ export default function AppStatus() {
             </div>
          </div>
          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md border">
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-               <Users className="text-green-500" />
-               {t("appStatus.connectedPeers")} ({connectedNodes})
-            </h2>
+            <div className="flex items-center justify-between mb-4">
+               <h2 className="text-xl font-semibold flex items-center gap-2">
+                  <Users className="text-green-500" />
+                  {t("appStatus.connectedPeers")} ({connectedNodes})
+               </h2>
+               <NetworkTopologyDialog />
+            </div>
             {peersLoading ? (
                <div className="flex items-center justify-center py-8 gap-2">
                   <RefreshCw className="animate-spin text-blue-500" />
