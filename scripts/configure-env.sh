@@ -349,6 +349,7 @@ case "$PROFILE_KEY" in
     # IPFS
     START_PRIVATE_NETWORK=false
     _preset_ipfs_defaults
+    CLUSTER_PEERNAME_0="cluster0"
     # AI
     DISABLE_ALL_AI_FUNCTIONALITY=false
     OLLAMA_MODEL="$DEFAULT_OLLAMA_MODEL"
