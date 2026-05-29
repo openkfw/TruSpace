@@ -13,7 +13,12 @@ export {
    loadDocuments,
    useDocumentsStatistics
 } from "@/modules/documents";
-export { getHealth, useHealth, usePeers } from "@/modules/health";
+export {
+   getHealth,
+   useHealth,
+   useNetworkGraph,
+   usePeers
+} from "@/modules/health";
 export { useLanguage, useLanguageStatus } from "@/modules/languages";
 export {
    deleteUserPermission,
