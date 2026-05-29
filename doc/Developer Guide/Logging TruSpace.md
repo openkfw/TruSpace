@@ -2,7 +2,7 @@
 
 ## Logger configuration
 
-As the logger technology, we use Winston. You can find the documentation for Winston [here](https://github.com/winstonjs/winston). The configuration itself is in [backend/src/config/winston.ts](./../../backend/src/config/winston.ts). The log level can be defined through the following environment variable:
+As the logger technology, we use Winston. You can find the documentation for Winston [here](https://github.com/winstonjs/winston). The configuration itself is in [backend/src/shared/config/winston.ts](./../../backend/src/shared/config/winston.ts). The log level can be defined through the following environment variable:
 
 ```bash
 LOG_LEVEL=DEBUG  # DEBUG is the default value

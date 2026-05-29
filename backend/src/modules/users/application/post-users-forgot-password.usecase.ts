@@ -12,11 +12,7 @@ import { HttpError, InternalServerError } from '../../../shared/errors';
 import { sendEmail } from '../../../shared/mailing/mailing';
 import { passwordReset } from '../../../shared/mailing/mailingConstants';
 
-export async function postUsersForgotPassword(
-  email: string,
-  resetPasswordLink: string,
-  lang: string,
-) {
+export async function postUsersForgotPassword(email: string, resetPasswordLink: string, lang: string) {
   const { smtpServer } = config;
 
   if (!smtpServer.host || !smtpServer.port) {
@@ -41,7 +37,7 @@ export async function postUsersForgotPassword(
 
     await createTokenDb(user.id, token);
 
-    const filePath = path.join(process.cwd(), 'src/mailing/templates/resetPasswordEmail.html');
+    const filePath = path.join(process.cwd(), 'src/shared/mailing/templates/resetPasswordEmail.html');
     const source = fs.readFileSync(filePath, 'utf-8');
     const template = compile(source);
     const replacements = {

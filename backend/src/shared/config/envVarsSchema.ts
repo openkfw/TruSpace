@@ -27,6 +27,14 @@ export const envVarsSchema = Joi.object({
     .allow("")
     .empty("")
     .default(false),
+  MALWARE_SCANNING_ENABLED: Joi.bool()
+    .optional()
+    .allow("")
+    .empty("")
+    .default(false),
+  CLAMAV_HOST: Joi.string().optional().allow("").empty("").default("clamav"),
+  CLAMAV_PORT: Joi.number().port().optional().allow("").empty("").default(3310),
+  CLAMAV_TIMEOUT_MS: Joi.number().optional().allow("").empty("").default(15000),
   DATABASE_PATH: Joi.string()
     .optional()
     .allow("")

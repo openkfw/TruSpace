@@ -49,7 +49,8 @@ class UsersIpfsRepository {
 
       const fileBuffer = Buffer.from(result.data);
 
-      res.setHeader('Content-Type', result.headers['content-type']);
+      const contentType = result.headers['content-type'];
+      res.setHeader('Content-Type', typeof contentType === 'string' ? contentType : 'application/octet-stream');
       res.setHeader('Content-Disposition', `attachment; filename="${cid}"`);
 
       res.end(fileBuffer);

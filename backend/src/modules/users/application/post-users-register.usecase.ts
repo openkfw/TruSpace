@@ -88,7 +88,7 @@ export async function postUsersRegister(
         }
       }
 
-      const filePath = path.join(process.cwd(), 'src/mailing/templates/registrationConfirmation.html');
+      const filePath = path.join(process.cwd(), 'src/shared/mailing/templates/registrationConfirmation.html');
       const source = fs.readFileSync(filePath, 'utf-8');
       const template = compile(source);
       const replacements = {

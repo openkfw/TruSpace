@@ -13,7 +13,7 @@ theme:
   name: material
   custom_dir: overrides
   language: en
-  
+
   palette:
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
@@ -22,7 +22,7 @@ theme:
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
-    
+
     - media: "(prefers-color-scheme: light)"
       scheme: default
       primary: deep purple
@@ -167,59 +167,68 @@ extra_javascript:
 
 nav:
   - Home: index.md
-  
+
   - Getting Started:
-    - getting-started/index.md
-    - Quick Start: getting-started/quickstart.md
-    - Installation:
-      - getting-started/installation/index.md
-      - Local Development: getting-started/installation/local-dev.md
-      - Docker Deployment: getting-started/installation/docker.md
-      - Raspberry Pi: getting-started/installation/raspberry-pi.md
-      - Production: getting-started/installation/production.md
-    - First Steps: getting-started/first-steps.md
-    - FAQ: getting-started/faq.md
-  
+      - getting-started/index.md
+      - Quick Start: getting-started/quickstart.md
+      - Installation:
+          - getting-started/installation/index.md
+          - Local Deployment: getting-started/installation/local.md
+          - Remote Deployment: getting-started/installation/remote.md
+          - Connect a node: guides/admin/connecting-nodes.md
+      - First Steps: getting-started/first-steps.md
+      - FAQ: getting-started/faq.md
+
   - Architecture:
-    - architecture/index.md
-    - System Overview: architecture/overview.md
-    - Components: architecture/components.md
-    - Data Model: architecture/data-model.md
-    - Security: architecture/security.md
-    - IPFS Network: architecture/ipfs-network.md
-  
+      - architecture/index.md
+      - System Overview: architecture/overview.md
+      - Components: architecture/components.md
+      - Data Model: architecture/data-model.md
+      - Security: architecture/security.md
+      - IPFS Network: architecture/ipfs-network.md
+      - Workflows: architecture/workflows.md
+      - Architecture Decisions:
+          - architecture/decisions/index.md
+          - ADR-001 – IPFS Event Bus: architecture/decisions/adr-001-ipfs-event-bus.md
+          - ADR-002 – Email as Global ID: architecture/decisions/adr-002-email-global-id.md
+
   - Configuration:
-    - configuration/index.md
-    - Environment Variables: configuration/environment-variables.md
-    - Startup Options: configuration/startup-options.md
-    - Network Configuration: configuration/network.md
-    - AI Configuration: configuration/ai-config.md
-  
+      - configuration/index.md
+      - Environment Variables: configuration/environment-variables.md
+      - Startup Options: configuration/startup-options.md
+      - Network Configuration: configuration/network.md
+      - AI Configuration: configuration/ai-config.md
+      - eMail Configuration: configuration/environment-variables.md
+
   - Guides:
-    - guides/index.md
-    - User Guide:
-      - guides/user/index.md
-      - Workspaces: guides/user/workspaces.md
-      - Documents: guides/user/documents.md
-      - AI Features: guides/user/ai-features.md
-    - Admin Guide:
-      - guides/admin/index.md
-      - User Management: guides/admin/user-management.md
-      - Workspace Management: guides/admin/workspace-management.md
-      - Connecting Nodes: guides/admin/connecting-nodes.md
-      - Backup & Recovery: guides/admin/backup-recovery.md
-    - Developer Guide:
-      - guides/developer/index.md
-      - Development Setup: guides/developer/setup.md
-      - Contributing: guides/developer/contributing.md
-      - API Reference: guides/developer/api.md
-      - Testing: guides/developer/testing.md
-  
+      - guides/index.md
+      - User Guide:
+          - guides/user/index.md
+          - Workspaces: guides/user/workspaces.md
+          - Documents: guides/user/documents.md
+          - AI Features: guides/user/ai-features.md
+      - Admin Guide:
+          - guides/admin/index.md
+          - User Management: guides/admin/user-management.md
+          - Workspace Management: guides/admin/workspace-management.md
+          - Connecting Nodes: guides/admin/connecting-nodes.md
+          - Backup & Recovery: guides/admin/backup-recovery.md
+          - Maintenance: guides/admin/maintenance.md
+          - Resource Requirements: guides/admin/resource-requirements.md
+      - Developer Guide:
+          - guides/developer/index.md
+          - Development Setup: guides/developer/setup.md
+          - Contributing: guides/developer/contributing.md
+          - API Reference: guides/developer/api.md
+          - Testing: guides/developer/testing.md
+          - Code of Conduct: guides/developer/code-of-conduct.md
+          - Logging: guides/developer/logging.md
+
   - Reference:
-    - reference/index.md
-    - API Documentation: reference/api.md
-    - Data Types: reference/data-types.md
-    - CLI Reference: reference/cli.md
-    - Troubleshooting: reference/troubleshooting.md
-  
+      - reference/index.md
+      - API Documentation: reference/api.md
+      - Data Types: reference/data-types.md
+      - CLI Reference: reference/cli.md
+      - Troubleshooting: reference/troubleshooting.md
+
   - Tags: tags.md

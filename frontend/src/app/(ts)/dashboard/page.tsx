@@ -9,8 +9,8 @@ import { FileText, Folder, MessageCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useDocuments } from "@/contexts/DocumentsContext";
 import { useWorkspaceContext } from "@/contexts/WorkspaceContext";
-import { ChatMessage } from "@/interfaces";
 import { useRecentChats } from "@/lib/services";
+import { ChatMessage } from "@/modules/chats/domain";
 
 export default function Dashboard() {
    const { allDocuments, fetchAllDocuments } = useDocuments();

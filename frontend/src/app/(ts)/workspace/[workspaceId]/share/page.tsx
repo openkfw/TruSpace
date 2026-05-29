@@ -1,10 +1,12 @@
 "use client";
 import { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
+
 import { LockOpen, UserCircle, Users, X } from "lucide-react";
-import { validateEmail } from "@/lib/validateEmail";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { WorkspaceContext } from "@/contexts/WorkspaceContext";
@@ -13,6 +15,7 @@ import {
    getUsersInWorkspace,
    postPermission
 } from "@/lib/services";
+import { validateEmail } from "@/lib/validateEmail";
 
 export default function WorkspaceShare() {
    const [users, setUsers] = useState([]);

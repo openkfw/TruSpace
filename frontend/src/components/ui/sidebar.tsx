@@ -5,7 +5,7 @@ import { Slot } from "@radix-ui/react-slot";
 import { VariantProps, cva } from "class-variance-authority";
 import { PanelLeft } from "lucide-react";
 
-import { useIsMobile } from "@/hooks/use-mobile";
+import { MOBILE_BREAKPOINT, useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -97,7 +97,12 @@ const SidebarProvider = React.forwardRef<
 
       // Helper to toggle the sidebar.
       const toggleSidebar = React.useCallback(() => {
-         return isMobile
+         const isMobileViewport =
+            isMobile ||
+            (typeof window !== "undefined" &&
+               window.innerWidth < MOBILE_BREAKPOINT);
+
+         return isMobileViewport
             ? setOpenMobile((open) => !open)
             : setOpen((open) => !open);
       }, [isMobile, setOpen, setOpenMobile]);

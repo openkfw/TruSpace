@@ -75,6 +75,16 @@ class HealthIpfsRepository {
       throw error;
     }
   }
+
+  async getNetworkGraph(): Promise<unknown> {
+    try {
+      const response = await clusterClient.get('/health/graph');
+      return response.data;
+    } catch (error) {
+      logger.error('Error getting network graph:', error);
+      throw error;
+    }
+  }
 }
 
 export const healthIpfsRepository = new HealthIpfsRepository();

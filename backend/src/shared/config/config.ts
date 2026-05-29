@@ -26,6 +26,14 @@ interface Config {
   };
   databasePath: string;
   disableAllAIFunctionality: boolean;
+  malwareScanning: {
+    enabled: boolean;
+    clamav: {
+      host: string;
+      port: number;
+      timeoutMs: number;
+    };
+  };
   jwt: {
     secret: string;
     expiration: number;
@@ -78,6 +86,14 @@ export const config: Config = {
   },
   databasePath: envVars.DATABASE_PATH,
   disableAllAIFunctionality: envVars.DISABLE_ALL_AI_FUNCTIONALITY,
+  malwareScanning: {
+    enabled: envVars.MALWARE_SCANNING_ENABLED,
+    clamav: {
+      host: envVars.CLAMAV_HOST,
+      port: envVars.CLAMAV_PORT,
+      timeoutMs: envVars.CLAMAV_TIMEOUT_MS,
+    },
+  },
   jwt: {
     secret: envVars.JWT_SECRET,
     expiration: envVars.JWT_MAX_AGE,

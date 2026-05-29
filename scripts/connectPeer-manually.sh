@@ -80,6 +80,9 @@ if [[ ! -f "$CLUSTER_CONFIG" ]]; then
   exit 1
 fi
 
+# Check dependencies
+command -v jq >/dev/null 2>&1 || { echo "❌ Error: jq not found. Please install jq and try again." >&2; exit 1; }
+
 # --- cluster secret handling ---
 if [[ -n "$SWARM_KEY_PATH" ]]; then
   if [[ ! -f "$SWARM_KEY_PATH" ]]; then
