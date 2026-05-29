@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useUser } from "@/contexts/UserContext";
 import { useWorkspaceContext } from "@/contexts/WorkspaceContext";
-import { Workspace } from "@/interfaces";
+import { Workspace } from "@/modules/workspaces/domain";
 
 import { NavDashboard } from "./NavDashboard";
 import { NavHowTo } from "./NavHowTo";

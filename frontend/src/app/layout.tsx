@@ -7,9 +7,9 @@ import { getLocale, getMessages } from "next-intl/server";
 import { GeistMono } from "geist/font/mono"; // eslint-disable-line import/no-unresolved
 import { GeistSans } from "geist/font/sans"; // eslint-disable-line import/no-unresolved
 
-import { DocumentsProvider } from "@/contexts/DocumentsContext";
-import { UserProvider } from "@/contexts/UserContext";
-import { WorkspaceProvider } from "@/contexts/WorkspaceContext";
+import { DocumentsProvider } from "@/modules/documents/presentation/document-provider";
+import { UserProvider } from "@/modules/users/presentation/user-provider";
+import { WorkspaceProvider } from "@/modules/workspaces/presentation/workspace-provider";
 
 import { ThemeProvider } from "../components/theme-provider";
 

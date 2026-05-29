@@ -1,7 +1,7 @@
 // This file is necessary for correctly passing cookies
 import { NextRequest, NextResponse } from "next/server";
 
-import { getApiUrl } from "@/lib/services";
+import { getApiUrl } from "@/shared/config";
 
 const apiUrl = getApiUrl();
 
