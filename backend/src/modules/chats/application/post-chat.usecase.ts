@@ -1,4 +1,5 @@
 import { sendNotification } from '../../../shared/mailing/notifications';
+import { setRequestContext } from '../../../shared/logging/request-context';
 import { ChatMessageRequest } from '../../../shared/types/interfaces';
 import { getUserSettingsByUiid } from '../../../shared/utility/user';
 import { documentsIpfsRepository } from '../../documents/infrastructure/documents-ipfs.repository';
@@ -12,6 +13,12 @@ export async function postChat(
   docId: string,
   workspaceOrigin: string,
 ) {
+  setRequestContext({
+    workspaceId: workspaceOrigin,
+    docId,
+    cid,
+  });
+
   /* Create a json document and store it in IPFS */
   const chatReq: ChatMessageRequest = {
     meta: {

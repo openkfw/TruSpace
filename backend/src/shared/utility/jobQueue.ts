@@ -7,6 +7,10 @@ import {
   updateJobStatusDb,
 } from '../clients/db/jobStatus';
 import logger from '../config/winston';
+import {
+  getRequestContext,
+  runWithRequestContext,
+} from '../logging/request-context';
 import { Prompt } from '../types/interfaces';
 import { registerDefaultJobTemplates } from './jobTemplates';
 
@@ -27,6 +31,7 @@ type Job = {
   job: () => Promise<any>;
   status: JobStatus;
   timestamp: Date;
+  parentRequestId?: string;
   result?: any;
   error?: any;
 };
@@ -57,7 +62,7 @@ class JobQueue {
           }
         })
         .catch((error) => {
-          console.error('Error loading pending jobs from database:', error);
+          logger.error('Error loading pending jobs from database', { error });
         });
     }
   }
@@ -78,10 +83,17 @@ class JobQueue {
     identifier?: string;
   }) {
     const requestId = this.#generateRequestId(cid, templateId, identifier);
+    const parentRequestId = getRequestContext()?.requestId;
+    const attributes: JobAttributes = { cid, prompts, requestId };
+
+    if (parentRequestId) {
+      attributes.parentRequestId = parentRequestId;
+    }
+
     this.addJobFromTemplate({
       requestId,
       templateId,
-      attributes: { cid, prompts, requestId },
+      attributes,
     });
     return requestId;
   }
@@ -119,6 +131,10 @@ class JobQueue {
       job,
       status: this.#useDatabase ? null : 'pending',
       timestamp: new Date(),
+      parentRequestId:
+        typeof attributes?.parentRequestId === 'string'
+          ? attributes.parentRequestId
+          : undefined,
     };
     this.#queue.push(jobObject);
 
@@ -183,19 +199,28 @@ class JobQueue {
       }
 
       if (job.status === 'pending') {
-        job.status = 'processing';
-        await updateJobStatusDb(job.id, 'processing');
-        try {
-          logger.debug(`Processing job ${job.id}...`);
-          const response = await job.job();
-          job.result = response;
-          job.status = 'completed';
-          logger.debug(`Processing job ${job.id} complete.`);
-        } catch (error) {
-          job.error = error;
-          job.status = 'failed';
-          logger.warn(`Processing job ${job.id} failed.`);
-        }
+        await runWithRequestContext(
+          {
+            requestId: job.id,
+            parentRequestId: job.parentRequestId,
+            jobId: job.id,
+          },
+          async () => {
+            job.status = 'processing';
+            await updateJobStatusDb(job.id, 'processing');
+            try {
+              logger.debug(`Processing job ${job.id}...`);
+              const response = await job.job();
+              job.result = response;
+              job.status = 'completed';
+              logger.debug(`Processing job ${job.id} complete.`);
+            } catch (error) {
+              job.error = error;
+              job.status = 'failed';
+              logger.warn(`Processing job ${job.id} failed.`, { error });
+            }
+          },
+        );
       }
       this.#queue.shift();
     }

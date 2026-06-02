@@ -5,6 +5,8 @@ declare global {
     interface Request {
       user?: JwtPayload;
       csrfToken?: () => string;
+      requestId?: string;
+      parentRequestId?: string;
     }
   }
 }

@@ -12,10 +12,14 @@ export async function authenticateCookie(req: AuthenticatedRequest, res: Respons
   const token = req.cookies.auth_token;
 
   if (!token) {
-    logger.error(`${req.url} Missing auth_token authentication cookie`);
+    logger.warn('Missing auth_token authentication cookie', {
+      path: req.originalUrl,
+      method: req.method,
+    });
     return res.status(401).json({
       status: 'failure',
       message: 'Authentication required',
+      requestId: req.requestId,
     });
   }
 
@@ -39,16 +43,18 @@ export async function authenticateCookie(req: AuthenticatedRequest, res: Respons
         return res.status(401).json({
           status: 'failure',
           message: 'Account inactive',
+          requestId: req.requestId,
         });
       }
     }
 
     next();
   } catch (error) {
-    logger.error(error);
+    logger.warn('Authentication failed', { error });
     return res.status(401).json({
       status: 'failure',
       message: 'Invalid or expired token',
+      requestId: req.requestId,
     });
   }
 }

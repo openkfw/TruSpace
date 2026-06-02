@@ -1,5 +1,6 @@
 import PDFDocument from 'pdfkit';
 
+import logger from '../../../shared/config/winston';
 import { chatsIpfsRepository } from '../infrastructure/chats-ipfs.repository';
 import { documentsIpfsRepository } from '../../documents/infrastructure/documents-ipfs.repository';
 
@@ -26,7 +27,7 @@ export async function getChatsExportByDocumentId(documentId: string): Promise<Ch
     try {
       messageText = JSON.parse(message.meta?.data).message;
     } catch (e) {
-      console.error('Error parsing message data', e);
+      logger.warn('Error parsing chat message data', { error: e });
       messageText = message.meta?.data;
     }
 

@@ -6,6 +6,7 @@ import { perspectivesIpfsRepository } from "../../../modules/perspectives/infras
 import { tagsIpfsRepository } from "../../../modules/tags/infrastructure/tags-ipfs.repository";
 import { config } from "../../config/config";
 import logger from "../../config/winston";
+import { attachHttpClientLogging } from "../../logging/http-client-logging";
 import {
   Document,
   FileData,
@@ -71,6 +72,7 @@ export class OpenWebUIClient {
         Accept: "application/json",
       },
     });
+    attachHttpClientLogging(axiosInstance, "open-webui");
     this.axiosInstance = axiosInstance;
     this.ollama = new OllamaModule(axiosInstance);
     this.chats = new ChatsModule(axiosInstance);
@@ -96,7 +98,7 @@ export class OpenWebUIClient {
       });
       return res.data.status;
     } catch (error) {
-      console.error(error);
+      logger.error("OpenWebUIClient.health failed", { error });
       return false;
     }
   }
@@ -220,7 +222,7 @@ export class OpenWebUIClient {
         return perspectivesRequest;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
-        console.error(`Error processing request ${requestId}:`, error);
+        logger.error("Error processing request", { requestId, error });
         const errorMessage =
           error instanceof Error ? error.message : "Unknown error";
         await TaskQueue.updateJobStatus(requestId, "failed", errorMessage);
@@ -231,7 +233,10 @@ export class OpenWebUIClient {
         };
       }
     } else {
-      console.error(`Error processing request ${requestId}:`, fileData.error);
+      logger.error("Error processing request", {
+        requestId,
+        errorMessage: fileData.error,
+      });
       TaskQueue.updateJobStatus(requestId, "failed", fileData.error);
       return {
         requestId,
@@ -269,7 +274,7 @@ export class OpenWebUIClient {
         return tagsRequest;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
-        console.error(`Error processing job ${requestId}:`, error);
+        logger.error("Error processing job", { requestId, error });
         const errorMessage =
           error instanceof Error ? error.message : "Unknown error";
         TaskQueue.updateJobStatus(requestId, "failed", errorMessage);
@@ -280,7 +285,10 @@ export class OpenWebUIClient {
         };
       }
     } else {
-      console.error(`Error processing request ${requestId}:`, fileData.error);
+      logger.error("Error processing request", {
+        requestId,
+        errorMessage: fileData.error,
+      });
       TaskQueue.updateJobStatus(requestId, "failed", fileData.error);
       return {
         requestId: requestId,

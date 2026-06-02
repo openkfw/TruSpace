@@ -1,5 +1,6 @@
 import { Response } from "express";
 import { findPermissionsByEmail } from "../handlers/userPermissions";
+import { setRequestContext } from "../logging/request-context";
 import { workspacesIpfsRepository } from "../../modules/workspaces/infrastructure/workspaces-ipfs.repository";
 
 export const checkPermissionForWorkspace = async (
@@ -7,6 +8,10 @@ export const checkPermissionForWorkspace = async (
   res: Response,
   workspaceId: string,
 ) => {
+  if (workspaceId) {
+    setRequestContext({ workspaceId });
+  }
+
   const allowedWs = (await findPermissionsByEmail(email)).map(
     (p) => p.workspaceId,
   );

@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+import { attachHttpClientLogging } from '../../../logging/http-client-logging';
 import { ipfsConfig } from './config';
 
 export const pinSvcClient = axios.create({
@@ -13,3 +14,7 @@ export const clusterClient = axios.create({
 export const gatewayClient = axios.create({
   baseURL: ipfsConfig.gatewayApiBaseUrl,
 });
+
+attachHttpClientLogging(pinSvcClient, 'ipfs-pinning-service');
+attachHttpClientLogging(clusterClient, 'ipfs-cluster');
+attachHttpClientLogging(gatewayClient, 'ipfs-gateway');

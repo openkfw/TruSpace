@@ -8,6 +8,7 @@ import { encrypt } from '../../../shared/encryption';
 import { MalwareDetectedError } from '../errors/malware-detected.error';
 import { decodeFilename, createDocumentRequest, getWorkspacePassword } from '../../../shared/handlers/documents';
 import { AuthenticatedRequest } from '../../../shared/types';
+import { setRequestContext } from '../../../shared/logging/request-context';
 import { Prompt } from '../../../shared/types/interfaces';
 import { checkPermissionForWorkspace } from '../../../shared/utility/permissions';
 import {
@@ -29,6 +30,8 @@ export async function postDocument(req: AuthenticatedRequest, res: Response) {
   const email = req.user?.email as string;
   const userUiid = req.user?.uiid as string;
   const creatorNodeId = req.user?.nodeId as string;
+
+  setRequestContext({ workspaceId: workspace });
 
   await checkPermissionForWorkspace(email, res, workspace);
 
@@ -78,6 +81,7 @@ export async function postDocument(req: AuthenticatedRequest, res: Response) {
 
   const ipfsClusterResponse = await documentsIpfsRepository.createDocument(docRequest, file);
   const cid = ipfsClusterResponse.cid;
+  setRequestContext({ cid });
 
   // ollama obviously needs unencrypted document
   file.data = fileDataClone;
