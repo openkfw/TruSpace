@@ -133,7 +133,7 @@ USE_REVERSE_PROXY - Are you using a reverse proxy (nginx, Caddy, Traefik)
 **Remaining prompts** (both scenarios)
 
 - **Master password** — minimum 8 characters; the default `Kennwort123` is rejected.
-- **SMTP settings** — for registration confirmation and password-reset emails. Press ENTER to skip if you don't have an SMTP server yet.
+- **SMTP settings** — for registration confirmation and password-reset emails. Press ENTER to skip if you don't have an SMTP server yet. If you have an external mail server and have to hand over the certificate, activate `USE_STORED_CERTIFICATE` and place the CA certificate in `./volumes/general/smtp/ca.crt` (see [README](../../configuration/smtp.md) for details).
 - **Open WebUI admin email and password** — for the AI management interface.
 - **`REGISTER_USERS_AS_INACTIVE`** — when enabled, new accounts need admin approval before they can log in (requires working SMTP or manual database access).
 
