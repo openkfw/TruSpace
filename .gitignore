@@ -20,3 +20,5 @@ scripts/prompts/cookies.txt
 doc/mkdocs/site
 frontend/public/terms/*
 .codex
+*.crt
+*.pem

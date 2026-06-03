@@ -12,4 +12,3 @@ self-signed or privately-issued certificate.
 4. Restart the backend container.
 
 The file is mounted into the backend container at `/app/smtp/ca.crt` (read-only).
-Do **not** commit actual certificate files — add `*.crt` and `*.pem` to `.gitignore`.
