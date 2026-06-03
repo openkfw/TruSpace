@@ -340,6 +340,7 @@ case "$PROFILE_KEY" in
     SMTP_SSL=false
     SMTP_TLS=false
     EMAIL_SENDER="\"TruSpace <truspace@localhost>\""
+    USE_STORED_CERTIFICATE=false  # If true, the certificate should be stored in volumes/general/smtp
     # CSP (empty — no external resources)
     CONTENT_SECURITY_POLICY_DEFAULT_URLS="$EMPTY"
     CONTENT_SECURITY_POLICY_IMG_URLS="$EMPTY"
@@ -567,6 +568,7 @@ prompt_var SMTP_USER     text "SMTP username (leave blank if not required)" "$EM
 prompt_var SMTP_PASSWORD text "SMTP password (leave blank if not required)" "$EMPTY"
 prompt_var EMAIL_SENDER  text "Sender name and address shown in emails" \
   "\"TruSpace <truspace@${DOMAIN:-localhost}>\""
+prompt_var USE_STORED_CERTIFICATE  bool "Use stored certificate for SMTP? (necessary if external SMTP with STARTTLS or SSL, store cert in volumes/general/smtp)" false
 
 #──────────────────────────────────────────────────────────────────────────────
 # CSP CONFIGURATION
@@ -790,6 +792,7 @@ SMTP_TLS=${SMTP_TLS}
 SMTP_USER=${SMTP_USER}
 SMTP_PASSWORD=${SMTP_PASSWORD}
 EMAIL_SENDER=${EMAIL_SENDER}
+USE_STORED_CERTIFICATE=${USE_STORED_CERTIFICATE}
 
 #──────────────────────────────────────────────────────────────────────────────
 # 🛡️ Content Security Policy

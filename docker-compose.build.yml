@@ -11,6 +11,7 @@ services:
       - ./backend/index.ts:/app/index.ts
       - ./backend/nodemon.json:/app/nodemon.json
       - ./backend/prompts:/app/prompts
+      - ./volumes/general/smtp:/app/smtp:ro
 
   frontend:
     build:

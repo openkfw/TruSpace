@@ -75,6 +75,8 @@ export const envVarsSchema = Joi.object({
   SMTP_USER: Joi.string().allow("").empty("").default(""),
   SMTP_PASSWORD: Joi.string().allow("").empty("").default(""),
   EMAIL_SENDER: Joi.string().allow("").empty("").default(""),
+  USE_STORED_CERTIFICATE: Joi.boolean().optional().allow("").empty("").default(false),
+  SMTP_CERTIFICATE_PATH: Joi.string().allow("").empty("").default("/app/smtp/ca.crt"),
   REGISTER_USERS_AS_INACTIVE: Joi.boolean()
     .optional()
     .allow("")

@@ -58,6 +58,8 @@ interface Config {
     tls: boolean;
     user: string;
     password: string;
+    useStoredCertificate: boolean;
+    certificatePath: string;
   };
   emailSender: string;
 }
@@ -132,6 +134,8 @@ export const config: Config = {
     tls: envVars.SMTP_TLS,
     user: envVars.SMTP_USER,
     password: envVars.SMTP_PASSWORD,
+    useStoredCertificate: envVars.USE_STORED_CERTIFICATE,
+    certificatePath: envVars.SMTP_CERTIFICATE_PATH,
   },
   emailSender: envVars.EMAIL_SENDER,
 };

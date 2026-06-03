@@ -36,12 +36,15 @@ services:
       SMTP_SSL: ${SMTP_SSL}
       SMTP_TLS: ${SMTP_TLS}
       EMAIL_SENDER: ${EMAIL_SENDER}
+      USE_STORED_CERTIFICATE: ${USE_STORED_CERTIFICATE:-false}
+      SMTP_CERTIFICATE_PATH: /app/smtp/ca.crt
     ports:
       - ${API_PORT}:${API_PORT}
     entrypoint: sh ./entrypoint.sh
     volumes:
       - ./volumes/db:/app/data
       - ./volumes/clamav-scan:/scan
+      - ./volumes/general/smtp:/app/smtp:ro
     logging:
       driver: json-file
       options:

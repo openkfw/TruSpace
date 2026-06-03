@@ -160,7 +160,7 @@ dirs=(
   "./volumes/db"
   "./volumes/db0"
   "./volumes/db1"
-  "./volumes/general"
+  "./volumes/general/smtp"
   "./volumes/ipfs0"
   "./volumes/ipfs1"
   "./volumes/ollama"
