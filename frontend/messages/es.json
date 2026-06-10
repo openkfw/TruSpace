@@ -196,7 +196,7 @@
     "uploadNewVersion": "Subir nueva versión",
     "uploadNewVersionTitle": "Subir nueva versión del documento",
     "uploading": "Subir...",
-    "searchPlaceholder": "Buscar por nombre del documento...",
+    "searchPlaceholder": "Buscar por nombre, autor o etiqueta...",
     "failedToDelete": "Error al eliminar",
     "documents": "Documentos",
     "participant": "Partícipe",
@@ -224,7 +224,14 @@
     "recentlyAddedWorkspace": "Espacios de trabajo agregados recientemente",
     "noWorkspaceActions": "Actualmente no hay acciones para espacios de trabajo.",
     "documentActions": "Documentos",
-    "workspaceActions": "Áreas de trabajo"
+    "workspaceActions": "Áreas de trabajo",
+    "filterByTag": "Etiquetas",
+    "filterByCreator": "Autores",
+    "sortBy": "Ordenar por",
+    "sortNewest": "Más reciente primero",
+    "sortOldest": "Más antiguo primero",
+    "sortNameAsc": "Nombre A–Z",
+    "sortNameDesc": "Nombre Z–A"
   },
   "documentPreview": {
     "preview": "Avance",

@@ -26,6 +26,7 @@ import {
 import { checkPermissionForWorkspace } from '../../../shared/utility/permissions';
 import { assertAndEncodeURIComponent } from '../../../shared/utility/validation';
 import { languagesIpfsRepository } from '../../languages/infrastructure/languages-ipfs.repository';
+import { tagsIpfsRepository } from '../../tags/infrastructure/tags-ipfs.repository';
 import { usersIpfsRepository } from '../../users/infrastructure/users-ipfs.repository';
 
 class DocumentsIpfsRepository {
@@ -229,27 +230,108 @@ class DocumentsIpfsRepository {
     from: number,
     limit: number,
     searchString: string = '',
+    tagFilter: string[] = [],
+    creatorFilter: string[] = [],
+    sortBy: 'name' | 'timestamp' = 'timestamp',
+    sortOrder: 'asc' | 'desc' = 'desc',
   ): Promise<DocumentsResponse> {
     try {
-      const pinRes: DocumentPinningResponse = (
-        await pinSvcClient.get(
-          `/pins?limit=${maxNumberOfFetchedPins}&meta={"type":"document","workspaceOrigin":"${workspaceId}"}`,
-        )
-      ).data;
+      const [pinRes, workspaceTags] = await Promise.all([
+        pinSvcClient.get(
+          `/pins?limit=${maxNumberOfFetchedPins}&meta=${encodeURIComponent(JSON.stringify({ type: 'document', workspaceOrigin: workspaceId }))}`,
+        ),
+        tagsIpfsRepository.getTagsByWorkspaceId(workspaceId),
+      ]);
 
-      const result = pinsToUniqueDocuments(pinRes.results);
-      const filteredResult = result.filter((document) =>
-        searchString && searchString.length > 0
-          ? document.meta.filename.toLowerCase().includes(searchString.toLowerCase())
-          : true,
+      const allDocs = pinsToUniqueDocuments((pinRes.data as DocumentPinningResponse).results);
+
+      // Group tags by docId
+      const tagsByDocId = new Map<string, { name: string; color: string }[]>();
+      for (const tag of workspaceTags) {
+        const existing = tagsByDocId.get(tag.meta.docId) ?? [];
+        existing.push({ name: tag.meta.name, color: tag.meta.color });
+        tagsByDocId.set(tag.meta.docId, existing);
+      }
+
+      // Build creator name map: fetch unique users in parallel
+      const uniqueCreatorIds = new Map<string, { nodeId: string; userId: string }>();
+      for (const doc of allDocs) {
+        const key = `${doc.meta.creatorNodeId}:${doc.meta.creatorUserId}`;
+        if (!uniqueCreatorIds.has(key)) {
+          uniqueCreatorIds.set(key, { nodeId: doc.meta.creatorNodeId, userId: doc.meta.creatorUserId });
+        }
+      }
+      const creatorEntries = [...uniqueCreatorIds.entries()];
+      const userDataResults = await Promise.all(
+        creatorEntries.map(([, { nodeId, userId }]) => usersIpfsRepository.getUserData(nodeId, userId)),
       );
-      const sliced = filteredResult.slice(from, from + limit);
-      const data = await Promise.all(sliced.map((document) => this.#enrichDocumentCreator(document)));
+      const creatorNameMap = new Map<string, string>();
+      creatorEntries.forEach(([key], i) => {
+        creatorNameMap.set(key, userDataResults[i].userName);
+      });
 
-      return {
-        data,
-        count: filteredResult.length,
-      };
+      // Apply filters
+      const search = searchString?.toLowerCase() ?? '';
+      const filteredResult = allDocs.filter((doc) => {
+        const docTags = tagsByDocId.get(doc.docId) ?? [];
+        const creatorKey = `${doc.meta.creatorNodeId}:${doc.meta.creatorUserId}`;
+        const creatorName = (creatorNameMap.get(creatorKey) ?? '').toLowerCase();
+        const filename = doc.meta.filename.toLowerCase();
+
+        const matchesSearch =
+          !search ||
+          filename.includes(search) ||
+          creatorName.includes(search) ||
+          docTags.some((t) => t.name.toLowerCase().includes(search));
+
+        const matchesTags =
+          tagFilter.length === 0 || tagFilter.some((tf) => docTags.some((t) => t.name === tf));
+
+        const matchesCreator =
+          creatorFilter.length === 0 ||
+          creatorFilter.includes(creatorNameMap.get(creatorKey) ?? '');
+
+        return matchesSearch && matchesTags && matchesCreator;
+      });
+
+      // Sort
+      filteredResult.sort((a, b) => {
+        let cmp = 0;
+        if (sortBy === 'name') {
+          cmp = a.meta.filename.localeCompare(b.meta.filename);
+        } else {
+          cmp = Number(a.meta.timestamp) - Number(b.meta.timestamp);
+        }
+        return sortOrder === 'asc' ? cmp : -cmp;
+      });
+
+      // Compute available filter options from all unfiltered docs
+      const availableTagsMap = new Map<string, { name: string; color: string }>();
+      for (const tags of tagsByDocId.values()) {
+        for (const tag of tags) {
+          if (!availableTagsMap.has(tag.name)) availableTagsMap.set(tag.name, tag);
+        }
+      }
+      const availableTags = [...availableTagsMap.values()];
+      const availableCreators = [
+        ...new Set(
+          allDocs
+            .map((doc) => creatorNameMap.get(`${doc.meta.creatorNodeId}:${doc.meta.creatorUserId}`) ?? '')
+            .filter((name) => name && name !== 'UNKNOWN'),
+        ),
+      ];
+
+      // Paginate and enrich
+      const count = filteredResult.length;
+      const sliced = filteredResult.slice(from, from + limit);
+      const data = await Promise.all(
+        sliced.map(async (doc) => {
+          const enriched = await this.#enrichDocumentCreator(doc);
+          return { ...enriched, tags: tagsByDocId.get(doc.docId) ?? [] };
+        }),
+      );
+
+      return { data, count, from, limit, availableTags, availableCreators };
     } catch (error) {
       logger.error(`Error getting documents by workspace ${workspaceId}:`, error);
       throw error;

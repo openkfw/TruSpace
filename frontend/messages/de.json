@@ -196,7 +196,7 @@
       "uploadNewVersion": "Neue Version hochladen",
       "uploadNewVersionTitle": "Neue Dokumentenversion hochladen",
       "uploading": "Hochladen...",
-      "searchPlaceholder": "Nach Dokumentennamen suchen...",
+      "searchPlaceholder": "Nach Name, Autor oder Tag suchen...",
       "failedToDelete": "Löschen fehlgeschlagen",
       "documents": "Dokumente",
       "participant": "TeilnehmerIn",
@@ -224,7 +224,14 @@
       "recentlyAddedWorkspace": "Kürzlich hinzugefügte Arbeitsbereiche",
       "noWorkspaceActions": "Zurzeit sind keine Aktionen für Arbeitsbereiche vorhanden",
       "documentActions": "Dokumente",
-      "workspaceActions": "Arbeitsbereiche"
+      "workspaceActions": "Arbeitsbereiche",
+      "filterByTag": "Tags",
+      "filterByCreator": "Autoren",
+      "sortBy": "Sortieren nach",
+      "sortNewest": "Neueste zuerst",
+      "sortOldest": "Älteste zuerst",
+      "sortNameAsc": "Name A–Z",
+      "sortNameDesc": "Name Z–A"
    },
    "documentPreview": {
       "preview": "Vorschau",
