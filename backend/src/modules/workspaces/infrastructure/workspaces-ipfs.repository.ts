@@ -1,4 +1,3 @@
-// @ts-nocheck
 import logger from '../../../shared/config/winston';
 import { buildMetadataQuery, createJsonFormData } from '../../../shared/infrastructure/ipfs/core/helpers';
 import { transformPinToGeneralWorkspaceItem, transformPinToWorkspace } from '../../../shared/infrastructure/ipfs/core/mappers';
@@ -12,14 +11,17 @@ import {
 import { assertAndEncodeURIComponent } from '../../../shared/utility/validation';
 import { usersIpfsRepository } from '../../users/infrastructure/users-ipfs.repository';
 
-async function fetchLocalAllocations(primaryFilter?: { key: string; value: string }) {
+type AllocationPin = { cid: string; metadata?: Record<string, string> };
+
+async function fetchLocalAllocations(primaryFilter?: { key: string; value: string }): Promise<AllocationPin[]> {
   const res = await clusterClient.get('/allocations?local=true');
   const data = res.data;
 
-  let result = [];
+  let result: AllocationPin[] = [];
   if (typeof data === 'string') {
     result = data.split('\n').filter((l) => l.trim().length > 0)
-      .map((l) => { try { return JSON.parse(l); } catch(e) { return null; } })
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      .map((l) => { try { return JSON.parse(l); } catch(_e) { return null; } })
       .filter(Boolean);
   } else if (Array.isArray(data)) {
     result = data;
@@ -142,7 +144,7 @@ class WorkspacesIpfsRepository {
       const allocations = await fetchLocalAllocations();
       const filtered = allocations.filter((a) => a.metadata?.workspaceOrigin === workspaceId);
       logger.info('[workspaces.getEverythingInWorkspace] fetch=' + (Date.now() - t0) + 'ms, total=' + allocations.length + ' filtered=' + filtered.length);
-      return filtered.map((a) => transformPinToGeneralWorkspaceItem({ cid: a.cid, meta: a.metadata ?? {} }));
+      return filtered.map((a) => transformPinToGeneralWorkspaceItem({ cid: a.cid, name: '', origins: [], meta: { app_id: '', ...(a.metadata ?? {}) } }));
     } catch (error) {
       logger.error('Error getting everything in workspace ' + workspaceId + ':', error);
       throw error;
@@ -158,10 +160,10 @@ class WorkspacesIpfsRepository {
     }
   }
 
-  async #enrichWorkspaces(allocations): Promise<Workspace[]> {
+  async #enrichWorkspaces(allocations: AllocationPin[]): Promise<Workspace[]> {
     return await Promise.all(
       allocations.map(async (alloc) => {
-        const workspace = transformPinToWorkspace({ cid: alloc.cid, meta: alloc.metadata ?? {} });
+        const workspace = transformPinToWorkspace({ cid: alloc.cid, name: '', origins: [], meta: { app_id: '', ...(alloc.metadata ?? {}) } });
         const userData = await usersIpfsRepository.getUserData(workspace.meta.creatorNodeId, workspace.meta.creatorUserId);
         return { ...workspace, meta: { ...workspace.meta, creatorName: userData.userName } };
       }),

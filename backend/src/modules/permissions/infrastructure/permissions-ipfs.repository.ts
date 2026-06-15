@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { v4 as uuidv4 } from 'uuid';
 
 import { buildMetadataQuery, createJsonFormData } from '../../../shared/infrastructure/ipfs/core/helpers';
@@ -6,13 +5,16 @@ import { clusterClient } from '../../../shared/infrastructure/ipfs/core/transpor
 import logger from '../../../shared/config/winston';
 import { UserPermissionDto } from '../domain/permissions.types';
 
-async function fetchLocalAllocations(primaryFilter?: { key: string; value: string }) {
+type AllocationPin = { cid: string; metadata?: Record<string, string> };
+
+async function fetchLocalAllocations(primaryFilter?: { key: string; value: string }): Promise<AllocationPin[]> {
   const res = await clusterClient.get('/allocations?local=true');
   const data = res.data;
-  let result = [];
+  let result: AllocationPin[] = [];
   if (typeof data === 'string') {
     result = data.split('\n').filter((l) => l.trim().length > 0)
-      .map((l) => { try { return JSON.parse(l); } catch(e) { return null; } })
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      .map((l) => { try { return JSON.parse(l); } catch(_e) { return null; } })
       .filter(Boolean);
   } else if (Array.isArray(data)) {
     result = data;
@@ -25,7 +27,7 @@ async function fetchLocalAllocations(primaryFilter?: { key: string; value: strin
   return result;
 }
 
-function allocationToPermission(alloc): UserPermissionDto {
+function allocationToPermission(alloc: AllocationPin): UserPermissionDto & { cid: string } {
   const m = alloc.metadata ?? {};
   return {
     id: m.id,

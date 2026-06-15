@@ -1,4 +1,4 @@
-// @ts-nocheck
+
 import logger from '../../../shared/config/winston';
 import { buildMetadataQuery, createJsonFormData } from '../../../shared/infrastructure/ipfs/core/helpers';
 import { transformPinToChatMessage } from '../../../shared/infrastructure/ipfs/core/mappers';
@@ -10,10 +10,10 @@ import { usersIpfsRepository } from '../../users/infrastructure/users-ipfs.repos
 async function fetchLocalAllocations(primaryFilter?: { key: string; value: string }) {
   const res = await clusterClient.get('/allocations?local=true');
   const data = res.data;
-  let result = [];
+  let result: Array<{ cid: string; metadata?: Record<string, string> }> = [];
   if (typeof data === 'string') {
     result = data.split('\n').filter((l) => l.trim().length > 0)
-      .map((l) => { try { return JSON.parse(l); } catch(e) { return null; } })
+      .map((l) => { try { return JSON.parse(l); } catch(_e) { console.log(_e);return null; } })
       .filter(Boolean);
   } else if (Array.isArray(data)) {
     result = data;
@@ -21,7 +21,8 @@ async function fetchLocalAllocations(primaryFilter?: { key: string; value: strin
     result = data.allocations;
   }
   if (primaryFilter) {
-    result = result.filter((a) => a.metadata && a.metadata[primaryFilter.key] === primaryFilter.value);
+    result = result.filter((a: { cid: string; metadata?: Record<string, string> }) => 
+      a.metadata && a.metadata[primaryFilter.key] === primaryFilter.value);
   }
   return result;
 }
@@ -68,10 +69,10 @@ class ChatsIpfsRepository {
     }
   }
 
-  async #enrichAndSortMessages(allocations): Promise<ChatMessage[]> {
+  async #enrichAndSortMessages(allocations: Array<{ cid: string; metadata?: Record<string, string> }>): Promise<ChatMessage[]> {
     const result = await Promise.all(
       allocations.map(async (alloc) => {
-        const pin = { cid: alloc.cid, meta: alloc.metadata ?? {} };
+        const pin = { cid: alloc.cid, name: '', origins: [], meta: { app_id: '', ...(alloc.metadata ?? {}) } };
         const chat = transformPinToChatMessage(pin);
         const userData = await usersIpfsRepository.getUserData(chat.meta.creatorNodeId, chat.meta.creatorUserId);
         return { ...chat, meta: { ...chat.meta, creatorName: userData.userName } };

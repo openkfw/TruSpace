@@ -1,17 +1,19 @@
-// @ts-nocheck
 import logger from '../../../shared/config/winston';
 import { buildMetadataQuery, createJsonFormData } from '../../../shared/infrastructure/ipfs/core/helpers';
 import { clusterClient } from '../../../shared/infrastructure/ipfs/core/transport';
 import { LanguageRequest } from '../../../shared/types/interfaces/truspace';
 
-async function fetchLocalAllocations(primaryFilter?: { key: string; value: string }) {
+type AllocationPin = { cid: string; metadata?: Record<string, string> };
+
+async function fetchLocalAllocations(primaryFilter?: { key: string; value: string }): Promise<AllocationPin[]> {
   const res = await clusterClient.get('/allocations?local=true');
   const data = res.data;
 
-  let result = [];
+  let result: AllocationPin[] = [];
   if (typeof data === 'string') {
     result = data.split('\n').filter((l) => l.trim().length > 0)
-      .map((l) => { try { return JSON.parse(l); } catch(e) { return null; } })
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      .map((l) => { try { return JSON.parse(l); } catch(_e) { return null; } })
       .filter(Boolean);
   } else if (Array.isArray(data)) {
     result = data;
@@ -27,7 +29,7 @@ async function fetchLocalAllocations(primaryFilter?: { key: string; value: strin
 }
 
 // Cache language lookups — language for a given CID never changes.
-const languageCache = new Map();
+const languageCache = new Map<string, string | undefined>();
 
 class LanguagesIpfsRepository {
   async createLanguage(langRequest: LanguageRequest): Promise<string> {
@@ -37,7 +39,6 @@ class LanguagesIpfsRepository {
       const clusterResp = await clusterClient.post('/add?stream-channels=false' + metadataQuery, form, {
         headers: { ...form.getHeaders() },
       });
-      // Invalidate cache for this versionCid if it exists
       if (langRequest.meta?.versionCid) {
         languageCache.delete(langRequest.meta.versionCid);
       }

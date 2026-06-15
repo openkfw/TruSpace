@@ -1,6 +1,6 @@
 import { Response } from "express";
 import { findPermissionsByEmail } from "../handlers/userPermissions";
-import { workspacesIpfsRepository } from "../../modules/workspaces/infrastructure/workspaces-ipfs.repository";
+import { workspacesIpfsRepository } from '../../modules/workspaces/infrastructure/workspaces-ipfs.repository';
 
 export const checkPermissionForWorkspace = async (
   email: string,

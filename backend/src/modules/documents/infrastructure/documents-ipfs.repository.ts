@@ -1,4 +1,4 @@
-// @ts-nocheck
+
 import { Response } from 'express';
 
 import { getWorkspacePasswordDb } from '../../../shared/clients/db';
@@ -46,7 +46,7 @@ async function fetchLocalAllocations(primaryFilter?: { key: string; value: strin
   if (typeof data === 'string') {
     const lines = data.split('\n').filter((l) => l.trim().length > 0);
     result = lines
-      .map((l) => { try { return JSON.parse(l); } catch(e) { logger.warn('NDJSON parse error: ' + l.slice(0, 100)); return null; } })
+      .map((l) => { try { return JSON.parse(l); } catch(e) { logger.warn('NDJSON parse error: ' + e+l.slice(0, 100)); return null; } })
       .filter(Boolean);
   } else if (Array.isArray(data)) {
     result = data;
@@ -383,8 +383,12 @@ class DocumentsIpfsRepository {
       const allocations = await fetchLocalAllocations();
       const matching = allocations.filter((a) => a.metadata?.docId === docId);
       logger.info('[getEverythingByDocId] fetch=' + (Date.now() - t0) + 'ms, matching=' + matching.length);
-      return matching.map((alloc) => transformPinToGeneralWorkspaceItem({ cid: alloc.cid, meta: alloc.metadata ?? {} }));
-    } catch (error) {
+      return matching.map((alloc) => transformPinToGeneralWorkspaceItem({ 
+  cid: alloc.cid,
+  name: '',
+  origins: [],
+  meta: { app_id: '', ...(alloc.metadata ?? {}) }
+}));} catch (error) {
       logger.error(`Error getting everything by doc ID ${docId}:`, error);
       throw error;
     }
@@ -400,7 +404,7 @@ class DocumentsIpfsRepository {
   }
 
   async #createDetailedDocumentFromPin(pinRequest: DocumentPinRequest): Promise<Document> {
-    const [language, document] = await Promise.all([
+    const [language] = await Promise.all([
       this.#getLanguageForVersion(pinRequest.pin.cid),
       Promise.resolve(transformPinToDocument(pinRequest.pin, undefined)),
     ]);

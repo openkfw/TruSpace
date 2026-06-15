@@ -4,7 +4,10 @@ import { findPermissionsByEmail } from '../../../shared/handlers/userPermissions
 import { checkPermissionForWorkspace } from '../../../shared/utility/permissions';
 import { chatsIpfsRepository } from '../../chats/infrastructure/chats-ipfs.repository';
 import { documentsIpfsRepository } from '../infrastructure/documents-ipfs.repository';
-import { workspacesIpfsRepository } from '../../workspaces/infrastructure/workspaces-ipfs.repository';
+import { workspacesIpfsRepository } from '../../../modules/workspaces/infrastructure/workspaces-ipfs.repository';
+
+
+
 
 // Compute contributor count cheaply from already-fetched allocations.
 // Avoids calling getContributorsDocument which fires 4 extra IPFS queries per doc.
@@ -58,6 +61,7 @@ export async function getDocumentsByWorkspaceId(
       data: paginatedResult,
     };
   } else {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [_permissionResult, documentsResult] = await Promise.all([
       checkPermissionForWorkspace(email, res, workspaceId, await publicWorkspacesPromise),
       documentsIpfsRepository.getDocumentsByWorkspace(

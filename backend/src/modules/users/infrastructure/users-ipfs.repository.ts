@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Response } from 'express';
 
 import logger from '../../../shared/config/winston';
@@ -7,19 +6,19 @@ import { clusterClient, gatewayClient } from '../../../shared/infrastructure/ipf
 import { File, UserData } from '../../../shared/types/interfaces/truspace';
 import { assertAndEncodeURIComponent } from '../../../shared/utility/validation';
 
-// In-process cache for user data. Key: `nodeId:userId`.
-// Invalidated on write. Reduces repeated gateway fetches for the same user
-// across many document versions in a single request.
-const userDataCache = new Map();
+type AllocationPin = { cid: string; metadata?: Record<string, string> };
 
-async function fetchLocalAllocations(primaryFilter?: { key: string; value: string }) {
+const userDataCache = new Map<string, UserData>();
+
+async function fetchLocalAllocations(primaryFilter?: { key: string; value: string }): Promise<AllocationPin[]> {
   const res = await clusterClient.get('/allocations?local=true');
   const data = res.data;
 
-  let result = [];
+  let result: AllocationPin[] = [];
   if (typeof data === 'string') {
     result = data.split('\n').filter((l) => l.trim().length > 0)
-      .map((l) => { try { return JSON.parse(l); } catch(e) { return null; } })
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      .map((l) => { try { return JSON.parse(l); } catch(_e) { return null; } })
       .filter(Boolean);
   } else if (Array.isArray(data)) {
     result = data;
@@ -125,7 +124,7 @@ class UsersIpfsRepository {
     const cacheKey = nodeId + ':' + userId;
     if (userDataCache.has(cacheKey)) {
       logger.debug('[users.getUserData] cache hit for ' + cacheKey);
-      return userDataCache.get(cacheKey);
+      return userDataCache.get(cacheKey) as UserData;
     }
 
     const t0 = Date.now();
@@ -135,7 +134,7 @@ class UsersIpfsRepository {
       logger.info('[users.getUserData] fetch=' + (Date.now() - t0) + 'ms, pins=' + pins.length + ' for ' + nodeId + ':' + userId);
 
       if (!pins.length) {
-        const unknown = { nodeId, userId, userName: 'UNKNOWN' };
+        const unknown: UserData = { nodeId, userId, userName: 'UNKNOWN' };
         userDataCache.set(cacheKey, unknown);
         return unknown;
       }
@@ -150,7 +149,7 @@ class UsersIpfsRepository {
       const userName = typeof parsed?.userName === 'string' && parsed.userName.trim().length > 0
         ? parsed.userName : 'UNKNOWN';
 
-      const userData = { nodeId, userId, userName };
+      const userData: UserData = { nodeId, userId, userName };
       userDataCache.set(cacheKey, userData);
       logger.info('[users.getUserData] total=' + (Date.now() - t0) + 'ms, userName=' + userName + ' (cached)');
       return userData;
