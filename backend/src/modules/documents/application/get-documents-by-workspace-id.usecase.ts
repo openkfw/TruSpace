@@ -14,6 +14,10 @@ export async function getDocumentsByWorkspaceId(
   searchString: string,
   email: string,
   res: Response,
+  tagFilter: string[] = [],
+  creatorFilter: string[] = [],
+  sortBy: 'name' | 'timestamp' = 'timestamp',
+  sortOrder: 'asc' | 'desc' = 'desc',
 ) {
   const publicWorkspacesPromise = workspacesIpfsRepository.getPublicWorkspaces();
 
@@ -24,12 +28,14 @@ export async function getDocumentsByWorkspaceId(
       findPermissionsByEmail(email).then((permissions) => permissions.map((p) => p.workspaceId)),
     ]);
 
+    const search = searchString?.toLowerCase() ?? '';
     const result = documents.filter(
       (d) =>
         (allowedWs.includes(d.meta.workspaceOrigin) ||
           publicWorkspaces.some((ws) => ws.meta.workspace_uuid === d.meta.workspaceOrigin)) &&
-        (searchString && searchString.length > 0
-          ? d.meta.filename.toLowerCase().includes(searchString.toLowerCase())
+        (search.length > 0
+          ? d.meta.filename.toLowerCase().includes(search) ||
+            (d.meta.creatorName ?? '').toLowerCase().includes(search)
           : true),
     );
 
@@ -42,10 +48,21 @@ export async function getDocumentsByWorkspaceId(
     };
   } else {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [_permissionResult, { data: documents, count }] = await Promise.all([
+    const [_permissionResult, documentsResult] = await Promise.all([
       checkPermissionForWorkspace(email, res, workspaceId),
-      documentsIpfsRepository.getDocumentsByWorkspace(workspaceId, from, limit, searchString),
+      documentsIpfsRepository.getDocumentsByWorkspace(
+        workspaceId,
+        from,
+        limit,
+        searchString,
+        tagFilter,
+        creatorFilter,
+        sortBy,
+        sortOrder,
+      ),
     ]);
+
+    const { data: documents, count, availableTags, availableCreators } = documentsResult;
 
     const documentsWithDetails = await Promise.all(
       documents.map(async (doc: Document) => {
@@ -71,6 +88,8 @@ export async function getDocumentsByWorkspaceId(
       from,
       limit,
       data: documentsWithDetails,
+      availableTags,
+      availableCreators,
     };
   }
 }

@@ -25,7 +25,14 @@ export const DocumentsController = {
     const limit = parseInt(req.query.limit as string) || 2;
     const searchString = req.query.search as string;
     const email = req.user?.email as string;
-    const result = await getDocumentsByWorkspaceId(workspaceId, from, limit, searchString, email, res);
+    const tagFilter = ([] as string[]).concat((req.query.tags as string | string[]) ?? []).filter(Boolean);
+    const creatorFilter = ([] as string[]).concat((req.query.creators as string | string[]) ?? []).filter(Boolean);
+    const sortBy = (req.query.sortBy as 'name' | 'timestamp') || 'timestamp';
+    const sortOrder = (req.query.sortOrder as 'asc' | 'desc') || 'desc';
+    const result = await getDocumentsByWorkspaceId(
+      workspaceId, from, limit, searchString, email, res,
+      tagFilter, creatorFilter, sortBy, sortOrder,
+    );
     res.json(result);
   },
 

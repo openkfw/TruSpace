@@ -17,12 +17,18 @@ export interface DocumentsContextType {
    documents: Document[];
    document: DocumentWithVersions | null;
    limit: number;
+   availableTags: { name: string; color: string }[];
+   availableCreators: string[];
    setDocuments: (documents: Document[]) => void;
    fetchDocuments: (
       workspaceId: string,
       from?: number,
       limit?: number,
-      searchString?: string
+      searchString?: string,
+      tagFilter?: string[],
+      creatorFilter?: string[],
+      sortBy?: string,
+      sortOrder?: string
    ) => Promise<void>;
    fetchAllDocuments: () => Promise<void>;
    fetchDocumentDetails: (documentID: string) => Promise<void>;
@@ -38,6 +44,8 @@ export const DocumentsContext = createContext<DocumentsContextType>({
    documents: [],
    document: null,
    limit: 10,
+   availableTags: [],
+   availableCreators: [],
    setDocuments: () => null,
    fetchDocuments: async () => undefined,
    fetchAllDocuments: async () => undefined,

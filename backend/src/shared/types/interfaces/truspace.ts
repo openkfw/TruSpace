@@ -40,6 +40,7 @@ export interface Document extends DocumentRequest {
   cid: string;
   meta: DocumentMeta;
   documentVersions?: DocumentVersion[];
+  tags?: { name: string; color: string }[];
 }
 
 export interface DocumentsResponse {
@@ -47,6 +48,8 @@ export interface DocumentsResponse {
   from?: number;
   limit?: number;
   data: Document[];
+  availableTags?: { name: string; color: string }[];
+  availableCreators?: string[];
 }
 
 export interface DocumentVersion {

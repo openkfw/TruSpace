@@ -25,7 +25,6 @@ import * as pdfjs from "pdfjs-dist";
 import EmptyWorkspace from "@/app/(ts)/workspace/EmptyWorkspace";
 import MalwareScanIndicator from "@/components/MalwareScanIndicator";
 import PaginationComponent from "@/components/Pagination";
-import SearchBar from "@/components/SearchBar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -57,6 +56,7 @@ import { isPdfBlank } from "@/lib/utils";
 import { DOCUMENTS_ENDPOINT } from "@/shared/config";
 
 import DocumentTags from "./DocumentTags";
+import DocumentFilterBar from "./DocumentFilterBar";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
    "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -77,13 +77,17 @@ const DocumentList = ({ workspaceId }) => {
    const translations = useTranslations("homePage");
    const generalTranslations = useTranslations("general");
    const documentTranslations = useTranslations("document");
-   const { count, limit, documents, fetchDocuments } = useDocuments();
+   const { count, limit, documents, fetchDocuments, availableTags, availableCreators } = useDocuments();
    const [from, setFrom] = useState(0);
 
    const [filteredDocuments, setFilteredDocuments] = useState([]);
    const [loading, setLoading] = useState(true);
    const [error, setError] = useState(null);
    const [searchQuery, setSearchQuery] = useState("");
+   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+   const [selectedCreators, setSelectedCreators] = useState<string[]>([]);
+   const [sortBy, setSortBy] = useState<"name" | "timestamp">("timestamp");
+   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
    const debouncedSearchQuery = useDebounce(searchQuery, 250);
 
@@ -270,7 +274,11 @@ const DocumentList = ({ workspaceId }) => {
                workspaceId,
                from,
                undefined,
-               debouncedSearchQuery
+               debouncedSearchQuery,
+               selectedTags,
+               selectedCreators,
+               sortBy,
+               sortOrder
             );
          } catch (err) {
             setError(err.message);
@@ -279,7 +287,7 @@ const DocumentList = ({ workspaceId }) => {
          }
       };
       loadDocuments();
-   }, [workspaceId, from, debouncedSearchQuery]);
+   }, [workspaceId, from, debouncedSearchQuery, selectedTags, selectedCreators, sortBy, sortOrder]);
 
    useEffect(() => {
       setFilteredDocuments(documents);
@@ -368,6 +376,26 @@ const DocumentList = ({ workspaceId }) => {
       }
    };
 
+   const handleTagToggle = (tag: string) => {
+      setSelectedTags((prev) =>
+         prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+      );
+      setFrom(0);
+   };
+
+   const handleCreatorToggle = (creator: string) => {
+      setSelectedCreators((prev) =>
+         prev.includes(creator) ? prev.filter((c) => c !== creator) : [...prev, creator]
+      );
+      setFrom(0);
+   };
+
+   const handleSortChange = (newSortBy: "name" | "timestamp", newSortOrder: "asc" | "desc") => {
+      setSortBy(newSortBy);
+      setSortOrder(newSortOrder);
+      setFrom(0);
+   };
+
    if (loading) {
       return (
          <p className="text-center text-gray-500">
@@ -411,10 +439,19 @@ const DocumentList = ({ workspaceId }) => {
    return (
       <>
          <div className="flex justify-between items-center mt-4">
-            <SearchBar
-               value={searchQuery}
-               onChange={setSearchQuery}
-               placeholder={translations("searchPlaceholder")}
+            <DocumentFilterBar
+               searchQuery={searchQuery}
+               onSearchChange={setSearchQuery}
+               availableTags={availableTags}
+               availableCreators={availableCreators}
+               selectedTags={selectedTags}
+               selectedCreators={selectedCreators}
+               sortBy={sortBy}
+               sortOrder={sortOrder}
+               onTagToggle={handleTagToggle}
+               onCreatorToggle={handleCreatorToggle}
+               onSortChange={handleSortChange}
+               searchPlaceholder={translations("searchPlaceholder")}
             />
          </div>
 

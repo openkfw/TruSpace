@@ -36,6 +36,19 @@ class TagsIpfsRepository {
     }
   }
 
+  async getTagsByWorkspaceId(workspaceId: string): Promise<Tag[]> {
+    try {
+      const pinRes: PinningResponse = (
+        await pinSvcClient.get(`/pins?limit=1000&meta=${encodeURIComponent(JSON.stringify({ type: 'tag', workspaceOrigin: workspaceId }))}`)
+      ).data;
+
+      return pinRes.results.map((pinRequest: PinRequest) => transformPinToTag(pinRequest.pin));
+    } catch (error) {
+      logger.error(`Error getting tags by workspace ID ${workspaceId}:`, error);
+      throw error;
+    }
+  }
+
   async getTagsByDocumentId(docId: string): Promise<Tag[]> {
     try {
       const pinRes: PinningResponse = (

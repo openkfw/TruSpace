@@ -196,7 +196,7 @@
       "uploadNewVersion": "Upload new version",
       "uploadNewVersionTitle": "Upload new document version",
       "uploading": "Uploading...",
-      "searchPlaceholder": "Search by document name...",
+      "searchPlaceholder": "Search by name, author or tag...",
       "failedToDelete": "Failed to delete",
       "documents": "documents",
       "participant": "participant",
@@ -224,7 +224,14 @@
       "recentlyAddedWorkspace": "Recently added workspace",
       "noWorkspaceActions": "No workspace actions are present at this time",
       "documentActions": "Documents",
-      "workspaceActions": "Workspaces"
+      "workspaceActions": "Workspaces",
+      "filterByTag": "Tags",
+      "filterByCreator": "Authors",
+      "sortBy": "Sort by",
+      "sortNewest": "Newest first",
+      "sortOldest": "Oldest first",
+      "sortNameAsc": "Name A–Z",
+      "sortNameDesc": "Name Z–A"
    },
    "documentPreview": {
       "preview": "Preview",
