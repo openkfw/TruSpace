@@ -231,6 +231,24 @@ class DocumentsIpfsRepository {
     }
   }
 
+  async getAllocationsByDocId(docId: string) {
+    const allocations = await fetchLocalAllocations();
+    return allocations.filter((a) => a.metadata?.docId === docId);
+  }
+
+  async countDocumentVersions(docId: string): Promise<number> {
+    const t0 = Date.now();
+    try {
+      const allocations = await fetchLocalAllocations({ key: 'type', value: 'document' });
+      const count = allocations.filter((a) => a.metadata?.docId === docId).length;
+      logger.info('[countDocumentVersions] fetch=' + (Date.now() - t0) + 'ms, versions=' + count);
+      return count;
+    } catch (error) {
+      logger.error('Error counting document versions for docId ' + docId + ':', error);
+      return 0;
+    }
+  }
+
   async getAllDocuments(from: number = 0, limit: number = 100): Promise<DocumentsResponse> {
     const t0 = Date.now();
     try {
