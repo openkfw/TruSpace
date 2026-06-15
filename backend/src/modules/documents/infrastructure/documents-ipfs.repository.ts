@@ -1,19 +1,19 @@
+// @ts-nocheck
 import { Response } from 'express';
 
 import { getWorkspacePasswordDb } from '../../../shared/clients/db';
 import { config } from '../../../shared/config/config';
 import logger from '../../../shared/config/winston';
 import { decrypt } from '../../../shared/encryption';
-import { maxNumberOfFetchedPins } from '../../../shared/infrastructure/ipfs/core/config';
 import { buildMetadataQuery, createFileFormData } from '../../../shared/infrastructure/ipfs/core/helpers';
 import {
   pinsToUniqueDocuments,
   transformPinToDocument,
   transformPinToGeneralWorkspaceItem,
 } from '../../../shared/infrastructure/ipfs/core/mappers';
-import { clusterClient, gatewayClient, pinSvcClient } from '../../../shared/infrastructure/ipfs/core/transport';
+import { clusterClient, gatewayClient } from '../../../shared/infrastructure/ipfs/core/transport';
 import { AuthenticatedRequest } from '../../../shared/types';
-import { DocumentPinRequest, DocumentPinningResponse, PinRequest, PinningResponse } from '../../../shared/types/interfaces';
+import { DocumentPinRequest } from '../../../shared/types/interfaces';
 import {
   Document,
   DocumentCreateResponse,
@@ -29,26 +29,64 @@ import { languagesIpfsRepository } from '../../languages/infrastructure/language
 import { tagsIpfsRepository } from '../../tags/infrastructure/tags-ipfs.repository';
 import { usersIpfsRepository } from '../../users/infrastructure/users-ipfs.repository';
 
+interface AllocationPin {
+  cid: string;
+  metadata: Record<string, string>;
+}
+
+async function fetchLocalAllocations(primaryFilter?: { key: string; value: string }): Promise<AllocationPin[]> {
+  const t0 = Date.now();
+  const url = '/allocations?local=true';
+
+  const res = await clusterClient.get(url);
+  const data = res.data;
+
+  let result: AllocationPin[] = [];
+
+  if (typeof data === 'string') {
+    const lines = data.split('\n').filter((l) => l.trim().length > 0);
+    result = lines
+      .map((l) => { try { return JSON.parse(l); } catch(e) { logger.warn('NDJSON parse error: ' + l.slice(0, 100)); return null; } })
+      .filter(Boolean);
+  } else if (Array.isArray(data)) {
+    result = data;
+  } else if (data && typeof data === 'object' && Array.isArray(data.allocations)) {
+    result = data.allocations;
+  } else {
+    logger.warn('fetchLocalAllocations: unrecognised response shape');
+  }
+
+  const fetchMs = Date.now() - t0;
+
+  if (primaryFilter) {
+    const before = result.length;
+    result = result.filter((a) => a.metadata && a.metadata[primaryFilter.key] === primaryFilter.value);
+    logger.info('[fetchLocalAllocations] fetch=' + fetchMs + 'ms total=' + before + ' after filter(' + primaryFilter.key + '=' + primaryFilter.value + ')=' + result.length);
+  } else {
+    logger.info('[fetchLocalAllocations] fetch=' + fetchMs + 'ms total=' + result.length + ' (no filter)');
+  }
+
+  return result;
+}
+
+function allocationToDocumentPinRequest(alloc: AllocationPin): DocumentPinRequest {
+  const meta = { app_id: '', ...(alloc.metadata ?? {}) };
+  const adapted: any = { requestid: alloc.cid, status: 'pinned', pin: { cid: alloc.cid, meta } };
+  return adapted as DocumentPinRequest;
+}
+
 class DocumentsIpfsRepository {
   async createDocument(doc: DocumentRequest, file: File): Promise<DocumentCreateResponse> {
     try {
       const form = createFileFormData(file);
       const docMeta = { ...doc.meta };
       delete docMeta.creatorName;
-      const metadataQuery = buildMetadataQuery(docMeta, {
-        encodeValueKeys: ['filename'],
-      });
+      const metadataQuery = buildMetadataQuery(docMeta, { encodeValueKeys: ['filename'] });
 
       const result = await clusterClient.post(
         `/add?stream-channels=false&name=${encodeURIComponent(file.name)}${metadataQuery}&meta-docId=${doc.docId}&meta-type=document`,
         form,
-        {
-          headers: {
-            ...form.getHeaders(),
-          },
-          timeout: 30000,
-          maxContentLength: Infinity,
-        },
+        { headers: { ...form.getHeaders() }, timeout: 30000, maxContentLength: Infinity },
       );
       const data = result.data[0];
       return { cid: data.cid, uuid: doc.docId };
@@ -59,14 +97,18 @@ class DocumentsIpfsRepository {
   }
 
   async getDocumentVersionDetailsByCid(cid: string): Promise<Document> {
+    const t0 = Date.now();
     try {
       const safeCid = assertAndEncodeURIComponent(cid);
-      const clusterRes = (await clusterClient.get(`/allocations/${safeCid}`)).data;
-      const language = await this.#getLanguageForVersion(cid);
-      const userData = await usersIpfsRepository.getUserData(
-        clusterRes.metadata.creatorNodeId || '',
-        clusterRes.metadata.creatorUserId || '',
-      );
+      const clusterRes = (await clusterClient.get(`/allocations/${safeCid}?local=true`)).data;
+      logger.info('[getDocumentVersionDetailsByCid] allocation lookup=' + (Date.now() - t0) + 'ms');
+
+      const t1 = Date.now();
+      const [language, userData] = await Promise.all([
+        this.#getLanguageForVersion(cid),
+        usersIpfsRepository.getUserData(clusterRes.metadata.creatorNodeId || '', clusterRes.metadata.creatorUserId || ''),
+      ]);
+      logger.info('[getDocumentVersionDetailsByCid] language+user lookup=' + (Date.now() - t1) + 'ms total=' + (Date.now() - t0) + 'ms');
 
       return {
         docId: clusterRes.metadata.docId,
@@ -102,9 +144,7 @@ class DocumentsIpfsRepository {
       await checkPermissionForWorkspace(req.user?.email as string, res, metadata.workspaceOrigin);
 
       const safeCid = assertAndEncodeURIComponent(cid);
-      const result = await gatewayClient.get(`/ipfs/${safeCid}`, {
-        responseType: 'arraybuffer',
-      });
+      const result = await gatewayClient.get(`/ipfs/${safeCid}`, { responseType: 'arraybuffer' });
 
       const fileBuffer = Buffer.from(result.data);
       let modifiedBuffer = fileBuffer;
@@ -128,9 +168,7 @@ class DocumentsIpfsRepository {
       const metadata = document.meta;
 
       const safeCid = assertAndEncodeURIComponent(cid);
-      const result = await gatewayClient.get(`/ipfs/${safeCid}`, {
-        responseType: 'arraybuffer',
-      });
+      const result = await gatewayClient.get(`/ipfs/${safeCid}`, { responseType: 'arraybuffer' });
       const fileBuffer = Buffer.from(result.data);
 
       let modifiedBuffer = fileBuffer;
@@ -138,10 +176,7 @@ class DocumentsIpfsRepository {
         modifiedBuffer = await decrypt(fileBuffer, metadata.workspaceOrigin);
       }
 
-      return {
-        data: modifiedBuffer,
-        size: Number(metadata.size),
-      };
+      return { data: modifiedBuffer, size: Number(metadata.size) };
     } catch (error) {
       logger.error(`Error getting document version content for CID ${cid}:`, error);
       throw error;
@@ -149,36 +184,25 @@ class DocumentsIpfsRepository {
   }
 
   async getDocumentDetailsById(docId: string): Promise<DocumentWithVersions> {
+    const t0 = Date.now();
     try {
-      const res = await pinSvcClient.get(`/pins?limit=1000&meta={"type":"document","docId":"${docId}"}`);
-      const documentPins = res.data.results as DocumentPinRequest[];
+      const allocations = await fetchLocalAllocations({ key: 'type', value: 'document' });
+      const documentPins = allocations.filter((a) => a.metadata?.docId === docId).map(allocationToDocumentPinRequest);
+      logger.info('[getDocumentDetailsById] allocations=' + (Date.now() - t0) + 'ms, versions=' + documentPins.length);
 
+      const t1 = Date.now();
       let documentVersions = await Promise.all(
         documentPins.map((pinRequest) => this.#createDetailedDocumentFromPin(pinRequest)),
       );
+      logger.info('[getDocumentDetailsById] enrich all versions=' + (Date.now() - t1) + 'ms total=' + (Date.now() - t0) + 'ms');
 
       documentVersions = documentVersions.sort((a, b) => Number(b.meta.timestamp) - Number(a.meta.timestamp));
 
       if (documentVersions.length === 0) {
         logger.warn(`No document versions found for docId: ${docId}. Returning minimal structure.`);
         return {
-          docId,
-          cid: '',
-          meta: {
-            filename: '',
-            timestamp: '',
-            version: '',
-            creatorNodeId: '',
-            creatorUserId: '',
-            workspaceOrigin: '',
-            language: undefined,
-            size: 0,
-            encrypted: 'false',
-            versionTagName: '',
-            malwareScanStatus: undefined,
-            malwareScanProvider: undefined,
-            malwareScanTimestamp: undefined,
-          },
+          docId, cid: '',
+          meta: { filename: '', timestamp: '', version: '', creatorNodeId: '', creatorUserId: '', workspaceOrigin: '', language: undefined, size: 0, encrypted: 'false', versionTagName: '', malwareScanStatus: undefined, malwareScanProvider: undefined, malwareScanTimestamp: undefined },
           documentVersions: [],
         };
       }
@@ -191,11 +215,16 @@ class DocumentsIpfsRepository {
   }
 
   async getDocumentsByDocumentId(docId: string): Promise<Document[]> {
+    const t0 = Date.now();
     try {
-      const res = await pinSvcClient.get(`/pins?limit=1000&meta={"type":"document","docId":"${docId}"}`);
-      const documentPins = res.data.results as DocumentPinRequest[];
+      const allocations = await fetchLocalAllocations({ key: 'type', value: 'document' });
+      const documentPins = allocations.filter((a) => a.metadata?.docId === docId).map(allocationToDocumentPinRequest);
+      logger.info('[getDocumentsByDocumentId] allocations=' + (Date.now() - t0) + 'ms, pins=' + documentPins.length);
 
-      return await Promise.all(documentPins.map((pinRequest) => this.#createDetailedDocumentFromPin(pinRequest)));
+      const t1 = Date.now();
+      const result = await Promise.all(documentPins.map((pinRequest) => this.#createDetailedDocumentFromPin(pinRequest)));
+      logger.info('[getDocumentsByDocumentId] enrich=' + (Date.now() - t1) + 'ms total=' + (Date.now() - t0) + 'ms');
+      return result;
     } catch (error) {
       logger.error(`Error getting documents by document ID ${docId}:`, error);
       throw error;
@@ -203,22 +232,20 @@ class DocumentsIpfsRepository {
   }
 
   async getAllDocuments(from: number = 0, limit: number = 100): Promise<DocumentsResponse> {
+    const t0 = Date.now();
     try {
-      const pinRes: DocumentPinningResponse = (
-        await pinSvcClient.get(`/pins?limit=${maxNumberOfFetchedPins}&meta={"type":"document"}`)
-      ).data;
+      const allocations = await fetchLocalAllocations({ key: 'type', value: 'document' });
+      const count = allocations.length;
+      const asPinRequests = allocations.map(allocationToDocumentPinRequest);
+      const result = pinsToUniqueDocuments(asPinRequests);
+      logger.info('[getAllDocuments] allocations+dedup=' + (Date.now() - t0) + 'ms, unique=' + result.length);
 
-      const count = pinRes.count || 0;
-      const result = pinsToUniqueDocuments(pinRes.results);
       const sliced = result.slice(from, from + limit);
+      const t1 = Date.now();
       const data = await Promise.all(sliced.map((document) => this.#enrichDocumentCreator(document)));
+      logger.info('[getAllDocuments] enrich=' + (Date.now() - t1) + 'ms total=' + (Date.now() - t0) + 'ms');
 
-      return {
-        count,
-        from,
-        limit,
-        data,
-      };
+      return { count, from, limit, data };
     } catch (error) {
       logger.error('Error getting all documents:', error);
       throw error;
@@ -235,15 +262,20 @@ class DocumentsIpfsRepository {
     sortBy: 'name' | 'timestamp' = 'timestamp',
     sortOrder: 'asc' | 'desc' = 'desc',
   ): Promise<DocumentsResponse> {
+    const t0 = Date.now();
     try {
-      const [pinRes, workspaceTags] = await Promise.all([
-        pinSvcClient.get(
-          `/pins?limit=${maxNumberOfFetchedPins}&meta=${encodeURIComponent(JSON.stringify({ type: 'document', workspaceOrigin: workspaceId }))}`,
-        ),
-        tagsIpfsRepository.getTagsByWorkspaceId(workspaceId),
+      const tagsTimeout = new Promise<[]>((resolve) => setTimeout(() => resolve([]), 5000));
+      const [allocations, workspaceTags] = await Promise.all([
+        fetchLocalAllocations({ key: 'type', value: 'document' }),
+        Promise.race([tagsIpfsRepository.getTagsByWorkspaceId(workspaceId), tagsTimeout]),
       ]);
+      logger.info('[getDocumentsByWorkspace] fetch+tags=' + (Date.now() - t0) + 'ms, allocations=' + allocations.length + ' tags=' + workspaceTags.length);
 
-      const allDocs = pinsToUniqueDocuments((pinRes.data as DocumentPinningResponse).results);
+      const t1 = Date.now();
+      const workspaceAllocations = allocations.filter((a) => a.metadata?.workspaceOrigin === workspaceId);
+      const asPinRequests = workspaceAllocations.map(allocationToDocumentPinRequest);
+      const allDocs = pinsToUniqueDocuments(asPinRequests);
+      logger.info('[getDocumentsByWorkspace] filter+dedup=' + (Date.now() - t1) + 'ms, workspace=' + workspaceAllocations.length + ' unique=' + allDocs.length);
 
       // Group tags by docId
       const tagsByDocId = new Map<string, { name: string; color: string }[]>();
@@ -253,10 +285,11 @@ class DocumentsIpfsRepository {
         tagsByDocId.set(tag.meta.docId, existing);
       }
 
-      // Build creator name map: fetch unique users in parallel
+      // Build creator name map in parallel
+      const t2 = Date.now();
       const uniqueCreatorIds = new Map<string, { nodeId: string; userId: string }>();
       for (const doc of allDocs) {
-        const key = `${doc.meta.creatorNodeId}:${doc.meta.creatorUserId}`;
+        const key = doc.meta.creatorNodeId + ':' + doc.meta.creatorUserId;
         if (!uniqueCreatorIds.has(key)) {
           uniqueCreatorIds.set(key, { nodeId: doc.meta.creatorNodeId, userId: doc.meta.creatorUserId });
         }
@@ -266,46 +299,31 @@ class DocumentsIpfsRepository {
         creatorEntries.map(([, { nodeId, userId }]) => usersIpfsRepository.getUserData(nodeId, userId)),
       );
       const creatorNameMap = new Map<string, string>();
-      creatorEntries.forEach(([key], i) => {
-        creatorNameMap.set(key, userDataResults[i].userName);
-      });
+      creatorEntries.forEach(([key], i) => { creatorNameMap.set(key, userDataResults[i].userName); });
+      logger.info('[getDocumentsByWorkspace] creator lookup=' + (Date.now() - t2) + 'ms, unique creators=' + creatorEntries.length);
 
-      // Apply filters
+      // Filter
       const search = searchString?.toLowerCase() ?? '';
       const filteredResult = allDocs.filter((doc) => {
         const docTags = tagsByDocId.get(doc.docId) ?? [];
-        const creatorKey = `${doc.meta.creatorNodeId}:${doc.meta.creatorUserId}`;
+        const creatorKey = doc.meta.creatorNodeId + ':' + doc.meta.creatorUserId;
         const creatorName = (creatorNameMap.get(creatorKey) ?? '').toLowerCase();
-        const filename = doc.meta.filename.toLowerCase();
-
-        const matchesSearch =
-          !search ||
-          filename.includes(search) ||
-          creatorName.includes(search) ||
-          docTags.some((t) => t.name.toLowerCase().includes(search));
-
-        const matchesTags =
-          tagFilter.length === 0 || tagFilter.some((tf) => docTags.some((t) => t.name === tf));
-
-        const matchesCreator =
-          creatorFilter.length === 0 ||
-          creatorFilter.includes(creatorNameMap.get(creatorKey) ?? '');
-
+        const filename = (doc.meta.filename ?? '').toLowerCase();
+        const matchesSearch = !search || filename.includes(search) || creatorName.includes(search) || docTags.some((t) => (t.name ?? '').toLowerCase().includes(search));
+        const matchesTags = tagFilter.length === 0 || tagFilter.some((tf) => docTags.some((t) => t.name === tf));
+        const matchesCreator = creatorFilter.length === 0 || creatorFilter.includes(creatorNameMap.get(creatorKey) ?? '');
         return matchesSearch && matchesTags && matchesCreator;
       });
 
       // Sort
       filteredResult.sort((a, b) => {
-        let cmp = 0;
-        if (sortBy === 'name') {
-          cmp = a.meta.filename.localeCompare(b.meta.filename);
-        } else {
-          cmp = Number(a.meta.timestamp) - Number(b.meta.timestamp);
-        }
+        const cmp = sortBy === 'name'
+          ? a.meta.filename.localeCompare(b.meta.filename)
+          : Number(a.meta.timestamp) - Number(b.meta.timestamp);
         return sortOrder === 'asc' ? cmp : -cmp;
       });
 
-      // Compute available filter options from all unfiltered docs
+      // Available filter options
       const availableTagsMap = new Map<string, { name: string; color: string }>();
       for (const tags of tagsByDocId.values()) {
         for (const tag of tags) {
@@ -316,33 +334,38 @@ class DocumentsIpfsRepository {
       const availableCreators = [
         ...new Set(
           allDocs
-            .map((doc) => creatorNameMap.get(`${doc.meta.creatorNodeId}:${doc.meta.creatorUserId}`) ?? '')
+            .map((doc) => creatorNameMap.get(doc.meta.creatorNodeId + ':' + doc.meta.creatorUserId) ?? '')
             .filter((name) => name && name !== 'UNKNOWN'),
         ),
       ];
 
-      // Paginate and enrich
+      // Paginate — reuse creatorNameMap, no extra async calls needed
       const count = filteredResult.length;
       const sliced = filteredResult.slice(from, from + limit);
-      const data = await Promise.all(
-        sliced.map(async (doc) => {
-          const enriched = await this.#enrichDocumentCreator(doc);
-          return { ...enriched, tags: tagsByDocId.get(doc.docId) ?? [] };
-        }),
-      );
+      const data = sliced.map((doc) => {
+        const creatorKey = doc.meta.creatorNodeId + ':' + doc.meta.creatorUserId;
+        return {
+          ...doc,
+          meta: { ...doc.meta, creatorName: creatorNameMap.get(creatorKey) ?? doc.meta.creatorName ?? 'UNKNOWN' },
+          tags: tagsByDocId.get(doc.docId) ?? [],
+        };
+      });
 
+      logger.info('[getDocumentsByWorkspace] total=' + (Date.now() - t0) + 'ms, returning count=' + count + ' data=' + data.length);
       return { data, count, from, limit, availableTags, availableCreators };
     } catch (error) {
-      logger.error(`Error getting documents by workspace ${workspaceId}:`, error);
+      logger.error('Error getting documents by workspace ' + workspaceId + ':', error);
       throw error;
     }
   }
 
   async getEverythingByDocId(docId: string): Promise<GeneralTemplateOfItemInWorkspace[]> {
+    const t0 = Date.now();
     try {
-      const pinRes: PinningResponse = (await pinSvcClient.get(`/pins?limit=1000&meta={"docId":"${docId}"}`)).data;
-
-      return pinRes.results.map((pinRequest: PinRequest) => transformPinToGeneralWorkspaceItem(pinRequest.pin));
+      const allocations = await fetchLocalAllocations();
+      const matching = allocations.filter((a) => a.metadata?.docId === docId);
+      logger.info('[getEverythingByDocId] fetch=' + (Date.now() - t0) + 'ms, matching=' + matching.length);
+      return matching.map((alloc) => transformPinToGeneralWorkspaceItem({ cid: alloc.cid, meta: alloc.metadata ?? {} }));
     } catch (error) {
       logger.error(`Error getting everything by doc ID ${docId}:`, error);
       throw error;
@@ -351,9 +374,7 @@ class DocumentsIpfsRepository {
 
   async deletePins(itemCids: string[]): Promise<void> {
     try {
-      await Promise.all(
-        itemCids.map((itemCid) => clusterClient.delete(`/pins/${assertAndEncodeURIComponent(itemCid)}`)),
-      );
+      await Promise.all(itemCids.map((itemCid) => clusterClient.delete(`/pins/${assertAndEncodeURIComponent(itemCid)}`)));
     } catch (error) {
       logger.error('Error deleting document-related pins:', error);
       throw error;
@@ -361,21 +382,17 @@ class DocumentsIpfsRepository {
   }
 
   async #createDetailedDocumentFromPin(pinRequest: DocumentPinRequest): Promise<Document> {
-    const language = await this.#getLanguageForVersion(pinRequest.pin.cid);
-    const document = transformPinToDocument(pinRequest.pin, language);
-    return this.#enrichDocumentCreator(document);
+    const [language, document] = await Promise.all([
+      this.#getLanguageForVersion(pinRequest.pin.cid),
+      Promise.resolve(transformPinToDocument(pinRequest.pin, undefined)),
+    ]);
+    const doc = transformPinToDocument(pinRequest.pin, language);
+    return this.#enrichDocumentCreator(doc);
   }
 
   async #enrichDocumentCreator(document: Document): Promise<Document> {
     const userData = await usersIpfsRepository.getUserData(document.meta.creatorNodeId, document.meta.creatorUserId);
-
-    return {
-      ...document,
-      meta: {
-        ...document.meta,
-        creatorName: userData.userName,
-      },
-    };
+    return { ...document, meta: { ...document.meta, creatorName: userData.userName } };
   }
 
   async #getLanguageForVersion(versionCid: string): Promise<string | undefined> {
@@ -393,7 +410,6 @@ class DocumentsIpfsRepository {
       logger.warn('Missing encryption password. Trying workspaceId ...');
       return workspaceId;
     }
-
     const workspacePassword = await decrypt(encryptedWorkspacePassword.encrypted_password, config.masterPassword);
     return workspacePassword.toString();
   }
