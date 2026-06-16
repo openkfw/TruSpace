@@ -1,11 +1,25 @@
 import { Response } from 'express';
 import { Document } from '../../../shared/types/interfaces/truspace';
-import { getContributorsDocument } from '../../../shared/handlers/documents';
 import { findPermissionsByEmail } from '../../../shared/handlers/userPermissions';
 import { checkPermissionForWorkspace } from '../../../shared/utility/permissions';
 import { chatsIpfsRepository } from '../../chats/infrastructure/chats-ipfs.repository';
 import { documentsIpfsRepository } from '../infrastructure/documents-ipfs.repository';
-import { workspacesIpfsRepository } from '../../workspaces/infrastructure/workspaces-ipfs.repository';
+import { workspacesIpfsRepository } from '../../../modules/workspaces/infrastructure/workspaces-ipfs.repository';
+
+
+
+
+// Compute contributor count cheaply from already-fetched allocations.
+// Avoids calling getContributorsDocument which fires 4 extra IPFS queries per doc.
+async function countContributors(docId: string): Promise<number> {
+  const allocations = await documentsIpfsRepository.getAllocationsByDocId(docId);
+  const uniqueCreators = new Set(
+    allocations
+      .map((a) => a.metadata?.creatorUserId)
+      .filter((id) => id && id !== 'ai' && !id.includes(':'))
+  );
+  return uniqueCreators.size;
+}
 
 export async function getDocumentsByWorkspaceId(
   workspaceId: string,
@@ -49,7 +63,7 @@ export async function getDocumentsByWorkspaceId(
   } else {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [_permissionResult, documentsResult] = await Promise.all([
-      checkPermissionForWorkspace(email, res, workspaceId),
+      checkPermissionForWorkspace(email, res, workspaceId, await publicWorkspacesPromise),
       documentsIpfsRepository.getDocumentsByWorkspace(
         workspaceId,
         from,
@@ -66,19 +80,17 @@ export async function getDocumentsByWorkspaceId(
 
     const documentsWithDetails = await Promise.all(
       documents.map(async (doc: Document) => {
-        const [chats, documentDetails, docContributors] = await Promise.all([
+        const [chats, versionCount, uniqueContributorsLength] = await Promise.all([
           chatsIpfsRepository.getMessagesByDocumentId(doc.docId),
-          documentsIpfsRepository.getDocumentDetailsById(doc.docId),
-          getContributorsDocument(doc.docId),
+          documentsIpfsRepository.countDocumentVersions(doc.docId),
+          countContributors(doc.docId),
         ]);
-
-        const documentVersions = documentDetails.documentVersions as Document[];
 
         return {
           ...doc,
           chatsLength: chats.length,
-          uniqueContributorsLength: docContributors.count,
-          documentVersionsLength: documentVersions.length,
+          uniqueContributorsLength,
+          documentVersionsLength: versionCount,
         };
       }),
     );
