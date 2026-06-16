@@ -89,10 +89,9 @@ export default function Register() {
          }
          router.push("/login");
       }
-      if (result.status === "failure") {
-         if (result.message === "Email address is already registered") {
-            setEmailTaken(true);
-         }
+      if (result.error === "CONFLICT") {
+         setEmailTaken(true);
+      } else if (result.error) {
          toast.error(translations("registerError"));
       }
    };
