@@ -14,8 +14,6 @@ chatsRouter.get(
   ChatsController.getChatsByDocumentId,
 );
 
-chatsRouter.get('/chats/export/:docId', authenticateCookie, ChatsController.getChatsExportByDocumentId);
-
 chatsRouter.get('/chats/recent', authenticateCookie, ChatsController.getRecentChats);
 
 chatsRouter.post('/chats', authenticateCookie, ChatsValidator.postChat, ChatsController.postChat);

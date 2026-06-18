@@ -19,26 +19,6 @@ export const loadChats = async (docId: string, errorText) => {
    return data;
 };
 
-export const getChatsPdfExportUrl = async (docId: string) => {
-   try {
-      const response = await fetchWithCredentials(
-         `${CHATS_ENDPOINT}/export/${docId}`,
-         {
-            credentials: "include"
-         }
-      );
-      if (!response.ok) {
-         throw new Error("Failed to generate PDF");
-      }
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      return url;
-   } catch (err) {
-      console.error(err);
-      throw new Error("Failed to generate PDF");
-   }
-};
-
 export const postChat = async (formData, errorText) => {
    const url = CHATS_ENDPOINT;
    const options: RequestInit = {

@@ -1,11 +1,10 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 
 import { AuthenticatedRequest } from '../../../shared/types';
 
 import { getChatsByDocumentId } from '../application/get-chats-by-document-id.usecase';
 import { getRecentChats } from '../application/get-chats-recent.usecase';
 import { postChat } from '../application/post-chat.usecase';
-import { getChatsExportByDocumentId } from '../application/get-chats-export-by-document-id.usecase';
 
 export const ChatsController = {
   getChatsByDocumentId: async (req: AuthenticatedRequest, res: Response) => {
@@ -14,15 +13,6 @@ export const ChatsController = {
       nodeId: req.user?.nodeId,
     });
     res.json(result);
-  },
-
-  getChatsExportByDocumentId: async (req: Request, res: Response) => {
-    const file = await getChatsExportByDocumentId(req.params.docId);
-
-    res.setHeader('Content-Type', file.contentType);
-    res.setHeader('Content-Disposition', `attachment; filename="${file.filename}"`);
-
-    file.stream.pipe(res);
   },
 
   getRecentChats: async (req: AuthenticatedRequest, res: Response) => {

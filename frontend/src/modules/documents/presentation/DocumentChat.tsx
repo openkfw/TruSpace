@@ -3,19 +3,13 @@ import { useCallback, useEffect, useState } from "react";
 
 import { useTranslations } from "next-intl";
 
-import { Download, MessageCircle } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 
 import ChatMessage from "@/components/ChatMessage";
 import InfoLabel from "@/components/InfoLabel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-   Tooltip,
-   TooltipContent,
-   TooltipProvider,
-   TooltipTrigger
-} from "@/components/ui/tooltip";
-import { getChatsPdfExportUrl, loadChats, postChat } from "@/lib/services";
+import { loadChats, postChat } from "@/lib/services";
 import { cn } from "@/lib/utils";
 import { ChatMessage as Chat } from "@/modules/chats/domain";
 import { Document } from "@/modules/documents/domain";
@@ -140,20 +134,6 @@ export default function DocumentChat({
       }
    };
 
-   const openChatsPdfExport = async (e: React.FormEvent) => {
-      e.preventDefault();
-
-      try {
-         const url = await getChatsPdfExportUrl(docId);
-         const a = document.createElement("a");
-         a.href = url;
-         a.download = `chats-${docId}.pdf`;
-         a.click();
-      } catch (err) {
-         console.error(err);
-      }
-   };
-
    const renderBody = () => {
       if (loading) {
          return (
@@ -246,39 +226,21 @@ export default function DocumentChat({
                      iconOnClick={hideNewNote}
                   />
                )}
-               <Input
-                  type="text"
-                  placeholder={translations("messagePlaceholder")}
-                  value={message}
-                  onChange={updateMessageText}
-                  className={`bg-slate-50 dark:bg-slate-800 dark:text-white dark:placeholder:text-white ${
-                     emptyMessageError && "border-red-500"
-                  }`}
-               />
-               {emptyMessageError && (
-                  <p className="text-red-500 text-sm">
-                     {translations("emptyMessageErrorText")}
-                  </p>
-               )}
                <div className="flex justify-between items-center">
-                  <TooltipProvider>
-                     <Tooltip>
-                        <TooltipTrigger asChild>
-                           <Button
-                              type="button"
-                              size="icon"
-                              variant="outline"
-                              onClick={openChatsPdfExport}
-                              className="p-2 bg-transparent"
-                           >
-                              <Download />
-                           </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                           {translations("downloadChatMessages")}
-                        </TooltipContent>
-                     </Tooltip>
-                  </TooltipProvider>
+                  <Input
+                      type="text"
+                      placeholder={translations("messagePlaceholder")}
+                      value={message}
+                      onChange={updateMessageText}
+                      className={`mr-3 bg-slate-50 dark:bg-slate-800 dark:text-white dark:placeholder:text-white ${
+                        emptyMessageError && "border-red-500"
+                      }`}
+                  />
+                  {emptyMessageError && (
+                      <p className="text-red-500 text-sm">
+                        {translations("emptyMessageErrorText")}
+                      </p>
+                  )}
                   <Button type="submit" disabled={sending}>
                      {sending ? translations("sending") : translations("send")}
                   </Button>
