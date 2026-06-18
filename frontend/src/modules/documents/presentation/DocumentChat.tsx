@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { useTranslations } from "next-intl";
 
-import { Download } from "lucide-react";
+import { Download, MessageCircle } from "lucide-react";
 
 import ChatMessage from "@/components/ChatMessage";
 import InfoLabel from "@/components/InfoLabel";
@@ -16,7 +16,33 @@ import {
    TooltipTrigger
 } from "@/components/ui/tooltip";
 import { getChatsPdfExportUrl, loadChats, postChat } from "@/lib/services";
+import { cn } from "@/lib/utils";
 import { ChatMessage as Chat } from "@/modules/chats/domain";
+import { Document } from "@/modules/documents/domain";
+
+interface DocumentChatProps {
+   cid: string;
+   docId: string;
+   workspaceOrigin: string;
+   documentVersions: Document[];
+   documentPageNumber?: number;
+   setDocumentPageNumber: (page: number) => void;
+   newNoteVisible: boolean;
+   setNewNoteVisible: (visible: boolean) => void;
+   newNotePosition?: { x: number; y: number } | null;
+   setNewNotePosition: (pos: { x: number; y: number } | null) => void;
+   displayNote: ({ x, y }: { x: number; y: number }) => void;
+   /**
+    * Optional title rendered as a sticky header above the chat. When provided,
+    * the chat assumes it's embedded inline (e.g. in the details page) and skips
+    * the top padding reserved for the FloatingChat close button.
+    */
+   title?: string;
+   /**
+    * Optional extra classes for the outer container.
+    */
+   className?: string;
+}
 
 export default function DocumentChat({
    cid,
@@ -29,8 +55,10 @@ export default function DocumentChat({
    setNewNoteVisible,
    newNotePosition,
    setNewNotePosition,
-   displayNote
-}) {
+   displayNote,
+   title,
+   className
+}: DocumentChatProps) {
    const [loading, setLoading] = useState(true);
    const [sending, setSending] = useState(false);
    const [error, setError] = useState(null);
@@ -67,13 +95,13 @@ export default function DocumentChat({
 
    const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
-      setSending(true);
       if (message === "") {
          setEmptyMessageError(true);
          return;
       }
+      setSending(true);
 
-      const data = {
+      const data: Record<string, unknown> = {
          documentCid: cid,
          message: message
       };
@@ -126,21 +154,28 @@ export default function DocumentChat({
       }
    };
 
-   if (loading) {
-      return <p>{generalTranslations("loading")}</p>;
-   }
-
-   if (error) {
+   const renderBody = () => {
+      if (loading) {
+         return (
+            <div className="flex-1 flex items-center justify-center text-muted-foreground text-sm">
+               {generalTranslations("loading")}
+            </div>
+         );
+      }
+      if (error) {
+         return (
+            <div className="flex-1 flex items-center justify-center text-sm text-destructive">
+               {generalTranslations("error")}: {error}
+            </div>
+         );
+      }
       return (
-         <p>
-            {generalTranslations("error")}: {error}
-         </p>
-      );
-   }
-
-   return (
-      <div className="flex flex-col h-full pt-10">
-         <div className="flex-1 overflow-auto space-y-4 px-4 pb-4 mt-2">
+         <div
+            className={cn(
+               "flex-1 overflow-auto space-y-4 px-4 pb-4",
+               title ? "pt-4" : "pt-10 mt-2"
+            )}
+         >
             {chats && chats.length > 0 ? (
                chats.map((chat: Chat) => {
                   const messageData = JSON.parse(chat.meta.data);
@@ -178,10 +213,27 @@ export default function DocumentChat({
                   );
                })
             ) : (
-               <p>{translations("noMessage")}</p>
+               <div className="h-full flex flex-col items-center justify-center text-center text-sm text-muted-foreground py-10">
+                  <MessageCircle className="h-8 w-8 mb-2 opacity-40" />
+                  {translations("noMessage")}
+               </div>
             )}
          </div>
-         <div className="border-t border-border p-4">
+      );
+   };
+
+   return (
+      <div className={cn("flex flex-col h-full min-h-0", className)}>
+         {title && (
+            <div className="flex shrink-0 items-center justify-between border-b border-border px-4 py-3 bg-card/60 backdrop-blur-sm rounded-t-xl">
+               <h3 className="text-base font-semibold flex items-center gap-2 text-foreground">
+                  <MessageCircle className="h-4 w-4 text-muted-foreground" />
+                  {title}
+               </h3>
+            </div>
+         )}
+         {renderBody()}
+         <div className="border-t border-border p-4 shrink-0">
             <form
                onSubmit={handleSubmit}
                className="flex flex-col gap-2 w-full"

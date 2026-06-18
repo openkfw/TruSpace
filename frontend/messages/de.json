@@ -345,7 +345,9 @@
    },
    "chat": {
       "chat": "Chatten",
+      "chatAndActivity": "Chat & Aktivität",
       "user": "Benutzer",
+      "showPointInDocument": "Stelle im Dokument anzeigen",
       "messageForVersion": "Bezogen auf die Dokumentversion:",
       "reply": "Antwort",
       "forward": "Nach vorne",

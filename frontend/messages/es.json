@@ -345,7 +345,9 @@
   },
   "chat": {
     "chat": "Charlar",
+    "chatAndActivity": "Chat y actividad",
     "user": "usuario",
+    "showPointInDocument": "Mostrar punto en el documento",
     "messageForVersion": "Relacionado con la versión del documento:",
     "reply": "Respuesta",
     "forward": "Adelante",
