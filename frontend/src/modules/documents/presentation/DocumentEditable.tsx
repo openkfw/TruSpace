@@ -86,7 +86,7 @@ export default function DocumentEditable({
    };
 
    return loadedEditorContent ? (
-      <div className="pb-[var(--chat-offset)]">
+      <div>
          <div className="flex items-center justify-between gap-4">
             <TooltipProvider>
                <Tooltip>
@@ -124,6 +124,7 @@ export default function DocumentEditable({
             content={loadedEditorContent}
             onChange={(editor) => setEditorContent(editor.getHTML())}
             stickyToolbarTopMargin="12"
+            contentMaxHeightClassName="max-h-[calc(100vh-27rem)]"
          />
 
       </div>

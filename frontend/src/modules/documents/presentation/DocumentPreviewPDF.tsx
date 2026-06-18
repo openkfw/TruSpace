@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 
 import { useTranslations } from "next-intl";
@@ -7,7 +7,6 @@ import { useTranslations } from "next-intl";
 import { ChevronLeft, ChevronRight, StickyNote } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { DOCUMENTS_ENDPOINT } from "@/shared/config";
 
 import "react-pdf/dist/Page/AnnotationLayer.css";
@@ -17,6 +16,12 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
    "pdfjs-dist/build/pdf.worker.min.mjs",
    import.meta.url
 ).toString();
+
+// Hoisted to module scope so its reference is stable across renders.
+// react-pdf warns when the `options` prop reference changes between renders.
+const DOCUMENT_OPTIONS = {
+   withCredentials: true
+} as const;
 
 export default function DocumentPreviewPDF({
    cid,
@@ -34,7 +39,6 @@ export default function DocumentPreviewPDF({
 }) {
    const [numPages, setNumPages] = useState<number>();
    const translations = useTranslations("documentPreview");
-   const isMobile = useIsMobile();
    const [containerWidth, setContainerWidth] = useState(0);
 
    const previewContainer = useRef(null);
@@ -128,11 +132,6 @@ export default function DocumentPreviewPDF({
    }, [numPages, pageNumber, addCanvasClickListener, handleClick]);
 
    useEffect(() => {
-      if (!isMobile) {
-         setContainerWidth(0);
-         return;
-      }
-
       if (!containerRef.current) {
          return;
       }
@@ -158,20 +157,23 @@ export default function DocumentPreviewPDF({
          resizeObserver?.disconnect();
          window.removeEventListener("resize", updateWidth);
       };
-   }, [isMobile]);
+   }, []);
 
-   const documentOptions = useMemo(
-      () => ({
-         withCredentials: true
-      }),
-      []
-   );
+   const documentOptions = DOCUMENT_OPTIONS;
+
+   // Reserve a little horizontal padding inside the scroll container so the
+   // page doesn't touch the scrollbar edge.
+   const pageWidth =
+      containerWidth > 0 ? Math.max(containerWidth - 24, 0) : undefined;
 
    // check if name is a pdf file
    if (!cid || filename.split(".").pop() === "pdf") {
       return (
-         <div ref={containerRef} className={isMobile ? "w-full" : ""}>
-            <div className="flex justify-center items-center gap-4 mb-2">
+         <div
+            ref={containerRef}
+            className="w-full max-h-[calc(100vh-16rem)] overflow-y-auto"
+         >
+            <div className="flex justify-center items-center gap-4 mb-2 sticky top-0 z-10 bg-background/80 backdrop-blur-sm py-2">
                <Button
                   className="h-8 w-8"
                   variant="outline"
@@ -201,8 +203,8 @@ export default function DocumentPreviewPDF({
             >
                <Page
                   pageNumber={pageNumber}
-                  className="relative"
-                  width={isMobile && containerWidth ? containerWidth : undefined}
+                  className="relative mx-auto"
+                  width={pageWidth}
                >
                   <div
                      className={`absolute ${newNoteVisible ? "block" : "hidden"} text-red-500 z-50`}

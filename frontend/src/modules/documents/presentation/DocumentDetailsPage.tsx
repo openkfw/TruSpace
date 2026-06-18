@@ -204,7 +204,7 @@ export default function DocumentDetailsPage() {
          <div className="mt-4 grid grid-cols-1 gap-4 min-[1200px]:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] min-[1200px]:gap-6 min-[1200px]:items-start">
             {/* Left column: Chat & Activity */}
             <Card
-               className="bg-transparent flex flex-col overflow-hidden p-0 h-[70vh] min-h-[480px] min-[1200px]:sticky min-[1200px]:top-4 min-[1200px]:h-[calc(100vh-13rem)] min-[1200px]:max-h-[calc(100vh-13rem)]"
+               className="bg-transparent flex flex-col overflow-hidden p-0 h-[70vh] min-h-[480px] md:sticky md:top-4 md:h-[calc(100vh-13rem)] md:max-h-[calc(100vh-13rem)]"
             >
                <DocumentChat
                   title={chatTranslations("chatAndActivity")}
