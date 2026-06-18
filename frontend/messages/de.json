@@ -366,6 +366,28 @@
       "send": "Senden",
       "sending": "Wird gesendet..."
    },
+   "events": {
+      "loadError": "Aktivitäten konnten nicht geladen werden",
+      "document": {
+         "upload": "{objectName} hochgeladen von {actor}",
+         "version": "Neue Dokumentenversion v{version} von {actor}",
+         "delete": "{objectName} gelöscht von {actor}"
+      },
+      "tag": {
+         "create": "Tag \"{objectName}\" hinzugefügt von {actor}",
+         "delete": "Tag \"{objectName}\" entfernt von {actor}"
+      },
+      "perspective": {
+         "create": "Perspektive \"{objectName}\" erstellt von {actor}",
+         "update": "Perspektive \"{objectName}\" aktualisiert von {actor}",
+         "delete": "Perspektive \"{objectName}\" gelöscht von {actor}"
+      },
+      "actor": {
+         "unknown": "unbekannter Nutzer",
+         "ai": "KI",
+         "aiNamed": "KI ({model})"
+      }
+   },
    "perspectives": {
       "addYourPerspective": "Füge deine Perspektive hinzu",
       "aiDisclaimer": "Diese Perspektive wurde von einem LLM-Modell generiert. Sie könnte einige Fehler oder Inkonsistenzen enthalten.",

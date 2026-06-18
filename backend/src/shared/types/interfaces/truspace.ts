@@ -193,3 +193,59 @@ interface LanguageMeta {
 export interface LanguageRequest {
   meta: LanguageMeta;
 }
+
+/**
+ * Activity event recorded for central document/workspace changes.
+ *
+ * Events are stored as their own pinned objects in IPFS (`type: "event"`) and
+ * are displayed in the document chat as a lightweight activity stream next to
+ * regular chat messages. Only the actor name is resolved at read time; the
+ * other display-relevant fields (`objectName`, `version`, ...) are denormalised
+ * into the meta so that the timeline still renders correctly even after the
+ * referenced object (e.g. a tag) has been deleted.
+ */
+export type EventType = "document" | "tag" | "perspective";
+
+export type EventAction =
+  | "upload"   // initial document upload
+  | "version"  // new document version
+  | "create"   // tag / perspective created
+  | "update"   // perspective updated
+  | "delete"; // any object deleted
+
+export type EventActorType = "user" | "ai";
+
+export interface EventMeta {
+  type: "event";
+  eventId: string;
+  eventType: EventType;
+  eventAction: EventAction;
+  /** Stable identifier of the affected object (docId / tag cid / perspective cid). */
+  objectId: string;
+  /** Human-readable label (filename, tag name, perspective type) for display. */
+  objectName?: string;
+  workspaceOrigin: string;
+  /** Optional so that future workspace-level events can omit it. */
+  docId?: string;
+  /** CID of the document version the event relates to, when applicable. */
+  versionCid?: string;
+  /** Document version number (denormalised for display on "version" events). */
+  version?: string;
+  actorType: EventActorType;
+  /** Empty for AI actors. */
+  actorNodeId?: string;
+  /** Empty for AI actors. */
+  actorUserId?: string;
+  /** Resolved at read time. */
+  actorName?: string;
+  /** ISO 8601 timestamp. */
+  timestamp: string;
+}
+
+export interface EventRequest {
+  meta: EventMeta;
+}
+
+export interface Event extends EventRequest {
+  cid: string;
+}

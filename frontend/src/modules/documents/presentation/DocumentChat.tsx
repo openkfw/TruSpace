@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useTranslations } from "next-intl";
 
@@ -9,10 +9,15 @@ import ChatMessage from "@/components/ChatMessage";
 import InfoLabel from "@/components/InfoLabel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { loadChats, postChat } from "@/lib/services";
+import {
+   loadChats,
+   loadEventsByDocumentId,
+   postChat
+} from "@/lib/services";
 import { cn } from "@/lib/utils";
 import { ChatMessage as Chat } from "@/modules/chats/domain";
 import { Document } from "@/modules/documents/domain";
+import { ActivityEntry, ActivityEvent } from "@/modules/events";
 
 interface DocumentChatProps {
    cid: string;
@@ -38,6 +43,30 @@ interface DocumentChatProps {
    className?: string;
 }
 
+/**
+ * Item rendered in the timeline. Chat messages and events share the same
+ * container so they can be ordered chronologically without duplication. The
+ * `sortKey` is computed once per item so the merge is stable across renders.
+ */
+type TimelineItem =
+   | { kind: "chat"; sortKey: number; chat: Chat }
+   | { kind: "event"; sortKey: number; event: ActivityEvent };
+
+/**
+ * Convert a chat or event timestamp (epoch-ms-as-string for chats, ISO 8601
+ * for events) into a numeric sort key. Returns 0 for unparseable values so
+ * malformed entries fall to the start of the list rather than NaN-poisoning
+ * the comparator.
+ */
+function toSortKey(timestamp: string | number | undefined): number {
+   if (timestamp == null) return 0;
+   if (typeof timestamp === "number") return timestamp;
+   const numeric = Number(timestamp);
+   if (Number.isFinite(numeric)) return numeric;
+   const parsed = new Date(timestamp).getTime();
+   return Number.isFinite(parsed) ? parsed : 0;
+}
+
 export default function DocumentChat({
    cid,
    docId,
@@ -57,9 +86,11 @@ export default function DocumentChat({
    const [sending, setSending] = useState(false);
    const [error, setError] = useState(null);
    const [chats, setChats] = useState<Chat[] | null>(null);
+   const [events, setEvents] = useState<ActivityEvent[] | null>(null);
    const [message, setMessage] = useState("");
    const [emptyMessageError, setEmptyMessageError] = useState(false);
    const translations = useTranslations("chat");
+   const eventTranslations = useTranslations("events");
    const generalTranslations = useTranslations("general");
 
    const hideNewNote = useCallback(() => {
@@ -67,25 +98,38 @@ export default function DocumentChat({
       setNewNotePosition(null);
    }, [setNewNoteVisible, setNewNotePosition]);
 
-   const fetchChats = useCallback(async () => {
+   const fetchTimeline = useCallback(async () => {
       try {
-         const data = await loadChats(docId, translations("chatError"));
-         if (data) {
-            setChats(data);
+         // Chats and events are independent endpoints - fetch in parallel.
+         // If events fail we still want to show chat messages, so the event
+         // failure is swallowed and only chat errors surface to the UI.
+         const [chatData, eventData] = await Promise.all([
+            loadChats(docId, translations("chatError")),
+            loadEventsByDocumentId(docId, eventTranslations("loadError")).catch(
+               (err) => {
+                  console.error("Failed to load activity events", err);
+                  return [] as ActivityEvent[];
+               }
+            )
+         ]);
+
+         if (chatData) {
+            setChats(chatData);
          } else {
-            console.error(translations("invalidResponse"), data);
+            console.error(translations("invalidResponse"), chatData);
             throw new Error(translations("invalidResponse"));
          }
+         setEvents(eventData ?? []);
       } catch (err) {
          setError(err.message);
       } finally {
          setLoading(false);
       }
-   }, [docId, translations]);
+   }, [docId, translations, eventTranslations]);
 
    useEffect(() => {
-      fetchChats();
-   }, [fetchChats]);
+      fetchTimeline();
+   }, [fetchTimeline]);
 
    const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
@@ -122,7 +166,7 @@ export default function DocumentChat({
          console.error(err);
       } finally {
          setNewNoteVisible(false);
-         setTimeout(fetchChats, 1000);
+         setTimeout(fetchTimeline, 1000);
          setSending(false);
       }
    };
@@ -133,6 +177,31 @@ export default function DocumentChat({
          setEmptyMessageError(false);
       }
    };
+
+   /**
+    * Merge chats and events into a single chronologically ordered list. Both
+    * arrays are already sorted by their respective backends, so the merge is
+    * stable and cheap. Recomputed only when inputs change.
+    */
+   const timeline = useMemo<TimelineItem[]>(() => {
+      const items: TimelineItem[] = [];
+      (chats ?? []).forEach((chat) =>
+         items.push({
+            kind: "chat",
+            sortKey: toSortKey(chat.meta.timestamp),
+            chat
+         })
+      );
+      (events ?? []).forEach((event) =>
+         items.push({
+            kind: "event",
+            sortKey: toSortKey(event.meta.timestamp),
+            event
+         })
+      );
+      items.sort((a, b) => a.sortKey - b.sortKey);
+      return items;
+   }, [chats, events]);
 
    const renderBody = () => {
       if (loading) {
@@ -156,12 +225,22 @@ export default function DocumentChat({
                title ? "pt-4" : "pt-10 mt-2"
             )}
          >
-            {chats && chats.length > 0 ? (
-               chats.map((chat: Chat) => {
+            {timeline.length > 0 ? (
+               timeline.map((item) => {
+                  if (item.kind === "event") {
+                     return (
+                        <ActivityEntry
+                           key={`event-${item.event.cid}`}
+                           event={item.event}
+                        />
+                     );
+                  }
+
+                  const chat = item.chat;
                   const messageData = JSON.parse(chat.meta.data);
                   return (
                      <ChatMessage
-                        key={chat.cid}
+                        key={`chat-${chat.cid}`}
                         creator={chat.meta.creatorName}
                         isOwnMessage={chat.isOwnMessage}
                         version={

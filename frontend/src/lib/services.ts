@@ -1,5 +1,4 @@
 export {
-   getChatsPdfExportUrl,
    loadChats,
    postChat,
    useRecentChats
@@ -13,6 +12,10 @@ export {
    loadDocuments,
    useDocumentsStatistics
 } from "@/modules/documents";
+export {
+   loadEventsByDocumentId,
+   loadEventsByWorkspaceId
+} from "@/modules/events";
 export {
    getHealth,
    useHealth,

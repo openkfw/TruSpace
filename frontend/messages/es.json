@@ -366,6 +366,28 @@
     "send": "Enviar",
     "sending": "Será enviado..."
   },
+  "events": {
+    "loadError": "No se pudieron cargar las actividades",
+    "document": {
+      "upload": "{objectName} subido por {actor}",
+      "version": "Nueva versión del documento v{version} por {actor}",
+      "delete": "{objectName} eliminado por {actor}"
+    },
+    "tag": {
+      "create": "Etiqueta \"{objectName}\" añadida por {actor}",
+      "delete": "Etiqueta \"{objectName}\" eliminada por {actor}"
+    },
+    "perspective": {
+      "create": "Perspectiva \"{objectName}\" creada por {actor}",
+      "update": "Perspectiva \"{objectName}\" actualizada por {actor}",
+      "delete": "Perspectiva \"{objectName}\" eliminada por {actor}"
+    },
+    "actor": {
+      "unknown": "usuario desconocido",
+      "ai": "IA",
+      "aiNamed": "IA ({model})"
+    }
+  },
   "perspectives": {
     "addYourPerspective": "Añade tu perspectiva",
     "aiDisclaimer": "Esta perspectiva fue generada por un modelo LLM. Puede contener algunos errores o inconsistencias.",
