@@ -17,4 +17,5 @@ export interface ChatMessageRequest {
 
 export interface ChatMessage extends ChatMessageRequest {
    cid: string;
+   isOwnMessage?: boolean;
 }

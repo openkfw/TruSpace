@@ -10,6 +10,7 @@ import {
    TooltipTrigger
 } from "@/components/ui/tooltip";
 import { formatDate } from "@/lib/formatDate";
+import { cn } from "@/lib/utils";
 
 import InfoLabel from "./InfoLabel";
 
@@ -20,6 +21,7 @@ interface ChatMessageProps {
    versionTagName?: string;
    message: string;
    onInfoPanelIconClick?: (() => void) | null;
+   isOwnMessage?: boolean;
 }
 
 function getInitials(name?: string) {
@@ -51,7 +53,8 @@ export default function ChatMessage({
    version,
    versionTagName,
    message,
-   onInfoPanelIconClick
+   onInfoPanelIconClick,
+   isOwnMessage = false
 }: ChatMessageProps) {
    const translations = useTranslations("chat");
    const displayName = creator || translations("user");
@@ -60,21 +63,47 @@ export default function ChatMessage({
    const hasVersionTag =
       versionTagName && versionTagName !== "undefined" ? versionTagName : null;
 
+   const avatar = (
+      <div
+         className={cn(
+            "flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold text-white",
+            isOwnMessage
+               ? "bg-blue-500 dark:bg-blue-900"
+               : "bg-gray-500 dark:bg-gray-700"
+         )}
+         aria-hidden
+      >
+         {getInitials(displayName)}
+      </div>
+   );
+
    return (
-      <div className="flex items-end gap-2">
+      <div
+         className={cn(
+            "flex items-end gap-2",
+            isOwnMessage && "flex-row-reverse"
+         )}
+      >
+         {avatar}
+
          <div
-            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-500 text-[10px] font-semibold text-white dark:bg-blue-700"
-            aria-hidden
-         >
-            {getInitials(displayName)}
-         </div>
+            className={cn(
+               "flex max-w-full min-w-0 flex-col rounded-xl px-3 py-1.5",
+               isOwnMessage
+                  ? "rounded-br-none bg-blue-200 dark:bg-blue-900"
+                  : "rounded-bl-none bg-slate-300 dark:bg-slate-700"
+            )}>
+            {!isOwnMessage && (
+               <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                  {displayName}
+               </span>
+            )}
 
-         <div className="flex max-w-full min-w-0 flex-col rounded-xl rounded-bl-none bg-blue-200 px-3 py-1.5 dark:bg-gray-700">
-            <span className="text-xs font-semibold text-blue-700 dark:text-blue-300">
-               {displayName}
-            </span>
-
-            <p className="whitespace-pre-wrap break-words text-sm leading-snug text-gray-900 dark:text-white">
+            <p className={cn("whitespace-pre-wrap break-words text-sm leading-snug text-gray-900 dark:text-white",
+            isOwnMessage
+               ? "text-end"
+               : "text-start"
+            )}>
                {message}
             </p>
 
@@ -83,6 +112,7 @@ export default function ChatMessage({
                   text={translations("showPointInDocument")}
                   icon={<ExternalLink />}
                   iconOnClick={onInfoPanelIconClick}
+                  isOwnMessage={isOwnMessage}
                />
             )}
 

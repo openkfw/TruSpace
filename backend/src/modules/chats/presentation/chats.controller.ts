@@ -8,8 +8,11 @@ import { postChat } from '../application/post-chat.usecase';
 import { getChatsExportByDocumentId } from '../application/get-chats-export-by-document-id.usecase';
 
 export const ChatsController = {
-  getChatsByDocumentId: async (req: Request, res: Response) => {
-    const result = await getChatsByDocumentId(req.params.docId);
+  getChatsByDocumentId: async (req: AuthenticatedRequest, res: Response) => {
+    const result = await getChatsByDocumentId(req.params.docId, {
+      uiid: req.user?.uiid,
+      nodeId: req.user?.nodeId,
+    });
     res.json(result);
   },
 
