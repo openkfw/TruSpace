@@ -12,7 +12,7 @@ export default function InfoLabel({
    iconOnClick?: () => void;
 }) {
    return (
-      <div className="flex items-center my-2.5 bg-blue-100 dark:bg-gray-600 rounded-xl p-2">
+      <div className="flex items-center my-2.5 bg-blue-100 dark:bg-gray-600 rounded-lg p-2">
          <div className="me-1">
             <span className="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white">
                {text}
@@ -26,7 +26,7 @@ export default function InfoLabel({
          <div className="inline-flex self-center items-right ml-auto">
             {iconOnClick && (
                <button
-                  className="inline-flex self-center items-center p-2 text-sm font-medium text-center text-gray-900 bg-blue-100 rounded-lg hover:bg-blue-50 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50 dark:bg-gray-600 dark:hover:bg-gray-500 dark:focus:ring-gray-600"
+                  className="inline-flex self-center items-center p-1 text-sm font-medium text-center text-gray-900 bg-blue-100 rounded-lg hover:bg-blue-50 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50 dark:bg-gray-600 dark:hover:bg-gray-500 dark:focus:ring-gray-600 [&_svg]:h-4 [&_svg]:w-4"
                   type="button"
                   onClick={iconOnClick}
                >
