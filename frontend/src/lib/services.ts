@@ -14,7 +14,10 @@ export {
 } from "@/modules/documents";
 export {
    loadEventsByDocumentId,
-   loadEventsByWorkspaceId
+   loadEventsByWorkspaceId,
+   notifyDocumentActivity,
+   subscribeToDocumentActivity,
+   useDocumentActivitySubscription
 } from "@/modules/events";
 export {
    getHealth,

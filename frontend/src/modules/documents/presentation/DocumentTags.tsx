@@ -22,7 +22,7 @@ import {
    TooltipProvider,
    TooltipTrigger
 } from "@/components/ui/tooltip";
-import { deleteTag, loadTags, postTag } from "@/lib/services";
+import { deleteTag, loadTags, notifyDocumentActivity, postTag } from "@/lib/services";
 
 const colors = [
    { color: "bg-blue-600", borderColor: "border-blue-600", textColor: "text-white" },
@@ -73,10 +73,13 @@ export default function DocumentTags({ cid, workspaceOrigin, docId, status }) {
    useEffect(() => {
       if (status?.status === "completed") {
          fetchTags();
+         // AI-generated tags also produce activity events on the backend,
+         // so let the timeline (DocumentChat) and other listeners know.
+         notifyDocumentActivity(docId);
       } else if (status?.status === "failed") {
          toast.error(translations("errorGeneratingAITags"));
       }
-   }, [fetchTags, status?.status, translations]);
+   }, [fetchTags, status?.status, translations, docId]);
 
    const updateTagName = (e: React.ChangeEvent<HTMLInputElement>) => {
       setNewTagName(e.target.value);
@@ -101,6 +104,10 @@ export default function DocumentTags({ cid, workspaceOrigin, docId, status }) {
       setSelectedColor(null);
       setIsAdding(false);
       if (data) {
+         // Local refresh after a short delay so the IPFS write becomes
+         // visible. The same notification refreshes DocumentChat (and any
+         // other listeners) without needing a setInterval anywhere.
+         notifyDocumentActivity(docId, { delayMs: 1000 });
          setTimeout(fetchTags, 1000);
       } else {
          console.error("Invalid response", data);
@@ -112,6 +119,7 @@ export default function DocumentTags({ cid, workspaceOrigin, docId, status }) {
       const data = await deleteTag(tagId);
       if (data) {
          setTags(tags.filter((tag) => tag.id !== tagId));
+         notifyDocumentActivity(docId);
       } else {
          console.error("Invalid response", data);
          throw new Error("Invalid response");

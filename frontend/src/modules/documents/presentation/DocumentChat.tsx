@@ -12,7 +12,9 @@ import { Input } from "@/components/ui/input";
 import {
    loadChats,
    loadEventsByDocumentId,
-   postChat
+   notifyDocumentActivity,
+   postChat,
+   useDocumentActivitySubscription
 } from "@/lib/services";
 import { cn } from "@/lib/utils";
 import { ChatMessage as Chat } from "@/modules/chats/domain";
@@ -128,8 +130,31 @@ export default function DocumentChat({
    }, [docId, translations, eventTranslations]);
 
    useEffect(() => {
+      // Initial load.
       fetchTimeline();
+
+      // Refresh immediately when the user comes back to the tab, so
+      // returning from another window feels instant and we still catch
+      // updates produced by other users (cross-browser changes are not
+      // covered by the local activity bus).
+      const onVisible = () => {
+         if (document.visibilityState === "visible") {
+            fetchTimeline();
+         }
+      };
+      document.addEventListener("visibilitychange", onVisible);
+
+      return () => {
+         document.removeEventListener("visibilitychange", onVisible);
+      };
    }, [fetchTimeline]);
+
+   // Refresh whenever someone (this tab or another tab in the same browser)
+   // signals new activity for this document - new chat, tag added/removed,
+   // perspective created, version uploaded, AI generation finished, ...
+   // This replaces the previous 5s polling loop, which was hammering the
+   // IPFS allocations endpoint for every open chat.
+   useDocumentActivitySubscription(docId, fetchTimeline);
 
    const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
@@ -166,7 +191,12 @@ export default function DocumentChat({
          console.error(err);
       } finally {
          setNewNoteVisible(false);
-         setTimeout(fetchTimeline, 1000);
+         // Notify the local activity bus instead of refetching directly.
+         // The chat itself is subscribed, so this refreshes the timeline
+         // here AND in any other tab that has the same document open.
+         // The short delay gives the backend a moment to persist the chat
+         // to IPFS before the refetch hits the listing endpoint.
+         notifyDocumentActivity(docId, { delayMs: 1000 });
          setSending(false);
       }
    };

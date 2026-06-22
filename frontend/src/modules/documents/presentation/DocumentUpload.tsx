@@ -20,7 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useDocuments } from "@/contexts/DocumentsContext";
 import { useWorkspaceContext } from "@/contexts/WorkspaceContext";
-import { documentUpload } from "@/lib/services";
+import { documentUpload, notifyDocumentActivity } from "@/lib/services";
 import { isPdfBlank } from "@/lib/utils";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -235,6 +235,10 @@ export default function DocumentUpload({
             );
             if (docId) {
                await refreshUntilVersionFound(docId, res.data.cid);
+               // New version creates a backend activity event - notify
+               // listeners (DocumentChat etc.) instead of forcing them
+               // to poll on an interval.
+               notifyDocumentActivity(docId);
             }
             await fetchDocuments(workspace?.uuid);
 
