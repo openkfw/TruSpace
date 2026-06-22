@@ -262,6 +262,31 @@ export default function DocumentDetailsPage() {
                         className="space-y-3"
                      >
                         <Card className="bg-transparent">
+                            <AccordionItem
+                              value="metadata"
+                              className="border-b-0"
+                            >
+                              <AccordionTrigger className="px-4 py-3 hover:no-underline">
+                                  <span className="flex items-center gap-2 text-base font-semibold text-muted-foreground">
+                                    <Info className="h-4 w-4" />
+                                    {documentTranslations("metadata")}
+                                  </span>
+                              </AccordionTrigger>
+                              <AccordionContent className="px-4 pb-4 pt-0">
+                                  <DocumentData
+                                    docId={document.docId}
+                                    cId={document.cid}
+                                    meta={document.meta}
+                                    documentVersions={document.documentVersions}
+                                    workspaceOrigin={
+                                        document.meta?.workspaceOrigin
+                                    }
+                                  />
+                              </AccordionContent>
+                            </AccordionItem>
+                        </Card>
+
+                        <Card className="bg-transparent">
                            <AccordionItem value="tags" className="border-b-0">
                               <AccordionTrigger className="px-4 py-3 hover:no-underline">
                                  <span className="flex items-center gap-2 text-base font-semibold text-foreground">
@@ -297,31 +322,6 @@ export default function DocumentDetailsPage() {
                                  <DocumentPerspectives
                                     cid={document.cid}
                                     docId={document.docId}
-                                    workspaceOrigin={
-                                       document.meta?.workspaceOrigin
-                                    }
-                                 />
-                              </AccordionContent>
-                           </AccordionItem>
-                        </Card>
-
-                        <Card className="bg-transparent">
-                           <AccordionItem
-                              value="metadata"
-                              className="border-b-0"
-                           >
-                              <AccordionTrigger className="px-4 py-3 hover:no-underline">
-                                 <span className="flex items-center gap-2 text-base font-semibold text-muted-foreground">
-                                    <Info className="h-4 w-4" />
-                                    {documentTranslations("metadata")}
-                                 </span>
-                              </AccordionTrigger>
-                              <AccordionContent className="px-4 pb-4 pt-0">
-                                 <DocumentData
-                                    docId={document.docId}
-                                    cId={document.cid}
-                                    meta={document.meta}
-                                    documentVersions={document.documentVersions}
                                     workspaceOrigin={
                                        document.meta?.workspaceOrigin
                                     }
