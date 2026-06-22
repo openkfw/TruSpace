@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useTranslations } from "next-intl";
 
@@ -91,6 +91,7 @@ export default function DocumentChat({
    const [events, setEvents] = useState<ActivityEvent[] | null>(null);
    const [message, setMessage] = useState("");
    const [emptyMessageError, setEmptyMessageError] = useState(false);
+   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
    const translations = useTranslations("chat");
    const eventTranslations = useTranslations("events");
    const generalTranslations = useTranslations("general");
@@ -233,6 +234,14 @@ export default function DocumentChat({
       return items;
    }, [chats, events]);
 
+   // Auto-scroll to the newest message/activity at the bottom whenever the
+   // timeline updates (initial load, new chat, new event, ...).
+   useEffect(() => {
+      const el = scrollContainerRef.current;
+      if (!el) return;
+      el.scrollTop = el.scrollHeight;
+   }, [timeline, loading]);
+
    const renderBody = () => {
       if (loading) {
          return (
@@ -250,6 +259,7 @@ export default function DocumentChat({
       }
       return (
          <div
+            ref={scrollContainerRef}
             className={cn(
                "flex-1 overflow-auto space-y-4 px-4 pb-4",
                title ? "pt-4" : "pt-10 mt-2"
