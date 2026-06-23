@@ -17,3 +17,10 @@ chatsRouter.get(
 chatsRouter.get('/chats/recent', authenticateCookie, ChatsController.getRecentChats);
 
 chatsRouter.post('/chats', authenticateCookie, ChatsValidator.postChat, ChatsController.postChat);
+
+chatsRouter.put(
+  '/chats/:cid',
+  authenticateCookie,
+  ChatsValidator.editChat,
+  ChatsController.editChat,
+);

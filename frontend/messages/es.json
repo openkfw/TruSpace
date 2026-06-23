@@ -364,7 +364,11 @@
     "messagePlaceholder": "Introduce un mensaje...",
     "downloadChatMessages": "Descargar mensajes de chat",
     "send": "Enviar",
-    "sending": "Será enviado..."
+    "sending": "Será enviado...",
+    "edit": "Editar",
+    "edited": "Editado",
+    "save": "Guardar",
+    "cancel": "Cancelar"
   },
   "events": {
     "loadError": "No se pudieron cargar las actividades",

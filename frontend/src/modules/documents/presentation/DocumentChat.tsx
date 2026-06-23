@@ -10,6 +10,7 @@ import InfoLabel from "@/components/InfoLabel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
+   editChat,
    loadChats,
    loadEventsByDocumentId,
    notifyDocumentActivity,
@@ -278,6 +279,16 @@ export default function DocumentChat({
 
                   const chat = item.chat;
                   const messageData = JSON.parse(chat.meta.data);
+                  const handleEdit = chat.isOwnMessage
+                     ? async (newMessage: string) => {
+                          await editChat(
+                             chat.cid,
+                             { ...messageData, message: newMessage },
+                             translations("messageError")
+                          );
+                          notifyDocumentActivity(docId, { delayMs: 500 });
+                       }
+                     : undefined;
                   return (
                      <ChatMessage
                         key={`chat-${chat.cid}`}
@@ -296,6 +307,9 @@ export default function DocumentChat({
                            )?.meta.versionTagName
                         }
                         timestamp={chat.meta.timestamp}
+                        edited={Boolean(chat.meta.editedTimestamp)}
+                        editedTimestamp={chat.meta.editedTimestamp}
+                        onEdit={handleEdit}
                         message={messageData.message}
                         onInfoPanelIconClick={
                            messageData?.documentCid === cid &&

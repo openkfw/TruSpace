@@ -1,4 +1,5 @@
 export {
+   editChat,
    loadChats,
    postChat,
    useRecentChats

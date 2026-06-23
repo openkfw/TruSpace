@@ -66,6 +66,7 @@ export function transformPinToChatMessage(pin: Pin): ChatMessage {
       creatorUserId: pin.meta.creatorUserId || '',
       creatorName: pin.meta.creatorName || pin.meta.creator || '',
       workspaceOrigin: pin.meta.workspaceOrigin,
+      ...(pin.meta.editedTimestamp ? { editedTimestamp: pin.meta.editedTimestamp } : {}),
     },
   };
 }

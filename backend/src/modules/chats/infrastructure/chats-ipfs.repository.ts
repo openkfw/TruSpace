@@ -44,6 +44,48 @@ class ChatsIpfsRepository {
     }
   }
 
+  async getMessageByCid(cid: string): Promise<ChatMessage | null> {
+    try {
+      const allocations = await fetchLocalAllocations({ key: 'type', value: 'chat' });
+      const match = allocations.find((a) => a.cid === cid);
+      if (!match) return null;
+      const [enriched] = await this.#enrichAndSortMessages([match]);
+      return enriched ?? null;
+    } catch (error) {
+      logger.error('Error getting chat message ' + cid + ':', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Replace an existing chat message pin with a new one carrying updated
+   * `data` and an `editedTimestamp`. Because IPFS content is immutable, we
+   * create a fresh pin (which produces a new cid) and unpin the old one. All
+   * other metadata - including the original `timestamp` - is preserved so the
+   * message stays in its original position in the timeline.
+   */
+  async updateMessage(originalCid: string, updatedData: string): Promise<string> {
+    const existing = await this.getMessageByCid(originalCid);
+    if (!existing) {
+      throw new Error('Chat message not found: ' + originalCid);
+    }
+    const updatedReq: ChatMessageRequest = {
+      meta: {
+        ...existing.meta,
+        data: updatedData,
+        editedTimestamp: Date.now().toString(),
+      },
+    };
+    const newCid = await this.createMessage(updatedReq);
+    try {
+      await clusterClient.delete('/pins/' + originalCid);
+    } catch (error) {
+      logger.error('Error unpinning old chat message ' + originalCid + ':', error);
+      // Best-effort cleanup; the new pin already exists.
+    }
+    return newCid;
+  }
+
   async getMessagesByDocumentId(docId: string): Promise<ChatMessage[]> {
     const t0 = Date.now();
     try {

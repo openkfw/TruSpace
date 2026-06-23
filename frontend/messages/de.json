@@ -364,7 +364,11 @@
       "messagePlaceholder": "Gib eine Nachricht ein...",
       "downloadChatMessages": "Chat-Nachrichten herunterladen",
       "send": "Senden",
-      "sending": "Wird gesendet..."
+      "sending": "Wird gesendet...",
+      "edit": "Bearbeiten",
+      "edited": "Bearbeitet",
+      "save": "Speichern",
+      "cancel": "Abbrechen"
    },
    "events": {
       "loadError": "Aktivitäten konnten nicht geladen werden",

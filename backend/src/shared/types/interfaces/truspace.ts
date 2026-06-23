@@ -104,6 +104,12 @@ interface ChatMessageMeta {
   docId: string;
   workspaceOrigin: string;
   timestamp: string;
+  /**
+   * Set when a chat message was edited by its author. Stored as an
+   * epoch-millis string (matching `timestamp`). Absent for messages that
+   * have never been edited.
+   */
+  editedTimestamp?: string;
   creatorNodeId: string;
   creatorUserId: string;
   creatorName?: string;
