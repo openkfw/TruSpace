@@ -21,7 +21,7 @@ async function fetchLocalAllocations(primaryFilter?: { key: string; value: strin
     result = data.allocations;
   }
   if (primaryFilter) {
-    result = result.filter((a: { cid: string; metadata?: Record<string, string> }) => 
+    result = result.filter((a: { cid: string; metadata?: Record<string, string> }) =>
       a.metadata && a.metadata[primaryFilter.key] === primaryFilter.value);
   }
   return result;
@@ -78,7 +78,7 @@ class ChatsIpfsRepository {
     };
     const newCid = await this.createMessage(updatedReq);
     try {
-      await clusterClient.delete('/pins/' + originalCid);
+      await clusterClient.delete('/pins/' + encodeURIComponent(originalCid));
     } catch (error) {
       logger.error('Error unpinning old chat message ' + originalCid + ':', error);
       // Best-effort cleanup; the new pin already exists.
