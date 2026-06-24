@@ -11,10 +11,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
    editChat,
+   likeChat,
    loadChats,
    loadEventsByDocumentId,
    notifyDocumentActivity,
    postChat,
+   unlikeChat,
    useDocumentActivitySubscription
 } from "@/lib/services";
 import { cn } from "@/lib/utils";
@@ -289,6 +291,38 @@ export default function DocumentChat({
                           notifyDocumentActivity(docId, { delayMs: 500 });
                        }
                      : undefined;
+                  // Likes reference the stable `chatId` (UUID preserved
+                  // across edits) so reactions survive message edits. Older
+                  // chats fall back to their cid server-side; mirror that
+                  // fallback here so the action still works.
+                  const likeTargetId = chat.meta.chatId ?? chat.cid;
+                  const likedBy = (chat.likes ?? [])
+                     // Oldest like first so the badge tooltip reads in the
+                     // order users reacted.
+                     .slice()
+                     .sort(
+                        (a, b) =>
+                           Number(a.meta.timestamp) - Number(b.meta.timestamp)
+                     )
+                     .map((like) => like.meta.creatorName)
+                     .filter((name): name is string => Boolean(name));
+                  const handleToggleLike = async () => {
+                     try {
+                        if (chat.isLikedByCurrentUser) {
+                           await unlikeChat(
+                              likeTargetId,
+                              translations("likeError")
+                           );
+                        } else {
+                           await likeChat(
+                              likeTargetId,
+                              translations("likeError")
+                           );
+                        }
+                     } finally {
+                        notifyDocumentActivity(docId, { delayMs: 500 });
+                     }
+                  };
                   return (
                      <ChatMessage
                         key={`chat-${chat.cid}`}
@@ -310,6 +344,11 @@ export default function DocumentChat({
                         edited={Boolean(chat.meta.editedTimestamp)}
                         editedTimestamp={chat.meta.editedTimestamp}
                         onEdit={handleEdit}
+                        likedBy={likedBy}
+                        isLikedByCurrentUser={Boolean(
+                           chat.isLikedByCurrentUser
+                        )}
+                        onToggleLike={handleToggleLike}
                         message={messageData.message}
                         onInfoPanelIconClick={
                            messageData?.documentCid === cid &&

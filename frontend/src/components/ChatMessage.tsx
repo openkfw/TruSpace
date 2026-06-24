@@ -3,7 +3,7 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 
 import { format, isToday, isYesterday } from "date-fns";
-import { Check, ExternalLink, Pencil, X } from "lucide-react";
+import { Check, ExternalLink, Pencil, ThumbsUp, X } from "lucide-react";
 
 import {
    Tooltip,
@@ -42,6 +42,19 @@ interface ChatMessageProps {
     * the request fails.
     */
    onEdit?: (newMessage: string) => Promise<void> | void;
+   /**
+    * Display names of users who liked this message. Empty / undefined means
+    * no likes; the like bubble is only rendered when at least one user liked.
+    */
+   likedBy?: string[];
+   /** Whether the current viewer has liked this message. */
+   isLikedByCurrentUser?: boolean;
+   /**
+    * Toggle a like on this message. When provided the thumbs-up affordance
+    * is shown on hover. The callback is awaited so the UI can briefly
+    * disable the button while the request is in flight.
+    */
+   onToggleLike?: () => Promise<void> | void;
 }
 
 function getInitials(name?: string) {
@@ -77,7 +90,10 @@ export default function ChatMessage({
    isOwnMessage = false,
    edited = false,
    editedTimestamp,
-   onEdit
+   onEdit,
+   likedBy,
+   isLikedByCurrentUser = false,
+   onToggleLike
 }: ChatMessageProps) {
    const translations = useTranslations("chat");
    const displayName = creator || translations("user");
@@ -86,10 +102,13 @@ export default function ChatMessage({
    const hasVersionTag =
       versionTagName && versionTagName !== "undefined" ? versionTagName : null;
    const canEdit = isOwnMessage && typeof onEdit === "function";
+   const canLike = typeof onToggleLike === "function";
+   const likeCount = likedBy?.length ?? 0;
 
    const [isEditing, setIsEditing] = useState(false);
    const [draft, setDraft] = useState(message);
    const [saving, setSaving] = useState(false);
+   const [togglingLike, setTogglingLike] = useState(false);
    const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
    // Keep the draft in sync if the parent updates the message text (e.g.
@@ -139,6 +158,18 @@ export default function ChatMessage({
       }
    };
 
+   const handleToggleLike = async () => {
+      if (!onToggleLike || togglingLike) return;
+      try {
+         setTogglingLike(true);
+         await onToggleLike();
+      } catch (err) {
+         console.error("Failed to toggle like", err);
+      } finally {
+         setTogglingLike(false);
+      }
+   };
+
    const avatar = (
       <div
          className={cn(
@@ -164,7 +195,11 @@ export default function ChatMessage({
 
          <div
             className={cn(
-               "flex max-w-full min-w-0 flex-col rounded-xl px-3 py-1.5",
+               "relative flex max-w-full min-w-0 flex-col rounded-xl px-3 py-1.5",
+               // Extra bottom padding when a like badge is rendered so the
+               // badge can sit below the bubble without overlapping the
+               // timestamp row above.
+               likeCount > 0 && "mb-3",
                isOwnMessage
                   ? "rounded-br-none bg-blue-200 dark:bg-blue-900"
                   : "rounded-bl-none bg-slate-300 dark:bg-slate-700"
@@ -309,6 +344,72 @@ export default function ChatMessage({
                   </>
                )}
             </div>
+
+            {(likeCount > 0 || (canLike && !isEditing)) && (
+               // Single like control: floating badge anchored just below the
+               // bubble's bottom edge, clear of the timestamp row above. When
+               // there are no likes yet it only appears on hover (revealed
+               // via the `group` on the message row) so it doubles as the
+               // "like" affordance.
+               <TooltipProvider>
+                  <Tooltip>
+                     <TooltipTrigger asChild>
+                        <button
+                           type="button"
+                           onClick={canLike ? handleToggleLike : undefined}
+                           disabled={!canLike || togglingLike}
+                           aria-label={
+                              likeCount > 0
+                                 ? `${translations("likedBy")}: ${(likedBy ?? []).join(", ")}`
+                                 : translations(
+                                      isLikedByCurrentUser ? "unlike" : "like"
+                                   )
+                           }
+                           aria-pressed={isLikedByCurrentUser}
+                           className={cn(
+                              "absolute -bottom-3.5 z-10 flex items-center gap-0.5 rounded-full border border-white/80 bg-white px-1.5 py-0.5 text-[10px] font-medium leading-none shadow-sm transition-opacity dark:border-slate-900/80 dark:bg-slate-800",
+                              isOwnMessage ? "-left-1" : "-right-1",
+                              isLikedByCurrentUser
+                                 ? "text-blue-600 dark:text-blue-300"
+                                 : "text-gray-600 dark:text-gray-300",
+                              canLike
+                                 ? "cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700"
+                                 : "cursor-default",
+                              // Hide the empty-state affordance until the
+                              // message is hovered/focused. When at least one
+                              // like exists, keep it permanently visible.
+                              likeCount === 0 &&
+                                 "opacity-0 group-hover:opacity-100 focus-within:opacity-100 focus-visible:opacity-100"
+                           )}
+                        >
+                           <ThumbsUp
+                              className={cn(
+                                 "h-3 w-3",
+                                 isLikedByCurrentUser && "fill-current"
+                              )}
+                           />
+                           {likeCount > 1 && <span className="pl-1">{likeCount}</span>}
+                        </button>
+                     </TooltipTrigger>
+                     <TooltipContent>
+                        {likeCount > 0 ? (
+                           <div className="flex flex-col gap-0.5 text-xs">
+                              <span className="font-semibold">
+                                 {translations("likedBy")}
+                              </span>
+                              {(likedBy ?? []).map((name, idx) => (
+                                 <span key={`${name}-${idx}`}>{name}</span>
+                              ))}
+                           </div>
+                        ) : (
+                           translations(
+                              isLikedByCurrentUser ? "unlike" : "like"
+                           )
+                        )}
+                     </TooltipContent>
+                  </Tooltip>
+               </TooltipProvider>
+            )}
          </div>
       </div>
    );

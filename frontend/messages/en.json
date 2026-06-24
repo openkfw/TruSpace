@@ -368,7 +368,11 @@
       "edit": "Edit",
       "edited": "Edited",
       "save": "Save",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "like": "Like",
+      "unlike": "Remove like",
+      "likedBy": "Liked by",
+      "likeError": "Failed to update like"
    },
    "events": {
       "loadError": "Failed to load activity events",

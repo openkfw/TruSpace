@@ -368,7 +368,11 @@
       "edit": "Bearbeiten",
       "edited": "Bearbeitet",
       "save": "Speichern",
-      "cancel": "Abbrechen"
+      "cancel": "Abbrechen",
+      "like": "Gefällt mir",
+      "unlike": "Gefällt mir entfernen",
+      "likedBy": "Gefällt",
+      "likeError": "Reaktion konnte nicht gespeichert werden"
    },
    "events": {
       "loadError": "Aktivitäten konnten nicht geladen werden",

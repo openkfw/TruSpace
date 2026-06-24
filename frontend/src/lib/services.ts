@@ -1,7 +1,9 @@
 export {
    editChat,
+   likeChat,
    loadChats,
    postChat,
+   unlikeChat,
    useRecentChats
 } from "@/modules/chats";
 export {

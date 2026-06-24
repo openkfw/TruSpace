@@ -24,3 +24,17 @@ chatsRouter.put(
   ChatsValidator.editChat,
   ChatsController.editChat,
 );
+
+chatsRouter.post(
+  '/chats/:chatId/like',
+  authenticateCookie,
+  ChatsValidator.likeChat,
+  ChatsController.likeChat,
+);
+
+chatsRouter.delete(
+  '/chats/:chatId/like',
+  authenticateCookie,
+  ChatsValidator.unlikeChat,
+  ChatsController.unlikeChat,
+);

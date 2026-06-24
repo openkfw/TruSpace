@@ -110,6 +110,14 @@ interface ChatMessageMeta {
    * have never been edited.
    */
   editedTimestamp?: string;
+  /**
+   * Stable per-message identifier (UUIDv4) preserved across edits. Because
+   * IPFS content is immutable, editing replaces the chat pin and yields a
+   * new `cid`; `chatId` is what associated entities (e.g. likes) reference
+   * so they survive edits. Older chats created before this field existed
+   * fall back to their `cid` during reads.
+   */
+  chatId?: string;
   creatorNodeId: string;
   creatorUserId: string;
   creatorName?: string;
@@ -119,9 +127,38 @@ export interface ChatMessageRequest {
   meta: ChatMessageMeta;
 }
 
+export interface ChatLikeMeta {
+  type: "chatLike";
+  /**
+   * Stable id of the liked chat. This is the only join key we need: chat
+   * lookups by id already give us `docId` / `workspaceOrigin` when required,
+   * so we don't duplicate them on every like pin.
+   */
+  chatId: string;
+  timestamp: string;
+  creatorNodeId: string;
+  creatorUserId: string;
+  creatorName?: string;
+}
+
+export interface ChatLikeRequest {
+  meta: ChatLikeMeta;
+}
+
+export interface ChatLike extends ChatLikeRequest {
+  cid: string;
+}
+
 export interface ChatMessage extends ChatMessageRequest {
   cid: string;
   isOwnMessage?: boolean;
+  /**
+   * Users who liked this message. Populated by the read path; not persisted
+   * inside the chat pin itself (likes are independent `chatLike` pins).
+   */
+  likes?: ChatLike[];
+  /** Convenience flag set when enriching for an authenticated reader. */
+  isLikedByCurrentUser?: boolean;
 }
 
 interface PerspectiveMeta {

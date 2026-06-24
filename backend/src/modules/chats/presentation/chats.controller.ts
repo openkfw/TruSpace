@@ -7,7 +7,9 @@ import { ChatEditForbiddenError } from '../errors/edit-forbidden.error';
 import { editChat } from '../application/edit-chat.usecase';
 import { getChatsByDocumentId } from '../application/get-chats-by-document-id.usecase';
 import { getRecentChats } from '../application/get-chats-recent.usecase';
+import { likeChat } from '../application/like-chat.usecase';
 import { postChat } from '../application/post-chat.usecase';
+import { unlikeChat } from '../application/unlike-chat.usecase';
 
 export const ChatsController = {
   getChatsByDocumentId: async (req: AuthenticatedRequest, res: Response) => {
@@ -51,5 +53,28 @@ export const ChatsController = {
       }
       throw error;
     }
+  },
+
+  likeChat: async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const result = await likeChat(req.params.chatId, {
+        uiid: req.user?.uiid,
+        nodeId: req.user?.nodeId,
+      });
+      res.json(result);
+    } catch (error) {
+      if (error instanceof ChatNotFoundError) {
+        return res.status(404).json({ status: 'failure', message: error.message });
+      }
+      throw error;
+    }
+  },
+
+  unlikeChat: async (req: AuthenticatedRequest, res: Response) => {
+    const result = await unlikeChat(req.params.chatId, {
+      uiid: req.user?.uiid,
+      nodeId: req.user?.nodeId,
+    });
+    res.json(result);
   },
 };

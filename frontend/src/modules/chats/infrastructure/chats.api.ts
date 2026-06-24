@@ -55,3 +55,36 @@ export const editChat = async (
    }
    return (await res.json()) as { cid: string };
 };
+
+/**
+ * Toggle a thumbs-up like on a chat message. Likes are stored as independent
+ * IPFS pins keyed by the message's stable `chatId`, so liking/unliking does
+ * not rewrite the chat pin itself. The backend operations are idempotent:
+ * liking an already-liked message is a no-op, as is unliking a message the
+ * user hasn't liked.
+ */
+export const likeChat = async (chatId: string, errorText: string) => {
+   const url = `${CHATS_ENDPOINT}/${encodeURIComponent(chatId)}/like`;
+   const options: RequestInit = {
+      method: "POST",
+      credentials: "include"
+   };
+   const res = await fetchWithCredentials(url, withCsrf(options));
+   if (!res.ok) {
+      throw new Error(errorText);
+   }
+   return (await res.json()) as { cid: string };
+};
+
+export const unlikeChat = async (chatId: string, errorText: string) => {
+   const url = `${CHATS_ENDPOINT}/${encodeURIComponent(chatId)}/like`;
+   const options: RequestInit = {
+      method: "DELETE",
+      credentials: "include"
+   };
+   const res = await fetchWithCredentials(url, withCsrf(options));
+   if (!res.ok) {
+      throw new Error(errorText);
+   }
+   return (await res.json()) as { removed: boolean };
+};

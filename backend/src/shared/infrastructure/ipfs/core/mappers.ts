@@ -1,5 +1,6 @@
 import { DocumentPin, DocumentPinRequest, Pin } from '../../../types/interfaces';
 import {
+  ChatLike,
   ChatMessage,
   Document,
   Event,
@@ -66,7 +67,24 @@ export function transformPinToChatMessage(pin: Pin): ChatMessage {
       creatorUserId: pin.meta.creatorUserId || '',
       creatorName: pin.meta.creatorName || pin.meta.creator || '',
       workspaceOrigin: pin.meta.workspaceOrigin,
+      // Fall back to the pin cid for legacy chats created before `chatId`
+      // existed, so likes still have a stable key to reference.
+      chatId: pin.meta.chatId || pin.cid,
       ...(pin.meta.editedTimestamp ? { editedTimestamp: pin.meta.editedTimestamp } : {}),
+    },
+  };
+}
+
+export function transformPinToChatLike(pin: Pin): ChatLike {
+  return {
+    cid: pin.cid,
+    meta: {
+      type: 'chatLike',
+      chatId: pin.meta.chatId,
+      timestamp: pin.meta.timestamp,
+      creatorNodeId: pin.meta.creatorNodeId || '',
+      creatorUserId: pin.meta.creatorUserId || '',
+      creatorName: pin.meta.creatorName || '',
     },
   };
 }

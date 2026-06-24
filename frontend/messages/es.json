@@ -368,7 +368,11 @@
     "edit": "Editar",
     "edited": "Editado",
     "save": "Guardar",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "like": "Me gusta",
+    "unlike": "Quitar me gusta",
+    "likedBy": "Les gusta a",
+    "likeError": "No se pudo actualizar la reacción"
   },
   "events": {
     "loadError": "No se pudieron cargar las actividades",
