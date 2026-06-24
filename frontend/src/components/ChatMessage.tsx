@@ -370,8 +370,8 @@ export default function ChatMessage({
                               "absolute -bottom-3.5 z-10 flex items-center gap-0.5 rounded-full border border-white/80 bg-white px-1.5 py-0.5 text-[10px] font-medium leading-none shadow-sm transition-opacity dark:border-slate-900/80 dark:bg-slate-800",
                               isOwnMessage ? "-left-1" : "-right-1",
                               isLikedByCurrentUser
-                                 ? "text-blue-600 dark:text-blue-300"
-                                 : "text-gray-600 dark:text-gray-300",
+                                 ? "text-blue-500 dark:text-blue-300"
+                                 : "text-gray-500 dark:text-gray-300",
                               canLike
                                  ? "cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700"
                                  : "cursor-default",
@@ -384,8 +384,8 @@ export default function ChatMessage({
                         >
                            <ThumbsUp
                               className={cn(
-                                 "h-3 w-3",
-                                 isLikedByCurrentUser && "fill-current"
+                                "h-3 w-3",
+                                likeCount != 0 && "fill-current"
                               )}
                            />
                            {likeCount > 1 && <span className="pl-1">{likeCount}</span>}
