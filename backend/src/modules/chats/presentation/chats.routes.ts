@@ -14,8 +14,27 @@ chatsRouter.get(
   ChatsController.getChatsByDocumentId,
 );
 
-chatsRouter.get('/chats/export/:docId', authenticateCookie, ChatsController.getChatsExportByDocumentId);
-
 chatsRouter.get('/chats/recent', authenticateCookie, ChatsController.getRecentChats);
 
 chatsRouter.post('/chats', authenticateCookie, ChatsValidator.postChat, ChatsController.postChat);
+
+chatsRouter.put(
+  '/chats/:cid',
+  authenticateCookie,
+  ChatsValidator.editChat,
+  ChatsController.editChat,
+);
+
+chatsRouter.post(
+  '/chats/:chatId/like',
+  authenticateCookie,
+  ChatsValidator.likeChat,
+  ChatsController.likeChat,
+);
+
+chatsRouter.delete(
+  '/chats/:chatId/like',
+  authenticateCookie,
+  ChatsValidator.unlikeChat,
+  ChatsController.unlikeChat,
+);

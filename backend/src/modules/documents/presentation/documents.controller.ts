@@ -15,7 +15,7 @@ export const DocumentsController = {
   deleteDocument: async (req: AuthenticatedRequest, res: Response) => {
     const docId = req.params.docId;
     const email = req.user?.email as string;
-    const result = await deleteDocument(docId, email, res);
+    const result = await deleteDocument(docId, email, res, req.user);
     res.json({ result });
   },
 

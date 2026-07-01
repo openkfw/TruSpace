@@ -1,7 +1,12 @@
 import { DocumentPin, DocumentPinRequest, Pin } from '../../../types/interfaces';
 import {
+  ChatLike,
   ChatMessage,
   Document,
+  Event,
+  EventAction,
+  EventActorType,
+  EventType,
   GeneralTemplateOfItemInWorkspace,
   Perspective,
   Tag,
@@ -62,6 +67,24 @@ export function transformPinToChatMessage(pin: Pin): ChatMessage {
       creatorUserId: pin.meta.creatorUserId || '',
       creatorName: pin.meta.creatorName || pin.meta.creator || '',
       workspaceOrigin: pin.meta.workspaceOrigin,
+      // Fall back to the pin cid for legacy chats created before `chatId`
+      // existed, so likes still have a stable key to reference.
+      chatId: pin.meta.chatId || pin.cid,
+      ...(pin.meta.editedTimestamp ? { editedTimestamp: pin.meta.editedTimestamp } : {}),
+    },
+  };
+}
+
+export function transformPinToChatLike(pin: Pin): ChatLike {
+  return {
+    cid: pin.cid,
+    meta: {
+      type: 'chatLike',
+      chatId: pin.meta.chatId,
+      timestamp: pin.meta.timestamp,
+      creatorNodeId: pin.meta.creatorNodeId || '',
+      creatorUserId: pin.meta.creatorUserId || '',
+      creatorName: pin.meta.creatorName || '',
     },
   };
 }
@@ -126,4 +149,27 @@ export function pinsToUniqueDocuments(pins: DocumentPinRequest[]): Document[] {
     .sort((a: DocumentPinRequest, b: DocumentPinRequest) => Number(b.pin.meta.timestamp) - Number(a.pin.meta.timestamp))
     .filter((value, index, allPins) => allPins.findIndex((pin) => pin.pin.meta.docId === value.pin.meta.docId) === index)
     .map((element) => transformPinToDocument(element.pin));
+}
+
+export function transformPinToEvent(pin: Pin): Event {
+  return {
+    cid: pin.cid,
+    meta: {
+      type: 'event',
+      eventId: pin.meta.eventId,
+      eventType: pin.meta.eventType as EventType,
+      eventAction: pin.meta.eventAction as EventAction,
+      objectId: pin.meta.objectId,
+      objectName: pin.meta.objectName ? decodeURIComponent(pin.meta.objectName) : undefined,
+      workspaceOrigin: pin.meta.workspaceOrigin,
+      docId: pin.meta.docId || undefined,
+      versionCid: pin.meta.versionCid || undefined,
+      version: pin.meta.version || undefined,
+      actorType: (pin.meta.actorType as EventActorType) || 'user',
+      actorNodeId: pin.meta.actorNodeId || undefined,
+      actorUserId: pin.meta.actorUserId || undefined,
+      actorName: pin.meta.actorName || undefined,
+      timestamp: pin.meta.timestamp,
+    },
+  };
 }

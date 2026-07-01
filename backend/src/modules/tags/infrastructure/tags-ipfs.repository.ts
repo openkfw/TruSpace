@@ -68,6 +68,24 @@ class TagsIpfsRepository {
     }
   }
 
+  async findTagByCid(tagCid: string): Promise<Tag | null> {
+    try {
+      const allocations = await fetchLocalAllocations({ key: 'type', value: 'tag' });
+      const match = allocations.find((a) => a.cid === tagCid);
+      if (!match) return null;
+      const tag = transformPinToTag({
+        cid: match.cid,
+        name: '',
+        origins: [],
+        meta: { app_id: '', ...(match.metadata ?? {}) },
+      });
+      return tag;
+    } catch (error) {
+      logger.error('Error finding tag by cid ' + tagCid + ':', error);
+      return null;
+    }
+  }
+
   async getTagsByDocumentId(docId: string): Promise<Tag[]> {
     const t0 = Date.now();
     try {

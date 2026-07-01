@@ -20,6 +20,7 @@ import {
 import TaskQueue from '../../../shared/utility/jobQueue';
 import { NoFileUploadedError } from '../errors/no-file-uploaded.error';
 import { documentsIpfsRepository } from '../infrastructure/documents-ipfs.repository';
+import { recordEvent } from '../../events/application/record-event.usecase';
 
 export async function postDocument(req: AuthenticatedRequest, res: Response) {
   if (!req.files || !req.files.file) {
@@ -78,6 +79,20 @@ export async function postDocument(req: AuthenticatedRequest, res: Response) {
 
   const ipfsClusterResponse = await documentsIpfsRepository.createDocument(docRequest, file);
   const cid = ipfsClusterResponse.cid;
+
+  await recordEvent({
+    eventType: 'document',
+    eventAction: 'upload',
+    objectId: docRequest.docId,
+    objectName: filename,
+    workspaceOrigin: workspace,
+    docId: docRequest.docId,
+    versionCid: cid,
+    version: docRequest.meta.version,
+    actorType: 'user',
+    actorNodeId: creatorNodeId,
+    actorUserId: userUiid,
+  });
 
   // ollama obviously needs unencrypted document
   file.data = fileDataClone;

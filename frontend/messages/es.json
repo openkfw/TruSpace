@@ -345,7 +345,9 @@
   },
   "chat": {
     "chat": "Charlar",
+    "chatAndActivity": "Chat y actividad",
     "user": "usuario",
+    "showPointInDocument": "Mostrar punto en el documento",
     "messageForVersion": "Relacionado con la versión del documento:",
     "reply": "Respuesta",
     "forward": "Adelante",
@@ -362,7 +364,37 @@
     "messagePlaceholder": "Introduce un mensaje...",
     "downloadChatMessages": "Descargar mensajes de chat",
     "send": "Enviar",
-    "sending": "Será enviado..."
+    "sending": "Será enviado...",
+    "edit": "Editar",
+    "edited": "Editado",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "like": "Me gusta",
+    "unlike": "Quitar me gusta",
+    "likedBy": "Les gusta a",
+    "likeError": "No se pudo actualizar la reacción"
+  },
+  "events": {
+    "loadError": "No se pudieron cargar las actividades",
+    "document": {
+      "upload": "{objectName} subido por {actor}",
+      "version": "Nueva versión del documento v{version} por {actor}",
+      "delete": "{objectName} eliminado por {actor}"
+    },
+    "tag": {
+      "create": "Etiqueta \"{objectName}\" añadida por {actor}",
+      "delete": "Etiqueta \"{objectName}\" eliminada por {actor}"
+    },
+    "perspective": {
+      "create": "Perspectiva \"{objectName}\" creada por {actor}",
+      "update": "Perspectiva \"{objectName}\" actualizada por {actor}",
+      "delete": "Perspectiva \"{objectName}\" eliminada por {actor}"
+    },
+    "actor": {
+      "unknown": "usuario desconocido",
+      "ai": "IA",
+      "aiNamed": "IA ({model})"
+    }
   },
   "perspectives": {
     "addYourPerspective": "Añade tu perspectiva",

@@ -1,18 +1,25 @@
 import { X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function InfoLabel({
    text,
    secondaryText,
    icon,
-   iconOnClick
+   iconOnClick,
+    isOwnMessage = false
 }: {
    text: string;
    secondaryText?: string;
    icon?: React.ReactNode;
    iconOnClick?: () => void;
+   isOwnMessage?: boolean;
 }) {
    return (
-      <div className="flex items-center my-2.5 bg-blue-100 dark:bg-gray-600 rounded-xl p-2">
+     <div className={cn("flex items-center my-2.5 rounded-lg p-2",
+     isOwnMessage
+        ? "bg-blue-100 dark:bg-blue-700"
+        : "bg-gray-200 dark:bg-gray-600"
+     )}>
          <div className="me-1">
             <span className="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white">
                {text}
@@ -26,7 +33,11 @@ export default function InfoLabel({
          <div className="inline-flex self-center items-right ml-auto">
             {iconOnClick && (
                <button
-                  className="inline-flex self-center items-center p-2 text-sm font-medium text-center text-gray-900 bg-blue-100 rounded-lg hover:bg-blue-50 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50 dark:bg-gray-600 dark:hover:bg-gray-500 dark:focus:ring-gray-600"
+                 className={cn("inline-flex self-center items-center p-1 text-sm font-medium text-center text-gray-900 rounded-lg focus:ring-4 focus:outline-none dark:text-white [&_svg]:h-4 [&_svg]:w-4",
+                  isOwnMessage
+                      ? "bg-blue-100 hover:bg-blue-50 dark:bg-blue-700 dark:hover:bg-blue-500"
+                      : "bg-gray-200 hover:bg-gray-50 dark:bg-gray-600 dark:hover:bg-gray-500"
+                  )}
                   type="button"
                   onClick={iconOnClick}
                >
