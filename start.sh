@@ -125,7 +125,12 @@ fi
 
 # Load environment variables
 if [[ -f "$ENV_FILE" ]]; then
+  # Auto-export all variables defined in the .env file so that child
+  # processes (docker compose, `npm run dev` for --local-frontend, etc.)
+  # inherit them via process.env.
+  set -a
   source "$ENV_FILE"
+  set +a
 else
   echo_error ".env file is missing even after generation attempt"
   exit 1
