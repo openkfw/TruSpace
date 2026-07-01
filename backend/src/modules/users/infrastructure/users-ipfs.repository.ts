@@ -123,7 +123,7 @@ class UsersIpfsRepository {
 
     const cacheKey = nodeId + ':' + userId;
     if (userDataCache.has(cacheKey)) {
-      logger.debug('[users.getUserData] cache hit for ' + cacheKey);
+      // logger.debug('[users.getUserData] cache hit for ' + cacheKey);
       return userDataCache.get(cacheKey) as UserData;
     }
 

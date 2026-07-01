@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useDocuments } from "@/contexts/DocumentsContext";
 import { useWorkspaceContext } from "@/contexts/WorkspaceContext";
-import { documentUpload, loadDocumentBlob, notifyDocumentActivity } from "@/lib/services";
+import { documentUpload, loadDocumentBlob } from "@/lib/services";
 
 export default function DocumentEditable({
    cid,
@@ -77,8 +77,9 @@ export default function DocumentEditable({
 
       try {
          await documentUpload(formData, docId, translations("uploadError"));
-         // New editable-document version creates a backend activity event.
-         notifyDocumentActivity(docId);
+         // A new editable-document version creates a backend activity
+         // event; the DocumentChat timeline picks it up via its own SWR
+         // polling.
       } catch (err) {
          console.error(err);
       } finally {

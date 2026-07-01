@@ -4,6 +4,7 @@ export {
    loadChats,
    postChat,
    unlikeChat,
+   useChats,
    useRecentChats
 } from "@/modules/chats";
 export {
@@ -18,9 +19,7 @@ export {
 export {
    loadEventsByDocumentId,
    loadEventsByWorkspaceId,
-   notifyDocumentActivity,
-   subscribeToDocumentActivity,
-   useDocumentActivitySubscription
+   useEventsByDocumentId
 } from "@/modules/events";
 export {
    getHealth,

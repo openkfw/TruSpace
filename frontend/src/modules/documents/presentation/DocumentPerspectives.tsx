@@ -47,7 +47,6 @@ import { formatDate } from "@/lib/formatDate";
 import {
    createPerspective,
    customPerspective,
-   notifyDocumentActivity,
    usePerspectives,
    usePerspectivesStatus
 } from "@/lib/services";
@@ -142,9 +141,8 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
          } finally {
             setIsCreating(false);
             setTimeout(() => mutate(), 1000);
-            // Refreshes DocumentChat (and any other listener) via the
-            // shared activity bus instead of relying on interval polling.
-            notifyDocumentActivity(docId, { delayMs: 1000 });
+            // The DocumentChat timeline picks up the new perspective
+            // activity event via its own SWR polling.
          }
       }
    };
@@ -176,7 +174,6 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
          } finally {
             setIsCreating(false);
             setTimeout(() => mutate(), 1000);
-            notifyDocumentActivity(docId, { delayMs: 1000 });
          }
       }
    };
@@ -190,10 +187,10 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
    useEffect(() => {
       if (perspectivesStatus?.status === "completed") {
          mutate();
-         // AI-generated perspectives also record activity events.
-         notifyDocumentActivity(docId);
+         // AI-generated perspectives also record activity events; the
+         // DocumentChat timeline picks them up via its own SWR polling.
       }
-   }, [mutate, perspectivesStatus, docId]);
+   }, [mutate, perspectivesStatus]);
 
    useEffect(() => {
       if (

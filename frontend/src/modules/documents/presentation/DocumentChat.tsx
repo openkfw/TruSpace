@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useTranslations } from "next-intl";
 
@@ -12,12 +12,10 @@ import { Input } from "@/components/ui/input";
 import {
    editChat,
    likeChat,
-   loadChats,
-   loadEventsByDocumentId,
-   notifyDocumentActivity,
    postChat,
    unlikeChat,
-   useDocumentActivitySubscription
+   useChats,
+   useEventsByDocumentId
 } from "@/lib/services";
 import { cn } from "@/lib/utils";
 import { ChatMessage as Chat } from "@/modules/chats/domain";
@@ -87,78 +85,45 @@ export default function DocumentChat({
    title,
    className
 }: DocumentChatProps) {
-   const [loading, setLoading] = useState(true);
    const [sending, setSending] = useState(false);
-   const [error, setError] = useState(null);
-   const [chats, setChats] = useState<Chat[] | null>(null);
-   const [events, setEvents] = useState<ActivityEvent[] | null>(null);
    const [message, setMessage] = useState("");
    const [emptyMessageError, setEmptyMessageError] = useState(false);
    const scrollContainerRef = useRef<HTMLDivElement | null>(null);
    const translations = useTranslations("chat");
-   const eventTranslations = useTranslations("events");
    const generalTranslations = useTranslations("general");
 
-   const hideNewNote = useCallback(() => {
+   // Chats and events are fetched with SWR. That gives us:
+   // - Automatic revalidation on mount and on window focus (so returning
+   //   to the tab feels instant).
+   // - Background polling via `refreshInterval` inside the hooks, so
+   //   activity from *other* nodes / browsers shows up here without any
+   //   manual refresh.
+   // - `mutate` for instant local refreshes right after a write.
+   const {
+      chats,
+      error: chatsError,
+      isLoading: chatsLoading,
+      mutate: mutateChats
+   } = useChats(docId);
+   const {
+      events,
+      error: eventsError,
+      isLoading: eventsLoading,
+      mutate: mutateEvents
+   } = useEventsByDocumentId(docId);
+
+   const loading = chatsLoading || eventsLoading;
+   // Only surface chat errors to the user - a missing event feed should
+   // still let the chat render, matching the previous behaviour.
+   const error = chatsError;
+   if (eventsError) {
+      console.error("Failed to load activity events", eventsError);
+   }
+
+   const hideNewNote = () => {
       setNewNoteVisible(false);
       setNewNotePosition(null);
-   }, [setNewNoteVisible, setNewNotePosition]);
-
-   const fetchTimeline = useCallback(async () => {
-      try {
-         // Chats and events are independent endpoints - fetch in parallel.
-         // If events fail we still want to show chat messages, so the event
-         // failure is swallowed and only chat errors surface to the UI.
-         const [chatData, eventData] = await Promise.all([
-            loadChats(docId, translations("chatError")),
-            loadEventsByDocumentId(docId, eventTranslations("loadError")).catch(
-               (err) => {
-                  console.error("Failed to load activity events", err);
-                  return [] as ActivityEvent[];
-               }
-            )
-         ]);
-
-         if (chatData) {
-            setChats(chatData);
-         } else {
-            console.error(translations("invalidResponse"), chatData);
-            throw new Error(translations("invalidResponse"));
-         }
-         setEvents(eventData ?? []);
-      } catch (err) {
-         setError(err.message);
-      } finally {
-         setLoading(false);
-      }
-   }, [docId, translations, eventTranslations]);
-
-   useEffect(() => {
-      // Initial load.
-      fetchTimeline();
-
-      // Refresh immediately when the user comes back to the tab, so
-      // returning from another window feels instant and we still catch
-      // updates produced by other users (cross-browser changes are not
-      // covered by the local activity bus).
-      const onVisible = () => {
-         if (document.visibilityState === "visible") {
-            fetchTimeline();
-         }
-      };
-      document.addEventListener("visibilitychange", onVisible);
-
-      return () => {
-         document.removeEventListener("visibilitychange", onVisible);
-      };
-   }, [fetchTimeline]);
-
-   // Refresh whenever someone (this tab or another tab in the same browser)
-   // signals new activity for this document - new chat, tag added/removed,
-   // perspective created, version uploaded, AI generation finished, ...
-   // This replaces the previous 5s polling loop, which was hammering the
-   // IPFS allocations endpoint for every open chat.
-   useDocumentActivitySubscription(docId, fetchTimeline);
+   };
 
    const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
@@ -195,12 +160,13 @@ export default function DocumentChat({
          console.error(err);
       } finally {
          setNewNoteVisible(false);
-         // Notify the local activity bus instead of refetching directly.
-         // The chat itself is subscribed, so this refreshes the timeline
-         // here AND in any other tab that has the same document open.
-         // The short delay gives the backend a moment to persist the chat
-         // to IPFS before the refetch hits the listing endpoint.
-         notifyDocumentActivity(docId, { delayMs: 1000 });
+         // Give the backend a moment to persist the chat to IPFS before we
+         // ask SWR to refetch, otherwise the listing endpoint would still
+         // return the pre-write state.
+         window.setTimeout(() => {
+            mutateChats();
+            mutateEvents();
+         }, 1000);
          setSending(false);
       }
    };
@@ -256,7 +222,7 @@ export default function DocumentChat({
       if (error) {
          return (
             <div className="flex-1 flex items-center justify-center text-sm text-destructive">
-               {generalTranslations("error")}: {error}
+               {generalTranslations("error")}: {error.message}
             </div>
          );
       }
@@ -288,7 +254,10 @@ export default function DocumentChat({
                              { ...messageData, message: newMessage },
                              translations("messageError")
                           );
-                          notifyDocumentActivity(docId, { delayMs: 500 });
+                          window.setTimeout(() => {
+                             mutateChats();
+                             mutateEvents();
+                          }, 500);
                        }
                      : undefined;
                   // Likes reference the stable `chatId` (UUID preserved
@@ -320,7 +289,9 @@ export default function DocumentChat({
                            );
                         }
                      } finally {
-                        notifyDocumentActivity(docId, { delayMs: 500 });
+                        window.setTimeout(() => {
+                           mutateChats();
+                        }, 500);
                      }
                   };
                   return (

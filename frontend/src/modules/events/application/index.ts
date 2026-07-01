@@ -1,2 +1,1 @@
-export * from "./document-activity-bus";
-export * from "./use-document-activity";
+export * from "./events.hooks";

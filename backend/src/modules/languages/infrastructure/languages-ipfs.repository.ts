@@ -51,7 +51,7 @@ class LanguagesIpfsRepository {
 
   async getLanguageByVersionCid(versionCid: string): Promise<string | undefined> {
     if (languageCache.has(versionCid)) {
-      logger.debug('[languages.getLanguageByVersionCid] cache hit for ' + versionCid);
+      // logger.debug('[languages.getLanguageByVersionCid] cache hit for ' + versionCid);
       return languageCache.get(versionCid);
     }
 
