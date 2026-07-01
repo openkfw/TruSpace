@@ -31,6 +31,7 @@ import {
    PopoverContent,
    PopoverTrigger
 } from "@/components/ui/popover";
+import config from "@/config";
 import { getUserLocale } from "@/i18n/service";
 import { registerUser } from "@/lib/services";
 import { validateEmail } from "@/lib/validateEmail";
@@ -52,25 +53,29 @@ export default function Register() {
    const [showTerms, setShowTerms] = useState(false);
    const [termsContent, setTermsContent] = useState("");
 
-   const passwordChecks = [
-      {
-         label: translations("passwordMinLength"),
-         check: (password) => password.length >= 12
-      },
-      {
-         label: translations("passwordUppercase"),
-         check: (password) => /[A-Z]/.test(password)
-      },
-      {
-         label: translations("passwordNumber"),
-         check: (password) => /\d/.test(password)
-      },
-      {
-         label: translations("passwordPattern"),
-         check: (password) =>
-            /[ !"#$%&'()*+,-./:;<=>?@[\\\]^_`{|}~]/.test(password)
-      }
-   ];
+   const requireStrictPasswords = config.requireStrictPasswords;
+
+   const passwordChecks = requireStrictPasswords
+      ? [
+           {
+              label: translations("passwordMinLength"),
+              check: (password) => password.length >= 12
+           },
+           {
+              label: translations("passwordUppercase"),
+              check: (password) => /[A-Z]/.test(password)
+           },
+           {
+              label: translations("passwordNumber"),
+              check: (password) => /\d/.test(password)
+           },
+           {
+              label: translations("passwordPattern"),
+              check: (password) =>
+                 /[ !"#$%&'()*+,-./:;<=>?@[\\\]^_`{|}~]/.test(password)
+           }
+        ]
+      : [];
 
    const onSubmit = async (data) => {
       const locale = await getUserLocale();
@@ -118,17 +123,24 @@ export default function Register() {
       setValueAs: (value) => value.trim()
    });
 
-   const passwordValidation = register("password", {
-      required: translations("passwordRequired"),
-      minLength: {
-         value: 12,
-         message: translations("passwordMinLength")
-      },
-      pattern: {
-         value: /^(?=.*[A-Z])(?=.*\d)(?=.*[ !"#$%&'()*+,-./:;<=>?@[\\\]^_`{|}~])[A-Za-z\d !"#$%&'()*+,-./:;<=>?@[\\\]^_`{|}~]{12,}$/,
-         message: translations("passwordPattern")
-      }
-   });
+   const passwordValidation = register(
+      "password",
+      requireStrictPasswords
+         ? {
+              required: translations("passwordRequired"),
+              minLength: {
+                 value: 12,
+                 message: translations("passwordMinLength")
+              },
+              pattern: {
+                 value: /^(?=.*[A-Z])(?=.*\d)(?=.*[ !"#$%&'()*+,-./:;<=>?@[\\\]^_`{|}~])[A-Za-z\d !"#$%&'()*+,-./:;<=>?@[\\\]^_`{|}~]{12,}$/,
+                 message: translations("passwordPattern")
+              }
+           }
+         : {
+              required: translations("passwordRequired")
+           }
+   );
 
    const confirmPasswordValidation = register("confirmPassword", {
       required: translations("confirmPasswordRequired"),
@@ -221,9 +233,72 @@ export default function Register() {
                               <Label htmlFor="password">
                                  {translations("password")}
                               </Label>
-                              <Popover>
-                                 <div className="relative">
-                                    <PopoverTrigger asChild>
+                              {requireStrictPasswords ? (
+                                 <Popover>
+                                    <div className="relative">
+                                       <PopoverTrigger asChild>
+                                          <Input
+                                             id="password"
+                                             type={
+                                                showPassword ? "text" : "password"
+                                             }
+                                             autoComplete="new-password"
+                                             {...passwordValidation}
+                                             className="bg-slate-50 dark:bg-slate-800 dark:text-white dark:placeholder:text-white pr-10"
+                                             placeholder={translations(
+                                                "passwordPlaceholder"
+                                             )}
+                                             data-test-id="register-password"
+                                          />
+                                       </PopoverTrigger>
+
+                                       <Button
+                                          type="button"
+                                          size="icon"
+                                          variant="ghost"
+                                          onClick={() =>
+                                             setShowPassword((prev) => !prev)
+                                          }
+                                          className="absolute inset-y-0 right-1 flex items-center hover:bg-transparent focus:ring-offset-1 focus:ring-offset-transparent dark:text-white text-slate-800 z-10"
+                                       >
+                                          {showPassword ? <Eye /> : <EyeOff />}
+                                       </Button>
+                                    </div>
+                                    {errors.password?.message && (
+                                       <p className="text-red-500 text-sm">
+                                          {translations("passwordError")}
+                                       </p>
+                                    )}
+                                    <PopoverContent
+                                       onOpenAutoFocus={(e) => e.preventDefault()}
+                                       data-password-popover="true"
+                                       className="w-[--radix-popover-trigger-width] p-3 space-y-1 mb-6 bg-slate-100 dark:bg-slate-700 text-sm shadow-md border border-slate-300 dark:border-slate-600"
+                                       side="top"
+                                       align="center"
+                                    >
+                                       <div className="font-medium text-slate-800 dark:text-white mb-1">
+                                          {translations("passwordDescription")}
+                                       </div>
+                                       {passwordChecks.map(
+                                          ({ label, check }, idx) => (
+                                             <div
+                                                key={idx}
+                                                className="flex items-center gap-2"
+                                             >
+                                                {check(password) ? (
+                                                   <CheckCircle className="text-green-500 w-4 h-4" />
+                                                ) : (
+                                                   <XCircle className="text-red-400 w-4 h-4" />
+                                                )}
+                                                <span>{label}</span>
+                                             </div>
+                                          )
+                                       )}
+                                    </PopoverContent>
+                                 </Popover>
+                              ) : (
+                                 <>
+                                    <div className="relative">
                                        <Input
                                           id="password"
                                           type={
@@ -237,52 +312,25 @@ export default function Register() {
                                           )}
                                           data-test-id="register-password"
                                        />
-                                    </PopoverTrigger>
-
-                                    <Button
-                                       type="button"
-                                       size="icon"
-                                       variant="ghost"
-                                       onClick={() =>
-                                          setShowPassword((prev) => !prev)
-                                       }
-                                       className="absolute inset-y-0 right-1 flex items-center hover:bg-transparent focus:ring-offset-1 focus:ring-offset-transparent dark:text-white text-slate-800 z-10"
-                                    >
-                                       {showPassword ? <Eye /> : <EyeOff />}
-                                    </Button>
-                                 </div>
-                                 {errors.password?.message && (
-                                    <p className="text-red-500 text-sm">
-                                       {translations("passwordError")}
-                                    </p>
-                                 )}
-                                 <PopoverContent
-                                    onOpenAutoFocus={(e) => e.preventDefault()}
-                                    data-password-popover="true"
-                                    className="w-[--radix-popover-trigger-width] p-3 space-y-1 mb-6 bg-slate-100 dark:bg-slate-700 text-sm shadow-md border border-slate-300 dark:border-slate-600"
-                                    side="top"
-                                    align="center"
-                                 >
-                                    <div className="font-medium text-slate-800 dark:text-white mb-1">
-                                       {translations("passwordDescription")}
+                                       <Button
+                                          type="button"
+                                          size="icon"
+                                          variant="ghost"
+                                          onClick={() =>
+                                             setShowPassword((prev) => !prev)
+                                          }
+                                          className="absolute inset-y-0 right-1 flex items-center hover:bg-transparent focus:ring-offset-1 focus:ring-offset-transparent dark:text-white text-slate-800 z-10"
+                                       >
+                                          {showPassword ? <Eye /> : <EyeOff />}
+                                       </Button>
                                     </div>
-                                    {passwordChecks.map(
-                                       ({ label, check }, idx) => (
-                                          <div
-                                             key={idx}
-                                             className="flex items-center gap-2"
-                                          >
-                                             {check(password) ? (
-                                                <CheckCircle className="text-green-500 w-4 h-4" />
-                                             ) : (
-                                                <XCircle className="text-red-400 w-4 h-4" />
-                                             )}
-                                             <span>{label}</span>
-                                          </div>
-                                       )
+                                    {errors.password?.message && (
+                                       <p className="text-red-500 text-sm">
+                                          {String(errors.password.message)}
+                                       </p>
                                     )}
-                                 </PopoverContent>
-                              </Popover>
+                                 </>
+                              )}
                            </div>
                            <div className="grid gap-2">
                               <Label htmlFor="confirmPassword">

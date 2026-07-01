@@ -20,7 +20,7 @@ Complete reference for all TruSpace configuration options.
 | [Network](#network-settings)   | `CORS_ORIGIN`, `FRONTEND_PORT`, `BACKEND_PORT`         |
 | [IPFS](#ipfs-settings)         | `IPFS_*`, `CLUSTER_*`                                  |
 | [AI](#ai-settings)             | `OLLAMA_*`, `DISABLE_ALL_AI_FUNCTIONALITY`             |
-| [Security](#security-settings) | `JWT_SECRET`, `CLUSTER_SECRET`                         |
+| [Security](#security-settings) | `JWT_SECRET`, `CLUSTER_SECRET`, `REQUIRE_STRICT_PASSWORDS` |
 | [Email](#email-settings)       | `SMTP_*`, `EMAIL_SENDER`, `REGISTER_USERS_AS_INACTIVE` |
 
 ---
@@ -255,6 +255,33 @@ Number of bcrypt hashing rounds.
 ```env
 BCRYPT_ROUNDS=12
 ```
+
+### `REQUIRE_STRICT_PASSWORDS`
+
+Controls whether passwords set during registration and password reset must meet
+strong-password rules on the frontend. When enabled, passwords must be at least
+12 characters long and contain at least one uppercase letter, one number, and
+one special character.
+
+| Value   | Description                                                        |
+| ------- | ------------------------------------------------------------------ |
+| `true`  | Enforce strong-password rules (default, recommended for production) |
+| `false` | Allow any non-empty password (useful for local development/testing) |
+
+```env
+# Enforce strong passwords (default)
+REQUIRE_STRICT_PASSWORDS=true
+
+# Allow any password
+REQUIRE_STRICT_PASSWORDS=false
+```
+
+!!! note
+This flag is consumed at frontend build time. When using pre-built images
+(`BUILD_OR_PULL_IMAGES=pull`), the value baked into the published image
+applies. When building locally (`BUILD_OR_PULL_IMAGES=build`) or running the
+frontend in dev mode (`npm run dev` inside `frontend/`), the current `.env`
+value is used.
 
 ---
 

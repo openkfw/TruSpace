@@ -20,7 +20,9 @@ const nextConfig: NextConfig = {
    env: {
       TRUSPACE_VERSION: getTruSpaceVersion(),
       DISABLE_ALL_AI_FUNCTIONALITY:
-         process.env.DISABLE_ALL_AI_FUNCTIONALITY ?? "false"
+         process.env.DISABLE_ALL_AI_FUNCTIONALITY ?? "false",
+      REQUIRE_STRICT_PASSWORDS:
+         process.env.REQUIRE_STRICT_PASSWORDS ?? "true"
    }
 };
 
