@@ -325,6 +325,7 @@ case "$PROFILE_KEY" in
     _gen_secret JWT_SECRET
     JWT_MAX_AGE="$DEFAULT_JWT_MAX_AGE"
     REGISTER_USERS_AS_INACTIVE=false
+    REQUIRE_STRICT_PASSWORDS=false
     RATE_LIMIT_PER_MINUTE=200
     # Network (localhost, no reverse proxy)
     PROTOCOL="http"
@@ -385,6 +386,7 @@ case "$PROFILE_KEY" in
     _gen_secret JWT_SECRET
     JWT_MAX_AGE="$DEFAULT_JWT_MAX_AGE"
     RATE_LIMIT_PER_MINUTE=60
+    REQUIRE_STRICT_PASSWORDS=true
     FRONTEND_PORT="$DEFAULT_FRONTEND_PORT"
     API_PORT="$DEFAULT_API_PORT"
     # SMTP defaults — left unset so STARTTLS/SSL can follow the protocol choice
@@ -461,6 +463,8 @@ prompt_var JWT_MAX_AGE text \
   "JWT token expiry in seconds (86400 = 24 h)" "$DEFAULT_JWT_MAX_AGE"
 prompt_var REGISTER_USERS_AS_INACTIVE bool \
   "Require admin approval before new accounts are activated? (Requires SMTP or manual DB edit)" false
+prompt_var REQUIRE_STRICT_PASSWORDS bool \
+  "Require strict passwords (min 12 chars, uppercase, number, special char) for registration and reset?" true
 prompt_var RATE_LIMIT_PER_MINUTE text \
   "Max API requests per IP per minute (anti-DoS)" 200
 
@@ -740,6 +744,11 @@ JWT_MAX_AGE=${JWT_MAX_AGE}
 # When true, new registrations are inactive until approved by an admin.
 # Requires a working SMTP server or manual approval via the SQLite database.
 REGISTER_USERS_AS_INACTIVE=${REGISTER_USERS_AS_INACTIVE}
+
+# When true (recommended for production), passwords set during registration and
+# password reset must be at least 12 characters and contain at least one uppercase
+# letter, one number, and one special character. Set to false to allow any password.
+REQUIRE_STRICT_PASSWORDS=${REQUIRE_STRICT_PASSWORDS}
 
 # Max API requests per IP per minute (protects against DoS)
 RATE_LIMIT_PER_MINUTE=${RATE_LIMIT_PER_MINUTE}
