@@ -80,6 +80,12 @@ export const envVarsSchema = Joi.object({
     .allow("")
     .empty("")
     .default(false),
+  RESTRICTED_EMAIL_DOMAINS: Joi.string()
+    .optional()
+    .allow("")
+    .empty("")
+    .default("")
+    .note("Comma-separated list of allowed email domains for registration. Empty = no restriction."),
 })
   .unknown()
   .required();
