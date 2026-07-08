@@ -87,12 +87,39 @@ export default function FloatingChat({
       return () => window.removeEventListener("resize", updateOffset);
    }, []);
 
+   // On mobile, hide the floating button while the page is being scrolled
+   // so it doesn't hover on top of the document content. It reappears
+   // shortly after scrolling stops.
+   const [isHiddenOnScroll, setIsHiddenOnScroll] = useState(false);
+
+   useEffect(() => {
+      const mobileQuery = window.matchMedia("(max-width: 768px)");
+      let scrollTimeout: ReturnType<typeof setTimeout>;
+
+      const handleScroll = () => {
+         if (!mobileQuery.matches) return;
+         setIsHiddenOnScroll(true);
+         clearTimeout(scrollTimeout);
+         scrollTimeout = setTimeout(() => setIsHiddenOnScroll(false), 400);
+      };
+
+      window.addEventListener("scroll", handleScroll, { passive: true });
+      return () => {
+         window.removeEventListener("scroll", handleScroll);
+         clearTimeout(scrollTimeout);
+      };
+   }, []);
+
    return (
       <div ref={chatButtonRef} className="fixed bottom-6 right-6 z-50">
          {!isOpen && (
             <Button
                onClick={() => setIsOpen((prev) => !prev)}
-               className="flex items-center h-16 pr-1 bg-blue-600 hover:bg-blue-700 rounded-full shadow-md group"
+               className={`flex items-center h-16 pr-1 bg-blue-600 hover:bg-blue-700 rounded-full shadow-md group transition-all duration-300 ${
+                  isHiddenOnScroll
+                     ? "opacity-0 translate-y-4 pointer-events-none"
+                     : "opacity-100 translate-y-0"
+               }`}
             >
                <span className="text-lg font-bold">
                   {chatTranslations("chat")}
