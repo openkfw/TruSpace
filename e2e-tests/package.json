@@ -4,7 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "cypress open"
+    "test": "cypress open",
+    "k6:smoke": "k6 run k6/scenarios/smoke.js",
+    "k6:browse": "k6 run k6/scenarios/browse.js",
+    "k6:chat": "k6 run k6/scenarios/chat.js",
+    "k6:upload": "k6 run k6/scenarios/upload.js"
   },
   "author": "",
   "license": "none",

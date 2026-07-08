@@ -1,3 +1,4 @@
-# Cypress e2e tests
+# End-to-end and load tests
 
-Run by `npm run test`
+- Cypress UI tests: `npm run test`
+- k6 API/load tests: see [k6/README.md](/home/michael/dev/bearingpoint/TruSpace/e2e-tests/k6/README.md)
