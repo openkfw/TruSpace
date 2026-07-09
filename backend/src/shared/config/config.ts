@@ -51,6 +51,7 @@ interface Config {
   rateLimitPerMinute: number;
   maxNumberOfFetchedPins: number;
   registerUsersAsInactive: boolean;
+  restrictedEmailDomains: string[];
   smtpServer: {
     host: string;
     port: number;
@@ -125,6 +126,9 @@ export const config: Config = {
     ? parseInt(envVars.MAX_NUMBER_OF_FETCHED_PINS, 10)
     : 1000,
   registerUsersAsInactive: envVars.REGISTER_USERS_AS_INACTIVE,
+  restrictedEmailDomains: envVars.RESTRICTED_EMAIL_DOMAINS
+    ? envVars.RESTRICTED_EMAIL_DOMAINS.split(",").map((d: string) => d.trim().toLowerCase()).filter(Boolean)
+    : [],
   smtpServer: {
     host: envVars.SMTP_HOST,
     port: envVars.SMTP_PORT,

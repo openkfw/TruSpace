@@ -50,6 +50,7 @@ export default function Register() {
    const [showPassword, setShowPassword] = useState(false);
    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
    const [emailTaken, setEmailTaken] = useState(false);
+   const [domainNotAllowed, setDomainNotAllowed] = useState(false);
    const [showTerms, setShowTerms] = useState(false);
    const [termsContent, setTermsContent] = useState("");
 
@@ -87,6 +88,7 @@ export default function Register() {
       const result = await registerUser(enhancedData);
       if (result.status === "success") {
          setEmailTaken(false);
+         setDomainNotAllowed(false);
          if (result.message === "email sent") {
             toast.success(translations("emailSent"));
          } else {
@@ -96,6 +98,8 @@ export default function Register() {
       }
       if (result.error === "CONFLICT") {
          setEmailTaken(true);
+      } else if (result.error === "WRONG_DOMAIN") {
+         setDomainNotAllowed(true);
       } else if (result.error) {
          toast.error(translations("registerError"));
       }
@@ -214,6 +218,7 @@ export default function Register() {
                                  placeholder={translations("emailPlaceholder")}
                                  onChange={(e) => {
                                     setEmailTaken(false);
+                                    setDomainNotAllowed(false);
                                     emailValidation.onChange(e);
                                  }}
                                  data-test-id="register-email"
@@ -226,6 +231,11 @@ export default function Register() {
                               {emailTaken && (
                                  <p className="text-red-500 text-sm">
                                     {translations("emailAlreadyTaken")}
+                                 </p>
+                              )}
+                              {domainNotAllowed && (
+                                 <p className="text-red-500 text-sm">
+                                    {translations("emailDomainNotAllowed")}
                                  </p>
                               )}
                            </div>

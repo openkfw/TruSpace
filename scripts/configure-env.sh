@@ -326,6 +326,7 @@ case "$PROFILE_KEY" in
     JWT_MAX_AGE="$DEFAULT_JWT_MAX_AGE"
     REGISTER_USERS_AS_INACTIVE=false
     REQUIRE_STRICT_PASSWORDS=false
+    RESTRICTED_EMAIL_DOMAINS="$EMPTY"
     RATE_LIMIT_PER_MINUTE=200
     # Network (localhost, no reverse proxy)
     PROTOCOL="http"
@@ -387,6 +388,7 @@ case "$PROFILE_KEY" in
     JWT_MAX_AGE="$DEFAULT_JWT_MAX_AGE"
     RATE_LIMIT_PER_MINUTE=60
     REQUIRE_STRICT_PASSWORDS=true
+    RESTRICTED_EMAIL_DOMAINS="$EMPTY"
     FRONTEND_PORT="$DEFAULT_FRONTEND_PORT"
     API_PORT="$DEFAULT_API_PORT"
     # SMTP defaults — left unset so STARTTLS/SSL can follow the protocol choice
@@ -467,6 +469,9 @@ prompt_var REQUIRE_STRICT_PASSWORDS bool \
   "Require strict passwords (min 12 chars, uppercase, number, special char) for registration and reset?" true
 prompt_var RATE_LIMIT_PER_MINUTE text \
   "Max API requests per IP per minute (anti-DoS)" 200
+prompt_var RESTRICTED_EMAIL_DOMAINS text \
+  "Comma-separated list of allowed email domains for registration (e.g. example.com,example2.de). Leave empty to allow all domains." \
+  "$EMPTY"
 
 #──────────────────────────────────────────────────────────────────────────────
 # DOMAIN & URL CONFIGURATION
@@ -752,6 +757,10 @@ REQUIRE_STRICT_PASSWORDS=${REQUIRE_STRICT_PASSWORDS}
 
 # Max API requests per IP per minute (protects against DoS)
 RATE_LIMIT_PER_MINUTE=${RATE_LIMIT_PER_MINUTE}
+
+# Comma-separated list of allowed email domains for registration (e.g. example.com,example2.de).
+# Leave empty to allow registrations from all domains.
+RESTRICTED_EMAIL_DOMAINS=${RESTRICTED_EMAIL_DOMAINS}
 
 # Path to the SQLite database file (inside the backend container)
 DATABASE_PATH=${DATABASE_PATH}

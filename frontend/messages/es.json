@@ -142,7 +142,8 @@
     "termsLink": "Condiciones de uso.",
     "termsAccept": "Acepto eso",
     "termsAndConditions": "Condiciones de uso",
-    "termsLoadError": "No se pudieron cargar los Términos de servicio."
+    "termsLoadError": "No se pudieron cargar los Términos de servicio.",
+    "emailDomainNotAllowed": "No se permite el registro con este dominio de correo electrónico"
   },
   "settings": {
     "updateSuccess": "Configuración de usuario actualizada",
