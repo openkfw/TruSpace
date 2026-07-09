@@ -235,6 +235,8 @@ export default function DocumentUpload({
             );
             if (docId) {
                await refreshUntilVersionFound(docId, res.data.cid);
+               // A new version creates a backend activity event; the
+               // DocumentChat timeline picks it up via its own SWR polling.
             }
             await fetchDocuments(workspace?.uuid);
 

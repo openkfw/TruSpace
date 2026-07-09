@@ -77,6 +77,7 @@ const Editor = ({
    hasError = false,
    errorMessage = "",
    stickyToolbarTopMargin,
+   contentMaxHeightClassName = "max-h-[63vh]",
    allowedButtons = {
       bold: true,
       italic: true,
@@ -105,6 +106,7 @@ const Editor = ({
    hasError?: boolean;
    errorMessage?: string;
    stickyToolbarTopMargin?: string;
+   contentMaxHeightClassName?: string;
    allowedButtons?: AllowedButtons;
 }) => {
    const translations = useTranslations("editor");
@@ -299,7 +301,7 @@ const Editor = ({
 
          <EditorContent
             editor={editor}
-            className="bg-white dark:bg-gray-700 p-4 max-h-[63vh] overflow-y-auto"
+            className={`bg-white dark:bg-gray-700 p-4 overflow-y-auto ${contentMaxHeightClassName}`}
          />
          {isRequired && hasError ? (
             <div

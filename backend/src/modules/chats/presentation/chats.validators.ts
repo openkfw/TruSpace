@@ -10,4 +10,10 @@ export const ChatsValidator = {
     body('workspaceOrigin').isUUID(4),
     body('data').notEmpty(),
   ]),
+
+  editChat: validate([param('cid').notEmpty(), body('data').notEmpty()]),
+
+  likeChat: validate([param('chatId').notEmpty()]),
+
+  unlikeChat: validate([param('chatId').notEmpty()]),
 };

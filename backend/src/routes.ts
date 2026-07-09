@@ -1,6 +1,7 @@
 import express from 'express';
 import { chatsRouter } from './modules/chats/presentation/chats.routes';
 import { documentsRouter } from './modules/documents/presentation/documents.routes';
+import { eventsRouter } from './modules/events/presentation/events.routes';
 import { healthRouter } from './modules/health/presentation/health.routes';
 import { languagesRouter } from './modules/languages/presentation/languages.routes';
 import { permissionsRouter } from './modules/permissions/presentation/permissions.routes';
@@ -14,6 +15,7 @@ export const router = express.Router();
 
 router.use(chatsRouter);
 router.use(documentsRouter);
+router.use(eventsRouter);
 router.use(healthRouter);
 router.use(languagesRouter);
 router.use(permissionsRouter);

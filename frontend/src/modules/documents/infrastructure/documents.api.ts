@@ -31,10 +31,16 @@ export const loadDocuments = async (
    errorText,
    from = 0,
    limit = 10,
-   searchString = ""
+   searchString = "",
+   tagFilter: string[] = [],
+   creatorFilter: string[] = [],
+   sortBy: string = "timestamp",
+   sortOrder: string = "desc"
 ) => {
    const query = workspaceId ? `&workspace=${workspaceId}` : "";
-   const url = `${DOCUMENTS_ENDPOINT}?from=${from}&limit=${limit}${query}&search=${searchString}`;
+   const tagsQuery = tagFilter.map((t) => `&tags=${encodeURIComponent(t)}`).join("");
+   const creatorsQuery = creatorFilter.map((c) => `&creators=${encodeURIComponent(c)}`).join("");
+   const url = `${DOCUMENTS_ENDPOINT}?from=${from}&limit=${limit}${query}&search=${searchString}${tagsQuery}${creatorsQuery}&sortBy=${sortBy}&sortOrder=${sortOrder}`;
    const options: RequestInit = {
       method: "GET",
       credentials: "include"

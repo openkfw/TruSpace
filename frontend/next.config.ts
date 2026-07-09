@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 
-
 const withNextIntl = createNextIntlPlugin();
 
 function getTruSpaceVersion() {
@@ -9,18 +8,18 @@ function getTruSpaceVersion() {
 }
 
 const nextConfig: NextConfig = {
-   experimental: {
-      turbo: {
-         resolveAlias: {
-            canvas: "./empty-module.ts"
-         }
+   turbopack: {
+      resolveAlias: {
+         canvas: "./empty-module.ts"
       }
    },
    output: "standalone",
    env: {
       TRUSPACE_VERSION: getTruSpaceVersion(),
       DISABLE_ALL_AI_FUNCTIONALITY:
-         process.env.DISABLE_ALL_AI_FUNCTIONALITY ?? "false"
+         process.env.DISABLE_ALL_AI_FUNCTIONALITY ?? "false",
+      REQUIRE_STRICT_PASSWORDS:
+         process.env.REQUIRE_STRICT_PASSWORDS ?? "true"
    }
 };
 

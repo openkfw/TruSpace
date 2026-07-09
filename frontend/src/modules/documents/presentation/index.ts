@@ -13,4 +13,3 @@ export { default as DocumentPreviewPDF } from "./DocumentPreviewPDF";
 export { default as DocumentTags } from "./DocumentTags";
 export { default as DocumentUpload } from "./DocumentUpload";
 export { default as DocumentVersions } from "./DocumentVersions";
-export { default as FloatingChat } from "./FloatingChat";
