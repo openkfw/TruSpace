@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { ValidationChain, validationResult } from "express-validator";
 
+import logger from "../config/winston";
+
 /**
  * Middleware that runs express-validator validations and handles errors
  * @param validations Array of express-validator validation chains
@@ -16,7 +18,11 @@ const validate = (validations: ValidationChain[]) => {
 
     const validation = validationResult(req);
     if (!validation.isEmpty()) {
-      console.error({ errors: validation.array() });
+      logger.warn("Validation failed", {
+        path: req.originalUrl,
+        method: req.method,
+        validationErrors: validation.array(),
+      });
       res.status(400).json({ errors: validation.array() });
       return;
     }

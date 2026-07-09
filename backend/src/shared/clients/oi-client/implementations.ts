@@ -1,6 +1,8 @@
 import { AxiosInstance } from "axios";
 import { UploadedFile } from "express-fileupload";
 import FormData from "form-data";
+
+import logger from "../../config/winston";
 import { ChatForm, FileData } from "../../types/interfaces";
 import {
   IAuthsModule,
@@ -57,7 +59,7 @@ class OllamaModule implements IOllamaModule {
       });
       return res.status === 200;
     } catch (error) {
-      console.error(error);
+      logger.error("OllamaModule.status failed", { error });
       return false;
     }
   }
@@ -141,7 +143,7 @@ class ChatModule implements IChatsModule {
       );
       return res.data;
     } catch (error) {
-      console.error(error);
+      logger.error("ChatModule.completion failed", { error });
       throw error;
     }
   }
@@ -195,7 +197,7 @@ class FilesModule implements IFilesModule {
       });
       return response.data;
     } catch (error) {
-      console.error(error);
+      logger.error("FilesModule.upload failed", { error });
       throw error;
     }
   }

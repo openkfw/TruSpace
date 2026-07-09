@@ -383,12 +383,15 @@ class DocumentsIpfsRepository {
       const allocations = await fetchLocalAllocations();
       const matching = allocations.filter((a) => a.metadata?.docId === docId);
       logger.info('[getEverythingByDocId] fetch=' + (Date.now() - t0) + 'ms, matching=' + matching.length);
-      return matching.map((alloc) => transformPinToGeneralWorkspaceItem({ 
-  cid: alloc.cid,
-  name: '',
-  origins: [],
-  meta: { app_id: '', ...(alloc.metadata ?? {}) }
-}));} catch (error) {
+      return matching.map((alloc) =>
+        transformPinToGeneralWorkspaceItem({
+          cid: alloc.cid,
+          name: '',
+          origins: [],
+          meta: { app_id: '', ...(alloc.metadata ?? {}) },
+        }),
+      );
+    } catch (error) {
       logger.error(`Error getting everything by doc ID ${docId}:`, error);
       throw error;
     }
