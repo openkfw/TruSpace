@@ -24,6 +24,7 @@ import TaskQueue from '../../../shared/utility/jobQueue';
 import { NoFileUploadedError } from '../errors/no-file-uploaded.error';
 import { MalwareDetectedError } from '../errors/malware-detected.error';
 import { documentsIpfsRepository } from '../infrastructure/documents-ipfs.repository';
+import { recordEvent } from '../../events/application/record-event.usecase';
 
 export async function putDocument(req: AuthenticatedRequest, res: Response) {
   if (!req.files || !req.files.file) {
@@ -92,6 +93,20 @@ export async function putDocument(req: AuthenticatedRequest, res: Response) {
   const ipfsClusterResponse = await documentsIpfsRepository.createDocument(docRequest, file);
   const cid = ipfsClusterResponse.cid;
   setRequestContext({ cid });
+
+  await recordEvent({
+    eventType: 'document',
+    eventAction: 'version',
+    objectId: docId,
+    objectName: filename,
+    workspaceOrigin: workspace,
+    docId,
+    versionCid: cid,
+    version: docRequest.meta.version,
+    actorType: 'user',
+    actorNodeId: creatorNodeId,
+    actorUserId: userUiid,
+  });
 
   file.data = fileDataClone;
 

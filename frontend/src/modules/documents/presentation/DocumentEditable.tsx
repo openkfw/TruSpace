@@ -77,6 +77,9 @@ export default function DocumentEditable({
 
       try {
          await documentUpload(formData, docId, translations("uploadError"));
+         // A new editable-document version creates a backend activity
+         // event; the DocumentChat timeline picks it up via its own SWR
+         // polling.
       } catch (err) {
          console.error(err);
       } finally {
@@ -86,7 +89,7 @@ export default function DocumentEditable({
    };
 
    return loadedEditorContent ? (
-      <div className="pb-[var(--chat-offset)]">
+      <div>
          <div className="flex items-center justify-between gap-4">
             <TooltipProvider>
                <Tooltip>
@@ -124,6 +127,7 @@ export default function DocumentEditable({
             content={loadedEditorContent}
             onChange={(editor) => setEditorContent(editor.getHTML())}
             stickyToolbarTopMargin="12"
+            contentMaxHeightClassName="max-h-[calc(100vh-27rem)]"
          />
 
       </div>

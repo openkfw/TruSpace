@@ -3,9 +3,12 @@ import { GeneralTemplateOfItemInWorkspace } from '../../../shared/types/interfac
 import { documentsIpfsRepository } from '../infrastructure/documents-ipfs.repository';
 
 export async function deleteDocumentsAndAssociatedItems(allItems: GeneralTemplateOfItemInWorkspace[]) {
-  const allItemCids = allItems.map((item) => item.cid);
+  // Events are kept after a document is deleted so they remain available for
+  // future workspace-level audit views. They are filtered out here.
+  const itemsToDelete = allItems.filter((item) => item.meta.type !== 'event');
+  const allItemCids = itemsToDelete.map((item) => item.cid);
 
-  const allDocuments = allItems.filter((item) => item.meta.type === 'document');
+  const allDocuments = itemsToDelete.filter((item) => item.meta.type === 'document');
   const allDocumentCids = allDocuments.map((document) => document.cid);
 
   const requestIds: string[] = [];

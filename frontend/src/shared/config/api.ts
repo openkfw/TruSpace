@@ -7,6 +7,7 @@ export const getApiUrl = (): string => {
 export const API_URL = getApiUrl();
 
 export const DOCUMENTS_ENDPOINT = `${API_URL}/documents`;
+export const EVENTS_ENDPOINT = `${API_URL}/events`;
 export const PERSPECTIVES_ENDPOINT = `${API_URL}/perspectives`;
 export const CHATS_ENDPOINT = `${API_URL}/chats`;
 export const TAGS_ENDPOINT = `${API_URL}/tags`;

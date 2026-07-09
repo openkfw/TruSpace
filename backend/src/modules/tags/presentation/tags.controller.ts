@@ -29,8 +29,8 @@ export const TagsController = {
     res.json(result);
   },
 
-  deleteTag: async (req: Request, res: Response) => {
-    const result = await deleteTag(req.params.tagId);
+  deleteTag: async (req: AuthenticatedRequest, res: Response) => {
+    const result = await deleteTag(req.params.tagId, req.user);
     res.json(result);
   },
 

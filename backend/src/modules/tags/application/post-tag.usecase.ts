@@ -2,6 +2,7 @@ import { Response } from 'express';
 
 import { TagRequest } from '../../../shared/types/interfaces';
 import { checkPermissionForWorkspace } from '../../../shared/utility/permissions';
+import { recordEvent } from '../../events/application/record-event.usecase';
 import { tagsIpfsRepository } from '../infrastructure/tags-ipfs.repository';
 
 export async function postTag(
@@ -32,5 +33,20 @@ export async function postTag(
 
   await checkPermissionForWorkspace(email, res, workspaceOrigin);
 
-  return tagsIpfsRepository.createTag(tagRequest);
+  const tagCid = await tagsIpfsRepository.createTag(tagRequest);
+
+  await recordEvent({
+    eventType: 'tag',
+    eventAction: 'create',
+    objectId: tagCid,
+    objectName: tagName,
+    workspaceOrigin,
+    docId,
+    versionCid: cid,
+    actorType: 'user',
+    actorNodeId: creatorNodeId,
+    actorUserId: creatorUserId,
+  });
+
+  return tagCid;
 }

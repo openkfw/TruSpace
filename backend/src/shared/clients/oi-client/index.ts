@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import { languagesIpfsRepository } from "../../../modules/languages/infrastructure/languages-ipfs.repository";
 import { perspectivesIpfsRepository } from "../../../modules/perspectives/infrastructure/perspectives-ipfs.repository";
 import { tagsIpfsRepository } from "../../../modules/tags/infrastructure/tags-ipfs.repository";
+import { recordEvent } from "../../../modules/events/application/record-event.usecase";
 import { config } from "../../config/config";
 import logger from "../../config/winston";
 import { attachHttpClientLogging } from "../../logging/http-client-logging";
@@ -483,7 +484,21 @@ export class OpenWebUIClient {
 
         logger.debug(`#SUMMARY:\n ${perspectiveRequest.meta.data}`);
 
-        return perspectivesIpfsRepository.createPerspective(perspectiveRequest);
+        const perspectiveCid = await perspectivesIpfsRepository.createPerspective(perspectiveRequest);
+
+        await recordEvent({
+          eventType: "perspective",
+          eventAction: "create",
+          objectId: perspectiveCid,
+          objectName: result.perspectiveType,
+          workspaceOrigin: document.meta.workspaceOrigin,
+          docId: document.docId,
+          versionCid: document.cid,
+          actorType: "ai",
+          actorUserId: config.ollama.model,
+        });
+
+        return perspectiveCid;
       });
       TaskQueue.updateJobStatus(requestId, "completed");
     } catch (error) {
@@ -525,7 +540,7 @@ export class OpenWebUIClient {
       const tags: string[] = await processTags(result.summary, this.chats);
 
       // store max. 5 tags in IPFS;
-      tags.slice(0, 5).map((tag: string) => {
+      tags.slice(0, 5).map(async (tag: string) => {
         const tagRequest: TagRequest = {
           meta: {
             type: "tag",
@@ -540,7 +555,21 @@ export class OpenWebUIClient {
             creatorType: "ai",
           },
         };
-        return tagsIpfsRepository.createTag(tagRequest);
+        const tagCid = await tagsIpfsRepository.createTag(tagRequest);
+
+        await recordEvent({
+          eventType: "tag",
+          eventAction: "create",
+          objectId: tagCid,
+          objectName: tag,
+          workspaceOrigin: document.meta.workspaceOrigin,
+          docId: document.docId,
+          versionCid: document.cid,
+          actorType: "ai",
+          actorUserId: config.ollama.model,
+        });
+
+        return tagCid;
       });
       await TaskQueue.updateJobStatus(requestId, "completed");
     } catch (error) {

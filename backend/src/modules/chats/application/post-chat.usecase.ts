@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid';
+
 import { sendNotification } from '../../../shared/mailing/notifications';
 import { setRequestContext } from '../../../shared/logging/request-context';
 import { ChatMessageRequest } from '../../../shared/types/interfaces';
@@ -29,6 +31,9 @@ export async function postChat(
       docId,
       workspaceOrigin,
       timestamp: Date.now().toString(),
+      // Stable per-message id preserved across edits, used by likes to
+      // reference the message independently of its current pin cid.
+      chatId: uuidv4(),
       creatorNodeId,
       creatorUserId,
     },
