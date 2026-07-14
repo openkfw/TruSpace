@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useTranslations } from "next-intl";
 
@@ -39,6 +39,7 @@ export default function FloatingChat({
    displayNote
 }: FloatingChatProps) {
    const [isOpen, setIsOpen] = useState(false);
+   const [isVisible, setIsVisible] = useState(true);
    const chatRef = useRef<HTMLDivElement>(null);
    const chatTranslations = useTranslations("chat");
 
@@ -87,8 +88,47 @@ export default function FloatingChat({
       return () => window.removeEventListener("resize", updateOffset);
    }, []);
 
+   // On mobile, hide the floating chat when the user scrolls so it
+   // doesn't hover over the document content. The chat reappears
+   // shortly after scrolling stops. When the chat panel is open and
+   // the user scrolls, close the panel first.
+   const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+   const handleScroll = useCallback(() => {
+      // Only apply scroll-to-hide on mobile viewports
+      if (window.innerWidth >= 768) return;
+
+      // If the chat panel is open, close it on scroll
+      setIsOpen(false);
+
+      setIsVisible(false);
+
+      if (scrollTimeoutRef.current) {
+         clearTimeout(scrollTimeoutRef.current);
+      }
+
+      scrollTimeoutRef.current = setTimeout(() => {
+         setIsVisible(true);
+      }, 500);
+   }, []);
+
+   useEffect(() => {
+      window.addEventListener("scroll", handleScroll, { passive: true });
+      return () => {
+         window.removeEventListener("scroll", handleScroll);
+         if (scrollTimeoutRef.current) {
+            clearTimeout(scrollTimeoutRef.current);
+         }
+      };
+   }, [handleScroll]);
+
    return (
-      <div ref={chatButtonRef} className="fixed bottom-6 right-6 z-50">
+      <div
+         ref={chatButtonRef}
+         className={`fixed bottom-6 right-6 z-50 transition-transform duration-300 ${
+            !isVisible ? "translate-y-24" : "translate-y-0"
+         }`}
+      >
          {!isOpen && (
             <Button
                onClick={() => setIsOpen((prev) => !prev)}
