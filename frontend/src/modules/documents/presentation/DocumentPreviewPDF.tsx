@@ -209,6 +209,7 @@ export default function DocumentPreviewPDF({
    return (
       <div
          ref={containerRef}
+         data-test-id="document-pdf-preview"
          className="group relative w-full max-w-4xl max-h-[calc(100vh-16rem)] overflow-y-auto"
       >
          {/* Floating page indicator: always visible briefly after a page

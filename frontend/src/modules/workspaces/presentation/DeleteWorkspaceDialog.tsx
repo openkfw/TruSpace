@@ -85,12 +85,17 @@ export default function DeleteWorkspaceDialog({
                   type="button"
                   variant="destructive"
                   onClick={() => setOpen(false)}
+                  data-test-id="workspace-delete-cancel-button"
                >
                   {translations(
                      "workspaceDeletionDialog.cancelButtonWorkspaceDeletion"
                   )}
                </Button>
-               <Button type="submit" onClick={handleConfirmDeletion}>
+               <Button
+                  type="submit"
+                  onClick={handleConfirmDeletion}
+                  data-test-id="workspace-delete-confirm-button"
+               >
                   {isDeleting ? (
                      <>
                         <Loader2 className="animate-spin" />

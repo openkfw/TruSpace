@@ -90,6 +90,7 @@ export function NavUser() {
                               setOpenMobile(false);
                            }
                         }}
+                        data-test-id="user-settings-nav-button"
                      >
                         <UserRoundCog />
                         {translations("userSettings")}

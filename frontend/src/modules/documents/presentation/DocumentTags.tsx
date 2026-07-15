@@ -146,7 +146,7 @@ export default function DocumentTags({ cid, workspaceOrigin, docId, status }) {
    const isPending = status?.status === "pending";
 
    return (
-      <div className="flex flex-col">
+      <div className="flex flex-col" data-test-id="document-tags-content">
          <div className="h-full">
             <div className="space-y-4 mb-2">
                {isGenerating ? (

@@ -70,19 +70,23 @@ export default function AppStatus() {
    const loading = healthLoading || peersLoading;
 
    return (
-      <div className="pt-4 space-y-6">
+      <div className="pt-4 space-y-6" data-test-id="app-status-page">
          <div className="flex items-center justify-between">
             <h1 className="text-3xl font-bold">{t("appStatus.title")}</h1>
             <Button
                onClick={handleRefresh}
                disabled={loading}
                className="disabled:opacity-50"
+               data-test-id="app-status-refresh-button"
             >
                <RefreshCw className={`${loading ? "animate-spin" : ""}`} />
                {t("appStatus.refresh")}
             </Button>
          </div>
-         <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md border">
+         <div
+            className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md border"
+            data-test-id="app-status-health-overview"
+         >
             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
                <CheckCircle2 className="text-green-500" />
                {t("appStatus.systemHealthOverview")}

@@ -75,7 +75,7 @@ export default function Dashboard() {
       "transition-transform duration-300 group-hover:scale-110 group-hover:text-blue-600";
 
    return (
-      <div className="space-y-10">
+      <div className="space-y-10" data-test-id="dashboard-page">
          <div className="space-y-4">
             <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
                {homeTranslations("documentActions")}

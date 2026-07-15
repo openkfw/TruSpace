@@ -224,12 +224,18 @@ export default function Register() {
                                  data-test-id="register-email"
                               />
                               {errors.email?.message && (
-                                 <p className="text-red-500 text-sm">
+                                 <p
+                                    className="text-red-500 text-sm"
+                                    data-test-id="register-email-error"
+                                 >
                                     {String(errors.email.message)}
                                  </p>
                               )}
                               {emailTaken && (
-                                 <p className="text-red-500 text-sm">
+                                 <p
+                                    className="text-red-500 text-sm"
+                                    data-test-id="register-email-taken-error"
+                                 >
                                     {translations("emailAlreadyTaken")}
                                  </p>
                               )}
@@ -374,7 +380,10 @@ export default function Register() {
                                  </Button>
                               </div>
                               {errors.confirmPassword?.message && (
-                                 <p className="text-red-500 text-sm">
+                                 <p
+                                    className="text-red-500 text-sm"
+                                    data-test-id="register-password-confirm-error"
+                                 >
                                     {String(errors.confirmPassword.message)}
                                  </p>
                               )}
@@ -386,6 +395,7 @@ export default function Register() {
                                     type="checkbox"
                                     id="terms"
                                     className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:bg-slate-800 dark:border-slate-600 mt-0.5"
+                                    data-test-id="register-terms"
                                     {...register("terms", {
                                        required: translations("termsRequired")
                                     })}

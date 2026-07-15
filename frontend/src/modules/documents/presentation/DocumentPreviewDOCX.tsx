@@ -47,6 +47,7 @@ export default function DocumentPreviewDOCX({ cid }) {
          */}
          <div
             id="docx-preview"
+            data-test-id="document-docx-preview"
             className="w-full [&_.docx-wrapper]:!w-full [&_.docx-wrapper]:!p-0 [&_.docx-wrapper]:!bg-transparent [&_.docx-wrapper>section.docx]:!w-full [&_.docx-wrapper>section.docx]:!max-w-full [&_.docx-wrapper>section.docx]:!min-w-0 [&_.docx-wrapper>section.docx]:!box-border [&_img]:!max-w-full [&_img]:!h-auto [&_table]:!max-w-full"
          />
       </div>

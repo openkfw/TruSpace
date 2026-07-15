@@ -19,7 +19,7 @@ export default function Statistics() {
    const { peers } = usePeers();
 
    return (
-      <div className="pt-4">
+      <div className="pt-4" data-test-id="statistics-page">
          <h1 className="text-3xl font-bold">{translations("statistics")}</h1>
          <div className="grid grid-rows-3 sm:grid-cols-3 gap-4 mt-4">
             <KPIBox

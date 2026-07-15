@@ -164,6 +164,7 @@ export default function DocumentDetailsPage() {
                               variant="link"
                               className="px-1"
                               onClick={downloadFile}
+                              data-test-id="document-details-download-button"
                            >
                               <Download className="!size-5" />
                            </Button>
@@ -232,6 +233,7 @@ export default function DocumentDetailsPage() {
                   <TabsList className="grid grid-cols-3 bg-blue-100 dark:bg-slate-800">
                      <TabsTrigger
                         value="details"
+                        data-test-id="document-details-tab"
                         className="data-[state=active]:bg-blue-200 data-[state=active]:dark:bg-blue-900 data-[state=active]:text-blue-800 data-[state=active]:dark:text-blue-400"
                      >
                         {documentTranslations("details")}
@@ -239,6 +241,7 @@ export default function DocumentDetailsPage() {
                      <TabsTrigger
                         value="preview"
                         disabled={!isPreviewAvailable}
+                        data-test-id="document-preview-tab"
                         className="data-[state=active]:bg-blue-200 data-[state=active]:dark:bg-blue-900 data-[state=active]:text-blue-800 data-[state=active]:dark:text-blue-400"
                      >
                         {isRichTextDocument
@@ -249,6 +252,7 @@ export default function DocumentDetailsPage() {
                      </TabsTrigger>
                      <TabsTrigger
                         value="versions"
+                        data-test-id="document-versions-tab"
                         className="data-[state=active]:bg-blue-200 data-[state=active]:dark:bg-blue-900 data-[state=active]:text-blue-800 data-[state=active]:dark:text-blue-400"
                      >
                         {documentTranslations("versions")}
@@ -261,12 +265,18 @@ export default function DocumentDetailsPage() {
                         defaultValue={["tags", "perspectives"]}
                         className="space-y-3"
                      >
-                        <Card className="bg-transparent">
+                        <Card
+                           className="bg-transparent"
+                           data-test-id="document-metadata-section"
+                        >
                             <AccordionItem
                               value="metadata"
                               className="border-b-0"
                             >
-                              <AccordionTrigger className="px-4 py-3 hover:no-underline">
+                              <AccordionTrigger
+                                 className="px-4 py-3 hover:no-underline"
+                                 data-test-id="document-metadata-trigger"
+                              >
                                   <span className="flex items-center gap-2 text-base font-semibold text-muted-foreground">
                                     <Info className="h-4 w-4" />
                                     {documentTranslations("metadata")}
@@ -286,9 +296,15 @@ export default function DocumentDetailsPage() {
                             </AccordionItem>
                         </Card>
 
-                        <Card className="bg-transparent">
+                        <Card
+                           className="bg-transparent"
+                           data-test-id="document-tags-section"
+                        >
                            <AccordionItem value="tags" className="border-b-0">
-                              <AccordionTrigger className="px-4 py-3 hover:no-underline">
+                              <AccordionTrigger
+                                 className="px-4 py-3 hover:no-underline"
+                                 data-test-id="document-tags-trigger"
+                              >
                                  <span className="flex items-center gap-2 text-base font-semibold text-foreground">
                                     <Tag className="h-4 w-4 text-muted-foreground" />
                                     {tagsTranslations("title")}
@@ -307,12 +323,18 @@ export default function DocumentDetailsPage() {
                            </AccordionItem>
                         </Card>
 
-                        <Card className="bg-transparent">
+                        <Card
+                           className="bg-transparent"
+                           data-test-id="document-perspectives-section"
+                        >
                            <AccordionItem
                               value="perspectives"
                               className="border-b-0"
                            >
-                              <AccordionTrigger className="px-4 py-3 hover:no-underline">
+                              <AccordionTrigger
+                                 className="px-4 py-3 hover:no-underline"
+                                 data-test-id="document-perspectives-trigger"
+                              >
                                  <span className="flex items-center gap-2 text-base font-semibold text-foreground">
                                     <Lightbulb className="h-4 w-4 text-muted-foreground" />
                                     {perspectivesTranslations("title")}
