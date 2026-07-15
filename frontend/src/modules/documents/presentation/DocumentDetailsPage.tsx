@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useDocuments } from "@/contexts/DocumentsContext";
 import { useTagsStatus } from "@/lib/services";
+import { cn } from "@/lib/utils";
 import { DOCUMENTS_ENDPOINT } from "@/shared/config";
 
 import DocumentChat from "./DocumentChat";
@@ -75,6 +76,7 @@ export default function DocumentDetailsPage() {
    const [notePosition, setNotePosition] = useState<{ x: number; y: number }>();
    const [pageNumber, setPageNumber] = useState<number>(1);
    const [openDocumentUpload, setOpenDocumentUpload] = useState(false);
+   const [chatCollapsed, setChatCollapsed] = useState(false);
 
    const generalTranslations = useTranslations("general");
    const documentTranslations = useTranslations("document");
@@ -196,15 +198,27 @@ export default function DocumentDetailsPage() {
 
          {/*
             Two-column layout that persists across tabs:
-              - Left (40%): permanent Chat & Activity panel.
+              - Left (40%): collapsible Chat & Activity panel.
               - Right (60%): tabs whose content swaps between details (sidebar
                 accordions), preview (PDF/editor), and versions (table).
             Collapses to a single stacked column below 1200px.
          */}
-         <div className="mt-4 grid grid-cols-1 gap-4 min-[1200px]:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] min-[1200px]:gap-6 min-[1200px]:items-start">
+         <div
+            className={cn(
+               "mt-4 grid grid-cols-1 gap-4 min-[1200px]:gap-6 min-[1200px]:items-start",
+               chatCollapsed
+                  ? "min-[1200px]:grid-cols-[3rem_minmax(0,1fr)]"
+                  : "min-[1200px]:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]"
+            )}
+         >
             {/* Left column: Chat & Activity */}
             <Card
-               className="bg-transparent flex flex-col overflow-hidden p-0 h-[70vh] min-h-[480px] md:sticky md:top-4 md:h-[calc(100vh-13rem)] md:max-h-[calc(100vh-13rem)]"
+               className={cn(
+                  "bg-transparent flex flex-col overflow-hidden p-0 min-[1200px]:sticky min-[1200px]:top-4",
+                  chatCollapsed
+                     ? "h-12 min-h-0 min-[1200px]:w-12"
+                     : "h-[70vh] min-h-[480px] min-[1200px]:h-[calc(100vh-13rem)] min-[1200px]:max-h-[calc(100vh-13rem)]"
+               )}
             >
                <DocumentChat
                   title={chatTranslations("chatAndActivity")}
@@ -219,6 +233,8 @@ export default function DocumentDetailsPage() {
                   newNotePosition={newNotePosition}
                   setNewNotePosition={setNewNotePosition}
                   displayNote={displayNote}
+                  collapsed={chatCollapsed}
+                  onToggleCollapsed={() => setChatCollapsed((value) => !value)}
                />
             </Card>
 
