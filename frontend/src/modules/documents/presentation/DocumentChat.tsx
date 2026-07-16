@@ -3,7 +3,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useTranslations } from "next-intl";
 
-import { MessageCircle } from "lucide-react";
+import {
+   MessageCircle,
+   PanelLeftClose,
+   PanelLeftOpen
+} from "lucide-react";
 
 import ChatMessage from "@/components/ChatMessage";
 import InfoLabel from "@/components/InfoLabel";
@@ -40,6 +44,14 @@ interface DocumentChatProps {
     * the top padding reserved for the FloatingChat close button.
     */
    title?: string;
+   /**
+    * Whether the chat content is collapsed into a compact toggle.
+    */
+   collapsed?: boolean;
+   /**
+    * Called when the collapse toggle is activated.
+    */
+   onToggleCollapsed?: () => void;
    /**
     * Optional extra classes for the outer container.
     */
@@ -83,6 +95,8 @@ export default function DocumentChat({
    setNewNotePosition,
    displayNote,
    title,
+   collapsed = false,
+   onToggleCollapsed,
    className
 }: DocumentChatProps) {
    const [sending, setSending] = useState(false);
@@ -346,6 +360,39 @@ export default function DocumentChat({
       );
    };
 
+   if (collapsed) {
+      return (
+         <div
+            className={cn(
+               "flex h-full min-h-0 items-center justify-between border-border bg-card/60 px-3",
+               "min-[1200px]:justify-center min-[1200px]:px-0",
+               className
+            )}
+         >
+            <div className="flex min-w-0 items-center gap-2 min-[1200px]:hidden">
+               <MessageCircle className="h-4 w-4 shrink-0 text-muted-foreground" />
+               {title && (
+                  <span className="truncate text-sm font-semibold text-foreground">
+                     {title}
+                  </span>
+               )}
+            </div>
+            <Button
+               type="button"
+               variant="ghost"
+               size="icon"
+               className="shrink-0"
+               onClick={onToggleCollapsed}
+               aria-label="Open chat"
+               title="Open chat"
+            >
+                <MessageCircle className="h-4 w-4 shrink-0 text-muted-foreground hidden min-[1200px]:block" />
+               <PanelLeftOpen className="h-4 w-4 min-[1200px]:hidden" />
+            </Button>
+         </div>
+      );
+   }
+
    return (
       <div className={cn("flex flex-col h-full min-h-0", className)}>
          {title && (
@@ -354,6 +401,17 @@ export default function DocumentChat({
                   <MessageCircle className="h-4 w-4 text-muted-foreground" />
                   {title}
                </h3>
+               <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="shrink-0"
+                  onClick={onToggleCollapsed}
+                  aria-label="Collapse chat"
+                  title="Collapse chat"
+               >
+                  <PanelLeftClose className="h-4 w-4" />
+               </Button>
             </div>
          )}
          {renderBody()}
