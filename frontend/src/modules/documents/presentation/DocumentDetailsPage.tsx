@@ -130,6 +130,7 @@ export default function DocumentDetailsPage() {
    const isPreviewAvailable =
       document?.meta?.filename?.endsWith(".pdf") ||
       document?.meta?.filename?.endsWith(".docx") ||
+      document?.meta?.filename?.endsWith(".pptx") ||
       document?.meta?.filename?.endsWith(".editableFile");
 
    const isRichTextDocument =

@@ -5,7 +5,6 @@ import { toast } from "react-toastify";
 import { useTranslations } from "next-intl";
 
 import { Loader2, Upload, X } from "lucide-react";
-import * as pdfjs from "pdfjs-dist";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -20,13 +19,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useDocuments } from "@/contexts/DocumentsContext";
 import { useWorkspaceContext } from "@/contexts/WorkspaceContext";
+import { loadPdfjs } from "@/lib/pdfjs";
 import { documentUpload } from "@/lib/services";
 import { isPdfBlank } from "@/lib/utils";
-
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-   "pdfjs-dist/build/pdf.worker.min.mjs",
-   import.meta.url
-).toString();
 
 const MAX_FILE_SIZE_MB = 110;
 
@@ -139,6 +134,7 @@ export default function DocumentUpload({
          const fileExtension = file.name.split(".").pop()?.toLowerCase();
          if (fileExtension === "pdf") {
             try {
+               const pdfjs = await loadPdfjs();
                isBlank = await isPdfBlank(file, pdfjs);
             } catch (error) {
                console.error(
