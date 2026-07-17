@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const chromiumExecutablePath = process.env.PW_CHROMIUM_EXECUTABLE_PATH;
+const isCI = !!process.env.CI;
 
 const testDir = defineBddConfig({
   features: "playwright/features/**/*.feature",
@@ -14,9 +15,10 @@ const testDir = defineBddConfig({
 
 export default defineConfig({
   testDir,
+  forbidOnly: isCI,
   fullyParallel: false,
   workers: 1,
-  retries: 0,
+  retries: isCI ? 1 : 0,
   grepInvert: /@wip/,
   reporter: [
     ["line"],

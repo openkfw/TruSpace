@@ -12,6 +12,8 @@
     "pw:install": "playwright install chromium",
     "pw:bdd:gen": "bddgen",
     "pw:test": "npm run pw:bdd:gen && playwright test",
+    "pw:test:smoke": "npm run pw:bdd:gen && playwright test --grep @smoke",
+    "pw:test:ci": "npm run pw:bdd:gen && playwright test --grep @ci-candidate",
     "pw:test:headed": "npm run pw:bdd:gen && playwright test --headed",
     "pw:test:ui": "npm run pw:bdd:gen && playwright test --ui",
     "pw:test:list": "npm run pw:bdd:gen && playwright test --list",
