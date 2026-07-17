@@ -42,6 +42,7 @@ export const addPerspectivesTemplate = (taskQueue: JobTemplateRegistrar) =>
 
       const docRequest = createDocumentRequest({
         filename: fileDetails.meta.filename,
+        docId: fileDetails.docId,
         creatorNodeId: fileDetails.meta.creatorNodeId,
         creatorUserId: fileDetails.meta.creatorUserId,
         workspaceOrigin: fileDetails.meta.workspaceOrigin,
@@ -92,6 +93,7 @@ export const addTagsTemplate = (taskQueue: JobTemplateRegistrar) =>
 
       const docRequest = createDocumentRequest({
         filename: fileDetails.meta.filename,
+        docId: fileDetails.docId,
         creatorNodeId: fileDetails.meta.creatorNodeId,
         creatorUserId: fileDetails.meta.creatorUserId,
         workspaceOrigin: fileDetails.meta.workspaceOrigin,
@@ -141,6 +143,7 @@ export const addLanguageDetectionTemplate = (taskQueue: JobTemplateRegistrar) =>
 
       const docRequest = createDocumentRequest({
         filename: fileDetails.meta.filename,
+        docId: fileDetails.docId,
         creatorNodeId: fileDetails.meta.creatorNodeId,
         creatorUserId: fileDetails.meta.creatorUserId,
         workspaceOrigin: fileDetails.meta.workspaceOrigin,

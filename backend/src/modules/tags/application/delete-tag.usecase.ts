@@ -14,7 +14,7 @@ export async function deleteTag(tagId: string, user?: AuthenticatedRequest['user
       eventType: 'tag',
       eventAction: 'delete',
       objectId: tagId,
-      objectName: tag.meta.name ? decodeURIComponent(tag.meta.name) : undefined,
+      objectName: tag.meta.name,
       workspaceOrigin: tag.meta.workspaceOrigin,
       docId: tag.meta.docId,
       versionCid: tag.meta.versionCid,
