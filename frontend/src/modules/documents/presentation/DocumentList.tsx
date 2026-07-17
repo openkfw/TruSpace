@@ -20,7 +20,6 @@ import {
    MessageSquareText,
    MoreVertical
 } from "lucide-react";
-import * as pdfjs from "pdfjs-dist";
 
 import EmptyWorkspace from "@/app/(ts)/workspace/EmptyWorkspace";
 import MalwareScanIndicator from "@/components/MalwareScanIndicator";
@@ -51,17 +50,13 @@ import { useDocuments } from "@/contexts/DocumentsContext";
 import { useWorkspaceContext } from "@/contexts/WorkspaceContext";
 import { useDebounce } from "@/hooks/useDebounce";
 import { formatDate, formatDateDays } from "@/lib/formatDate";
+import { loadPdfjs } from "@/lib/pdfjs";
 import { deleteDocument, documentUpload } from "@/lib/services";
 import { isPdfBlank } from "@/lib/utils";
 import { DOCUMENTS_ENDPOINT } from "@/shared/config";
 
 import DocumentTags from "./DocumentTags";
 import DocumentFilterBar from "./DocumentFilterBar";
-
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-   "pdfjs-dist/build/pdf.worker.min.mjs",
-   import.meta.url
-).toString();
 
 const MAX_FILE_SIZE_MB = 110;
 
@@ -344,6 +339,7 @@ const DocumentList = ({ workspaceId }) => {
          const ext = file.name.split(".").pop()?.toLowerCase();
          if (ext === "pdf") {
             try {
+               const pdfjs = await loadPdfjs();
                const isBlank = await isPdfBlank(file, pdfjs);
                if (isBlank) {
                   toast.error(
