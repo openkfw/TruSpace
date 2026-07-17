@@ -224,6 +224,10 @@ nav:
           - Code of Conduct: guides/developer/code-of-conduct.md
           - Logging: guides/developer/logging.md
 
+  - Migrations:
+      - migrations/index.md
+      - Version 1.0: migrations/1.0.md
+
   - Reference:
       - reference/index.md
       - API Documentation: reference/api.md
