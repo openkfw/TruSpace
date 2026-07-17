@@ -417,21 +417,6 @@ const DocumentList = ({ workspaceId }) => {
       }
    }
 
-   if (documents.length === 0) {
-      return (
-         <div
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-            className={`mt-6 rounded-lg overflow-hidden relative transition-colors ${
-               isDragging ? "border-2 border-blue-500" : "border-none"
-            }`}
-         >
-            <EmptyWorkspace />
-         </div>
-      );
-   }
-
    return (
       <>
          <div className="flex justify-between items-center mt-4">
@@ -451,6 +436,18 @@ const DocumentList = ({ workspaceId }) => {
             />
          </div>
 
+         {documents.length === 0 ? (
+            <div
+               onDragOver={handleDragOver}
+               onDragLeave={handleDragLeave}
+               onDrop={handleDrop}
+               className={`mt-6 rounded-lg overflow-hidden relative transition-colors ${
+                  isDragging ? "border-2 border-blue-500" : "border-none"
+               }`}
+            >
+               <EmptyWorkspace />
+            </div>
+         ) : (
          <div
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
@@ -515,6 +512,7 @@ const DocumentList = ({ workspaceId }) => {
                onPageChange={(page) => setFrom((page - 1) * limit)}
             />
          </div>
+         )}
       </>
    );
 };

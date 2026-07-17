@@ -540,37 +540,44 @@ export class OpenWebUIClient {
       const tags: string[] = await processTags(result.summary, this.chats);
 
       // store max. 5 tags in IPFS;
-      tags.slice(0, 5).map(async (tag: string) => {
-        const tagRequest: TagRequest = {
-          meta: {
-            type: "tag",
-            workspaceOrigin: document.meta.workspaceOrigin,
-            docId: document.docId,
-            versionCid: document.cid,
-            timestamp: new Date().toISOString(),
-            name: tag,
-            color: "",
-            creatorNodeId: "ai",
-            creatorUserId: config.ollama.model,
-            creatorType: "ai",
-          },
-        };
-        const tagCid = await tagsIpfsRepository.createTag(tagRequest);
+      await Promise.all(
+        tags.slice(0, 5).map(async (tag: string) => {
+          try {
+            const tagRequest: TagRequest = {
+              meta: {
+                type: "tag",
+                workspaceOrigin: document.meta.workspaceOrigin,
+                docId: document.docId,
+                versionCid: document.cid,
+                timestamp: new Date().toISOString(),
+                name: encodeURIComponent(tag),
+                color: "",
+                creatorNodeId: "ai",
+                creatorUserId: config.ollama.model,
+                creatorType: "ai",
+              },
+            };
+            const tagCid = await tagsIpfsRepository.createTag(tagRequest);
 
-        await recordEvent({
-          eventType: "tag",
-          eventAction: "create",
-          objectId: tagCid,
-          objectName: tag,
-          workspaceOrigin: document.meta.workspaceOrigin,
-          docId: document.docId,
-          versionCid: document.cid,
-          actorType: "ai",
-          actorUserId: config.ollama.model,
-        });
+            await recordEvent({
+              eventType: "tag",
+              eventAction: "create",
+              objectId: tagCid,
+              objectName: tag,
+              workspaceOrigin: document.meta.workspaceOrigin,
+              docId: document.docId,
+              versionCid: document.cid,
+              actorType: "ai",
+              actorUserId: config.ollama.model,
+            });
 
-        return tagCid;
-      });
+            return tagCid;
+          } catch (error) {
+            logger.error(`Error creating AI-generated tag "${tag}":`, error);
+            return undefined;
+          }
+        }),
+      );
       await TaskQueue.updateJobStatus(requestId, "completed");
     } catch (error) {
       logger.error(error);
