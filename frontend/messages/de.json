@@ -444,7 +444,11 @@
     "uploading": "Wird hochgeladen...",
     "uploadError": "Upload fehlgeschlagen",
     "versionTagDefault": "Setze ein Versionstag",
-    "versionTagTip": "Füge ein Versionstag hinzu um die Änderungen dieser Version zu klarifizieren."
+    "versionTagTip": "Füge ein Versionstag hinzu um die Änderungen dieser Version zu klarifizieren.",
+    "export": "Exportieren",
+    "exportHtml": "HTML",
+    "exportMarkdown": "Markdown",
+    "exportError": "Export fehlgeschlagen"
   },
   "tags": {
     "aiTag": "Tag von KI generiert",
