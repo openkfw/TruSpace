@@ -444,7 +444,11 @@
     "uploading": "Subiendo...",
     "uploadError": "Error al subir",
     "versionTagDefault": "Añadir etiqueta de versión",
-    "versionTagTip": "Añade aquí una nota sobre la versión para explicar los cambios que incluye."
+    "versionTagTip": "Añade aquí una nota sobre la versión para explicar los cambios que incluye.",
+    "export": "Exportar",
+    "exportHtml": "HTML",
+    "exportMarkdown": "Markdown",
+    "exportError": "Error al exportar"
   },
   "tags": {
     "aiTag": "Día generado por IA",
