@@ -82,12 +82,12 @@ jobs:
       - name: Wait for services
         run: |
           for i in {1..60}; do
-            if curl -fsS http://localhost:5001/api/v0/id > /dev/null; then
+            if curl -fsS -X POST http://localhost:5001/api/v0/id > /dev/null; then
               break
             fi
             sleep 2
           done
-          curl -fsS http://localhost:5001/api/v0/id > /dev/null
+          curl -fsS -X POST http://localhost:5001/api/v0/id > /dev/null
 
           for i in {1..60}; do
             status=$(curl -s -o /dev/null -w '%{http_code}' \
