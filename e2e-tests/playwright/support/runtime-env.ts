@@ -10,6 +10,7 @@ const defaultAvatarFile = path.resolve(
 
 export const runtimeEnv = {
   baseUrl: process.env.BASE_URL || "http://localhost:3000",
+  apiUrl: process.env.API_URL || "http://localhost:8000",
   username: process.env.USERNAME || "admin@example.com",
   password: process.env.PASSWORD || "Test123456789*",
   workspacePrefix:

@@ -1,11 +1,11 @@
-@manual @document
+@document
 Feature: Document management
-  Manual Playwright BDD coverage for the core document lifecycle in a workspace.
+  Playwright BDD coverage for the core document lifecycle in a workspace.
 
   Background:
     Given a signed-in user is in a dedicated workspace
 
-  @smoke @ci-candidate
+  @smoke
   Scenario: Upload a supported document
     When the user uploads a supported document
     Then the document appears in the workspace document list
@@ -16,19 +16,17 @@ Feature: Document management
     Then the upload is rejected
     And the user is informed that the file type is not supported
 
-  @ci-candidate
   Scenario: View document details
     Given a document exists in the current scenario workspace
     When the user opens the document details
     Then the document details are displayed
 
-  @ci-candidate
   Scenario: Download a document
     Given a document exists in the current scenario workspace
     When the user downloads the document
     Then the document download starts successfully
 
-  @destructive @ci-candidate
+  @destructive
   Scenario: Delete a document
     Given a document exists in the current scenario workspace
     When the user deletes the document

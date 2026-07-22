@@ -167,7 +167,7 @@ export class TestDataFactory {
     options?: RegisterOptions,
   ) {
     const response = await this.page.request.post(
-      `${runtimeEnv.baseUrl}/api/users/register`,
+      `${runtimeEnv.apiUrl}/api/users/register`,
       {
         data: {
           confirmationLink: `${runtimeEnv.baseUrl}/confirm`,
@@ -200,7 +200,7 @@ export class TestDataFactory {
     await this.loginViaApi(user);
     const csrfToken = await this.ensureCsrfToken();
     const response = await this.page.request.delete(
-      `${runtimeEnv.baseUrl}/api/workspaces/${workspace.cid}/${workspace.id}`,
+      `${runtimeEnv.apiUrl}/api/workspaces/${workspace.cid}/${workspace.id}`,
       {
         headers: {
           "X-CSRF-Token": csrfToken,
@@ -225,7 +225,7 @@ export class TestDataFactory {
 
     const csrfToken = await this.ensureCsrfToken();
     const response = await this.page.request.delete(
-      `${runtimeEnv.baseUrl}/api/users/delete-user`,
+      `${runtimeEnv.apiUrl}/api/users/delete-user`,
       {
         headers: {
           "X-CSRF-Token": csrfToken,
@@ -253,7 +253,7 @@ export class TestDataFactory {
     await this.page.context().clearCookies();
 
     const response = await this.page.request.post(
-      `${runtimeEnv.baseUrl}/api/users/login`,
+      `${runtimeEnv.apiUrl}/api/users/login`,
       {
         data: {
           email: user.email,
@@ -267,7 +267,7 @@ export class TestDataFactory {
 
   private async ensureCsrfToken() {
     const response = await this.page.request.get(
-      `${runtimeEnv.baseUrl}/api/workspaces`,
+      `${runtimeEnv.apiUrl}/api/workspaces`,
     );
 
     if (!response.ok()) {
@@ -276,7 +276,7 @@ export class TestDataFactory {
       );
     }
 
-    const cookies = await this.page.context().cookies(runtimeEnv.baseUrl);
+    const cookies = await this.page.context().cookies(runtimeEnv.apiUrl);
     const csrfCookie = cookies.find((cookie) => cookie.name === CSRF_COOKIE_NAME);
 
     if (!csrfCookie?.value) {
