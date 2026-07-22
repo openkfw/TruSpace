@@ -18,6 +18,7 @@ jobs:
     timeout-minutes: 45
     env:
       BASE_URL: http://localhost:3000
+      API_URL: http://localhost:8000
       USERNAME: playwright-ci@example.com
       PASSWORD: Test123456789*
     steps:
@@ -105,12 +106,14 @@ jobs:
           test "$status" != "000"
 
           for i in {1..60}; do
-            if curl -fsS http://localhost:3000/login > /dev/null; then
+            status=$(curl -s -o /dev/null -w '%{http_code}' \
+              http://localhost:3000/login || true)
+            if [ "$status" != "000" ]; then
               break
             fi
             sleep 2
           done
-          curl -fsS http://localhost:3000/login > /dev/null
+          test "$status" != "000"
 
       - name: Run Playwright smoke suite
         working-directory: e2e-tests
