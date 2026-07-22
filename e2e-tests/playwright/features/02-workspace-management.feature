@@ -5,7 +5,6 @@ Feature: Workspace management
   Background:
     Given a signed-in user is on the workspace overview
 
-  @smoke
   Scenario: Create a workspace with a new name
     When the user creates a workspace with a new name
     Then the workspace is created

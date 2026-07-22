@@ -5,7 +5,6 @@ Feature: Document management
   Background:
     Given a signed-in user is in a dedicated workspace
 
-  @smoke
   Scenario: Upload a supported document
     When the user uploads a supported document
     Then the document appears in the workspace document list
