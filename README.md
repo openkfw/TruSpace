@@ -1,52 +1,46 @@
 <div align="center">
-    <img src="./frontend/public/images/TruSpaceLogo.svg" height=250>
+    <img src="./frontend/public/images/TruSpaceLogo.svg" height="180">
+
+  <h1>TruSpace</h1>
+
+  <p><strong>A decentralized, sovereign document workspace for organizations that don't want to hand their data to a cloud provider.</strong></p>
+
+  <p>
+    <a href="https://ipfs.tech"><img src="https://img.shields.io/badge/IPFS-000000?style=for-the-badge&logo=ipfs&logoColor=white" alt="IPFS"></a>
+    <a href="https://ipfscluster.io"><img src="https://img.shields.io/badge/IPFS%20Cluster-262626?style=for-the-badge" alt="IPFS Cluster"></a>
+    <a href="https://www.docker.com/"><img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker"></a>
+    <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript"></a>
+    <a href="https://reactjs.org"><img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React"></a>
+    <a href="https://nextjs.org"><img src="https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js"></a>
+    <a href="./LICENSE"><img src="https://img.shields.io/badge/GPL--3.0-red?style=for-the-badge" alt="GPL v3"></a>
+  </p>
+
+  <p>
+    <a href="https://web.truspace.dev/site/"><strong>📚 Documentation</strong></a> ·
+    <a href="https://truspace.dev"><strong>🧪 Try the Sandbox</strong></a> ·
+    <a href="#-quick-start">🚀 Quick Start</a> ·
+    <a href="https://www.youtube.com/watch?v=Tkhag_dVfhc">▶️ Watch the Trailer</a> ·
+    <a href="https://github.com/openkfw/TruSpace/discussions">💬 Discussions</a>
+  </p>
 </div>
 
-# TruSpace - an AI-infused, decentralized and sovereign document workspace
+---
 
-<p align="center" style="display: flex; flex-direction: column; gap: 10px;">
+Document collaboration between multiple organizations usually means one of them has to trust a third party — a cloud provider, a platform vendor, a "neutral" middleman — with everyone's data. **TruSpace removes that requirement.**
 
-  <!-- Row 1 -->
-  <div style="display: flex; justify-content: center; gap: 10px;">
-    <img src="./doc/images/login.png" alt="Log In" style="width: 32%; border-radius: 2px;">
-    <img src="./doc/images/welcome.png" alt="Welcome" style="width: 32%; border-radius: 2px;">
-    <img src="./doc/images/app_status.png" alt="App Status" style="width: 32%; border-radius: 2px;">
-  </div>
+It's a network where every participant (or organization) runs their **own node**. Documents, versions, and metadata are synced peer-to-peer over **IPFS**, so no single party owns or controls the data. Everyone keeps a full, verifiable copy. On top of that, TruSpace adds local AI to help teams actually understand what's in the documents they share — without ever sending that content to an external API.
 
-  <!-- Row 2 -->
-  <div style="display: flex; justify-content: center; gap: 10px; margin-top: 10px;">
-    <img src="./doc/images/workspace.png" alt="Workspace" style="width: 32%; border-radius: 2px;">
-    <img src="./doc/images/workspace_darkmode.png" alt="Workspace Dark Mode" style="width: 32%; border-radius: 2px;">
-    <img src="./doc/images/document_overview.png" alt="Document Overview" style="width: 32%; border-radius: 2px;">
-  </div>
+## ✨ Why TruSpace
 
-</p>
+- 🔓 **Sovereign by design** — 100% open-source and self-hostable. No cloud account, no vendor lock-in, no third party holding your data.
+- 🌐 **Truly decentralized** — built on IPFS/IPFS Cluster. Every organization runs its own node; data replicates automatically across trusted peers and survives network splits.
+- 🛡️ **Fault-tolerant & censorship-resistant** — there is no central server to take down or subpoena. Peers can run as a private network.
+- 🧠 **AI-assisted, not AI-dependent** — local LLMs (Ollama + Open Web UI) help interpret documents with customizable prompts, entirely on infrastructure you control.
+- 🗂️ **Built for real collaboration** — workspaces organize content and participants across institutional boundaries.
 
-The purpose of TruSpace is to make collaboration on documents between several stakeholders more efficient while making the respective data **sovereign to all** participants. It uses AI to support document interpretation and decentralization to stay in control of your data.
+If you're an institution that needs to collaborate on sensitive documents with partners, regulators, or subsidiaries you don't fully control — and "just use our cloud" isn't an acceptable answer — this is what TruSpace is for.
 
-[![IPFS](https://img.shields.io/badge/IPFS-000000?style=for-the-badge&logo=ipfs&logoColor=white)](https://ipfs.tech) [![IPFS Cluster](https://img.shields.io/badge/IPFS%20Cluster-262626?style=for-the-badge)](https://ipfscluster.io) [![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/) [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org) [![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org) [![Ollama](https://img.shields.io/badge/Ollama-2563EB?style=for-the-badge)](https://ollama.com) [![Open Web UI](https://img.shields.io/badge/Open%20Web%20UI-111827?style=for-the-badge)](https://openwebui.com) [![GPL v3](https://img.shields.io/badge/GPL--3.0-red?style=for-the-badge)](./LICENSE)
-
-## ✨ Key Features
-
-- 🆓 100% open-source, sovereign and self-hostable - no cloud provider needed
-- 🔄 Fully decentralized storage using IPFS: Automatic sync of data between trusted IPFS nodes/partners (private or public setup)
-- 🧠 Local AI interpretation of documents using Ollama + Open Web UI using customisable pre-defined prompts
-- 🗂️ Workspace-based organization of content and participants
-
-## Quick start, I want to..
-
-- 🧪 [Play around in a sandbox demo environment](#play-around-in-an-online-sandbox-demo-environment)
-- 💻 [Install TruSpace locally](https://web.truspace.dev/site/getting-started/installation/local/)
-- 🌐 [Connect to other TruSpace nodes](https://web.truspace.dev/site/getting-started/installation/local/)
-- 📚 [Check out architecture, guides, details](https://web.truspace.dev/site/architecture/)
-
-## Play around in an online sandbox demo environment
-
-To check how TruSpace works, get to the sandbox installation at https://truspace.dev, register a new user, login and start playing with private and public workspaces! It's an experiment-sandbox, so your data might get deleted occasionally.
-
-## Install TruSpace locally
-
-For a very **quick and easy** TruSpace setup on your local machine using `localhost`, run:
+## 🚀 Quick Start
 
 ```bash
 git clone git@github.com:openkfw/TruSpace.git
@@ -54,94 +48,65 @@ cd TruSpace
 ./start.sh
 ```
 
-<video src="https://github.com/user-attachments/assets/d75b27a5-3556-466f-80fc-d3fdea68917c" title="TruSpace Installation Demo"></video>
+Then open [http://localhost:3000](http://localhost:3000), register a local account, and start creating workspaces. Your data stays on your machine.
 
-### What should I expect?
+> [!TIP]
+> Don't want to install anything yet? Play around first in the [online sandbox](https://truspace.dev) — register, log in, and explore public and private workspaces. It's a demo environment, so data may be reset occasionally.
 
-<details>
-<summary>Please open to see the expected results with screenshots</summary>
+Having trouble? Run `docker ps` and confirm these containers are up: `truspace-frontend`, `truspace-backend`, `ipfs0`, `cluster0`, and the Open Web UI container. Full walkthrough and troubleshooting: [Installation Guide](https://web.truspace.dev/site/getting-started/installation/local/).
 
-1. Open frontend in your browser at [http://localhost:3000](http://localhost:3000) to see the login screen:
-   ![Screenshot of login screen](./doc/images/screenshot_login.png)
+### Where to next?
 
-2. Click on "Register" to create a new user account. Fill out the required fields. The user account is local, your data is not going anywhere.
-   ![Screenshot of register screen](./doc/images/screenshot_register.png)
+| I want to...                                     | Go here                                                                                       |
+| ------------------------------------------------ | --------------------------------------------------------------------------------------------- |
+| Install TruSpace locally                         | [Local Installation Guide](https://web.truspace.dev/site/getting-started/installation/local/) |
+| Connect my node to other TruSpace nodes/partners | [Networking Guide](https://web.truspace.dev/site/getting-started/installation/local/)         |
+| Understand the architecture in depth             | [Architecture Docs](https://web.truspace.dev/site/architecture/)                              |
+| Use TruSpace as an end user                      | [User Guide](https://web.truspace.dev/site/guides/user/)                                      |
+| Set up a dev environment / contribute            | [Developer Guide](https://web.truspace.dev/site/guides/developer/)                            |
+| Administer a TruSpace node                       | [Admin Guide](https://web.truspace.dev/site/guides/admin/)                                    |
 
-3. After the submission, the app takes you back to the login screen, and from there to the dashboard.
-   ![Screenshot of dashboard](./doc/images/screenshot_dashboard.png)
+📖 The full documentation lives at **[web.truspace.dev/site](https://web.truspace.dev/site/)** — that's the best place to go deeper on anything below.
 
-If something doesn't work, check that all containers are running with `docker ps`. They should show these containers:
-| CONTAINER ID | IMAGE | COMMAND | CREATED | STATUS | PORTS | NAMES |
-|--------------|--------------------------------------|--------------------------|------------------|--------------------------|--------------------------------------------------------------------------------------------------|---------------------|
-| 14f... | ghcr.io/open-webui/open-webui:main | "bash start.sh" | 26 minutes ago | Up 26 minutes (healthy) | 0.0.0.0:3333->8080/tcp | truspace-webui-1 |
-| 412... | ipfs/ipfs-cluster:latest | "/usr/bin/tini -- /u…" | 26 minutes ago | Up 26 minutes | 0.0.0.0:9094->9094/tcp, 0.0.0.0:9096-9097->9096-9097/tcp, 9095/tcp | cluster0 |
-| 7b4...| truspace-backend | "sh ./entrypoint.sh" | 26 minutes ago | Up 26 minutes | 0.0.0.0:8000->8000/tcp | truspace-backend-1 |
-| 783... |truspace-frontend | "sh startup.sh" | 26 minutes ago | Up 26 minutes (healthy) | 0.0.0.0:3000->3000/tcp, :::3000->3000/tcp | truspace-frontend-1|
-| 590... | ipfs/kubo:release | "/sbin/tini -- /usr/…" | 26 minutes ago | Up 26 minutes (healthy) | 0.0.0.0:4001->4001/tcp, 0.0.0.0:5001->5001/tcp, 4001/udp, 0.0.0.0:8080->8080/tcp, 8081/tcp | ipfs0 |
+## 🧰 Tech Stack
 
-</details>
+| Layer                 | Technologies                            |
+| --------------------- | --------------------------------------- |
+| Frontend              | TypeScript · React · Next.js · Radix UI |
+| Backend               | TypeScript · Express.js                 |
+| Decentralized storage | IPFS · IPFS Cluster                     |
+| User database         | SQLite                                  |
+| LLM engine            | Ollama                                  |
+| AI API & RAG          | Open Web UI                             |
+| Containerization      | Docker                                  |
 
-<br>
+The UI and API (this repository) provide the interface and orchestration layer. When you start TruSpace, it pulls and connects containers for Open Web UI (AI processing) and IPFS/IPFS Cluster (data persistence) — see the [architecture docs](https://web.truspace.dev/site/architecture/) for the full picture, including port mappings and data flow.
 
-> [!NOTE]
-> For more details on the installation, feel free to check out our detailed installation guide [here](https://web.truspace.dev/site/getting-started/installation/).
+## 🌐 How decentralization works
 
-### 🧰 Tech Stack and Architecture overview
+- Each organization runs its own IPFS node — there is no central server holding everyone's documents.
+- Nodes automatically replicate documents and metadata (chats, versions, AI perspectives) across the trusted network.
+- Pinning is orchestrated via IPFS Cluster to guarantee data availability even if individual nodes go offline.
+- Workspaces, documents, and metadata form a hierarchical data model linked via UUIDs; each entry is a single small file, minimizing merge conflicts if the network partitions. See the type definitions in [`backend/src/types/interfaces/truspace.ts`](backend/src/types/interfaces/truspace.ts).
 
-| Layer                 | Technologies                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Frontend              | [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org) [![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org) [![Radix UI](https://img.shields.io/badge/Radix%20UI-0F172A?style=for-the-badge)](https://www.radix-ui.com/) |
-| Backend               | [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Express.js](https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com)                                                                                                                                                                                                                                   |
-| Decentralized storage | [![IPFS](https://img.shields.io/badge/IPFS-000000?style=for-the-badge&logo=ipfs&logoColor=white)](https://ipfs.tech) [![IPFS Cluster](https://img.shields.io/badge/IPFS%20Cluster-262626?style=for-the-badge)](https://ipfscluster.io)                                                                                                                                                                                                                                                                                      |
-| User Database         | [![SQLite](https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://sqlite.org)                                                                                                                                                                                                                                                                                                                                                                                                 |
-| LLM Engine            | [![Ollama](https://img.shields.io/badge/Ollama-2563EB?style=for-the-badge)](https://ollama.com)                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| AI API and RAG        | [![Open Web UI](https://img.shields.io/badge/Open%20Web%20UI-111827?style=for-the-badge)](https://openwebui.com)                                                                                                                                                                                                                                                                                                                                                                                                            |
-| Containerization      | [![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)                                                                                                                                                                                                                                                                                                                                                                                            |
+## 🔒 Security & Data Privacy
 
-In the overview, you can see how the components work together. The UI and API is part of this repository and provides the interface and the translation to other services. Once you start TruSpace, it pulls and connects to containers from Open Web UI (for AI processing) and IPFS/IPFS-Cluster to persist the data. The respective ports are outlined in the image.
+- Sensitive data (e.g. login credentials) is encrypted at rest in SQLite on the local node.
+- Documents sync only to **trusted IPFS peers**; IPFS can be run as a fully private network.
+- All inter-node communication is encrypted.
+- Documents are encrypted per workspace.
 
-![Architecture](./doc/images/tech-arch-diagram.PNG "Tech Architecture overview")
+## 🤝 Contributing
 
-### Data model for workspaces in IPFS
-
-The data model has a hierarchical structure of workspaces, documents and metadata. They are linked using UUIDs in the metadata-fields of the IPFS files. Each data entry is a single (small) file to avoid merge conflicts in the IPFS network, e.g. in case of network split. The concept is outlined in the visual representation of the [Data model](./doc/images/datamodel.png "Data model")
-
-The specific fields are described in [backend/src/types/interfaces/truspace.ts](backend/src/types/interfaces/truspace.ts)
-
-### IPFS Sync for the decentralization of data
-
-- Ideally, each organization runs its own node
-- Nodes automatically replicate documents and metadata (e.g. chats, versions, AI perspectives) within the network
-- Pinning is orchestrated via IPFS Cluster to ensure data availability
-- Fault-tolerant and censorship-resistant architecture
-
-### Security & Data Privacy
-
-- Sensitive data (e.g. login credentials) is stored encrypted in **SQLite** on the local node
-- Documents are synced only to **trusted IPFS peers**, IPFS can be configured as private network by default
-- All inter-node communications are encrypted
-- Documents are encrypted with workspace ID
-
-## 🤝 Contribution Guide
-
-We welcome contributions! Please read the [CONTRIBUTING.md](CONTRIBUTING.md) and the [Developer Guide](https://web.truspace.dev/site/guides/developer/) for:
-
-- Setting up a development environment
-- Reporting issues and submitting pull requests
-- Code style guidelines
-
-To inspire contributers and make it easier to get started, we have visualized our 2 main goals for TruSpace in the near future and respective features that will help us get there:
-![WhatsNext](./doc/images/WhatsNext.jpg)
+Contributions are welcome! Start with [CONTRIBUTING.md](CONTRIBUTING.md) and the [Developer Guide](https://web.truspace.dev/site/guides/developer/) for setting up your environment, coding guidelines, and how to submit pull requests.
 
 ## 📜 License
 
-This project is licensed under the **GNU General Public License v3.0**. See the [LICENSE](./LICENSE) file for details.
+Licensed under the **GNU General Public License v3.0** — see [LICENSE](./LICENSE) for details.
 
 ## 💬 Community & Support
 
-- User guide: [User Guide](https://web.truspace.dev/site/guides/user/)
-- Developer guide: [Developer Guide](https://web.truspace.dev/site/guides/developer/)
-- Admin guide: [Admin Guide](https://web.truspace.dev/site/guides/admin/)
-- Discussions: [GitHub Discussions](https://github.com/openkfw/TruSpace/discussions)
-- Report issues: [GitHub Issues](https://github.com/openkfw/TruSpace/issues)
-- Intro Story to get what it's about: [Medium Blog](https://medium.com/@angryarchitect/your-place-or-my-place-a-tale-of-decentralization-and-sovereignty-c775dafbadbb)
+- 📖 [User Guide](https://web.truspace.dev/site/guides/user/) · [Developer Guide](https://web.truspace.dev/site/guides/developer/) · [Admin Guide](https://web.truspace.dev/site/guides/admin/)
+- 💬 [GitHub Discussions](https://github.com/openkfw/TruSpace/discussions)
+- 🐛 [Report an issue](https://github.com/openkfw/TruSpace/issues)
+- ✍️ Why decentralization and sovereignty matter: [Medium: "Your place or my place?"](https://medium.com/@angryarchitect/your-place-or-my-place-a-tale-of-decentralization-and-sovereignty-c775dafbadbb)

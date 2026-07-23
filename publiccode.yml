@@ -34,15 +34,13 @@ localisation:
 description:
   en:
     genericName: TruSpace
-    documentation: 'https://github.com/openkfw/TruSpace/tree/main/doc/User%20Guide'
+    documentation: 'https://web.truspace.dev/site/'
     apiDocumentation: 'https://github.com/openkfw/TruSpace/blob/main/backend/openapi/openapi.yaml'
-    shortDescription: 'An AI-infused, collaborative and decentralized file management solution.'
-    longDescription: "The purpose of TruSpace is to make collaboration on documents between several stakeholders more efficient while making the respective data sovereign to all participants. It uses AI to support document interpretation and decentralization to stay in control of your data.\n\n**Collaborative, decentralized document sharing and editing platform** built with **Next.js**, **Express.js**, **SQLite**, and **IPFS Cluster**. Enhanced with local LLM capabilities via **Ollama**, **Open Web UI** and a nice web-interface.\n\n## **✨ Key Features**\n\n- \U0001F193 100% open-source, sovereign and self-hostable - no cloud provider needed\n- \U0001F504 Fully decentralized storage using IPFS Cluster: Automatic sync of data between trusted IPFS cluster nodes/partners (private or public setup)\n- \U0001F9E0 Local AI interpretation of documents using Ollama + Open Web UI using customisable pre-defined prompts\n- \U0001F5C2️ Workspace-based organization of content and participants\n"
+    shortDescription: 'A decentralized, sovereign document workspace for organizations - AI-assisted, never cloud-dependent.'
+    longDescription: "Document collaboration between multiple organizations usually means one of them has to trust a third party with everyone's data. TruSpace removes that requirement.\n\nIt's a workspace where every participant runs their own node. Documents, versions, and metadata are synced peer-to-peer over **IPFS**, so no single party owns or controls the data. Everyone keeps a full, verifiable copy. On top of that, TruSpace adds local AI to help teams understand what's in the documents they share, without ever sending that content to an external API.\n\nBuilt with **Next.js**, **Express.js**, **SQLite**, and **IPFS Cluster**. Enhanced with local LLM capabilities via **Ollama** and **Open Web UI**.\n\n## **✨ Why TruSpace**\n\n- \U0001F513 Sovereign by design - 100% open-source and self-hostable. No cloud account, no vendor lock-in, no third party holding your data.\n- \U0001F310 Truly decentralized - built on IPFS/IPFS Cluster. Every organization runs its own node; data replicates automatically across trusted peers and survives network splits.\n- \U0001F6E1️ Fault-tolerant and censorship-resistant - there is no central server to take down or subpoena. Peers can run as a private network.\n- \U0001F9E0 AI-assisted, not AI-dependent - local LLMs (Ollama + Open Web UI) help interpret documents with customizable prompts, entirely on infrastructure you control.\n- \U0001F5C2️ Built for real collaboration - workspaces organize content and participants across institutional boundaries.\n"
     features:
       - Decentralized file management
       - Sovereign Articifial Intelligence
-    screenshots:
-      - >-
-        https://github.com/openkfw/TruSpace/blob/main/doc/images/screenshot_dashboard.png
     videos:
+      - 'https://www.youtube.com/watch?v=Tkhag_dVfhc'
       - 'https://www.youtube.com/watch?v=dpo_D3NJpqE'
