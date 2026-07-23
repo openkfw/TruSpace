@@ -28,4 +28,16 @@ Learn how to use TruSpace effectively.
     
     [:octicons-arrow-right-24: AI Features](ai-features.md)
 
+-   :material-account-circle: **Account & Login**
+    
+    Register, log in, and manage your account settings.
+    
+    [:octicons-arrow-right-24: Account & Login](account.md)
+
+-   :material-lightbulb-on: **Use Cases**
+    
+    See practical examples of TruSpace in action.
+    
+    [:octicons-arrow-right-24: Use Cases](use-cases.md)
+
 </div>

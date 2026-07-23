@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="./doc/Admin Guide/TruSpaceLogo.svg" height=250>
+    <img src="./frontend/public/images/TruSpaceLogo.svg" height=250>
 </div>
 
 # TruSpace - an AI-infused, decentralized and sovereign document workspace
@@ -84,7 +84,7 @@ If something doesn't work, check that all containers are running with `docker ps
 <br>
 
 > [!NOTE]
-> For more details on the installation, feel free to check out our detailed installation guide [here](./doc/Admin%20Guide/Setup%20TruSpace/Installation.md).
+> For more details on the installation, feel free to check out our detailed installation guide [here](https://web.truspace.dev/site/getting-started/installation/).
 
 ### 🧰 Tech Stack and Architecture overview
 
@@ -124,7 +124,7 @@ The specific fields are described in [backend/src/types/interfaces/truspace.ts](
 
 ## 🤝 Contribution Guide
 
-We welcome contributions! Please read the [CONTRIBUTING.md](CONTRIBUTING.md) and the [Developer Guide](./doc/Developer%20Guide/README.md) for:
+We welcome contributions! Please read the [CONTRIBUTING.md](CONTRIBUTING.md) and the [Developer Guide](https://web.truspace.dev/site/guides/developer/) for:
 
 - Setting up a development environment
 - Reporting issues and submitting pull requests
@@ -139,9 +139,9 @@ This project is licensed under the **GNU General Public License v3.0**. See the 
 
 ## 💬 Community & Support
 
-- User guide: [User Guide](./doc/User%20Guide/README.md)
-- Developer guide: [Developer Guide](./doc/Developer%20Guide/README.md)
-- Admin guide: [Admin Guide](./doc/Admin%20Guide/README.md)
+- User guide: [User Guide](https://web.truspace.dev/site/guides/user/)
+- Developer guide: [Developer Guide](https://web.truspace.dev/site/guides/developer/)
+- Admin guide: [Admin Guide](https://web.truspace.dev/site/guides/admin/)
 - Discussions: [GitHub Discussions](https://github.com/openkfw/TruSpace/discussions)
 - Report issues: [GitHub Issues](https://github.com/openkfw/TruSpace/issues)
 - Intro Story to get what it's about: [Medium Blog](https://medium.com/@angryarchitect/your-place-or-my-place-a-tale-of-decentralization-and-sovereignty-c775dafbadbb)

@@ -36,13 +36,25 @@ npm run dev
 
 ## Project Structure
 
+The codebase is organized into several key directories, each serving a specific purpose:
+
 ```
 TruSpace/
-├── backend/          # Express API
-├── frontend/         # Next.js app
-├── docker-compose.*  # Docker configs
-├── scripts/          # Helper scripts
-└── doc/              # Documentation
+├── .github/           # GitHub-specific configuration (workflows, issue templates)
+├── backend/           # Express API — backend services and routes
+├── doc/               # Documentation files and guides for the project
+├── e2e-tests/         # End-to-end tests for the application
+├── frontend/          # Next.js app — frontend application code and assets
+├── helm/              # Helm charts for deploying the application on Kubernetes
+├── helper-scripts/    # Helper scripts for development and deployment
+├── production/        # Production-specific setup and startup scripts
+├── scripts/           # Scripts for development and deployment tasks, incl.
+│                      # start, configuration, and audit scripts
+├── docker-compose-files/ # Docker Compose files for local development and testing
+├── .env*              # Environment variable files for different stages
+│                      # (development, testing, production)
+├── LICENSE            # Project license (GPL-3.0)
+└── README.md          # Main project documentation and setup instructions
 ```
 
 ## VS Code Extensions

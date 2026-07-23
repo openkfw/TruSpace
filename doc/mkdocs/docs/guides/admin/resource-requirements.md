@@ -118,6 +118,6 @@ services:
 ## Related
 
 - [:octicons-arrow-right-24: Installation Options](../../getting-started/installation/index.md) — choose the right deployment profile
-- [:octicons-arrow-right-24: Raspberry Pi Setup](../../getting-started/installation/raspberry-pi.md) — low-power deployment guide
+- [:octicons-arrow-right-24: Raspberry Pi Setup](../../getting-started/installation/remote.md#raspberry-pi-performance-tips) — low-power deployment guide
 - [:octicons-arrow-right-24: AI Configuration](../../configuration/ai-config.md) — model selection and GPU setup
 - [:octicons-arrow-right-24: Maintenance](maintenance.md) — monitoring resource usage over time

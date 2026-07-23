@@ -1,30 +1,74 @@
-# Run isolated container
+---
+title: Testing with an Isolated IPFS Node
+description: Spin up a standalone IPFS container to inspect content and decrypt workspace documents manually
+icon: material/flask-outline
+tags:
+  - ipfs
+  - testing
+  - reference
+  - advanced
+---
 
-`docker run -itd --network truspace_default --name singleipfs -p 5027:5001 -p 4027:4001 -p 8027:8080 -p 8028:8081 --platform linux/arm64 arm64v8/ubuntu`
+# Testing with an Isolated IPFS Node
 
-`docker exec -it singleipfs /bin/bash`
+For advanced debugging, it can be useful to inspect IPFS content directly from a standalone container that is separate from the running TruSpace stack — for example, to fetch a CID and manually decrypt a document outside of the application.
 
-# Install ipfs node
+!!! warning "Advanced / manual procedure"
+    This is a low-level diagnostic technique intended for developers and administrators comfortable working directly with IPFS and Node.js. It is not required for normal operation of TruSpace.
 
-`apt update -y && apt upgrade -y && apt install wget -y && apt install nodejs -y`
+---
 
-`wget https://dist.ipfs.tech/kubo/v0.33.2/kubo_v0.33.2_linux-arm64.tar.gz`
+## 1. Run an Isolated Container
 
-`tar xvfz kubo_v0.33.2_linux-arm64.tar.gz`
+Start a plain Ubuntu container attached to the TruSpace Docker network, with its own set of ports so it does not collide with the running stack:
 
-`cd kubo`
+```bash
+docker run -itd --network truspace_default --name singleipfs \
+  -p 5027:5001 -p 4027:4001 -p 8027:8080 -p 8028:8081 \
+  --platform linux/arm64 arm64v8/ubuntu
+```
 
-`./install.sh`
+!!! note "Platform flag"
+    Adjust `--platform` (e.g. `linux/amd64`) to match your host architecture.
 
-`ipfs init`
+Attach a shell to the container:
 
-`ipfs daemon`
+```bash
+docker exec -it singleipfs /bin/bash
+```
 
-# Get some file
+## 2. Install an IPFS Node (Kubo)
 
-`ipfs get <cid>`
+Inside the container:
 
-Use this script to decrypt and use the workspace cid as password
+```bash
+apt update -y && apt upgrade -y && apt install wget -y && apt install nodejs -y
+
+wget https://dist.ipfs.tech/kubo/v0.33.2/kubo_v0.33.2_linux-arm64.tar.gz
+tar xvfz kubo_v0.33.2_linux-arm64.tar.gz
+cd kubo
+./install.sh
+
+ipfs init
+ipfs daemon
+```
+
+!!! tip "Matching architecture"
+    Download the Kubo release matching your platform (e.g. `kubo_v0.33.2_linux-amd64.tar.gz`) from the [Kubo release list](https://dist.ipfs.tech/kubo/).
+
+## 3. Fetch Content by CID
+
+With the daemon running (in a second shell into the same container, or backgrounded):
+
+```bash
+ipfs get <cid>
+```
+
+## 4. Decrypt a Fetched Document
+
+TruSpace encrypts document content before writing it to IPFS, using the workspace ID as part of the key derivation (see [Security Architecture](../architecture/security.md#encryption)). To inspect a fetched file's plaintext outside of the application, use the helper script below with the workspace ID (CID) as the password.
+
+Save as `decrypt.js`:
 
 ```js
 const fs = require("fs");
@@ -181,3 +225,19 @@ function writeFile(filePath, data) {
   }
 })();
 ```
+
+Usage:
+
+```bash
+# Decrypt a file fetched from IPFS, using the workspace CID as the password
+node decrypt.js decrypt --file ./<fetched-file> "<workspace-cid>"
+
+# Encrypt arbitrary data the same way TruSpace would
+node decrypt.js encrypt "some plaintext" "<workspace-cid>"
+```
+
+## Related
+
+- [:octicons-arrow-right-24: Security Architecture](../architecture/security.md)
+- [:octicons-arrow-right-24: Data Model](../architecture/data-model.md)
+- [:octicons-arrow-right-24: Troubleshooting](troubleshooting.md#ipfs--cluster)

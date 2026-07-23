@@ -15,12 +15,15 @@ Complete reference for all TruSpace configuration options.
 ## Quick Reference
 
 | Category                       | Variables                                              |
-| ------------------------------ | ------------------------------------------------------ |
-| [Core](#core-settings)         | `NODE_ENV`, `LOG_LEVEL`                                |
+| ------------------------------- | ------------------------------------------------------ |
+| [Core](#core-settings)         | `NODE_ENV`, `LOG_LEVEL`, `API_PORT`, `DATABASE_PATH`   |
 | [Network](#network-settings)   | `CORS_ORIGIN`, `FRONTEND_PORT`, `BACKEND_PORT`         |
-| [IPFS](#ipfs-settings)         | `IPFS_*`, `CLUSTER_*`                                  |
-| [AI](#ai-settings)             | `OLLAMA_*`, `DISABLE_ALL_AI_FUNCTIONALITY`             |
-| [Security](#security-settings) | `JWT_SECRET`, `CLUSTER_SECRET`, `REQUIRE_STRICT_PASSWORDS` |
+| [Content Security Policy](#content-security-policy) | `CONTENT_SECURITY_POLICY_*`, `RATE_LIMIT_PER_MINUTE` |
+| [IPFS](#ipfs-settings)         | `IPFS_*`, `START_PRIVATE_NETWORK`, `SWARM_PORT`        |
+| [IPFS Cluster](#ipfs-cluster-settings) | `CLUSTER_*`, `OPEN_API_PORT`, `PINNING_SERVICE_PORT` |
+| [AI](#ai-settings)             | `OLLAMA_*`, `AUTO_DOWNLOAD`, `DISABLE_ALL_AI_FUNCTIONALITY` |
+| [Open Web UI](#open-web-ui-settings) | `OPENWEBUI_HOST`, `OPEN_WEBUI_PORT`, `ADMIN_USER_EMAIL`, `WEBUI_SECRET_KEY` |
+| [Security](#security-settings) | `JWT_SECRET`, `MASTER_PASSWORD`, `CLUSTER_SECRET`, `REQUIRE_STRICT_PASSWORDS` |
 | [Email](#email-settings)       | `SMTP_*`, `EMAIL_SENDER`, `REGISTER_USERS_AS_INACTIVE` |
 
 ---
@@ -53,6 +56,22 @@ Logging verbosity level.
 
 ```env
 LOG_LEVEL=info
+```
+
+### `API_PORT`
+
+Port on which the backend API server listens internally.
+
+```env
+API_PORT=8000
+```
+
+### `DATABASE_PATH`
+
+Path to the SQLite database file which stores user credentials and other sensitive data that is not decentralized.
+
+```env
+DATABASE_PATH=/app/data/truspace.db
 ```
 
 ---
@@ -97,6 +116,33 @@ OI_CORS_ALLOW_ORIGIN=http://localhost:3000
 
 ---
 
+## Content Security Policy
+
+Optional Content Security Policy (CSP) directives enforced by the backend. Each accepts a comma-separated list of URLs.
+
+| Variable | CSP directive | Required |
+|---|---|---|
+| `CONTENT_SECURITY_POLICY_DEFAULT_URLS` | `default-src` | false |
+| `CONTENT_SECURITY_POLICY_IMG_URLS` | `img-src` | false |
+| `CONTENT_SECURITY_POLICY_FRAME_URLS` | `frame-src` | false |
+| `CONTENT_SECURITY_POLICY_SCRIPT_URLS` | `script-src` | false |
+| `CONTENT_SECURITY_POLICY_WORKER_URLS` | `worker-src` | false |
+
+```env
+CONTENT_SECURITY_POLICY_DEFAULT_URLS=https://example.com
+CONTENT_SECURITY_POLICY_IMG_URLS=https://images.example.com
+```
+
+### `RATE_LIMIT_PER_MINUTE`
+
+Maximum number of requests allowed per minute per IP address.
+
+```env
+RATE_LIMIT_PER_MINUTE=200
+```
+
+---
+
 ## IPFS Settings
 
 ### `IPFS_PROFILE`
@@ -128,9 +174,40 @@ Custom IPFS data directory.
 IPFS_PATH=/custom/ipfs/path
 ```
 
+### `START_PRIVATE_NETWORK`
+
+Option to allow or disable connection to public IPFS bootstrap nodes.
+
+```env
+START_PRIVATE_NETWORK=true
+```
+
+### IPFS Kubo Node Ports
+
+| Variable | Description | Default |
+|---|---|---|
+| `SWARM_PORT` | Swarm port for IPFS peer-to-peer networking. | 4001 |
+| `IPFS_API_PORT` | IPFS API port (used for pinning and data manipulation). | 5001 |
+| `IPFS_GATEWAY_PORT` | IPFS Gateway port (used for fetching files from IPFS). | 8080 |
+
 ---
 
 ## IPFS Cluster Settings
+
+### Cluster Service Addresses
+
+| Variable | Description | Default |
+|---|---|---|
+| `IPFS_CLUSTER_HOST` | Address of the IPFS Cluster REST API. | `http://cluster0:9094` |
+| `IPFS_PINSVC_HOST` | Address of the IPFS pinning service API. | `http://cluster0:9097` |
+| `IPFS_GATEWAY_HOST` | Address of the IPFS gateway (used to fetch content). | `http://ipfs0:8080` |
+| `CLUSTER_MONITORPINGINTERVAL` | Interval between cluster health checks. | `2s` |
+| `CLUSTER_RESTAPI_HTTPLISTENMULTIADDRESS` | Multiaddress for the cluster REST API to bind to. | `/ip4/0.0.0.0/tcp/9094` |
+| `CLUSTER_PINSVCAPI_HTTPLISTENMULTIADDRESS` | Multiaddress for the pinning service API. | `/ip4/0.0.0.0/tcp/9097` |
+| `CLUSTER_SWARM_PORT` | Port for peer-to-peer cluster swarm communication. | 9096 |
+| `OPEN_API_PORT` | Port used by the IPFS Cluster REST API. | 9094 |
+| `PINNING_SERVICE_PORT` | Port used by the pinning service API. | 9097 |
+| `CLUSTER_PEERS` | Comma-separated multiaddresses of cluster peers. | |
 
 ### `CLUSTER_SECRET`
 
@@ -169,6 +246,21 @@ Maximum number of nodes that should pin each item.
 ```env
 CLUSTER_REPLICATION_MAX=3
 ```
+
+### Multi-Peer Cluster Configuration
+
+For deployments running more than one local cluster peer (e.g. `cluster0` and `cluster1`), each peer gets its own indexed set of variables:
+
+| Variable | Description | Default |
+|---|---|---|
+| `CLUSTER_PEERNAME_0` | Human-readable name for the first cluster peer. | `cluster0` |
+| `CLUSTER_IPFSHTTP_NODEMULTIADDRESS_0` | Multiaddress of the first peer's IPFS daemon. | `/dns4/ipfs0/tcp/5001` |
+| `CLUSTER_CRDT_TRUSTEDPEERS_0` | CRDT trusted peers for cluster consensus. `"*"` allows all. | `"*"` |
+| `CLUSTER_PEERNAME_1` | Name for the second cluster peer. | `cluster1` |
+| `CLUSTER_IPFSHTTP_NODEMULTIADDRESS_1` | Multiaddress of the second peer's IPFS daemon. | `/dns4/ipfs1/tcp/5001` |
+| `CLUSTER_CRDT_TRUSTEDPEERS_1` | CRDT trusted peers for this peer. | `"*"` |
+| `OPEN_API_PORT_1` | REST API port for cluster 1. | 9194 |
+| `PINNING_SERVICE_PORT_1` | Pinning service port for cluster 1. | 9197 |
 
 ---
 
@@ -222,9 +314,42 @@ OLLAMA_GPU=auto
 OLLAMA_GPU=cpu
 ```
 
+### `AUTO_DOWNLOAD`
+
+Whether to automatically download the configured model's weights on startup.
+
+```env
+AUTO_DOWNLOAD=true
+```
+
+---
+
+## Open Web UI Settings
+
+TruSpace provisions and talks to an [Open Web UI](https://openwebui.com) instance for the AI chat interface and RAG capabilities.
+
+| Variable | Description | Default | Required |
+|---|---|---|---|
+| `OPENWEBUI_HOST` | URL of the Open Web UI instance. | `http://webui:8080` | true |
+| `OPEN_WEBUI_PORT` | Port where Open Web UI listens. | 3333 | true |
+| `ADMIN_USER_EMAIL` | Default admin user email for Open Web UI. | `admin@example.com` | true |
+| `ADMIN_USER_PASSWORD` | Default admin password. **Change this in production!** | `admin` | true |
+| `WEBUI_SECRET_KEY` | Secret key for Open Web UI session security. | `t0p-s3cr3t` | true |
+
+!!! danger "Security"
+    Always change `ADMIN_USER_PASSWORD` and `WEBUI_SECRET_KEY` from their defaults before exposing TruSpace beyond `localhost`.
+
 ---
 
 ## Security Settings
+
+### `MASTER_PASSWORD`
+
+Password used for encryption of stored workspace passwords. Set to a strong, unique value in production — the wizard rejects the default `Kennwort123`.
+
+```env
+MASTER_PASSWORD=<a-strong-unique-password>
+```
 
 ### `JWT_SECRET`
 

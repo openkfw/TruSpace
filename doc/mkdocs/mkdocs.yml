@@ -207,6 +207,8 @@ nav:
           - Workspaces: guides/user/workspaces.md
           - Documents: guides/user/documents.md
           - AI Features: guides/user/ai-features.md
+          - Account & Login: guides/user/account.md
+          - Use Cases: guides/user/use-cases.md
       - Admin Guide:
           - guides/admin/index.md
           - User Management: guides/admin/user-management.md
@@ -234,5 +236,10 @@ nav:
       - Data Types: reference/data-types.md
       - CLI Reference: reference/cli.md
       - Troubleshooting: reference/troubleshooting.md
+      - Glossary: reference/glossary.md
+      - IPFS Node Testing: reference/ipfs-node-testing.md
+
+  - About:
+      - The Story: about/story.md
 
   - Tags: tags.md

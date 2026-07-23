@@ -34,4 +34,16 @@ Technical reference documentation.
     
     [:octicons-arrow-right-24: Troubleshooting](troubleshooting.md)
 
+-   :material-book-alphabet: **Glossary**
+    
+    Key terms and concepts used throughout TruSpace.
+    
+    [:octicons-arrow-right-24: Glossary](glossary.md)
+
+-   :material-flask: **IPFS Node Testing**
+    
+    Test an isolated IPFS node and verify encryption behaviour.
+    
+    [:octicons-arrow-right-24: IPFS Node Testing](ipfs-node-testing.md)
+
 </div>

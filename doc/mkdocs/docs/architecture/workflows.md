@@ -174,15 +174,36 @@ erDiagram
 
 ## Contributing a Workflow
 
+TruSpace no longer keeps a separate `workflows/proposed/` and `workflows/established/` folder structure — all workflows live directly in this documentation site (`doc/mkdocs/docs/architecture/workflows.md`), with Mermaid diagrams embedded inline as fenced ` ```mermaid ` code blocks rather than as separate `.mmd`/`.png` files.
+
 To add or update a workflow:
 
-1. Create a Markdown file in `doc/Architecture/workflows/proposed/`
-2. Include a Mermaid diagram (`.mmd`) in the same folder
-3. Open a PR for review
-4. Once accepted, move the file to `doc/Architecture/workflows/established/`
-5. Add a section to this page and update `mkdocs.yml`
+1. Add a new section to this page (or a new page under `architecture/` for larger topics) describing the workflow.
+2. Include one or more Mermaid diagrams inline using fenced code blocks — MkDocs renders them automatically, no separate image generation step is required.
+3. Open a PR for review.
+4. Once the workflow is implemented/accepted, update the wording from "proposed" to reflect its established status, and cross-link it from [Components](components.md) or [Data Model](data-model.md) as relevant.
+5. Update `mkdocs.yml` navigation if you added a new page.
 
-See the [Architecture README](https://github.com/openkfw/TruSpace/blob/main/doc/Architecture/README.md) for the full diagram generation workflow using Mermaid CLI.
+### Writing Mermaid diagrams
+
+Because diagrams are embedded directly as text, there's no build step — just write the Mermaid syntax inside a fenced block:
+
+````markdown
+```mermaid
+sequenceDiagram
+    participant A as Service A
+    participant B as Service B
+    A->>B: Request
+    B-->>A: Response
+```
+````
+
+If you want to preview a diagram before committing, use the [Mermaid Live Editor](https://mermaid.live) or install the CLI locally:
+
+```bash
+npm install -g @mermaid-js/mermaid-cli
+mmdc -i diagram.mmd -o diagram.png   # optional, only if you need a standalone image
+```
 
 ---
 

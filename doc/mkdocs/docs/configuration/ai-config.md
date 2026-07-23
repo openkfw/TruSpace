@@ -71,4 +71,14 @@ DISABLE_ALL_AI_FUNCTIONALITY=true
 
 ## Custom Prompts
 
-AI perspectives use configurable prompts. Customize in the application settings.
+AI perspectives are generated using configurable prompts. Example prompts are provided out of the box, and you can add your own using either of the following approaches.
+
+### Option 1: `prompts.json` (legacy, still functional)
+
+Create a `prompts.json` file in the `prompts` folder at the root of the application (see `prompts_example.json` in the same folder for the expected structure). This folder is mounted as a Docker volume, so changes are picked up without rebuilding images.
+
+### Option 2: Prompts API (recommended)
+
+Using the TruSpace API, you can create, read, update, or delete prompts — persisted in the SQLite database rather than a static file. The frontend for managing prompts through the UI is not yet complete, but you can drive the API directly with `curl`.
+
+See `scripts/prompts/examples.sh` for a full worked example, including the login flow. The Prompts API is protected — only registered users can view and edit prompts, and the example script illustrates the required login/cookie handling.

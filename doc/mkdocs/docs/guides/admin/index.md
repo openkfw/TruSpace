@@ -34,4 +34,16 @@ Administration and management of TruSpace.
     
     [:octicons-arrow-right-24: Backup & Recovery](backup-recovery.md)
 
+-   :material-wrench: **Maintenance**
+    
+    Routine upkeep and health checks.
+    
+    [:octicons-arrow-right-24: Maintenance](maintenance.md)
+
+-   :material-server: **Resource Requirements**
+    
+    Sizing guidance for CPU, RAM, and storage.
+    
+    [:octicons-arrow-right-24: Resource Requirements](resource-requirements.md)
+
 </div>

@@ -56,7 +56,7 @@ tags:
     Yes. Podman is fully compatible. Either add `alias docker=podman` or substitute `podman` for `docker` in all commands. See the [Podman compatibility guide](https://podman-desktop.io/docs/migrating-from-docker/managing-docker-compatibility).
 
 ??? question "Can I run TruSpace on a Raspberry Pi?"
-    Yes — Raspberry Pi 4/5 with 4 GB+ RAM is supported. Use `tinyllama` as the model or run with `--no-ai` to conserve resources. See the [Raspberry Pi guide](installation/raspberry-pi.md).
+    Yes — Raspberry Pi 4/5 with 4 GB+ RAM is supported. Use `tinyllama` as the model or run with `--no-ai` to conserve resources. See the [Raspberry Pi performance tips](installation/remote.md#raspberry-pi-performance-tips).
 
 ??? question "How do I access TruSpace from other devices on my network?"
     1. Find your server's IP: `hostname -I`

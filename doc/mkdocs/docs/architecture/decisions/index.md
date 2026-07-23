@@ -36,9 +36,9 @@ An ADR captures a single architectural decision with:
 
 ## Contributing a New ADR
 
-ADR source files live in `doc/Architecture/decisions/` in the repository. To add a new one:
+ADR source files live in `doc/mkdocs/docs/architecture/decisions/` in the repository. To add a new one:
 
-1. Create `doc/Architecture/decisions/ADR-NNN-short-title.md`
+1. Create `doc/mkdocs/docs/architecture/decisions/adr-NNN-short-title.md`
 2. Use the template below
 3. Open a PR — the ADR will be reviewed and its status updated once accepted
 4. Add a row to the table above and a matching page to `mkdocs.yml`
