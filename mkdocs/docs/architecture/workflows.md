@@ -174,7 +174,7 @@ erDiagram
 
 ## Contributing a Workflow
 
-TruSpace no longer keeps a separate `workflows/proposed/` and `workflows/established/` folder structure — all workflows live directly in this documentation site (`doc/mkdocs/docs/architecture/workflows.md`), with Mermaid diagrams embedded inline as fenced ` ```mermaid ` code blocks rather than as separate `.mmd`/`.png` files.
+TruSpace no longer keeps a separate `workflows/proposed/` and `workflows/established/` folder structure — all workflows live directly in this documentation site (`mkdocs/docs/architecture/workflows.md`), with Mermaid diagrams embedded inline as fenced ` ```mermaid ` code blocks rather than as separate `.mmd`/`.png` files.
 
 To add or update a workflow:
 

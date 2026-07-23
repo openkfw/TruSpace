@@ -197,7 +197,7 @@ After updating packages:
 
 ## Writing Documentation
 
-All TruSpace documentation lives in [`doc/mkdocs/docs/`](https://github.com/openkfw/TruSpace/tree/main/doc/mkdocs/docs) and is built with [MkDocs](https://www.mkdocs.org/) using the [Material theme](https://squidfunk.github.io/mkdocs-material/). Centralizing documentation this way keeps information accessible for developers, contributors, admins, and users alike.
+All TruSpace documentation lives in [`mkdocs/docs/`](https://github.com/openkfw/TruSpace/tree/main/mkdocs/docs) and is built with [MkDocs](https://www.mkdocs.org/) using the [Material theme](https://squidfunk.github.io/mkdocs-material/). Centralizing documentation this way keeps information accessible for developers, contributors, admins, and users alike.
 
 It's important that documentation stays up to date and accurately reflects the current state of the project. If you spot discrepancies or outdated information, please update it directly or open an issue to discuss the change.
 
@@ -213,7 +213,7 @@ It's important that documentation stays up to date and accurately reflects the c
 To preview your changes locally before opening a PR:
 
 ```bash
-cd doc/mkdocs
+cd mkdocs
 pip install mkdocs-material
 mkdocs serve
 ```
