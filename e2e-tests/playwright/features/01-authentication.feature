@@ -8,24 +8,28 @@ Feature: Authentication
     When the user signs in with valid credentials
     Then the application shell is displayed
 
+  @smoke
   Scenario: Login fails with a wrong password
     Given a registered user is on the login page
     When the user signs in with a valid email and an invalid password
     Then the login is rejected
     And the user is informed that the credentials are invalid
 
+  @smoke
   Scenario: Login fails with an invalid email format
     Given a visitor is on the login page
     When the visitor signs in with an invalid email format
     Then the login is rejected
     And the user is informed that the email format is invalid
 
+  @smoke
   Scenario: Login fails for an unknown account
     Given a visitor is on the login page
     When the visitor signs in with an email that is not registered
     Then the login is rejected
     And the user is informed that the credentials are invalid
 
+  @smoke
   Scenario: Start password recovery
     Given a visitor is on the login page
     When the visitor chooses the password recovery option

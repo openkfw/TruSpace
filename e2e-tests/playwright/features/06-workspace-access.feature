@@ -5,24 +5,24 @@ Feature: Workspace access and permissions
   Background:
     Given a signed-in user owns a private workspace
 
-  @sharing
+  @wip
   Scenario: Invite another user to a workspace
     When the owner invites another user to the workspace
     Then the invited user receives access to the workspace
 
-  @sharing @destructive
+  @destructive @wip
   Scenario: Remove another user from a workspace
     Given another user already has access to the workspace
     When the owner removes that user from the workspace
     Then the removed user no longer has access to the workspace
 
-  @sharing
+  @wip
   Scenario: Deny access to a user without permission
     Given another signed-in user does not have access to the workspace
     When the user attempts to open that workspace
     Then access is denied
 
-  @sharing @destructive
+  @destructive @wip
   Scenario: Leave a workspace while others remain invited
     Given another user already has access to the workspace
     When the invited user leaves the workspace

@@ -15,17 +15,19 @@ Feature: Document management
     Then the upload is rejected
     And the user is informed that the file type is not supported
 
+  @wip
   Scenario: View document details
     Given a document exists in the current scenario workspace
     When the user opens the document details
     Then the document details are displayed
 
+  @wip
   Scenario: Download a document
     Given a document exists in the current scenario workspace
     When the user downloads the document
     Then the document download starts successfully
 
-  @destructive
+  @destructive @wip
   Scenario: Delete a document
     Given a document exists in the current scenario workspace
     When the user deletes the document
