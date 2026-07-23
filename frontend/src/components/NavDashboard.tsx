@@ -28,6 +28,7 @@ export function NavDashboard({ activePath }: { activePath: string }) {
                <Button
                   variant="ghost"
                   className="flex justify-start"
+                  data-test-id="nav-dashboard-button"
                   onClick={() => {
                      router.push("/dashboard");
                      if (isMobile) {

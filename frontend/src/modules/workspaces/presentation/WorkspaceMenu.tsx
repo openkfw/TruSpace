@@ -63,7 +63,10 @@ function WorkspaceMenu() {
             </MenubarMenu>
             <Separator orientation="vertical" />
             <MenubarMenu>
-               <MenubarTrigger className="hover:bg-blue-500 hover:dark:bg-blue-800 focus:bg-blue-500 focus:dark:bg-blue-800 data-[state=open]:bg-blue-500 data-[state=open]:dark:bg-blue-800 hover:text-white focus:text-white data-[state=open]:text-white">
+               <MenubarTrigger
+                  className="hover:bg-blue-500 hover:dark:bg-blue-800 focus:bg-blue-500 focus:dark:bg-blue-800 data-[state=open]:bg-blue-500 data-[state=open]:dark:bg-blue-800 hover:text-white focus:text-white data-[state=open]:text-white"
+                  data-test-id="workspace-actions-menu-button"
+               >
                   {generalTranslations("workspace")}
                </MenubarTrigger>
                <MenubarContent
@@ -78,6 +81,7 @@ function WorkspaceMenu() {
                            setwUID(workspace.uuid);
                            setIsWorkspaceTypeDialogOpen(true);
                         }}
+                        data-test-id="workspace-actions-visibility-button"
                      >
                         <span>
                            {workspace?.meta?.is_public
@@ -92,6 +96,7 @@ function WorkspaceMenu() {
                      onClick={() =>
                         router.push(`/workspace/${workspace.uuid}/share`)
                      }
+                     data-test-id="workspace-actions-share-button"
                   >
                      <span>{translations("shareWorkspace")}</span>
                   </MenubarItem>
@@ -102,6 +107,7 @@ function WorkspaceMenu() {
                         setwUID(workspace.uuid);
                         setIsDeleteDialogOpen(true);
                      }}
+                     data-test-id="workspace-actions-delete-button"
                   >
                      <span>{translations("deleteWorkspace")}</span>
                   </MenubarItem>

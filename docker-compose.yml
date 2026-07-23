@@ -38,6 +38,7 @@ services:
       SMTP_SSL: ${SMTP_SSL}
       SMTP_TLS: ${SMTP_TLS}
       EMAIL_SENDER: ${EMAIL_SENDER}
+      RUN_SEEDS: ${RUN_SEEDS:-false}
     ports:
       - ${API_PORT}:${API_PORT}
     entrypoint: sh ./entrypoint.sh

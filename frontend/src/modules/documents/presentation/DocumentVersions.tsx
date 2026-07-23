@@ -197,7 +197,10 @@ export default function DocumentVersions({ documentVersions }) {
 
    return (
       <div className="mt-4 rounded-lg overflow-hidden border-none">
-         <Table className="border-r last-of-type:border-none">
+         <Table
+            className="border-r last-of-type:border-none"
+            data-test-id="document-versions-table"
+         >
             <TableHeader>
                {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow key={headerGroup.id}>

@@ -435,7 +435,10 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                </form>
             </DialogContent>
          </Dialog>
-         <div className="flex flex-col">
+         <div
+            className="flex flex-col"
+            data-test-id="document-perspectives-content"
+         >
             <div className="h-full">
                <div className="space-y-4">
                   {isGenerating ? (

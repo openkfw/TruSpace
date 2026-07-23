@@ -38,12 +38,15 @@ export default function WorkspaceTitle() {
    }, [setContributors, workspace?.meta.workspace_uuid]);
 
    return (
-      <div className="min-w-0 flex-1">
+      <div className="min-w-0 flex-1" data-test-id="workspace-title-section">
          <h1 className="text-2xl/7 font-bold break-words sm:text-3xl sm:tracking-tight">
             {workspace?.meta?.name}
          </h1>
          <div className="w-max mt-3 grid grid-cols-2 gap-x-6 gap-y-2 sm:mt-0 sm:flex sm:flex-row sm:flex-wrap sm:space-x-6 sm:gap-x-0">
-            <div className="mt-2 flex items-center text-sm text-gray-500">
+            <div
+               className="mt-2 flex items-center text-sm text-gray-500"
+               data-test-id="workspace-visibility-badge"
+            >
                {workspace?.meta?.is_public ? (
                   <LockOpen className="mr-1.5 size-5 shrink-0 text-gray-500 dark:text-gray-400" />
                ) : (

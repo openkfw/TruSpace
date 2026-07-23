@@ -219,6 +219,7 @@ export default function UserSettings() {
                onClick={handleAvatarClick}
                aria-label="Upload avatar"
                className="relative hover:bg-transparent"
+               data-test-id="user-settings-avatar-button"
             >
                <Avatar className="h-24 w-24 border-2 border-gray-200 dark:border-gray-800 shadow-md transition hover:opacity-90 hover:border-slate-300 dark:hover:border-gray-500">
                   <AvatarImage
@@ -237,6 +238,7 @@ export default function UserSettings() {
                ref={fileInputRef}
                onChange={handleAvatarChange}
                className="hidden"
+               data-test-id="user-settings-avatar-input"
             />
             <p className="mt-6 text-sm text-muted-foreground">
                {generalTranslations("uploadAvatar")}
@@ -251,6 +253,7 @@ export default function UserSettings() {
                   type="text"
                   className="mt-1 p-2 bg-slate-50 dark:bg-slate-800 dark:text-white dark:placeholder:text-white"
                   defaultValue={user.name}
+                  data-test-id="user-settings-name-input"
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       handleNameChange(e);
@@ -276,7 +279,10 @@ export default function UserSettings() {
                   value={selectedLanguage}
                   onValueChange={handlePreferedLanguageChange}
                >
-                  <SelectTrigger className="mt-1 w-[50%] bg-slate-50 dark:bg-slate-800 dark:text-white dark:placeholder:text-white">
+                  <SelectTrigger
+                     className="mt-1 w-[50%] bg-slate-50 dark:bg-slate-800 dark:text-white dark:placeholder:text-white"
+                     data-test-id="user-settings-language-trigger"
+                  >
                      <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -284,7 +290,11 @@ export default function UserSettings() {
                         { key: "en", label: "English" },
                         { key: "de", label: "Deutsch" }
                      ].map((language) => (
-                        <SelectItem key={language.key} value={language.key}>
+                        <SelectItem
+                           key={language.key}
+                           value={language.key}
+                           data-test-id={`user-settings-language-${language.key}`}
+                        >
                            {language.label}
                         </SelectItem>
                      ))}
@@ -306,6 +316,7 @@ export default function UserSettings() {
                      setSettingChanged(true);
                   }}
                   className="mr-2"
+                  data-test-id="user-settings-notification-added-to-workspace"
                />
                <Label htmlFor="notificationAddedToWorkspace">
                   {settingsTranslations("notificationAddedToWorkspace")}
@@ -320,6 +331,7 @@ export default function UserSettings() {
                      setSettingChanged(true);
                   }}
                   className="mr-2"
+                  data-test-id="user-settings-notification-removed-from-workspace"
                />
                <Label htmlFor="notificationRemovedFromWorkspace">
                   {settingsTranslations("notificationRemovedFromWorkspace")}
@@ -334,6 +346,7 @@ export default function UserSettings() {
                      setSettingChanged(true);
                   }}
                   className="mr-2"
+                  data-test-id="user-settings-notification-document-changed"
                />
                <Label htmlFor="notificationDocumentChanged">
                   {settingsTranslations("notificationDocumentChanged")}
@@ -348,6 +361,7 @@ export default function UserSettings() {
                      setSettingChanged(true);
                   }}
                   className="mr-2"
+                  data-test-id="user-settings-notification-document-chat"
                />
                <Label htmlFor="notificationDocumentChat">
                   {settingsTranslations("notificationDocumentChat")}
@@ -362,6 +376,7 @@ export default function UserSettings() {
                      setSettingChanged(true);
                   }}
                   className="mr-2"
+                  data-test-id="user-settings-notification-workspace-change"
                />
                <Label htmlFor="notificationWorkspaceChange">
                   {settingsTranslations("notificationWorkspaceChanged")}
@@ -369,7 +384,12 @@ export default function UserSettings() {
             </div>
          </div>
          <div className="space-y-4">
-            <Button type="submit" onClick={handleSubmit} className="w-full">
+            <Button
+               type="submit"
+               onClick={handleSubmit}
+               className="w-full"
+               data-test-id="user-settings-save-button"
+            >
                {generalTranslations("saveSettings")}
             </Button>
 
@@ -387,6 +407,7 @@ export default function UserSettings() {
                      type="button"
                      variant="outline"
                      className="w-full border-red-600 text-red-600 bg-transparent hover:bg-red-600 hover:text-white"
+                     data-test-id="user-settings-delete-user-trigger"
                   >
                      {settingsTranslations("deleteUserButton")}
                   </Button>
@@ -420,6 +441,7 @@ export default function UserSettings() {
                               placeholder={settingsTranslations(
                                  "deleteUserPasswordPlaceholder"
                               )}
+                              data-test-id="user-settings-delete-user-password"
                            />
                         </div>
                      </div>
@@ -428,6 +450,7 @@ export default function UserSettings() {
                            type="submit"
                            className="w-full bg-red-600 text-white hover:bg-red-700"
                            disabled={isDeletingUser}
+                           data-test-id="user-settings-delete-user-confirm"
                         >
                            {isDeletingUser
                               ? generalTranslations("loading")

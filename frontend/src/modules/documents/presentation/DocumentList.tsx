@@ -218,7 +218,11 @@ const DocumentList = ({ workspaceId }) => {
                <div className="flex justify-center items-center">
                   <DropdownMenu>
                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
+                        <Button
+                           variant="ghost"
+                           className="h-8 w-8 p-0"
+                           data-test-id="document-actions-trigger"
+                        >
                            <span className="sr-only">
                               {translations("openMenu")}
                            </span>
@@ -229,11 +233,13 @@ const DocumentList = ({ workspaceId }) => {
                         <DropdownMenuItem>
                            <Link
                               href={`/workspace/${workspaceId || row.original.meta.workspaceOrigin}/document/${row.original.docId}`}
+                              data-test-id="document-actions-detail"
                            >
                               {translations("detail")}
                            </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem
+                           data-test-id="document-actions-download"
                            onClick={(e: React.MouseEvent<HTMLElement>) =>
                               downloadDocument(e, row.original.cid)
                            }
@@ -241,6 +247,7 @@ const DocumentList = ({ workspaceId }) => {
                            {translations("download")}
                         </DropdownMenuItem>
                         <DropdownMenuItem
+                           data-test-id="document-actions-delete"
                            onClick={(e: React.MouseEvent<HTMLElement>) =>
                               removeDocument(e, row.original.docId)
                            }
@@ -403,7 +410,10 @@ const DocumentList = ({ workspaceId }) => {
    if (error) {
       if (error === "unauthorized") {
          return (
-            <div className="items-center mt-2 text-center">
+            <div
+               className="items-center mt-2 text-center"
+               data-test-id="workspace-private-message"
+            >
                <Lock className="w-16 h-16 mx-auto mt-10" />
                <h2 className="text-xl font-bold">Workspace is private</h2>
             </div>
@@ -485,6 +495,7 @@ const DocumentList = ({ workspaceId }) => {
                   {filteredDocuments.map((document) => (
                      <TableRow
                         key={document.docId}
+                        data-test-id="document-row"
                         onClick={() =>
                            router.push(
                               `/workspace/${workspaceId || document.meta.workspaceOrigin}/document/${document.docId}`

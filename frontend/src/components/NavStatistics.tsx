@@ -28,6 +28,7 @@ export function NavStatistics({ activePath }: { activePath: string }) {
                <Button
                   variant="ghost"
                   className="flex justify-start"
+                  data-test-id="nav-statistics-button"
                   onClick={() => {
                      router.push("/statistics");
                      if (isMobile) {

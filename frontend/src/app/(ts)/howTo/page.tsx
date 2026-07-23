@@ -1,5 +1,9 @@
 import AppFeatures from "@/components/AppFeatures";
 
 export default function HowTo() {
-   return <AppFeatures />;
+   return (
+      <div data-test-id="how-to-page">
+         <AppFeatures />
+      </div>
+   );
 }

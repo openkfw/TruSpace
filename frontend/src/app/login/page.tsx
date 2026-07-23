@@ -91,12 +91,18 @@ export default function Login({}: React.ComponentPropsWithoutRef<"div">) {
                      <form onSubmit={handleSubmit(onSubmit)}>
                         <div className="flex flex-col gap-6">
                            {loginError && (
-                              <div className="rounded-md border border-red-500 bg-red-100 px-4 py-2 text-sm text-red-700">
+                              <div
+                                 className="rounded-md border border-red-500 bg-red-100 px-4 py-2 text-sm text-red-700"
+                                 data-test-id="login-invalid-credentials-error"
+                              >
                                  {translations("invalidCredentials")}
                               </div>
                            )}
                            {statusError && (
-                              <div className="rounded-md border border-orange-500 bg-orange-100 px-4 py-2 text-sm text-orange-700">
+                              <div
+                                 className="rounded-md border border-orange-500 bg-orange-100 px-4 py-2 text-sm text-orange-700"
+                                 data-test-id="login-status-error"
+                              >
                                  {translations("activationRequired")}
                               </div>
                            )}
@@ -113,7 +119,10 @@ export default function Login({}: React.ComponentPropsWithoutRef<"div">) {
                                  data-test-id="login-username"
                               />
                               {errors.email?.message && (
-                                 <p className="text-red-500 text-sm">
+                                 <p
+                                    className="text-red-500 text-sm"
+                                    data-test-id="login-email-error"
+                                 >
                                     {String(errors.email.message)}
                                  </p>
                               )}

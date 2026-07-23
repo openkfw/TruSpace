@@ -1,0 +1,2 @@
+This is a tiny TruSpace k6 upload fixture.
+It exists so the upload scenario can exercise document creation against the local API and IPFS stack.

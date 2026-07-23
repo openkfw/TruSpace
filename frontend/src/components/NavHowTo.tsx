@@ -28,6 +28,7 @@ export function NavHowTo({ activePath }: { activePath: string }) {
                <Button
                   variant="ghost"
                   className="flex justify-start"
+                  data-test-id="nav-how-to-button"
                   onClick={() => {
                      router.push("/howTo");
                      if (isMobile) {
