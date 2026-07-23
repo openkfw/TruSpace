@@ -240,4 +240,4 @@ node decrypt.js encrypt "some plaintext" "<workspace-cid>"
 
 - [:octicons-arrow-right-24: Security Architecture](../architecture/security.md)
 - [:octicons-arrow-right-24: Data Model](../architecture/data-model.md)
-- [:octicons-arrow-right-24: Troubleshooting](troubleshooting.md#ipfs--cluster)
+- [:octicons-arrow-right-24: Troubleshooting](troubleshooting.md#ipfs-cluster)

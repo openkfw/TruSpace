@@ -232,4 +232,4 @@ All nodes in a private network must use the same `swarm.key`. If keys differ, IP
 docker exec ipfs0 ipfs key list -l
 ```
 
-For more diagnostics, see the [Troubleshooting guide](../../reference/troubleshooting.md#ipfs--cluster).
+For more diagnostics, see the [Troubleshooting guide](../../reference/troubleshooting.md#ipfs-cluster).

@@ -171,7 +171,7 @@ npm install
 npm run build
 ```
 
-Open a dedicated pull request for dependency updates — see the [Contributing guide](../../guides/developer/contributing.md#security-fixes--dependency-updates) for the full workflow.
+Open a dedicated pull request for dependency updates — see the [Contributing guide](../../guides/developer/contributing.md#security-fixes-dependency-updates) for the full workflow.
 
 ### Docker Image Security
 
