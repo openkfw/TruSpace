@@ -8,8 +8,8 @@ url: 'https://github.com/openkfw/TruSpace'
 landingURL: 'https://web.truspace.dev'
 releaseDate: '2025-08-17'
 logo: publiccodeLogo.svg
-softwareVersion: v0.13
-developmentStatus: beta
+softwareVersion: v1.0
+developmentStatus: stable
 softwareType: standalone/iot
 platforms:
   - web
