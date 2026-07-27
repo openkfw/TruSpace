@@ -273,7 +273,7 @@ Before deploying to production, verify all security layers:
 - Check `REGISTER_USERS_AS_INACTIVE` is set to `true`
 - Review backend logs: `docker logs backend`
 
-For more diagnostics, see the [Troubleshooting guide](../../reference/troubleshooting.md#ipfs--cluster).
+For more diagnostics, see the [Troubleshooting guide](../reference/troubleshooting.md#ipfs--cluster).
 
 ---
 
