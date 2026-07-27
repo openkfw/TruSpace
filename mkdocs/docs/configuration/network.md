@@ -28,14 +28,50 @@ TruSpace can be deployed as a private, permissioned system suitable for enterpri
 
 ---
 
-## IPFS Ports Reference
+## IPFS Ports
 
-| Port | Protocol | Purpose                  |
-| ---- | -------- | ------------------------ |
-| 4001 | TCP/UDP  | Swarm - peer connections |
-| 5001 | TCP      | API - local operations   |
-| 8080 | TCP      | Gateway - content access |
-| 9096 | TCP      | IPFS Cluster swarm       |
+| Port | Protocol | Purpose |
+|------|----------|---------|
+| 4001 | TCP/UDP | Swarm - peer connections |
+| 5001 | TCP | API - local operations |
+| 8080 | TCP | Gateway - content access |
+
+## Full Port Reference
+
+TruSpace requires the following ports to be open for communication. Ensure the correct direction (inbound/outbound) and protocol (TCP/UDP) are configured in your firewall.
+
+### Public-facing ports
+
+| Port(s) | Protocol  | Direction        | Purpose                                 |
+| ------- | --------- | ---------------- | ---------------------------------------- |
+| 443     | TCP       | Inbound          | HTTPS traffic                            |
+| 80      | TCP       | Inbound          | HTTP traffic (required for initial Certbot setup; can be closed afterwards) |
+| 4001    | TCP & UDP | Inbound/Outbound | IPFS swarm (peer-to-peer communication)  |
+| 9096    | TCP & UDP | Inbound/Outbound | IPFS cluster management                  |
+
+### Ports mapped via reverse proxy (nginx)
+
+| Port(s) | Protocol | Purpose                             |
+| ------- | -------- | ------------------------------------ |
+| 3000    | TCP      | TruSpace UI (main web interface)     |
+| 3333    | TCP      | Open Web UI service (AI processing)  |
+| 8000    | TCP      | API service (backend)                |
+
+### Internal-only ports
+
+These are used for communication between TruSpace components and typically do not need to be exposed externally, but must be reachable within your network/Docker network:
+
+| Port(s) | Protocol | Purpose                          |
+| ------- | -------- | --------------------------------- |
+| 5001    | TCP      | IPFS API                          |
+| 6831    | UDP      | Jaeger agent endpoint (tracing)   |
+| 8080    | TCP      | IPFS HTTP Gateway                 |
+| 8888    | TCP      | Prometheus endpoint (metrics)     |
+| 9094    | TCP      | IPFS cluster management           |
+| 9095    | TCP      | IPFS cluster management           |
+| 9097    | TCP      | IPFS cluster management           |
+
+See [Environment Variables](environment-variables.md#ipfs-cluster-settings) for the corresponding configuration variables, and the [Remote Setup guide](../getting-started/installation/remote.md) for a full nginx + Certbot walkthrough.
 
 ### Firewall Configuration
 
@@ -49,6 +85,8 @@ sudo ufw allow 9096/tcp
 ```
 
 ---
+
+## Private Networks & Security Layers
 
 ### Layer 1: Peer Connection Control
 
@@ -273,7 +311,7 @@ Before deploying to production, verify all security layers:
 - Check `REGISTER_USERS_AS_INACTIVE` is set to `true`
 - Review backend logs: `docker logs backend`
 
-For more diagnostics, see the [Troubleshooting guide](../reference/troubleshooting.md#ipfs--cluster).
+For more diagnostics, see the [Troubleshooting guide](../reference/troubleshooting.md#ipfs-cluster).
 
 ---
 
