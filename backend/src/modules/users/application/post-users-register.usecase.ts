@@ -12,6 +12,7 @@ import { CONFIRMATION_EMAIL_EXPIRATION, USER_STATUS } from '../../../shared/util
 import { config } from '../../../shared/config/config';
 import logger from '../../../shared/config/winston';
 import { UserConflictError } from '../errors/user-conflict.error';
+import { WrongDomainError } from '../errors/wrong-domain.error';
 import { usersIpfsRepository } from '../infrastructure/users-ipfs.repository';
 
 const resolveNodeId = async (explicitNodeId?: string): Promise<string> => {
@@ -34,7 +35,14 @@ export async function postUsersRegister(
   confirmationLink: string,
   lang: string | number,
 ) {
-  const { registerUsersAsInactive, smtpServer } = config;
+  const { registerUsersAsInactive, smtpServer, restrictedEmailDomains } = config;
+
+  if (restrictedEmailDomains.length > 0) {
+    const emailDomain = email.split('@')[1]?.toLowerCase();
+    if (!emailDomain || !restrictedEmailDomains.includes(emailDomain)) {
+      throw new WrongDomainError(email);
+    }
+  }
 
   if (registerUsersAsInactive && (!smtpServer.host || !smtpServer.port)) {
     logger.error('SMTP server not set');

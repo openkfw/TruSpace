@@ -1,0 +1,153 @@
+name: Playwright Smoke CI
+
+on:
+  push:
+    branches: ["dev"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: playwright-smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  playwright-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      BASE_URL: http://localhost:3000
+      API_URL: http://localhost:8000
+      USERNAME: playwright-ci@example.com
+      PASSWORD: Test123456789*
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: e2e-tests/package-lock.json
+
+      - name: Install e2e dependencies
+        working-directory: e2e-tests
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        working-directory: e2e-tests
+        run: npx playwright install --with-deps chromium
+
+      - name: Generate local development environment
+        run: |
+          rm -f .env
+          ./scripts/configure-env.sh --dev
+
+      - name: Apply CI environment overrides
+        run: |
+          echo "LUID=$(id -u)" >> "$GITHUB_ENV"
+          echo "LGID=$(id -g)" >> "$GITHUB_ENV"
+          echo "TRUSPACE_VERSION=$(tr -d '[:space:]' < VERSION)" >> "$GITHUB_ENV"
+          sed -i 's/^DISABLE_ALL_AI_FUNCTIONALITY=.*/DISABLE_ALL_AI_FUNCTIONALITY=true/' .env
+          sed -i 's/^AUTO_DOWNLOAD=.*/AUTO_DOWNLOAD=false/' .env
+          sed -i 's/^REGISTER_USERS_AS_INACTIVE=.*/REGISTER_USERS_AS_INACTIVE=false/' .env
+          printf '\nRUN_SEEDS=false\n' >> .env
+
+      - name: Prepare mounted directories
+        run: |
+          mkdir -p volumes/cluster0 volumes/db volumes/general/terms volumes/ipfs0 volumes/clamav-scan
+          cp frontend/default_terms/* volumes/general/terms/
+          rm -rf frontend/public/terms
+          mkdir -p frontend/public/terms
+          cp volumes/general/terms/* frontend/public/terms/
+
+      - name: Validate docker compose configuration
+        run: |
+          docker compose --env-file ./.env \
+            -f docker-compose.yml \
+            -f docker-compose-frontend.yml \
+            -f docker-compose.build.yml \
+            config > /dev/null
+
+      - name: Start application stack
+        run: |
+          docker compose --env-file ./.env \
+            -f docker-compose.yml \
+            -f docker-compose-frontend.yml \
+            -f docker-compose.build.yml \
+            up -d --build backend frontend ipfs0 cluster0
+
+      - name: Wait for services
+        run: |
+          for i in {1..60}; do
+            if curl -fsS -X POST http://localhost:5001/api/v0/id > /dev/null; then
+              break
+            fi
+            sleep 2
+          done
+          curl -fsS -X POST http://localhost:5001/api/v0/id > /dev/null
+
+          for i in {1..60}; do
+            status=$(curl -s -o /dev/null -w '%{http_code}' \
+              -H 'Content-Type: application/json' \
+              -d '{}' \
+              http://localhost:8000/api/users/login || true)
+            if [ "$status" != "000" ]; then
+              break
+            fi
+            sleep 2
+          done
+          status=$(curl -s -o /dev/null -w '%{http_code}' \
+            -H 'Content-Type: application/json' \
+            -d '{}' \
+            http://localhost:8000/api/users/login || true)
+          test "$status" != "000"
+
+          for i in {1..60}; do
+            if (: > /dev/tcp/127.0.0.1/3000) 2> /dev/null; then
+              break
+            fi
+            sleep 2
+          done
+          (: > /dev/tcp/127.0.0.1/3000) 2> /dev/null
+
+      - name: Run Playwright smoke suite
+        working-directory: e2e-tests
+        run: npm run pw:test:smoke
+
+      - name: Collect diagnostics
+        if: always()
+        run: |
+          mkdir -p artifacts
+          docker compose --env-file ./.env \
+            -f docker-compose.yml \
+            -f docker-compose-frontend.yml \
+            -f docker-compose.build.yml \
+            ps -a > artifacts/docker-compose-ps.txt || true
+          docker compose --env-file ./.env \
+            -f docker-compose.yml \
+            -f docker-compose-frontend.yml \
+            -f docker-compose.build.yml \
+            logs --no-color > artifacts/docker-compose.log || true
+
+      - name: Upload Playwright artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-smoke-artifacts
+          path: |
+            e2e-tests/playwright-report
+            e2e-tests/test-results
+            artifacts
+          if-no-files-found: ignore
+
+      - name: Stop application stack
+        if: always()
+        run: |
+          docker compose --env-file ./.env \
+            -f docker-compose.yml \
+            -f docker-compose-frontend.yml \
+            -f docker-compose.build.yml \
+            down -v --remove-orphans || true

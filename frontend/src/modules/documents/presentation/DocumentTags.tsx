@@ -73,6 +73,8 @@ export default function DocumentTags({ cid, workspaceOrigin, docId, status }) {
    useEffect(() => {
       if (status?.status === "completed") {
          fetchTags();
+         // AI-generated tags also produce activity events on the backend;
+         // the DocumentChat timeline picks those up via its own SWR polling.
       } else if (status?.status === "failed") {
          toast.error(translations("errorGeneratingAITags"));
       }
@@ -101,6 +103,9 @@ export default function DocumentTags({ cid, workspaceOrigin, docId, status }) {
       setSelectedColor(null);
       setIsAdding(false);
       if (data) {
+         // Refresh our own tag list after a short delay so the IPFS write
+         // becomes visible. The DocumentChat timeline picks up the new
+         // activity event via its own SWR polling.
          setTimeout(fetchTags, 1000);
       } else {
          console.error("Invalid response", data);
@@ -141,7 +146,7 @@ export default function DocumentTags({ cid, workspaceOrigin, docId, status }) {
    const isPending = status?.status === "pending";
 
    return (
-      <div className="flex flex-col">
+      <div className="flex flex-col" data-test-id="document-tags-content">
          <div className="h-full">
             <div className="space-y-4 mb-2">
                {isGenerating ? (

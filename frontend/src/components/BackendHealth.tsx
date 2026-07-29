@@ -43,6 +43,7 @@ export function BackendHealth() {
          variant="ghost"
          className="rounded-full flex justify-between items-center"
          onClick={() => router.push("/appStatus")}
+         data-test-id="nav-app-status-button"
       >
          <span>{overallStatus()}</span>
          <span>{t("appStatus")}</span>

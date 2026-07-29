@@ -1,7 +1,10 @@
 export {
-   getChatsPdfExportUrl,
+   editChat,
+   likeChat,
    loadChats,
    postChat,
+   unlikeChat,
+   useChats,
    useRecentChats
 } from "@/modules/chats";
 export {
@@ -13,6 +16,11 @@ export {
    loadDocuments,
    useDocumentsStatistics
 } from "@/modules/documents";
+export {
+   loadEventsByDocumentId,
+   loadEventsByWorkspaceId,
+   useEventsByDocumentId
+} from "@/modules/events";
 export {
    getHealth,
    useHealth,

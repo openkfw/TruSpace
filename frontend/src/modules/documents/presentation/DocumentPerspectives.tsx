@@ -141,6 +141,8 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
          } finally {
             setIsCreating(false);
             setTimeout(() => mutate(), 1000);
+            // The DocumentChat timeline picks up the new perspective
+            // activity event via its own SWR polling.
          }
       }
    };
@@ -185,6 +187,8 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
    useEffect(() => {
       if (perspectivesStatus?.status === "completed") {
          mutate();
+         // AI-generated perspectives also record activity events; the
+         // DocumentChat timeline picks them up via its own SWR polling.
       }
    }, [mutate, perspectivesStatus]);
 
@@ -431,7 +435,10 @@ export default function DocumentPerspectives({ cid, docId, workspaceOrigin }) {
                </form>
             </DialogContent>
          </Dialog>
-         <div className="flex flex-col">
+         <div
+            className="flex flex-col"
+            data-test-id="document-perspectives-content"
+         >
             <div className="h-full">
                <div className="space-y-4">
                   {isGenerating ? (

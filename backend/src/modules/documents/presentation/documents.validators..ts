@@ -7,6 +7,10 @@ export const DocumentsValidator = {
     query('from').isInt().optional(),
     query('limit').isInt().optional(),
     query('search').isString().optional(),
+    query('tags').optional(),
+    query('creators').optional(),
+    query('sortBy').isIn(['name', 'timestamp']).optional(),
+    query('sortOrder').isIn(['asc', 'desc']).optional(),
   ]),
 
   validateDocumentId: validate([param('docId').isUUID(4)]),

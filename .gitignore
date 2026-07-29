@@ -17,6 +17,6 @@ scripts/prompts/cookies.txt
 .idea
 .connection
 .connection.password
-doc/mkdocs/site
+mkdocs/site
 frontend/public/terms/*
 .codex

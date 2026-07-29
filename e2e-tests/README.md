@@ -1,3 +1,5 @@
-# Cypress e2e tests
+# End-to-end and load tests
 
-Run by `npm run test`
+- Cypress UI tests: `npm run test`
+- Playwright BDD tests: see [playwright/README.md](./playwright/README.md)
+- Manual k6 API/load tests: see [k6/README.md](./k6/README.md)

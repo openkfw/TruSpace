@@ -101,6 +101,7 @@ export default function WorkspaceShare() {
                         placeholder={translations("inputPlaceholder")}
                         className="p-2 bg-slate-50 dark:bg-slate-800 dark:text-white dark:placeholder:text-white"
                         disabled={workspace?.meta?.is_public}
+                        data-test-id="workspace-share-email-input"
                      />
                      {errors.email?.message && (
                         <p className="mt-1 text-red-500 text-sm text-left">
@@ -112,6 +113,7 @@ export default function WorkspaceShare() {
                      type="submit"
                      className="whitespace-nowrap"
                      disabled={workspace?.meta?.is_public}
+                     data-test-id="workspace-share-add-button"
                   >
                      {translations("addButton")}
                   </Button>
@@ -126,6 +128,7 @@ export default function WorkspaceShare() {
                <div
                   key={user.email}
                   className="flex items-center space-x-4 rounded-md border p-4 bg-blue-200 dark:bg-gray-700"
+                  data-test-id="workspace-share-collaborator-row"
                >
                   <UserCircle />
                   <div className="flex-1 space-y-1">
@@ -143,6 +146,7 @@ export default function WorkspaceShare() {
                      <Button
                         variant="ghost"
                         onClick={() => removeUser(user.id)}
+                        data-test-id="workspace-share-remove-button"
                      >
                         <X />
                      </Button>

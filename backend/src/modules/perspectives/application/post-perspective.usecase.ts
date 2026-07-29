@@ -1,4 +1,5 @@
 import { PerspectiveRequest } from '../../../shared/types/interfaces';
+import { recordEvent } from '../../events/application/record-event.usecase';
 import { perspectivesIpfsRepository } from '../infrastructure/perspectives-ipfs.repository';
 
 export async function postPerspective(
@@ -26,5 +27,20 @@ export async function postPerspective(
     },
   };
 
-  return perspectivesIpfsRepository.createPerspective(perspectiveRequest);
+  const perspectiveCid = await perspectivesIpfsRepository.createPerspective(perspectiveRequest);
+
+  await recordEvent({
+    eventType: 'perspective',
+    eventAction: 'create',
+    objectId: perspectiveCid,
+    objectName: perspectiveType,
+    workspaceOrigin,
+    docId,
+    versionCid: cid,
+    actorType: 'user',
+    actorNodeId: creatorNodeId,
+    actorUserId: creatorUserId,
+  });
+
+  return perspectiveCid;
 }

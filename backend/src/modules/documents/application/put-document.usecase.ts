@@ -8,6 +8,7 @@ import { config } from '../../../shared/config/config';
 import { encrypt } from '../../../shared/encryption';
 import { decodeFilename, createDocumentRequest, getWorkspacePassword } from '../../../shared/handlers/documents';
 import { sendNotification } from '../../../shared/mailing/notifications';
+import { setRequestContext } from '../../../shared/logging/request-context';
 import { AuthenticatedRequest } from '../../../shared/types';
 import { Prompt } from '../../../shared/types/interfaces';
 import { checkPermissionForWorkspace } from '../../../shared/utility/permissions';
@@ -23,6 +24,7 @@ import TaskQueue from '../../../shared/utility/jobQueue';
 import { NoFileUploadedError } from '../errors/no-file-uploaded.error';
 import { MalwareDetectedError } from '../errors/malware-detected.error';
 import { documentsIpfsRepository } from '../infrastructure/documents-ipfs.repository';
+import { recordEvent } from '../../events/application/record-event.usecase';
 
 export async function putDocument(req: AuthenticatedRequest, res: Response) {
   if (!req.files || !req.files.file) {
@@ -33,6 +35,8 @@ export async function putDocument(req: AuthenticatedRequest, res: Response) {
   const email = req.user?.email as string;
   const userUiid = req.user?.uiid as string;
   const creatorNodeId = req.user?.nodeId as string;
+
+  setRequestContext({ workspaceId: workspace, docId });
 
   await checkPermissionForWorkspace(email, res, workspace);
 
@@ -88,6 +92,21 @@ export async function putDocument(req: AuthenticatedRequest, res: Response) {
   // store encrypted document. cid is derived from this encrypted version
   const ipfsClusterResponse = await documentsIpfsRepository.createDocument(docRequest, file);
   const cid = ipfsClusterResponse.cid;
+  setRequestContext({ cid });
+
+  await recordEvent({
+    eventType: 'document',
+    eventAction: 'version',
+    objectId: docId,
+    objectName: filename,
+    workspaceOrigin: workspace,
+    docId,
+    versionCid: cid,
+    version: docRequest.meta.version,
+    actorType: 'user',
+    actorNodeId: creatorNodeId,
+    actorUserId: userUiid,
+  });
 
   file.data = fileDataClone;
 

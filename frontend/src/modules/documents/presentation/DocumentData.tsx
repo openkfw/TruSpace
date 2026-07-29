@@ -155,7 +155,7 @@ export default function DocumentData({
    }, [languageStatus?.status, documentLanguageRefresh, cId]);
 
    return (
-      <div className="space-y-6 md:w-full">
+      <div className="space-y-6 md:w-full" data-test-id="document-metadata-grid">
          <div className="grid grid-cols-[2fr_1fr] gap-y-6">
             <div className="font-bold">{translations("docName")}</div>
             <div>

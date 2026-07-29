@@ -7,10 +7,11 @@ import session from 'express-session';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import lusca from 'lusca';
-import morgan from 'morgan';
 
 import { config } from './shared/config/config';
 import { catchAllErrorsMiddleware } from './shared/middlewares/catch-all-errors.middleware';
+import { requestContextMiddleware } from './shared/logging/request-context.middleware';
+import { morganWinstonMiddleware } from './shared/logging/morgan-winston';
 import { router } from './routes';
 import { notFoundMiddleware } from './shared/middlewares/not-found.middleware';
 
@@ -19,7 +20,8 @@ const { contentSecurityPolicy, rateLimitPerMinute } = config;
 const app = express();
 app.set('trust proxy', 1); // trust first proxy (e.g. if behind a load balancer) for correct client IP and secure cookie handling
 
-app.use(morgan('dev'));
+app.use(requestContextMiddleware);
+app.use(morganWinstonMiddleware);
 
 app.use(
   helmet({

@@ -142,7 +142,8 @@
     "termsLink": "Condiciones de uso.",
     "termsAccept": "Acepto eso",
     "termsAndConditions": "Condiciones de uso",
-    "termsLoadError": "No se pudieron cargar los Términos de servicio."
+    "termsLoadError": "No se pudieron cargar los Términos de servicio.",
+    "emailDomainNotAllowed": "No se permite el registro con este dominio de correo electrónico"
   },
   "settings": {
     "updateSuccess": "Configuración de usuario actualizada",
@@ -196,7 +197,7 @@
     "uploadNewVersion": "Subir nueva versión",
     "uploadNewVersionTitle": "Subir nueva versión del documento",
     "uploading": "Subir...",
-    "searchPlaceholder": "Buscar por nombre del documento...",
+    "searchPlaceholder": "Buscar por nombre, autor o etiqueta...",
     "failedToDelete": "Error al eliminar",
     "documents": "Documentos",
     "participant": "Partícipe",
@@ -224,7 +225,14 @@
     "recentlyAddedWorkspace": "Espacios de trabajo agregados recientemente",
     "noWorkspaceActions": "Actualmente no hay acciones para espacios de trabajo.",
     "documentActions": "Documentos",
-    "workspaceActions": "Áreas de trabajo"
+    "workspaceActions": "Áreas de trabajo",
+    "filterByTag": "Etiquetas",
+    "filterByCreator": "Autores",
+    "sortBy": "Ordenar por",
+    "sortNewest": "Más reciente primero",
+    "sortOldest": "Más antiguo primero",
+    "sortNameAsc": "Nombre A–Z",
+    "sortNameDesc": "Nombre Z–A"
   },
   "documentPreview": {
     "preview": "Avance",
@@ -338,7 +346,9 @@
   },
   "chat": {
     "chat": "Charlar",
+    "chatAndActivity": "Chat y actividad",
     "user": "usuario",
+    "showPointInDocument": "Mostrar punto en el documento",
     "messageForVersion": "Relacionado con la versión del documento:",
     "reply": "Respuesta",
     "forward": "Adelante",
@@ -355,7 +365,37 @@
     "messagePlaceholder": "Introduce un mensaje...",
     "downloadChatMessages": "Descargar mensajes de chat",
     "send": "Enviar",
-    "sending": "Será enviado..."
+    "sending": "Será enviado...",
+    "edit": "Editar",
+    "edited": "Editado",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "like": "Me gusta",
+    "unlike": "Quitar me gusta",
+    "likedBy": "Les gusta a",
+    "likeError": "No se pudo actualizar la reacción"
+  },
+  "events": {
+    "loadError": "No se pudieron cargar las actividades",
+    "document": {
+      "upload": "{objectName} subido por {actor}",
+      "version": "Nueva versión del documento v{version} por {actor}",
+      "delete": "{objectName} eliminado por {actor}"
+    },
+    "tag": {
+      "create": "Etiqueta \"{objectName}\" añadida por {actor}",
+      "delete": "Etiqueta \"{objectName}\" eliminada por {actor}"
+    },
+    "perspective": {
+      "create": "Perspectiva \"{objectName}\" creada por {actor}",
+      "update": "Perspectiva \"{objectName}\" actualizada por {actor}",
+      "delete": "Perspectiva \"{objectName}\" eliminada por {actor}"
+    },
+    "actor": {
+      "unknown": "usuario desconocido",
+      "ai": "IA",
+      "aiNamed": "IA ({model})"
+    }
   },
   "perspectives": {
     "addYourPerspective": "Añade tu perspectiva",
@@ -404,7 +444,11 @@
     "uploading": "Subiendo...",
     "uploadError": "Error al subir",
     "versionTagDefault": "Añadir etiqueta de versión",
-    "versionTagTip": "Añade aquí una nota sobre la versión para explicar los cambios que incluye."
+    "versionTagTip": "Añade aquí una nota sobre la versión para explicar los cambios que incluye.",
+    "export": "Exportar",
+    "exportHtml": "HTML",
+    "exportMarkdown": "Markdown",
+    "exportError": "Error al exportar"
   },
   "tags": {
     "aiTag": "Día generado por IA",

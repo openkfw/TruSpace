@@ -4,6 +4,7 @@ import { createWorkspacePasswordDb } from '../../../shared/clients/db';
 import { config } from '../../../shared/config/config';
 import { encrypt, hashPassword } from '../../../shared/encryption';
 import { createPermission } from '../../../shared/handlers/userPermissions';
+import { setRequestContext } from '../../../shared/logging/request-context';
 import { WorkspaceRequest } from '../../../shared/types/interfaces';
 import { WorkspaceConflictError } from '../errors/workspace-conflict.error';
 import { workspacesIpfsRepository } from '../infrastructure/workspaces-ipfs.repository';
@@ -23,6 +24,7 @@ export async function postWorkspace(
   }
 
   const workspaceId = uuidv4();
+  setRequestContext({ workspaceId });
   const password = workspacePassword || workspaceId;
   const workspacePasswordHash = await hashPassword(password);
 

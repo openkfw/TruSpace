@@ -8,6 +8,7 @@ import { encrypt } from '../../../shared/encryption';
 import { MalwareDetectedError } from '../errors/malware-detected.error';
 import { decodeFilename, createDocumentRequest, getWorkspacePassword } from '../../../shared/handlers/documents';
 import { AuthenticatedRequest } from '../../../shared/types';
+import { setRequestContext } from '../../../shared/logging/request-context';
 import { Prompt } from '../../../shared/types/interfaces';
 import { checkPermissionForWorkspace } from '../../../shared/utility/permissions';
 import {
@@ -20,6 +21,7 @@ import {
 import TaskQueue from '../../../shared/utility/jobQueue';
 import { NoFileUploadedError } from '../errors/no-file-uploaded.error';
 import { documentsIpfsRepository } from '../infrastructure/documents-ipfs.repository';
+import { recordEvent } from '../../events/application/record-event.usecase';
 
 export async function postDocument(req: AuthenticatedRequest, res: Response) {
   if (!req.files || !req.files.file) {
@@ -29,6 +31,8 @@ export async function postDocument(req: AuthenticatedRequest, res: Response) {
   const email = req.user?.email as string;
   const userUiid = req.user?.uiid as string;
   const creatorNodeId = req.user?.nodeId as string;
+
+  setRequestContext({ workspaceId: workspace });
 
   await checkPermissionForWorkspace(email, res, workspace);
 
@@ -78,6 +82,21 @@ export async function postDocument(req: AuthenticatedRequest, res: Response) {
 
   const ipfsClusterResponse = await documentsIpfsRepository.createDocument(docRequest, file);
   const cid = ipfsClusterResponse.cid;
+  setRequestContext({ cid });
+
+  await recordEvent({
+    eventType: 'document',
+    eventAction: 'upload',
+    objectId: docRequest.docId,
+    objectName: filename,
+    workspaceOrigin: workspace,
+    docId: docRequest.docId,
+    versionCid: cid,
+    version: docRequest.meta.version,
+    actorType: 'user',
+    actorNodeId: creatorNodeId,
+    actorUserId: userUiid,
+  });
 
   // ollama obviously needs unencrypted document
   file.data = fileDataClone;

@@ -86,12 +86,17 @@ export default function WorkspaceTypeDialog({
                   type="button"
                   variant="destructive"
                   onClick={() => setOpen(false)}
+                  data-test-id="workspace-visibility-cancel-button"
                >
                   {translations(
                      "workspaceTypeDialog.cancelWorkspaceTypeUpdate"
                   )}
                </Button>
-               <Button type="submit" onClick={handleConfirmUpdate}>
+               <Button
+                  type="submit"
+                  onClick={handleConfirmUpdate}
+                  data-test-id="workspace-visibility-confirm-button"
+               >
                   {isUpdating ? (
                      <>
                         <Loader2 className="animate-spin" />

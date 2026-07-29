@@ -163,7 +163,10 @@ export default function WorkspaceDialog({
                         </TooltipProvider>
                      </div>
                      {validationError && (
-                        <p className="mt-2 text-sm text-red-500">
+                        <p
+                           className="mt-2 text-sm text-red-500"
+                           data-test-id="workspace-create-error"
+                        >
                            {validationError}
                         </p>
                      )}

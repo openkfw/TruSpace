@@ -4,15 +4,32 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "cypress open"
+    "test": "cypress open",
+    "k6:smoke": "k6 run k6/scenarios/smoke.js",
+    "k6:browse": "k6 run k6/scenarios/browse.js",
+    "k6:chat": "k6 run k6/scenarios/chat.js",
+    "k6:upload": "k6 run k6/scenarios/upload.js",
+    "pw:install": "playwright install chromium",
+    "pw:bdd:gen": "bddgen",
+    "pw:test": "npm run pw:bdd:gen && playwright test",
+    "pw:test:smoke": "npm run pw:bdd:gen && playwright test --grep @smoke",
+    "pw:test:headed": "npm run pw:bdd:gen && playwright test --headed",
+    "pw:test:ui": "npm run pw:bdd:gen && playwright test --ui",
+    "pw:test:list": "npm run pw:bdd:gen && playwright test --list",
+    "pw:report": "playwright show-report"
   },
   "author": "",
   "license": "none",
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^26.1.1",
     "cypress": "^13.16.0",
     "cypress-cucumber-preprocessor": "^4.3.1",
     "dotenv": "^16.4.7",
+    "playwright-bdd": "^9.2.0",
+    "prettier": "^3.9.5",
+    "prettier-plugin-gherkin": "^4.0.0",
     "typescript": "^5.8.3"
   },
   "cypress-cucumber-preprocessor": {

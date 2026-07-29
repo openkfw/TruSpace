@@ -116,7 +116,7 @@ export async function postUsersLogin(req: Request, res: Response) {
       },
     });
   } catch (error) {
-    console.error('Login error:', error);
+    logger.error('Login error', { error });
     return res.status(500).json({
       status: 'failure',
       message: 'Authentication error',

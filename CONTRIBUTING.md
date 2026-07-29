@@ -110,4 +110,4 @@ Happy coding!
 
 ## Installation
 
-For installation steps, please refer to [this guide](./doc/Developer%20Guide/Setting%20up%20development%20environment.md).
+For installation steps, please refer to [the Development Setup guide](https://web.truspace.dev/site/guides/developer/setup/).

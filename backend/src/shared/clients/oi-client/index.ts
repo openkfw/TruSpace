@@ -4,8 +4,10 @@ import { v4 as uuidv4 } from "uuid";
 import { languagesIpfsRepository } from "../../../modules/languages/infrastructure/languages-ipfs.repository";
 import { perspectivesIpfsRepository } from "../../../modules/perspectives/infrastructure/perspectives-ipfs.repository";
 import { tagsIpfsRepository } from "../../../modules/tags/infrastructure/tags-ipfs.repository";
+import { recordEvent } from "../../../modules/events/application/record-event.usecase";
 import { config } from "../../config/config";
 import logger from "../../config/winston";
+import { attachHttpClientLogging } from "../../logging/http-client-logging";
 import {
   Document,
   FileData,
@@ -71,6 +73,7 @@ export class OpenWebUIClient {
         Accept: "application/json",
       },
     });
+    attachHttpClientLogging(axiosInstance, "open-webui");
     this.axiosInstance = axiosInstance;
     this.ollama = new OllamaModule(axiosInstance);
     this.chats = new ChatsModule(axiosInstance);
@@ -96,7 +99,7 @@ export class OpenWebUIClient {
       });
       return res.data.status;
     } catch (error) {
-      console.error(error);
+      logger.error("OpenWebUIClient.health failed", { error });
       return false;
     }
   }
@@ -220,7 +223,7 @@ export class OpenWebUIClient {
         return perspectivesRequest;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
-        console.error(`Error processing request ${requestId}:`, error);
+        logger.error("Error processing request", { requestId, error });
         const errorMessage =
           error instanceof Error ? error.message : "Unknown error";
         await TaskQueue.updateJobStatus(requestId, "failed", errorMessage);
@@ -231,7 +234,10 @@ export class OpenWebUIClient {
         };
       }
     } else {
-      console.error(`Error processing request ${requestId}:`, fileData.error);
+      logger.error("Error processing request", {
+        requestId,
+        errorMessage: fileData.error,
+      });
       TaskQueue.updateJobStatus(requestId, "failed", fileData.error);
       return {
         requestId,
@@ -269,7 +275,7 @@ export class OpenWebUIClient {
         return tagsRequest;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
-        console.error(`Error processing job ${requestId}:`, error);
+        logger.error("Error processing job", { requestId, error });
         const errorMessage =
           error instanceof Error ? error.message : "Unknown error";
         TaskQueue.updateJobStatus(requestId, "failed", errorMessage);
@@ -280,7 +286,10 @@ export class OpenWebUIClient {
         };
       }
     } else {
-      console.error(`Error processing request ${requestId}:`, fileData.error);
+      logger.error("Error processing request", {
+        requestId,
+        errorMessage: fileData.error,
+      });
       TaskQueue.updateJobStatus(requestId, "failed", fileData.error);
       return {
         requestId: requestId,
@@ -475,7 +484,21 @@ export class OpenWebUIClient {
 
         logger.debug(`#SUMMARY:\n ${perspectiveRequest.meta.data}`);
 
-        return perspectivesIpfsRepository.createPerspective(perspectiveRequest);
+        const perspectiveCid = await perspectivesIpfsRepository.createPerspective(perspectiveRequest);
+
+        await recordEvent({
+          eventType: "perspective",
+          eventAction: "create",
+          objectId: perspectiveCid,
+          objectName: result.perspectiveType,
+          workspaceOrigin: document.meta.workspaceOrigin,
+          docId: document.docId,
+          versionCid: document.cid,
+          actorType: "ai",
+          actorUserId: config.ollama.model,
+        });
+
+        return perspectiveCid;
       });
       TaskQueue.updateJobStatus(requestId, "completed");
     } catch (error) {
@@ -517,23 +540,44 @@ export class OpenWebUIClient {
       const tags: string[] = await processTags(result.summary, this.chats);
 
       // store max. 5 tags in IPFS;
-      tags.slice(0, 5).map((tag: string) => {
-        const tagRequest: TagRequest = {
-          meta: {
-            type: "tag",
-            workspaceOrigin: document.meta.workspaceOrigin,
-            docId: document.docId,
-            versionCid: document.cid,
-            timestamp: new Date().toISOString(),
-            name: tag,
-            color: "",
-            creatorNodeId: "ai",
-            creatorUserId: config.ollama.model,
-            creatorType: "ai",
-          },
-        };
-        return tagsIpfsRepository.createTag(tagRequest);
-      });
+      await Promise.all(
+        tags.slice(0, 5).map(async (tag: string) => {
+          try {
+            const tagRequest: TagRequest = {
+              meta: {
+                type: "tag",
+                workspaceOrigin: document.meta.workspaceOrigin,
+                docId: document.docId,
+                versionCid: document.cid,
+                timestamp: new Date().toISOString(),
+                name: encodeURIComponent(tag),
+                color: "",
+                creatorNodeId: "ai",
+                creatorUserId: config.ollama.model,
+                creatorType: "ai",
+              },
+            };
+            const tagCid = await tagsIpfsRepository.createTag(tagRequest);
+
+            await recordEvent({
+              eventType: "tag",
+              eventAction: "create",
+              objectId: tagCid,
+              objectName: tag,
+              workspaceOrigin: document.meta.workspaceOrigin,
+              docId: document.docId,
+              versionCid: document.cid,
+              actorType: "ai",
+              actorUserId: config.ollama.model,
+            });
+
+            return tagCid;
+          } catch (error) {
+            logger.error(`Error creating AI-generated tag "${tag}":`, error);
+            return undefined;
+          }
+        }),
+      );
       await TaskQueue.updateJobStatus(requestId, "completed");
     } catch (error) {
       logger.error(error);

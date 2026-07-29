@@ -31,7 +31,7 @@ export const addPerspectivesTemplate = (taskQueue: JobTemplateRegistrar) =>
         data: fileContent.data,
         size: fileDetails.meta.size || 0,
         mv: async (path: string) => {
-          console.log(path);
+          logger.debug("Temporary file move requested", { path });
         },
         encoding: "7bit",
         mimetype: fileDetails.meta.mimetype || "application/octet-stream", // default to binary if not provided
@@ -42,6 +42,7 @@ export const addPerspectivesTemplate = (taskQueue: JobTemplateRegistrar) =>
 
       const docRequest = createDocumentRequest({
         filename: fileDetails.meta.filename,
+        docId: fileDetails.docId,
         creatorNodeId: fileDetails.meta.creatorNodeId,
         creatorUserId: fileDetails.meta.creatorUserId,
         workspaceOrigin: fileDetails.meta.workspaceOrigin,
@@ -51,7 +52,7 @@ export const addPerspectivesTemplate = (taskQueue: JobTemplateRegistrar) =>
       const fileData = await oiClient.uploadFile(file);
 
       if (!fileData || "error" in fileData) {
-        logger.error(`Failed to upload file to Ollama:  ${fileData}`);
+        logger.error("Failed to upload file to Ollama", { fileData });
         throw new Error("Failed to upload file to Ollama");
       }
 
@@ -81,7 +82,7 @@ export const addTagsTemplate = (taskQueue: JobTemplateRegistrar) =>
         data: fileContent.data,
         size: fileDetails.meta.size || 0,
         mv: async (path: string) => {
-          console.log(path);
+          logger.debug("Temporary file move requested", { path });
         },
         encoding: "7bit",
         mimetype: fileDetails.meta.mimetype || "application/octet-stream", // default to binary if not provided
@@ -92,6 +93,7 @@ export const addTagsTemplate = (taskQueue: JobTemplateRegistrar) =>
 
       const docRequest = createDocumentRequest({
         filename: fileDetails.meta.filename,
+        docId: fileDetails.docId,
         creatorNodeId: fileDetails.meta.creatorNodeId,
         creatorUserId: fileDetails.meta.creatorUserId,
         workspaceOrigin: fileDetails.meta.workspaceOrigin,
@@ -101,7 +103,7 @@ export const addTagsTemplate = (taskQueue: JobTemplateRegistrar) =>
       const fileData = await oiClient.uploadFile(file);
 
       if (!fileData || "error" in fileData) {
-        console.error("Failed to upload file to Ollama", fileData);
+        logger.error("Failed to upload file to Ollama", { fileData });
         throw new Error("Failed to upload file to Ollama");
       }
 
@@ -130,7 +132,7 @@ export const addLanguageDetectionTemplate = (taskQueue: JobTemplateRegistrar) =>
         data: fileContent.data,
         size: fileDetails.meta.size || 0,
         mv: async (path: string) => {
-          console.log(path);
+          logger.debug("Temporary file move requested", { path });
         },
         encoding: "7bit",
         mimetype: fileDetails.meta.mimetype || "application/octet-stream", // default to binary if not provided
@@ -141,6 +143,7 @@ export const addLanguageDetectionTemplate = (taskQueue: JobTemplateRegistrar) =>
 
       const docRequest = createDocumentRequest({
         filename: fileDetails.meta.filename,
+        docId: fileDetails.docId,
         creatorNodeId: fileDetails.meta.creatorNodeId,
         creatorUserId: fileDetails.meta.creatorUserId,
         workspaceOrigin: fileDetails.meta.workspaceOrigin,
@@ -150,7 +153,7 @@ export const addLanguageDetectionTemplate = (taskQueue: JobTemplateRegistrar) =>
       const fileData = await oiClient.uploadFile(file);
 
       if (!fileData || "error" in fileData) {
-        console.error("Failed to upload file to Ollama", fileData);
+        logger.error("Failed to upload file to Ollama", { fileData });
         throw new Error("Failed to upload file to Ollama");
       }
 

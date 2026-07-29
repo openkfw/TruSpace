@@ -11,13 +11,27 @@ services:
     environment:
       ENV: dev # to see informative logs in container
       WEBUI_SECRET_KEY: ${WEBUI_SECRET_KEY}
+
+      # --- TruSpace Signup Settings ---
+      ENABLE_SIGNUP: "true"                  # TruSpace kann Admin per signup anlegen
+      ENABLE_PERSISTENT_CONFIG: "false"      # ← WICHTIG: umgeht PersistentConfig-Falle
+      DEFAULT_USER_ROLE: "admin"             # erster Signup wird direkt Admin
+      WEBUI_AUTH: "true"
+
+      # --- TruSpace Admin Settings ---
+      WEBUI_ADMIN_EMAIL: ${ADMIN_USER_EMAIL}
+      WEBUI_ADMIN_PASSWORD: ${ADMIN_USER_PASSWORD}
       ADMIN_USER_EMAIL: ${ADMIN_USER_EMAIL}
-      ENABLE_WEBSOCKET_SUPPORT: false
       ADMIN_USER_PASSWORD: ${ADMIN_USER_PASSWORD}
-      SPACE_ID: "true" # truthy value allows setting of admin credentials ^^^
-      OLLAMA_BASE_URL: http://localhost:11434 # hard-coded, because ollama is bundled in :ollama image
+      SPACE_ID: "truspace"
+      SPACE_HOST: "localhost"
+
+      # -- Ollama Model Settings ---
+      OLLAMA_BASE_URL: http://localhost:11434
+      ENABLE_WEBSOCKET_SUPPORT: "false"
       CORS_ALLOW_ORIGIN: ${OI_CORS_ALLOW_ORIGIN}
       GLOBAL_LOG_LEVEL: DEBUG
+
     volumes:
       - ./volumes/open-webui:/app/backend/data
       - ./volumes/ollama:/root/.ollama/models
