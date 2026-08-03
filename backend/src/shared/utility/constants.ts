@@ -1,6 +1,6 @@
 export const USER_STATUS = {
-  active: "active",
-  inactive: "inactive",
+  active: 'active',
+  inactive: 'inactive',
 };
 
-export const CONFIRMATION_EMAIL_EXPIRATION = 1200; // seconds
+export const CONFIRMATION_EMAIL_EXPIRATION = 3600; // seconds

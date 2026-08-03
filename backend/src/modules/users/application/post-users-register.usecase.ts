@@ -52,7 +52,7 @@ export async function postUsersRegister(
   const passwordHash = await hashPassword(password);
   const token = config.registerUsersAsInactive
     ? jwt.sign({ email: email }, Buffer.from(config.jwt.secret), {
-        expiresIn: CONFIRMATION_EMAIL_EXPIRATION, // 20 minutes
+        expiresIn: CONFIRMATION_EMAIL_EXPIRATION, // 60 minutes
       })
     : '';
 

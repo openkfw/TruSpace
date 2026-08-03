@@ -16,6 +16,7 @@ export function catchAllErrorsMiddleware(err: unknown, req: Request, res: Respon
       error: err.code,
       message: err.message,
       requestId,
+      ...(err.details ? { details: err.details } : {}),
     });
   }
 
