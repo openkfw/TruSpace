@@ -9,8 +9,10 @@ import { config } from '../../../shared/config/config';
 import logger from '../../../shared/config/winston';
 import { sendEmail } from '../../../shared/mailing/mailing';
 import { registrationConfirmation } from '../../../shared/mailing/mailingConstants';
-import { BadRequestError, HttpError, InternalServerError } from '../../../shared/errors';
+import { HttpError, InternalServerError } from '../../../shared/errors';
 import { CONFIRMATION_EMAIL_EXPIRATION } from '../../../shared/utility/constants';
+import { TokenExpiredError } from '../errors/token-expired.error';
+import { TokenInvalidError } from '../errors/token-invalid.error';
 import { UserNotFoundError } from '../errors/user-not-found.error';
 
 export async function postUsersConfirmRegistration(token: string, lang: string, confirmationLink: string) {
@@ -19,7 +21,7 @@ export async function postUsersConfirmRegistration(token: string, lang: string, 
     const user = await findUserByTokenDb(token);
 
     if (!user) {
-      throw new BadRequestError('Invalid token');
+      throw new TokenInvalidError();
     }
 
     const activatedUsers = await activateUserDb(user.id);
@@ -41,7 +43,7 @@ export async function postUsersConfirmRegistration(token: string, lang: string, 
         const user = await findUserByTokenDb(token);
 
         if (!user) {
-          throw new BadRequestError('Invalid token');
+          throw new TokenInvalidError();
         }
 
         const newToken = jwt.sign({ email: user.email }, Buffer.from(config.jwt.secret), {
@@ -73,7 +75,10 @@ export async function postUsersConfirmRegistration(token: string, lang: string, 
         await sendEmail(user.email, registrationConfirmation[lang].subject, htmlTemplateToSend);
         logger.info('New confirmation email sent');
 
-        throw new BadRequestError('Expired token');
+        // Signal to the client that a fresh link is already on its way,
+        // so the UI can tell the user to check their inbox instead of
+        // showing a bare "something went wrong" error.
+        throw new TokenExpiredError({ emailResent: true });
       } catch (err) {
         logger.error(err);
         if (err instanceof HttpError) {
@@ -84,7 +89,7 @@ export async function postUsersConfirmRegistration(token: string, lang: string, 
     }
 
     if (error instanceof jwt.JsonWebTokenError) {
-      throw new BadRequestError('Invalid token', error);
+      throw new TokenInvalidError();
     }
 
     if (error instanceof HttpError) {
