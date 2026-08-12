@@ -360,6 +360,7 @@
     "invalidResponse": "Respuesta no válida",
     "messageError": "Error al agregar el mensaje",
     "noMessage": "No hay mensajes disponibles.",
+    "messageUnavailable": "Este mensaje no se pudo cargar.",
     "documentNote": "Agregar nota de documento",
     "secondaryMessage": "El mensaje de chat está vinculado a un punto en el documento.",
     "messagePlaceholder": "Introduce un mensaje...",

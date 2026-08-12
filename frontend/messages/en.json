@@ -360,6 +360,7 @@
     "invalidResponse": "Invalid response",
     "messageError": "Adding message failed",
     "noMessage": "No messages available.",
+    "messageUnavailable": "This message could not be loaded.",
     "documentNote": "Adding document note",
     "secondaryMessage": "Chat message will be linked to point in document",
     "messagePlaceholder": "Type a message...",

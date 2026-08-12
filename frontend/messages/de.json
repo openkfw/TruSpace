@@ -360,6 +360,7 @@
     "invalidResponse": "Ungültige Antwort",
     "messageError": "Das Hinzufügen der Nachricht ist fehlgeschlagen",
     "noMessage": "Keine Nachrichten vorhanden.",
+    "messageUnavailable": "Diese Nachricht konnte nicht geladen werden.",
     "documentNote": "Dokumentnotiz hinzufügen",
     "secondaryMessage": "Chat-Nachricht wird mit Punkt im Dokument verknüpft",
     "messagePlaceholder": "Gib eine Nachricht ein...",
