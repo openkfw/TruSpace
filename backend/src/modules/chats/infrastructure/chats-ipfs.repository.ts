@@ -1,4 +1,3 @@
-
 import logger from '../../../shared/config/winston';
 import { buildMetadataQuery, createJsonFormData } from '../../../shared/infrastructure/ipfs/core/helpers';
 import { transformPinToChatLike, transformPinToChatMessage } from '../../../shared/infrastructure/ipfs/core/mappers';
@@ -14,8 +13,17 @@ async function fetchLocalAllocations(primaryFilter?: { key: string; value: strin
   const data = res.data;
   let result: AllocationPin[] = [];
   if (typeof data === 'string') {
-    result = data.split('\n').filter((l) => l.trim().length > 0)
-      .map((l) => { try { return JSON.parse(l); } catch(_e) { console.log(_e);return null; } })
+    result = data
+      .split('\n')
+      .filter((l) => l.trim().length > 0)
+      .map((l) => {
+        try {
+          return JSON.parse(l);
+        } catch (_e) {
+          console.log(_e);
+          return null;
+        }
+      })
       .filter(Boolean);
   } else if (Array.isArray(data)) {
     result = data;
@@ -23,8 +31,7 @@ async function fetchLocalAllocations(primaryFilter?: { key: string; value: strin
     result = data.allocations;
   }
   if (primaryFilter) {
-    result = result.filter((a) =>
-      a.metadata && a.metadata[primaryFilter.key] === primaryFilter.value);
+    result = result.filter((a) => a.metadata && a.metadata[primaryFilter.key] === primaryFilter.value);
   }
   return result;
 }
@@ -35,7 +42,7 @@ class ChatsIpfsRepository {
       const messageMeta = { ...message.meta };
       delete messageMeta.creatorName;
       const form = createJsonFormData({ ...message, meta: messageMeta });
-      const metadataQuery = buildMetadataQuery(messageMeta);
+      const metadataQuery = buildMetadataQuery(messageMeta, { encodeValueKeys: ['data'] }); //special chars otherwise pollute the ipfs file
       const clusterResp = await clusterClient.post('/add?stream-channels=false' + metadataQuery, form, {
         headers: { ...form.getHeaders() },
       });
@@ -67,9 +74,7 @@ class ChatsIpfsRepository {
   async getMessageByChatId(chatId: string): Promise<ChatMessage | null> {
     try {
       const allocations = await fetchLocalAllocations({ key: 'type', value: 'chat' });
-      const match =
-        allocations.find((a) => a.metadata?.chatId === chatId) ??
-        allocations.find((a) => a.cid === chatId);
+      const match = allocations.find((a) => a.metadata?.chatId === chatId) ?? allocations.find((a) => a.cid === chatId);
       if (!match) return null;
       const [enriched] = await this.#enrichAndSortMessages([match]);
       return enriched ?? null;
@@ -186,18 +191,12 @@ class ChatsIpfsRepository {
    * Find the (at most one) like a given user has placed on a chat. Used to
    * make the like endpoints idempotent and to support unlike.
    */
-  async findUserLikeForChat(
-    chatId: string,
-    userId: string,
-    nodeId: string,
-  ): Promise<ChatLike | null> {
+  async findUserLikeForChat(chatId: string, userId: string, nodeId: string): Promise<ChatLike | null> {
     try {
       const allocations = await fetchLocalAllocations({ key: 'type', value: 'chatLike' });
       const match = allocations.find(
         (a) =>
-          a.metadata?.chatId === chatId &&
-          a.metadata?.creatorUserId === userId &&
-          a.metadata?.creatorNodeId === nodeId,
+          a.metadata?.chatId === chatId && a.metadata?.creatorUserId === userId && a.metadata?.creatorNodeId === nodeId,
       );
       if (!match) return null;
       const [enriched] = await this.#enrichLikes([match]);
