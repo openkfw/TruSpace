@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -69,7 +69,6 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-
   #####################################################################
   # SECURITY SCAN USING TRIVY AGAINST THE STAGING IMAGES
   #####################################################################
@@ -94,7 +93,7 @@ jobs:
           category: trivy-backend
 
       - name: Upload backend scan as artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: backend-trivy-report
           path: backend-trivy-results.sarif
@@ -115,11 +114,10 @@ jobs:
           category: trivy-frontend
 
       - name: Upload frontend scan as artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: frontend-trivy-report
           path: frontend-trivy-results.sarif
-
 
   #####################################################################
   # FAILURE → CLEANUP STAGING IMAGES
@@ -142,7 +140,6 @@ jobs:
           docker buildx imagetools rm ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ env.STAGING_TAG }} || true
           docker buildx imagetools rm ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ env.STAGING_TAG }} || true
 
-
   #####################################################################
   # SUCCESS → RETAG & PUSH ALL FINAL TAGS
   #####################################################################
@@ -153,7 +150,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3

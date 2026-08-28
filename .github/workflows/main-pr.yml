@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: restrict_pr
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Fetch main branch
         run: git fetch origin main
@@ -68,12 +68,12 @@ jobs:
     runs-on: ubuntu-latest
     needs: new_version
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version-file: '.nvmrc'
+          node-version-file: ".nvmrc"
 
       - name: Install backend dependencies
         working-directory: ./backend
@@ -88,12 +88,12 @@ jobs:
     runs-on: ubuntu-latest
     needs: new_version
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version-file: '.nvmrc'
+          node-version-file: ".nvmrc"
 
       - name: Install frontend dependencies
         working-directory: ./frontend
