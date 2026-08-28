@@ -3,14 +3,11 @@
 # B) Make sure that release version (VERSION file) is different than on 'main' branch but aligned with version in publiccode.yml
 # C) Scan for npm vulnerabilities
 # parallel to A) In codeql.yml, run code scanning
-
 name: Protect PRs to `main`
-
 on:
   pull_request:
     branches:
       - main
-
 jobs:
   restrict_pr:
     name: Ensure PRs come from `dev`
@@ -24,25 +21,22 @@ jobs:
           else
             echo "✅ PR is from `dev`."
           fi
-
   new_version:
     name: Ensure release version is updated
     runs-on: ubuntu-latest
     needs: restrict_pr
     steps:
       - uses: actions/checkout@v5
-
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
       - name: Fetch main branch
         run: git fetch origin main
-
       - name: Read VERSION from main
         id: main_version
         run: echo "MAIN_VERSION=$(git show origin/main:VERSION)" >> $GITHUB_OUTPUT
-
       - name: Read VERSION from PR branch
         id: pr_version
         run: echo "PR_VERSION=$(cat VERSION)" >> $GITHUB_OUTPUT
-
       - name: Compare versions
         run: |
           if [ "${{ steps.pr_version.outputs.PR_VERSION }}" = "${{ steps.main_version.outputs.MAIN_VERSION }}" ]; then
@@ -51,7 +45,6 @@ jobs:
           else
             echo "✅ Release version has been updated in PR."
           fi
-
       - name: Make sure version in publiccode.yml matches VERSION file
         run: |
           PR_VERSION=$(cat VERSION)
@@ -62,43 +55,39 @@ jobs:
           else
             echo "✅ Version in publiccode.yml matches VERSION file."
           fi
-
   npm_audit_backend:
     name: Scan backend for npm vulnerabilities
     runs-on: ubuntu-latest
     needs: new_version
     steps:
       - uses: actions/checkout@v5
-
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
       - name: Set up Node.js
         uses: actions/setup-node@v5
         with:
           node-version-file: ".nvmrc"
-
       - name: Install backend dependencies
         working-directory: ./backend
         run: npm ci
-
       - name: Audit backend
         working-directory: ./backend
         run: npm audit --audit-level=high
-
   npm_audit_frontend:
     name: Scan frontend for npm vulnerabilities
     runs-on: ubuntu-latest
     needs: new_version
     steps:
       - uses: actions/checkout@v5
-
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
       - name: Set up Node.js
         uses: actions/setup-node@v5
         with:
           node-version-file: ".nvmrc"
-
       - name: Install frontend dependencies
         working-directory: ./frontend
         run: npm ci
-
       - name: Audit frontend
         working-directory: ./frontend
         run: npm audit --audit-level=high
