@@ -62,7 +62,7 @@ export function transformPinToChatMessage(pin: Pin): ChatMessage {
       timestamp: pin.meta.timestamp,
       docId: pin.meta.docId,
       perspectiveType: pin.meta.perspectiveType,
-      data: pin.meta.data,
+      data: pin.meta.data ? decodeURIComponent(pin.meta.data) : pin.meta.data,
       creatorNodeId: pin.meta.creatorNodeId || '',
       creatorUserId: pin.meta.creatorUserId || '',
       creatorName: pin.meta.creatorName || pin.meta.creator || '',
@@ -159,7 +159,9 @@ export function transformPinToGeneralWorkspaceItem(pin: Pin): GeneralTemplateOfI
 export function pinsToUniqueDocuments(pins: DocumentPinRequest[]): Document[] {
   return pins
     .sort((a: DocumentPinRequest, b: DocumentPinRequest) => Number(b.pin.meta.timestamp) - Number(a.pin.meta.timestamp))
-    .filter((value, index, allPins) => allPins.findIndex((pin) => pin.pin.meta.docId === value.pin.meta.docId) === index)
+    .filter(
+      (value, index, allPins) => allPins.findIndex((pin) => pin.pin.meta.docId === value.pin.meta.docId) === index,
+    )
     .map((element) => transformPinToDocument(element.pin));
 }
 

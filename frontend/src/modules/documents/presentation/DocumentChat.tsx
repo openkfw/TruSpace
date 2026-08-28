@@ -82,6 +82,43 @@ function toSortKey(timestamp: string | number | undefined): number {
    return Number.isFinite(parsed) ? parsed : 0;
 }
 
+/**
+ * Shape of the decoded `chat.meta.data` payload. Kept partial/optional
+ * everywhere because a message that failed to parse falls back to `{}`.
+ */
+interface ChatMessageData {
+   documentCid?: string;
+   message?: string;
+   documentPageNumber?: number;
+   position?: { x: number; y: number };
+   [key: string]: unknown;
+}
+
+/**
+ * `chat.meta.data` is a JSON string produced client-side and round-tripped
+ * through IPFS cluster pin metadata. If it was ever stored unencoded (e.g. a
+ * message containing raw double quotes before the metadata-encoding fix),
+ * the stored value can come back truncated/malformed. Parsing that directly
+ * during render would throw synchronously and take down the whole document
+ * page - not just this one message - since there's no error boundary around
+ * the timeline. Parse defensively instead so a single bad message just
+ * renders as unavailable.
+ */
+function safeParseChatData(raw: string): {
+   data: ChatMessageData;
+   corrupted: boolean;
+} {
+   try {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === "object") {
+         return { data: parsed as ChatMessageData, corrupted: false };
+      }
+      return { data: {}, corrupted: true };
+   } catch {
+      return { data: {}, corrupted: true };
+   }
+}
+
 export default function DocumentChat({
    cid,
    docId,
@@ -260,20 +297,26 @@ export default function DocumentChat({
                   }
 
                   const chat = item.chat;
-                  const messageData = JSON.parse(chat.meta.data);
-                  const handleEdit = chat.isOwnMessage
-                     ? async (newMessage: string) => {
-                          await editChat(
-                             chat.cid,
-                             { ...messageData, message: newMessage },
-                             translations("messageError")
-                          );
-                          window.setTimeout(() => {
-                             mutateChats();
-                             mutateEvents();
-                          }, 500);
-                       }
-                     : undefined;
+                  const { data: messageData, corrupted } = safeParseChatData(
+                     chat.meta.data
+                  );
+                  // Editing re-sends `messageData` merged with the new text -
+                  // if the original couldn't be parsed there's nothing valid
+                  // to merge into, so don't offer edit for this message.
+                  const handleEdit =
+                     chat.isOwnMessage && !corrupted
+                        ? async (newMessage: string) => {
+                             await editChat(
+                                chat.cid,
+                                { ...messageData, message: newMessage },
+                                translations("messageError")
+                             );
+                             window.setTimeout(() => {
+                                mutateChats();
+                                mutateEvents();
+                             }, 500);
+                          }
+                        : undefined;
                   // Likes reference the stable `chatId` (UUID preserved
                   // across edits) so reactions survive message edits. Older
                   // chats fall back to their cid server-side; mirror that
@@ -334,16 +377,26 @@ export default function DocumentChat({
                            chat.isLikedByCurrentUser
                         )}
                         onToggleLike={handleToggleLike}
-                        message={messageData.message}
+                        message={
+                           corrupted
+                              ? translations("messageUnavailable")
+                              : (messageData.message ?? "")
+                        }
                         onInfoPanelIconClick={
+                           !corrupted &&
                            messageData?.documentCid === cid &&
                            messageData?.documentPageNumber &&
                            messageData?.position
                               ? () => {
                                    setDocumentPageNumber(
-                                      messageData.documentPageNumber
+                                      messageData.documentPageNumber as number
                                    );
-                                   displayNote(messageData.position);
+                                   displayNote(
+                                      messageData.position as {
+                                         x: number;
+                                         y: number;
+                                      }
+                                   );
                                 }
                               : null
                         }
