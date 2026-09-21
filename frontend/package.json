@@ -44,7 +44,7 @@
     "@tiptap/extension-text-style": "^2.11.5",
     "@tiptap/extension-underline": "^2.11.5",
     "@tiptap/react": "^2.11.5",
-    "@tiptap/starter-kit": "^3.31.3",
+    "@tiptap/starter-kit": "^2.11.5",
     "@viz-js/viz": "^3.27.0",
     "axios": "^1.8.2",
     "class-variance-authority": "^0.7.1",
