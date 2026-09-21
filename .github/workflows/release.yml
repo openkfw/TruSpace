@@ -1,0 +1,202 @@
+# Single, linear release pipeline for pushes to 'main'.
+#
+# build -> scan -> promote (retag + optional GitHub release) -> cleanup
+#
+# A push to main only produces a versioned image + GitHub release when
+# VERSION was actually bumped (i.e. that tag doesn't exist yet). Any other
+# push to main (docs, workflow tweaks, hotfix without a version bump) just
+# refreshes the `main` / `latest` image tags and skips release creation —
+# it no longer fails.
+
+name: Release
+
+on:
+  push:
+    branches: ["main"]
+
+env:
+  REGISTRY: docker.io
+  BACKEND_IMAGE_NAME: kfwopensource/truspace-backend
+  FRONTEND_IMAGE_NAME: kfwopensource/truspace-frontend
+  STAGING_TAG: scan-${{ github.sha }}
+
+permissions:
+  contents: write
+  security-events: write
+
+jobs:
+  #####################################################################
+  # BUILD MULTIARCH STAGING IMAGES
+  #####################################################################
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64,amd64
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Backend - Build & Push (staging)
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ env.STAGING_TAG }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Frontend - Build & Push (staging)
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ env.STAGING_TAG }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  #####################################################################
+  # SECURITY SCAN USING TRIVY AGAINST THE STAGING IMAGES
+  #####################################################################
+  scan:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Scan Backend with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ env.STAGING_TAG }}
+          format: sarif
+          output: backend-trivy-results.sarif
+
+      - name: Upload backend scan to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: backend-trivy-results.sarif
+          category: trivy-backend
+
+      - name: Upload backend scan as artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: backend-trivy-report
+          path: backend-trivy-results.sarif
+
+      - name: Scan Frontend with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ env.STAGING_TAG }}
+          format: sarif
+          output: frontend-trivy-results.sarif
+
+      - name: Upload frontend scan to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: frontend-trivy-results.sarif
+          category: trivy-frontend
+
+      - name: Upload frontend scan as artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: frontend-trivy-report
+          path: frontend-trivy-results.sarif
+
+  #####################################################################
+  # PROMOTE STAGING IMAGES + CREATE RELEASE (only if VERSION is new)
+  #####################################################################
+  release:
+    needs: scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Determine version and whether this is a new release
+        id: version
+        run: |
+          VERSION_TAG=$(tr -d '[:space:]' < VERSION)
+          echo "version_tag=$VERSION_TAG" >> "$GITHUB_OUTPUT"
+          if git rev-parse "refs/tags/$VERSION_TAG" >/dev/null 2>&1 || \
+             git ls-remote --tags origin "refs/tags/$VERSION_TAG" | grep -q .; then
+            echo "is_release=false" >> "$GITHUB_OUTPUT"
+            echo "VERSION ($VERSION_TAG) already released, refreshing main/latest tags only."
+          else
+            echo "is_release=true" >> "$GITHUB_OUTPUT"
+            echo "VERSION ($VERSION_TAG) is new, promoting versioned tags and creating a release."
+          fi
+
+      - name: Promote Backend Tags
+        run: |
+          TAGS="main latest"
+          if [ "${{ steps.version.outputs.is_release }}" = "true" ]; then
+            TAGS="$TAGS ${{ steps.version.outputs.version_tag }}"
+          fi
+          for tag in $TAGS; do
+            docker buildx imagetools create \
+              -t "${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:$tag" \
+              ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ env.STAGING_TAG }}
+          done
+
+      - name: Promote Frontend Tags
+        run: |
+          TAGS="main latest"
+          if [ "${{ steps.version.outputs.is_release }}" = "true" ]; then
+            TAGS="$TAGS ${{ steps.version.outputs.version_tag }}"
+          fi
+          for tag in $TAGS; do
+            docker buildx imagetools create \
+              -t "${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:$tag" \
+              ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ env.STAGING_TAG }}
+          done
+
+      - name: Create GitHub Release
+        if: steps.version.outputs.is_release == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.version_tag }}
+          name: Release ${{ steps.version.outputs.version_tag }}
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  #####################################################################
+  # ALWAYS CLEAN UP THE STAGING IMAGES
+  #####################################################################
+  cleanup:
+    needs: [build, release]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Remove staging images
+        run: |
+          docker buildx imagetools rm ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ env.STAGING_TAG }} || true
+          docker buildx imagetools rm ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ env.STAGING_TAG }} || true
